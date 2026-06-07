@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { MatchScheduleCard } from "@/components/marketing/match-schedule-card";
 import { PlayerAvatar } from "@/components/ui/player-avatar";
+import { toast } from "@/components/ui/toast";
 import { Skeleton } from "@/components/dashboard/skeletons";
 import {
   formatKickoffDateTime,
@@ -27,9 +29,11 @@ interface PartidosDetailProps {
 }
 
 export function PartidosDetail({ matchId }: PartidosDetailProps) {
+  const router = useRouter();
   const [match, setMatch] = useState<Match | null>(null);
   const [stats, setStats] = useState<(MatchStat & { players: Player })[]>([]);
   const [loading, setLoading] = useState(true);
+  const [cancelling, setCancelling] = useState(false);
 
   const loadDetail = useCallback(async () => {
     setLoading(true);
@@ -54,6 +58,33 @@ export function PartidosDetail({ matchId }: PartidosDetailProps) {
   useEffect(() => {
     loadDetail();
   }, [loadDetail]);
+
+  async function handleCancelScheduled() {
+    if (!match) return;
+
+    const confirmed = window.confirm(
+      "¿Cancelar este partido programado? Desaparecerá del calendario público.",
+    );
+    if (!confirmed) return;
+
+    setCancelling(true);
+
+    const { error } = await supabase
+      .from("matches")
+      .update({ status: "cancelled" })
+      .eq("id", match.id);
+
+    setCancelling(false);
+
+    if (error) {
+      toast.error("No se pudo cancelar el partido.");
+      return;
+    }
+
+    toast.success("Partido cancelado.");
+    router.push("/dashboard/partidos");
+    router.refresh();
+  }
 
   if (loading) {
     return (
@@ -107,7 +138,17 @@ export function PartidosDetail({ matchId }: PartidosDetailProps) {
           </p>
         </div>
       ) : (
-        <MatchScheduleCard match={match} showCaptureLink variant="light" />
+        <div className="space-y-3">
+          <MatchScheduleCard match={match} showCaptureLink variant="light" />
+          <button
+            type="button"
+            onClick={handleCancelScheduled}
+            disabled={cancelling}
+            className="text-sm font-medium text-red-600 hover:underline disabled:opacity-50"
+          >
+            {cancelling ? "Cancelando..." : "Cancelar partido programado"}
+          </button>
+        </div>
       )}
 
       <div className="rounded-2xl bg-white shadow-sm">

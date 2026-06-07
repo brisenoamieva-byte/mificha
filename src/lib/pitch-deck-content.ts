@@ -47,8 +47,8 @@ export const PITCH_SLIDES: PitchSlide[] = [
     title: "Tres pasos, un ciclo que se repite cada semana",
     bullets: [
       "1. Registras plantel (Excel o manual) · fichas privadas por defecto.",
-      "2. Tras cada partido: rival, marcador y stats por jugador (goles, minutos).",
-      "3. Passport Score sube · compartes QR o WhatsApp · padre y scout ven la ficha.",
+      "2. Publicas calendario: rival, fecha, hora y sede para padres y scouts.",
+      "3. Tras cada partido capturas stats · Passport sube · compartes QR o WhatsApp.",
     ],
   },
   {
@@ -56,7 +56,7 @@ export const PITCH_SLIDES: PitchSlide[] = [
     kicker: "Para tu academia",
     title: "Panel operativo, no otro Excel",
     bullets: [
-      "Plantel, temporadas y partidos en un solo lugar.",
+      "Plantel, temporadas y calendario público con hora y sede.",
       "Reporte comparativo: jugador vs promedio del plantel.",
       "Marcador semanal interno y competencia entre categorías.",
       "QR imprimible para la cancha — onboarding del padre sin fricción.",
@@ -68,6 +68,7 @@ export const PITCH_SLIDES: PitchSlide[] = [
     kicker: "Para padres",
     title: "Cero fricción = más engagement",
     bullets: [
+      "Consulta calendario con hora y sede en la landing de la academia.",
       "Escanean QR en la cancha — sin descargar app ni crear cuenta.",
       "Ven Passport Score, stats de temporada e historial verificado.",
       "Comparten la ficha en WhatsApp con familia o visorías.",

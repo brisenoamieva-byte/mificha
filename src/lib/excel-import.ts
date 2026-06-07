@@ -38,6 +38,8 @@ export interface ParsedPlayerRow {
   jerseyNumber: number | null;
   heightCm: number | null;
   weightKg: number | null;
+  guardianName: string | null;
+  guardianEmail: string | null;
 }
 
 export interface InvalidPlayerRow {
@@ -62,6 +64,8 @@ export interface PlayerImportInsert {
   jersey_number: number | null;
   height_cm: number | null;
   weight_kg: number | null;
+  guardian_name: string | null;
+  guardian_email: string | null;
   academy_id: string;
   qr_code: string;
   is_public: boolean;
@@ -92,6 +96,13 @@ function parseOptionalNumber(value: string, min: number, max: number) {
   const parsed = Number(value);
   if (!Number.isFinite(parsed) || parsed < min || parsed > max) return null;
   return Math.round(parsed);
+}
+
+function parseOptionalEmail(value: string) {
+  if (!value) return null;
+  const email = value.trim().toLowerCase();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return null;
+  return email;
 }
 
 function parseBirthDate(raw: string): string | null {
@@ -158,6 +169,14 @@ export function parsePlayerImportFile(buffer: ArrayBuffer): PlayerImportPreview 
     const jerseyRaw = getCell(row, ["numero", "playera", "jersey"]);
     const heightRaw = getCell(row, ["estatura", "height", "altura"]);
     const weightRaw = getCell(row, ["peso", "weight"]);
+    const guardianName = getCell(row, ["tutor", "padre", "madre", "guardian name"]);
+    const guardianEmailRaw = getCell(row, [
+      "email tutor",
+      "email padre",
+      "correo tutor",
+      "correo padre",
+      "guardian email",
+    ]);
 
     const preview = buildPreviewLabel(firstName, lastName);
 
@@ -194,6 +213,8 @@ export function parsePlayerImportFile(buffer: ArrayBuffer): PlayerImportPreview 
       jerseyNumber: parseOptionalNumber(jerseyRaw, 1, 99),
       heightCm: parseOptionalNumber(heightRaw, 100, 220),
       weightKg: parseOptionalNumber(weightRaw, 30, 120),
+      guardianName: guardianName || null,
+      guardianEmail: parseOptionalEmail(guardianEmailRaw),
     });
   });
 
@@ -225,6 +246,8 @@ export function buildPlayerImportInserts(
       jersey_number: row.jerseyNumber,
       height_cm: row.heightCm,
       weight_kg: row.weightKg,
+      guardian_name: row.guardianName,
+      guardian_email: row.guardianEmail,
       academy_id: academyId,
       qr_code: buildPublicPlayerUrl(slug),
       is_public: false,
@@ -278,6 +301,8 @@ export function downloadPlayerImportTemplate() {
       numero: 9,
       estatura: 155,
       peso: 45,
+      "nombre tutor": "María Hernández",
+      "email tutor": "maria@email.com",
     },
     {
       nombre: "Mateo",
@@ -288,6 +313,8 @@ export function downloadPlayerImportTemplate() {
       numero: 8,
       estatura: 162,
       peso: 48,
+      "nombre tutor": "Carlos López",
+      "email tutor": "carlos@email.com",
     },
   ];
 
@@ -301,6 +328,8 @@ export function downloadPlayerImportTemplate() {
     { wch: 8 },
     { wch: 10 },
     { wch: 8 },
+    { wch: 18 },
+    { wch: 24 },
   ];
 
   const workbook = XLSX.utils.book_new();

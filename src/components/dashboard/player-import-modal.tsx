@@ -104,8 +104,8 @@ export function PlayerImportModal({
                 Importar plantel
               </Dialog.Title>
               <Dialog.Description className="mt-1 text-sm text-slate-500">
-                Sube tu roster completo al inicio de temporada. Las fichas se
-                crean privadas; activa consentimiento después desde cada jugador.
+                Sube tu roster completo al inicio de temporada. Opcional: columnas
+                «nombre tutor» y «email tutor» para reportes a padres.
               </Dialog.Description>
             </div>
             <Dialog.Close className="rounded-lg p-2 text-slate-500 hover:bg-slate-100">

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Award, MapPin, Shield, Trophy, Users } from "lucide-react";
+import { Award, ExternalLink, MapPin, Shield, Trophy, Users } from "lucide-react";
 import { AcademyScheduleSection } from "@/components/marketing/match-schedule-card";
 import { BrandLogoLink } from "@/components/ui/brand-logo";
 import { getPositionLabel } from "@/lib/dashboard-utils";
@@ -110,6 +110,33 @@ export function AcademyLanding({ data }: AcademyLandingProps) {
         academySlug={academy.slug}
         variant="dark"
       />
+
+      {academy.league_calendar_url?.trim() ? (
+        <section className="border-y border-slate-800 bg-slate-950/80">
+          <div className="mx-auto flex max-w-6xl flex-col gap-4 px-6 py-10 sm:flex-row sm:items-center sm:justify-between sm:px-10">
+            <div>
+              <p className="text-sm font-bold uppercase tracking-[0.2em] text-slate-500">
+                Liga oficial
+              </p>
+              <h2 className="mt-2 text-xl font-bold text-white">
+                {academy.league_name?.trim() || "Calendario de competición"}
+              </h2>
+              <p className="mt-2 text-sm text-slate-400">
+                Resultados y clasificación institucionales de tu federación o liga.
+              </p>
+            </div>
+            <a
+              href={academy.league_calendar_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-full border border-slate-700 px-5 py-3 text-sm font-semibold text-white hover:bg-slate-900"
+            >
+              Ver calendario oficial
+              <ExternalLink className="h-4 w-4" />
+            </a>
+          </div>
+        </section>
+      ) : null}
 
       <section className="mx-auto max-w-6xl px-6 py-20 sm:px-10">
         <div className="flex items-end justify-between gap-4">

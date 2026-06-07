@@ -12,7 +12,9 @@ import type { Academy } from "@/types/database";
 interface OnboardingProgress {
   profileReady: boolean;
   hasPlayers: boolean;
-  hasMatches: boolean;
+  hasScheduledMatch: boolean;
+  hasCompletedMatch: boolean;
+  hasGuardianEmails: boolean;
   hasShareableFicha: boolean;
   hasDiscoverablePlayer: boolean;
 }
@@ -35,41 +37,34 @@ export function AcademyOnboardingPanel() {
 
     setLoading(true);
 
-    const [playersResult, seasonResult] = await Promise.all([
+    const [playersResult, scheduledResult, completedResult] = await Promise.all([
       supabase
         .from("players")
-        .select("is_public, public_consent_at, is_discoverable")
+        .select("is_public, public_consent_at, is_discoverable, guardian_email")
         .eq("academy_id", academy.id),
       supabase
-        .from("seasons")
-        .select("id")
+        .from("matches")
+        .select("*", { count: "exact", head: true })
         .eq("academy_id", academy.id)
-        .eq("is_active", true)
-        .maybeSingle(),
+        .in("status", ["scheduled", "postponed"]),
+      supabase
+        .from("matches")
+        .select("*", { count: "exact", head: true })
+        .eq("academy_id", academy.id)
+        .eq("status", "completed"),
     ]);
 
     const players = playersResult.data ?? [];
-    let matchCount = 0;
-
-    if (seasonResult.data?.id) {
-      const { count } = await supabase
-        .from("matches")
-        .select("*", { count: "exact", head: true })
-        .eq("season_id", seasonResult.data.id);
-      matchCount = count ?? 0;
-    }
 
     setProgress({
       profileReady: isProfileReady(academy),
       hasPlayers: players.length > 0,
-      hasMatches: matchCount > 0,
-      hasShareableFicha: players.some((player) =>
-        hasPublicConsent(player),
-      ),
+      hasScheduledMatch: (scheduledResult.count ?? 0) > 0,
+      hasCompletedMatch: (completedResult.count ?? 0) > 0,
+      hasGuardianEmails: players.some((player) => player.guardian_email?.trim()),
+      hasShareableFicha: players.some((player) => hasPublicConsent(player)),
       hasDiscoverablePlayer: players.some(
-        (player) =>
-          player.is_discoverable &&
-          hasPublicConsent(player),
+        (player) => player.is_discoverable && hasPublicConsent(player),
       ),
     });
     setLoading(false);
@@ -95,17 +90,33 @@ export function AcademyOnboardingPanel() {
         id: "plantel",
         done: progress.hasPlayers,
         title: "Carga tu plantel",
-        description: "Importa Excel o agrega jugadores uno a uno.",
+        description: "Importa Excel (con email del tutor) o agrega jugadores manualmente.",
         href: "/dashboard/plantel",
         cta: "Ir a plantel",
       },
       {
+        id: "calendar",
+        done: progress.hasScheduledMatch,
+        title: "Publica tu calendario",
+        description: "Fecha, hora y sede visibles para padres y scouts.",
+        href: "/dashboard/partidos/programar",
+        cta: "Programar partido",
+      },
+      {
         id: "match",
-        done: progress.hasMatches,
-        title: "Registra tu primer partido",
-        description: "Activa stats, Passport y el marcador semanal.",
+        done: progress.hasCompletedMatch,
+        title: "Captura stats post-partido",
+        description: "Activa Passport Score y el marcador semanal.",
         href: "/dashboard/partidos/nuevo",
-        cta: "Nuevo partido",
+        cta: "Registrar resultado",
+      },
+      {
+        id: "guardians",
+        done: progress.hasGuardianEmails,
+        title: "Agrega contacto del tutor",
+        description: "Email del padre/madre para reportes verificados.",
+        href: "/dashboard/plantel",
+        cta: "Editar jugadores",
       },
       {
         id: "share",

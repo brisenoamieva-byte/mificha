@@ -106,6 +106,22 @@ curl -X POST http://localhost:3000/api/seed \
 
 Crea la academia **Academia Norteños Querétaro** con 5 jugadores, 1 temporada y 2 partidos.
 
+## Checklist de lanzamiento (prod)
+
+Ejecuta **todos** los scripts SQL en Supabase (pasos 1–13) antes de pláticas con academias.
+
+En la app, valida este flujo con tu academia real:
+
+1. Configuración → perfil completo + landing pública
+2. Plantel → importar Excel o manual (+ email tutor)
+3. Partidos → **Programar partido** (fecha, hora, sede)
+4. Ver calendario en `/a/tu-slug` y `/explorar`
+5. Partidos → **Registrar resultado** + stats
+6. Plantel → consentimiento + compartir QR/WhatsApp
+7. Reportes → preview (email requiere Resend con dominio verificado)
+
+Pitch deck privado: `/interno/pitch` (solo owner).
+
 ## Rutas principales
 
 | Ruta | Descripción |

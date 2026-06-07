@@ -119,13 +119,13 @@ export function PlantelContent() {
     [players],
   );
 
-  const publicProfilesCount = useMemo(
-    () => players.filter((player) => player.is_public).length,
+  const guardiansWithEmailCount = useMemo(
+    () => players.filter((player) => player.guardian_email?.trim()).length,
     [players],
   );
 
-  const discoverableCount = useMemo(
-    () => players.filter((player) => player.is_discoverable ?? false).length,
+  const publicProfilesCount = useMemo(
+    () => players.filter((player) => player.is_public).length,
     [players],
   );
 
@@ -211,7 +211,7 @@ export function PlantelContent() {
               Primer paso: carga tu plantel
             </p>
             <ol className="mt-3 list-decimal space-y-2 pl-5 text-sm text-slate-600">
-              <li>Descarga la plantilla Excel con nombre, apellido y fecha de nacimiento.</li>
+              <li>Descarga la plantilla Excel (incluye columnas opcionales de tutor).</li>
               <li>Importa todo el roster (ideal al inicio de temporada).</li>
               <li>Filtra por generación o Sub-X y completa foto, video y consentimiento.</li>
               <li>Comparte el QR con padres; ellos no necesitan cuenta.</li>
@@ -237,9 +237,9 @@ export function PlantelContent() {
               tone="green"
             />
             <MiniStatCard
-              label="Fichas públicas"
-              value={publicProfilesCount}
-              hint={`${discoverableCount} en directorio · de ${players.length} jugadores`}
+              label="Tutores con email"
+              value={guardiansWithEmailCount}
+              hint={`${publicProfilesCount} fichas públicas · de ${players.length}`}
               tone="amber"
             />
           </div>
