@@ -142,6 +142,8 @@ export type Database = {
           is_public: boolean;
           is_discoverable: boolean;
           public_consent_at: string | null;
+          guardian_name: string | null;
+          guardian_email: string | null;
           created_at: string;
         };
         Insert: {
@@ -163,6 +165,8 @@ export type Database = {
           is_public?: boolean;
           is_discoverable?: boolean;
           public_consent_at?: string | null;
+          guardian_name?: string | null;
+          guardian_email?: string | null;
           created_at?: string;
         };
         Update: {
@@ -184,6 +188,8 @@ export type Database = {
           is_public?: boolean;
           is_discoverable?: boolean;
           public_consent_at?: string | null;
+          guardian_name?: string | null;
+          guardian_email?: string | null;
           created_at?: string;
         };
         Relationships: [

@@ -16,7 +16,7 @@ export const PITCH_SLIDES: PitchSlide[] = [
     kicker: "mificha.mx",
     title: "MiFicha",
     subtitle: "La ficha técnica digital que tu academia comparte con padres y scouts.",
-    highlight: "Lanzamiento · acceso gratuito para academias fundadoras",
+    highlight: "Lanzamiento · academias fundadoras",
   },
   {
     id: "problema",
@@ -100,26 +100,14 @@ export const PITCH_SLIDES: PitchSlide[] = [
     id: "lanzamiento",
     variant: "cta",
     kicker: "Hoy",
-    title: "Acceso completo sin costo",
+    title: "Únete como academia fundadora",
     subtitle:
-      "Estamos en fase de lanzamiento. Las academias que entren ahora construyen la red de talento verificado y quedan como fundadoras.",
+      "Estamos en fase de lanzamiento. Las academias que entren ahora construyen la red de talento verificado en México.",
     bullets: [
-      "Sin tarjeta · sin límite de jugadores en esta fase.",
+      "Acceso completo mientras armamos la red.",
       "Te acompañamos a cargar plantel y registrar el primer partido.",
-      "Cuando activemos planes, las fundadoras tendrán condiciones preferentes.",
+      "Padres y scouts usan MiFicha sin fricción desde el día uno.",
     ],
-  },
-  {
-    id: "precios",
-    kicker: "Después del lanzamiento",
-    title: "Precios pensados para México",
-    stats: [
-      { value: "$699", label: "Starter / mes" },
-      { value: "$1,199", label: "Pro / mes" },
-      { value: "$1,999", label: "Elite / mes" },
-    ],
-    subtitle:
-      "Padres y scouts siguen gratis. Solo la academia paga el SaaS cuando decida escalar.",
   },
   {
     id: "cierre",

@@ -144,13 +144,18 @@ export function ReportesContent() {
     );
   }, [logs]);
 
+  const playersWithGuardianEmail = useMemo(
+    () => players.filter((player) => player.guardian_email?.trim()),
+    [players],
+  );
+
   async function handleSendReports() {
     if (!academy || !selectedSeasonId) return;
 
     const confirmed = window.confirm(
       sentThisWeek
         ? "Ya enviaste reportes esta semana. ¿Quieres intentarlo de nuevo?"
-        : "¿Enviar reportes a todos los padres del plantel?",
+        : `¿Enviar reportes a ${playersWithGuardianEmail.length} tutor${playersWithGuardianEmail.length === 1 ? "" : "es"} con email registrado?`,
     );
 
     if (!confirmed) return;
@@ -266,7 +271,11 @@ export function ReportesContent() {
           <button
             type="button"
             onClick={handleSendReports}
-            disabled={sending || !selectedSeasonId || players.length === 0}
+            disabled={
+              sending ||
+              !selectedSeasonId ||
+              playersWithGuardianEmail.length === 0
+            }
             className={cn(
               "inline-flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-60",
               sentThisWeek
@@ -279,9 +288,16 @@ export function ReportesContent() {
           </button>
 
           <p className="text-xs leading-relaxed text-slate-500">
-            Por ahora el email del administrador de la academia se usa como proxy
-            del padre hasta que cada jugador tenga su contacto registrado.
+            {playersWithGuardianEmail.length} de {players.length} jugadores tienen
+            email del tutor en Plantel. Solo esos recibirán el reporte.
           </p>
+
+          {players.length > 0 && playersWithGuardianEmail.length === 0 ? (
+            <p className="flex items-start gap-2 rounded-lg bg-amber-50 px-3 py-2 text-xs leading-relaxed text-amber-800">
+              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+              Edita cada jugador y agrega el email del padre o tutor en Contacto.
+            </p>
+          ) : null}
         </div>
 
         <div className="rounded-2xl border border-slate-200 bg-white shadow-sm">

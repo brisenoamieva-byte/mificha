@@ -52,6 +52,7 @@ RESEND_FROM_EMAIL=MiFicha <onboarding@resend.dev>
 # App
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 NEXT_PUBLIC_APP_NAME=MiFicha
+NEXT_PUBLIC_LAUNCH_FREE=true
 
 # Desarrollo (seed + pitch privado)
 SEED_ADMIN_KEY=dev-seed-key
@@ -73,6 +74,8 @@ En **Supabase → SQL Editor**, ejecuta en este orden:
 8. `supabase/privacy-storage-rls.sql` (fotos/videos de jugadores protegidos)
 9. `supabase/passport-score-trigger.sql` (Passport Score automático tras partidos)
 10. `supabase/academy-league-fields.sql` (enlace a calendario oficial de liga)
+11. `supabase/player-guardian-contact.sql` (email del tutor para reportes)
+12. `supabase/privacy-rls-hardening.sql` (endurecer privacidad RLS — ejecutar al final)
 
 ### 4. Auth en Supabase
 

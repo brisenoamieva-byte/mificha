@@ -1,4 +1,20 @@
-import type { Academy, PlayerPosition } from "@/types/database";
+import type { PlayerPosition } from "@/types/database";
+
+export interface PublicAcademy {
+  id: string;
+  name: string;
+  slug: string;
+  logo_url: string | null;
+  description: string | null;
+  city: string | null;
+  state: string | null;
+  phone: string | null;
+  website: string | null;
+  league_name: string | null;
+  league_calendar_url: string | null;
+  primary_color: string;
+  is_certified: boolean;
+}
 
 export interface FeaturedPlayer {
   slug: string;
@@ -10,7 +26,7 @@ export interface FeaturedPlayer {
 }
 
 export interface PublicAcademyData {
-  academy: Academy;
+  academy: PublicAcademy;
   stats: {
     totalPlayers: number;
     totalSeasons: number;
@@ -18,6 +34,9 @@ export interface PublicAcademyData {
   };
   featuredPlayers: FeaturedPlayer[];
 }
+
+const PUBLIC_ACADEMY_SELECT =
+  "id,name,slug,logo_url,description,city,state,phone,website,league_name,league_calendar_url,primary_color,is_certified";
 
 function getSupabaseHeaders() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -61,7 +80,7 @@ export async function fetchPublicAcademyBySlug(
   const { url, key } = getSupabaseHeaders();
 
   const academyResponse = await fetch(
-    `${url}/rest/v1/academies?slug=eq.${encodeURIComponent(slug)}&is_public=eq.true&select=*&limit=1`,
+    `${url}/rest/v1/academies?slug=eq.${encodeURIComponent(slug)}&is_public=eq.true&select=${PUBLIC_ACADEMY_SELECT}&limit=1`,
     {
       headers: {
         apikey: key,
@@ -73,18 +92,15 @@ export async function fetchPublicAcademyBySlug(
 
   if (!academyResponse.ok) return null;
 
-  const academies = (await academyResponse.json()) as Academy[];
+  const academies = (await academyResponse.json()) as PublicAcademy[];
   const academy = academies[0];
   if (!academy) return null;
 
+  const publicPlayerFilter = `academy_id=eq.${academy.id}&is_public=eq.true&public_consent_at=not.is.null`;
+
   const [totalPlayers, totalSeasons, totalMatches, playersResponse] =
     await Promise.all([
-      fetchCount(
-        url,
-        key,
-        "players",
-        `academy_id=eq.${academy.id}&select=id`,
-      ),
+      fetchCount(url, key, "players", `${publicPlayerFilter}&select=id`),
       fetchCount(
         url,
         key,
@@ -98,7 +114,7 @@ export async function fetchPublicAcademyBySlug(
         `academy_id=eq.${academy.id}&select=id`,
       ),
       fetch(
-        `${url}/rest/v1/players?academy_id=eq.${academy.id}&is_public=eq.true&public_consent_at=not.is.null&select=slug,first_name,last_name,position,passport_score,photo_url&order=passport_score.desc&limit=12`,
+        `${url}/rest/v1/players?${publicPlayerFilter}&select=slug,first_name,last_name,position,passport_score,photo_url&order=passport_score.desc&limit=12`,
         {
           headers: {
             apikey: key,
@@ -126,7 +142,7 @@ export async function fetchPublicAcademyBySlug(
   };
 }
 
-export function getPublicAcademyDescription(academy: Academy) {
+export function getPublicAcademyDescription(academy: PublicAcademy) {
   if (academy.description?.trim()) {
     return academy.description.trim();
   }

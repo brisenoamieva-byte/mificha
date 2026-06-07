@@ -148,8 +148,7 @@ export function AcademyOnboardingPanel() {
           Activa MiFicha en tu academia
         </h2>
         <p className="mt-1 text-sm text-slate-600">
-          {completedCount} de {steps.length} pasos completados · acceso gratuito
-          durante el lanzamiento
+          {completedCount} de {steps.length} pasos completados · fase de lanzamiento
         </p>
         <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-200">
           <div

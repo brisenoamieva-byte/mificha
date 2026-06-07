@@ -112,23 +112,6 @@ export async function POST(request: Request) {
       );
     }
 
-    const { data: ownerProfile, error: ownerError } = await supabase
-      .from("profiles")
-      .select("email")
-      .eq("id", academy.owner_id)
-      .single<Pick<Profile, "email">>();
-
-    if (ownerError || !ownerProfile?.email) {
-      return NextResponse.json(
-        {
-          sent: 0,
-          failed: 0,
-          errors: ["No hay email del administrador (proxy del padre por ahora)."],
-        },
-        { status: 400 },
-      );
-    }
-
     const { data: players, error: playersError } = await supabase
       .from("players")
       .select("*, player_season_stats(*)")
@@ -180,6 +163,16 @@ export async function POST(request: Request) {
         continue;
       }
 
+      const recipientEmail = player.guardian_email?.trim().toLowerCase();
+
+      if (!recipientEmail) {
+        errors.push(
+          `${player.first_name} ${player.last_name}: agrega email del tutor en Plantel.`,
+        );
+        failed += 1;
+        continue;
+      }
+
       const seasonStats =
         player.player_season_stats?.find((item) => item.season_id === season_id) ??
         emptySeasonStats();
@@ -209,7 +202,7 @@ export async function POST(request: Request) {
 
       const { error: sendError } = await resend.emails.send({
         from: fromEmail,
-        to: ownerProfile.email,
+        to: recipientEmail,
         subject,
         html: buildReportEmailHtml(emailData),
         text: buildReportEmailText(emailData),
@@ -220,7 +213,7 @@ export async function POST(request: Request) {
       const { error: logError } = await supabase.from("email_logs").insert({
         academy_id,
         player_id: player.id,
-        recipient_email: ownerProfile.email,
+        recipient_email: recipientEmail,
         subject,
         status,
       });

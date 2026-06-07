@@ -7,10 +7,10 @@ export function isLaunchFreeMode() {
 }
 
 export const LAUNCH_COPY = {
-  badge: "Lanzamiento · acceso gratuito",
+  badge: "Lanzamiento",
   title: "MiFicha está en lanzamiento",
   description:
-    "Por ahora todas las academias tienen acceso completo sin costo. Enfócate en cargar plantel, registrar partidos y compartir fichas con padres.",
+    "Todas las academias tienen acceso completo mientras construimos la red de talento verificado. Enfócate en cargar plantel, registrar partidos y compartir fichas con padres.",
   footnote:
-    "Cuando haya suficiente base de academias y talento verificado, activaremos planes de pago. Las academias fundadoras serán las primeras en enterarse.",
+    "Las academias que entren ahora quedan registradas como fundadoras.",
 } as const;

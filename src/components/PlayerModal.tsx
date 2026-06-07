@@ -58,6 +58,8 @@ export function PlayerModal({
   const [isPublic, setIsPublic] = useState(false);
   const [isDiscoverable, setIsDiscoverable] = useState(false);
   const [hasConsent, setHasConsent] = useState(false);
+  const [guardianName, setGuardianName] = useState("");
+  const [guardianEmail, setGuardianEmail] = useState("");
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [videoPreview, setVideoPreview] = useState<string | null>(null);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
@@ -82,6 +84,8 @@ export function PlayerModal({
       setIsPublic(player.is_public);
       setIsDiscoverable(player.is_discoverable ?? false);
       setHasConsent(Boolean(player.public_consent_at));
+      setGuardianName(player.guardian_name ?? "");
+      setGuardianEmail(player.guardian_email ?? "");
       setPhotoPreview(player.photo_url);
       setVideoPreview(player.video_url);
       return;
@@ -98,6 +102,8 @@ export function PlayerModal({
     setIsPublic(false);
     setIsDiscoverable(false);
     setHasConsent(false);
+    setGuardianName("");
+    setGuardianEmail("");
     setPhotoPreview(null);
     setVideoPreview(null);
   }, [open, player]);
@@ -137,6 +143,8 @@ export function PlayerModal({
         weight_kg: weightKg ? Number(weightKg) : null,
         photo_url: photoUrl,
         video_url: videoUrl,
+        guardian_name: guardianName.trim() || null,
+        guardian_email: guardianEmail.trim().toLowerCase() || null,
         ...privacy,
       };
 
@@ -356,6 +364,41 @@ export function PlayerModal({
                 {videoPreview ? (
                   <p className="mt-3 text-sm text-slate-500">{videoPreview}</p>
                 ) : null}
+              </div>
+            </div>
+
+            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+              <p className="text-sm font-semibold text-slate-900">
+                Contacto del padre o tutor
+              </p>
+              <p className="mt-1 text-xs leading-relaxed text-slate-500">
+                Opcional. Se usa para enviar reportes mensuales verificados desde
+                Reportes.
+              </p>
+              <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700">
+                    Nombre del tutor
+                  </label>
+                  <input
+                    value={guardianName}
+                    onChange={(event) => setGuardianName(event.target.value)}
+                    className={inputClassName}
+                    placeholder="Ej. María Hernández"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700">
+                    Email del tutor
+                  </label>
+                  <input
+                    type="email"
+                    value={guardianEmail}
+                    onChange={(event) => setGuardianEmail(event.target.value)}
+                    className={inputClassName}
+                    placeholder="tutor@email.com"
+                  />
+                </div>
               </div>
             </div>
 

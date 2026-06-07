@@ -1,24 +1,5 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { isLaunchFreeMode, LAUNCH_COPY } from "@/lib/launch-mode";
-
-export function HomeLaunchBanner() {
-  if (!isLaunchFreeMode()) return null;
-
-  return (
-    <section className="border-b border-mf-brand/15 bg-mf-brand-soft/60">
-      <div className="mx-auto flex max-w-6xl flex-col gap-1 px-4 py-3 sm:flex-row sm:items-center sm:gap-3 sm:px-6">
-        <span className="mf-marketing-eyebrow w-fit rounded-full bg-mf-brand/10 px-2.5 py-1 text-[10px]">
-          {LAUNCH_COPY.badge}
-        </span>
-        <p className="text-sm leading-6 text-mf-text-secondary">
-          Academias, padres y scouts usan MiFicha sin costo mientras construimos la
-          red de talento verificado en México.
-        </p>
-      </div>
-    </section>
-  );
-}
 
 export function HomeCtaBand() {
   return (

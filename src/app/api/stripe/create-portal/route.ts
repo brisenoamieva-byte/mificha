@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { isLaunchFreeMode } from "@/lib/launch-mode";
 import { getAppBaseUrl, getStripeClient } from "@/lib/stripe";
 import { getAuthedSupabaseClient } from "@/lib/supabase-server";
 import type { Profile } from "@/types/database";
@@ -9,6 +10,16 @@ interface PortalBody {
 
 export async function POST(request: Request) {
   try {
+    if (isLaunchFreeMode()) {
+      return NextResponse.json(
+        {
+          error:
+            "MiFicha está en lanzamiento. La gestión de suscripción se activará más adelante.",
+        },
+        { status: 403 },
+      );
+    }
+
     const body = (await request.json()) as PortalBody;
     const { academy_id } = body;
 

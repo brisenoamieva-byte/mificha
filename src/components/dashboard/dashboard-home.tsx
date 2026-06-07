@@ -1,9 +1,11 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import {
   AlertCircle,
+  Calendar,
   Sparkles,
   Trophy,
   Users,
@@ -44,6 +46,15 @@ interface RecentPlayer {
   photo_url: string | null;
 }
 
+interface LastMatch {
+  id: string;
+  opponent: string;
+  match_date: string;
+  result: string;
+  goals_for: number;
+  goals_against: number;
+}
+
 export function DashboardHome() {
   const { academy } = useDashboard();
   const searchParams = useSearchParams();
@@ -53,6 +64,7 @@ export function DashboardHome() {
   const [seasonStats, setSeasonStats] = useState<PlayerSeasonStat[]>([]);
   const [seasonName, setSeasonName] = useState<string | null>(null);
   const [allPlayers, setAllPlayers] = useState<Player[]>([]);
+  const [lastMatch, setLastMatch] = useState<LastMatch | null>(null);
 
   useEffect(() => {
     if (searchParams.get("success") === "true") {
@@ -135,7 +147,16 @@ export function DashboardHome() {
           .select("*")
           .eq("academy_id", academy.id);
 
+        const { data: latestMatch } = await supabase
+          .from("matches")
+          .select("id, opponent, match_date, result, goals_for, goals_against")
+          .eq("academy_id", academy.id)
+          .order("match_date", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
         setAllPlayers(roster ?? []);
+        setLastMatch(latestMatch ?? null);
         setSeasonStats(nextSeasonStats);
 
         setStats({
@@ -194,7 +215,7 @@ export function DashboardHome() {
               value=""
               icon={Sparkles}
               badge={{
-                label: isLaunchFreeMode() ? "Gratuito" : "Ver planes",
+                label: isLaunchFreeMode() ? "Lanzamiento" : "Suscripción",
                 active: isLaunchFreeMode(),
               }}
             />
@@ -278,18 +299,59 @@ export function DashboardHome() {
         </section>
 
         <section className="mf-card p-6">
-          <h2 className="mf-section-title">
-            Próximo partido
-          </h2>
-          <div className="mt-6 rounded-lg border border-dashed border-mf-border bg-mf-canvas p-6 text-center">
-            <Trophy className="mx-auto h-8 w-8 text-mf-text-muted" />
-            <p className="mt-3 text-sm font-medium text-mf-text">
-              Sin partidos programados
-            </p>
-            <p className="mt-1 text-sm text-mf-text-muted">
-              Aquí verás el siguiente partido de tu academia.
-            </p>
-          </div>
+          <h2 className="mf-section-title">Último partido</h2>
+          {lastMatch ? (
+            <div className="mt-6 rounded-xl border border-mf-border bg-mf-canvas p-5">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-mf-text-muted">
+                    vs {lastMatch.opponent}
+                  </p>
+                  <p className="mt-2 text-2xl font-semibold tabular-nums text-mf-text">
+                    {lastMatch.goals_for} – {lastMatch.goals_against}
+                  </p>
+                  <p className="mt-2 text-sm capitalize text-mf-text-secondary">
+                    {lastMatch.result === "win"
+                      ? "Victoria"
+                      : lastMatch.result === "loss"
+                        ? "Derrota"
+                        : lastMatch.result === "draw"
+                          ? "Empate"
+                          : lastMatch.result}
+                  </p>
+                </div>
+                <Calendar className="h-5 w-5 shrink-0 text-mf-brand" />
+              </div>
+              <p className="mt-4 text-sm text-mf-text-muted">
+                {new Date(`${lastMatch.match_date}T12:00:00`).toLocaleDateString(
+                  "es-MX",
+                  { dateStyle: "long" },
+                )}
+              </p>
+              <Link
+                href={`/dashboard/partidos/${lastMatch.id}`}
+                className="mt-4 inline-flex text-sm font-semibold text-mf-brand hover:underline"
+              >
+                Ver detalle →
+              </Link>
+            </div>
+          ) : (
+            <div className="mt-6 rounded-lg border border-dashed border-mf-border bg-mf-canvas p-6 text-center">
+              <Trophy className="mx-auto h-8 w-8 text-mf-text-muted" />
+              <p className="mt-3 text-sm font-medium text-mf-text">
+                Aún no hay partidos registrados
+              </p>
+              <p className="mt-1 text-sm text-mf-text-muted">
+                Captura tu primer partido para ver el resumen aquí.
+              </p>
+              <Link
+                href="/dashboard/partidos/nuevo"
+                className="mt-4 inline-flex text-sm font-semibold text-mf-brand hover:underline"
+              >
+                Nuevo partido →
+              </Link>
+            </div>
+          )}
         </section>
       </div>
     </div>
