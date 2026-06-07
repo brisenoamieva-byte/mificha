@@ -26,9 +26,14 @@ import {
   calculateAge,
   getPositionLabel,
 } from "@/lib/dashboard-utils";
+import {
+  formatKickoffDateTime,
+  formatMatchDate,
+  getMatchResultLabel,
+} from "@/lib/match-utils";
 import { isLaunchFreeMode } from "@/lib/launch-mode";
 import { supabase } from "@/lib/supabase";
-import type { Player, PlayerPosition, PlayerSeasonStat } from "@/types/database";
+import type { MatchResult, MatchStatus, Player, PlayerPosition, PlayerSeasonStat } from "@/types/database";
 
 interface DashboardStats {
   totalPlayers: number;
@@ -50,9 +55,12 @@ interface LastMatch {
   id: string;
   opponent: string;
   match_date: string;
-  result: string;
-  goals_for: number;
-  goals_against: number;
+  kickoff_at: string | null;
+  result: MatchResult | null;
+  goals_for: number | null;
+  goals_against: number | null;
+  venue_name: string | null;
+  status: MatchStatus;
 }
 
 export function DashboardHome() {
@@ -65,6 +73,7 @@ export function DashboardHome() {
   const [seasonName, setSeasonName] = useState<string | null>(null);
   const [allPlayers, setAllPlayers] = useState<Player[]>([]);
   const [lastMatch, setLastMatch] = useState<LastMatch | null>(null);
+  const [nextMatch, setNextMatch] = useState<LastMatch | null>(null);
 
   useEffect(() => {
     if (searchParams.get("success") === "true") {
@@ -147,16 +156,33 @@ export function DashboardHome() {
           .select("*")
           .eq("academy_id", academy.id);
 
-        const { data: latestMatch } = await supabase
-          .from("matches")
-          .select("id, opponent, match_date, result, goals_for, goals_against")
-          .eq("academy_id", academy.id)
-          .order("match_date", { ascending: false })
-          .limit(1)
-          .maybeSingle();
+        const [{ data: latestMatch }, { data: upcomingMatch }] = await Promise.all([
+          supabase
+            .from("matches")
+            .select(
+              "id, opponent, match_date, kickoff_at, result, goals_for, goals_against, venue_name, status",
+            )
+            .eq("academy_id", academy.id)
+            .eq("status", "completed")
+            .order("match_date", { ascending: false })
+            .limit(1)
+            .maybeSingle(),
+          supabase
+            .from("matches")
+            .select(
+              "id, opponent, match_date, kickoff_at, result, goals_for, goals_against, venue_name, status",
+            )
+            .eq("academy_id", academy.id)
+            .in("status", ["scheduled", "postponed"])
+            .gte("kickoff_at", new Date().toISOString())
+            .order("kickoff_at", { ascending: true })
+            .limit(1)
+            .maybeSingle(),
+        ]);
 
         setAllPlayers(roster ?? []);
         setLastMatch(latestMatch ?? null);
+        setNextMatch(upcomingMatch ?? null);
         setSeasonStats(nextSeasonStats);
 
         setStats({
@@ -299,8 +325,36 @@ export function DashboardHome() {
         </section>
 
         <section className="mf-card p-6">
-          <h2 className="mf-section-title">Último partido</h2>
-          {lastMatch ? (
+          <h2 className="mf-section-title">
+            {nextMatch ? "Próximo partido" : "Último partido"}
+          </h2>
+          {nextMatch ? (
+            <div className="mt-6 rounded-xl border border-mf-border bg-mf-canvas p-5">
+              <p className="text-xs font-semibold uppercase tracking-wide text-mf-brand">
+                vs {nextMatch.opponent}
+              </p>
+              <p className="mt-2 text-sm text-mf-text-secondary">
+                {formatKickoffDateTime(nextMatch.kickoff_at, nextMatch.match_date)}
+              </p>
+              {nextMatch.venue_name ? (
+                <p className="mt-2 text-sm text-mf-text">{nextMatch.venue_name}</p>
+              ) : null}
+              <div className="mt-4 flex flex-wrap gap-3">
+                <Link
+                  href={`/dashboard/partidos/${nextMatch.id}`}
+                  className="text-sm font-semibold text-mf-brand hover:underline"
+                >
+                  Ver detalle →
+                </Link>
+                <Link
+                  href={`/dashboard/partidos/nuevo?matchId=${nextMatch.id}`}
+                  className="text-sm font-semibold text-mf-text-secondary hover:underline"
+                >
+                  Registrar resultado
+                </Link>
+              </div>
+            </div>
+          ) : lastMatch ? (
             <div className="mt-6 rounded-xl border border-mf-border bg-mf-canvas p-5">
               <div className="flex items-start justify-between gap-3">
                 <div>
@@ -308,25 +362,18 @@ export function DashboardHome() {
                     vs {lastMatch.opponent}
                   </p>
                   <p className="mt-2 text-2xl font-semibold tabular-nums text-mf-text">
-                    {lastMatch.goals_for} – {lastMatch.goals_against}
+                    {lastMatch.goals_for ?? 0} – {lastMatch.goals_against ?? 0}
                   </p>
                   <p className="mt-2 text-sm capitalize text-mf-text-secondary">
-                    {lastMatch.result === "win"
-                      ? "Victoria"
-                      : lastMatch.result === "loss"
-                        ? "Derrota"
-                        : lastMatch.result === "draw"
-                          ? "Empate"
-                          : lastMatch.result}
+                    {lastMatch.result
+                      ? getMatchResultLabel(lastMatch.result)
+                      : "Jugado"}
                   </p>
                 </div>
                 <Calendar className="h-5 w-5 shrink-0 text-mf-brand" />
               </div>
               <p className="mt-4 text-sm text-mf-text-muted">
-                {new Date(`${lastMatch.match_date}T12:00:00`).toLocaleDateString(
-                  "es-MX",
-                  { dateStyle: "long" },
-                )}
+                {formatMatchDate(lastMatch.match_date)}
               </p>
               <Link
                 href={`/dashboard/partidos/${lastMatch.id}`}
@@ -339,16 +386,16 @@ export function DashboardHome() {
             <div className="mt-6 rounded-lg border border-dashed border-mf-border bg-mf-canvas p-6 text-center">
               <Trophy className="mx-auto h-8 w-8 text-mf-text-muted" />
               <p className="mt-3 text-sm font-medium text-mf-text">
-                Aún no hay partidos registrados
+                Aún no hay partidos en tu calendario
               </p>
               <p className="mt-1 text-sm text-mf-text-muted">
-                Captura tu primer partido para ver el resumen aquí.
+                Programa el siguiente juego o captura un resultado.
               </p>
               <Link
-                href="/dashboard/partidos/nuevo"
+                href="/dashboard/partidos/programar"
                 className="mt-4 inline-flex text-sm font-semibold text-mf-brand hover:underline"
               >
-                Nuevo partido →
+                Programar partido →
               </Link>
             </div>
           )}

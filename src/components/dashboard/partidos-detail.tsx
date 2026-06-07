@@ -2,17 +2,21 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
+import { MatchScheduleCard } from "@/components/marketing/match-schedule-card";
 import { PlayerAvatar } from "@/components/ui/player-avatar";
 import { Skeleton } from "@/components/dashboard/skeletons";
 import {
-  formatMatchDate,
+  formatKickoffDateTime,
   getMatchResultLabel,
+  getMatchStatusLabel,
+  isCompletedMatch,
 } from "@/lib/match-utils";
 import { supabase } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
 import type { Match, MatchResult, MatchStat, Player } from "@/types/database";
 
-function resultBadgeClass(result: MatchResult) {
+function resultBadgeClass(result: MatchResult | null) {
+  if (!result) return "bg-emerald-100 text-emerald-700";
   if (result === "win") return "bg-green-100 text-green-700";
   if (result === "draw") return "bg-amber-100 text-amber-800";
   return "bg-red-100 text-red-700";
@@ -71,6 +75,8 @@ export function PartidosDetail({ matchId }: PartidosDetailProps) {
     );
   }
 
+  const completed = isCompletedMatch(match.status);
+
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <Link
@@ -80,27 +86,36 @@ export function PartidosDetail({ matchId }: PartidosDetailProps) {
         ← Volver a partidos
       </Link>
 
-      <div className="rounded-2xl bg-white p-6 shadow-sm">
-        <div className="flex flex-wrap items-center gap-3">
-          <h1 className="text-2xl font-bold text-slate-900">vs {match.opponent}</h1>
-          <span
-            className={cn(
-              "rounded-full px-3 py-1 text-xs font-semibold",
-              resultBadgeClass(match.result),
-            )}
-          >
-            {getMatchResultLabel(match.result)}
-          </span>
+      {completed ? (
+        <div className="rounded-2xl bg-white p-6 shadow-sm">
+          <div className="flex flex-wrap items-center gap-3">
+            <h1 className="text-2xl font-bold text-slate-900">vs {match.opponent}</h1>
+            <span
+              className={cn(
+                "rounded-full px-3 py-1 text-xs font-semibold",
+                resultBadgeClass(match.result),
+              )}
+            >
+              {match.result
+                ? getMatchResultLabel(match.result)
+                : getMatchStatusLabel(match.status)}
+            </span>
+          </div>
+          <p className="mt-2 text-slate-600">
+            {formatKickoffDateTime(match.kickoff_at, match.match_date)} ·{" "}
+            {match.goals_for ?? 0}-{match.goals_against ?? 0}
+          </p>
         </div>
-        <p className="mt-2 text-slate-600">
-          {formatMatchDate(match.match_date)} · {match.goals_for}-{match.goals_against}
-        </p>
-      </div>
+      ) : (
+        <MatchScheduleCard match={match} showCaptureLink variant="light" />
+      )}
 
       <div className="rounded-2xl bg-white shadow-sm">
         {stats.length === 0 ? (
           <p className="p-6 text-sm text-slate-500">
-            No hay stats registradas para este partido.
+            {completed
+              ? "No hay stats registradas para este partido."
+              : "Registra el resultado y stats cuando termine el partido."}
           </p>
         ) : (
           <div className="divide-y divide-slate-100">

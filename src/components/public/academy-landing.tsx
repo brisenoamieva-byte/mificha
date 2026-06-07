@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Award, MapPin, Shield, Trophy, Users } from "lucide-react";
+import { AcademyScheduleSection } from "@/components/marketing/match-schedule-card";
 import { BrandLogoLink } from "@/components/ui/brand-logo";
 import { getPositionLabel } from "@/lib/dashboard-utils";
 import {
@@ -38,7 +39,7 @@ function StatBlock({
 }
 
 export function AcademyLanding({ data }: AcademyLandingProps) {
-  const { academy, stats, featuredPlayers } = data;
+  const { academy, stats, featuredPlayers, upcomingMatches } = data;
   const accent = academy.primary_color || "#1B4F8C";
   const location = [academy.city, academy.state].filter(Boolean).join(", ");
   const whatsappUrl = formatWhatsAppUrl(academy.phone);
@@ -102,6 +103,13 @@ export function AcademyLanding({ data }: AcademyLandingProps) {
           </div>
         </div>
       </section>
+
+      <AcademyScheduleSection
+        matches={upcomingMatches}
+        academyName={academy.name}
+        academySlug={academy.slug}
+        variant="dark"
+      />
 
       <section className="mx-auto max-w-6xl px-6 py-20 sm:px-10">
         <div className="flex items-end justify-between gap-4">

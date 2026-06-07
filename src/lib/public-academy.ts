@@ -33,6 +33,19 @@ export interface PublicAcademyData {
     totalMatches: number;
   };
   featuredPlayers: FeaturedPlayer[];
+  upcomingMatches: PublicScheduledMatch[];
+}
+
+export interface PublicScheduledMatch {
+  id: string;
+  opponent: string;
+  match_date: string;
+  kickoff_at: string | null;
+  venue_name: string | null;
+  venue_address: string | null;
+  category: string | null;
+  notes: string | null;
+  status: "scheduled" | "postponed";
 }
 
 const PUBLIC_ACADEMY_SELECT =
@@ -98,7 +111,7 @@ export async function fetchPublicAcademyBySlug(
 
   const publicPlayerFilter = `academy_id=eq.${academy.id}&is_public=eq.true&public_consent_at=not.is.null`;
 
-  const [totalPlayers, totalSeasons, totalMatches, playersResponse] =
+  const [totalPlayers, totalSeasons, totalMatches, playersResponse, scheduleResponse] =
     await Promise.all([
       fetchCount(url, key, "players", `${publicPlayerFilter}&select=id`),
       fetchCount(
@@ -123,12 +136,27 @@ export async function fetchPublicAcademyBySlug(
           next: { revalidate: 60 },
         },
       ),
+      fetch(
+        `${url}/rest/v1/matches?academy_id=eq.${academy.id}&status=in.(scheduled,postponed)&is_public=eq.true&select=id,opponent,match_date,kickoff_at,venue_name,venue_address,category,notes,status&order=kickoff_at.asc&limit=12`,
+        {
+          headers: {
+            apikey: key,
+            Authorization: `Bearer ${key}`,
+          },
+          next: { revalidate: 60 },
+        },
+      ),
     ]);
 
   let featuredPlayers: FeaturedPlayer[] = [];
+  let upcomingMatches: PublicScheduledMatch[] = [];
 
   if (playersResponse.ok) {
     featuredPlayers = (await playersResponse.json()) as FeaturedPlayer[];
+  }
+
+  if (scheduleResponse.ok) {
+    upcomingMatches = (await scheduleResponse.json()) as PublicScheduledMatch[];
   }
 
   return {
@@ -139,6 +167,7 @@ export async function fetchPublicAcademyBySlug(
       totalMatches,
     },
     featuredPlayers,
+    upcomingMatches,
   };
 }
 

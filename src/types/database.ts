@@ -244,9 +244,16 @@ export type Database = {
           academy_id: string;
           opponent: string;
           match_date: string;
-          result: Database["public"]["Enums"]["match_result"];
-          goals_for: number;
-          goals_against: number;
+          result: Database["public"]["Enums"]["match_result"] | null;
+          goals_for: number | null;
+          goals_against: number | null;
+          status: Database["public"]["Enums"]["match_status"];
+          kickoff_at: string | null;
+          venue_name: string | null;
+          venue_address: string | null;
+          category: string | null;
+          is_public: boolean;
+          notes: string | null;
           created_at: string;
         };
         Insert: {
@@ -255,9 +262,16 @@ export type Database = {
           academy_id: string;
           opponent: string;
           match_date: string;
-          result: Database["public"]["Enums"]["match_result"];
-          goals_for: number;
-          goals_against: number;
+          result?: Database["public"]["Enums"]["match_result"] | null;
+          goals_for?: number | null;
+          goals_against?: number | null;
+          status?: Database["public"]["Enums"]["match_status"];
+          kickoff_at?: string | null;
+          venue_name?: string | null;
+          venue_address?: string | null;
+          category?: string | null;
+          is_public?: boolean;
+          notes?: string | null;
           created_at?: string;
         };
         Update: {
@@ -266,9 +280,16 @@ export type Database = {
           academy_id?: string;
           opponent?: string;
           match_date?: string;
-          result?: Database["public"]["Enums"]["match_result"];
-          goals_for?: number;
-          goals_against?: number;
+          result?: Database["public"]["Enums"]["match_result"] | null;
+          goals_for?: number | null;
+          goals_against?: number | null;
+          status?: Database["public"]["Enums"]["match_status"];
+          kickoff_at?: string | null;
+          venue_name?: string | null;
+          venue_address?: string | null;
+          category?: string | null;
+          is_public?: boolean;
+          notes?: string | null;
           created_at?: string;
         };
         Relationships: [
@@ -454,6 +475,7 @@ export type Database = {
       player_position: "goalkeeper" | "defender" | "midfielder" | "forward";
       dominant_foot: "left" | "right" | "both";
       match_result: "win" | "draw" | "loss";
+      match_status: "scheduled" | "completed" | "cancelled" | "postponed";
       captured_by: "coach" | "admin";
       email_status: "sent" | "failed";
     };
@@ -468,6 +490,7 @@ export type PlanStatus = Database["public"]["Enums"]["plan_status"];
 export type PlayerPosition = Database["public"]["Enums"]["player_position"];
 export type DominantFoot = Database["public"]["Enums"]["dominant_foot"];
 export type MatchResult = Database["public"]["Enums"]["match_result"];
+export type MatchStatus = Database["public"]["Enums"]["match_status"];
 export type CapturedBy = Database["public"]["Enums"]["captured_by"];
 export type EmailStatus = Database["public"]["Enums"]["email_status"];
 

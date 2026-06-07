@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { MatchSavedSummary, type SavedPlayerSummary } from "@/components/dashboard/match-saved-summary";
 import {
@@ -160,9 +160,12 @@ function SeasonQuickForm({
 
 export function PartidosNuevoContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const scheduledMatchIdParam = searchParams.get("matchId");
   const { academy } = useDashboard();
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [season, setSeason] = useState<Season | null>(null);
+  const [scheduledMatchId, setScheduledMatchId] = useState<string | null>(null);
   const [players, setPlayers] = useState<Player[]>([]);
   const [captures, setCaptures] = useState<PlayerCapture[]>([]);
   const [savedSummaries, setSavedSummaries] = useState<SavedPlayerSummary[]>([]);
@@ -189,6 +192,52 @@ export function PartidosNuevoContent() {
 
     setLoading(true);
     setError(null);
+
+    if (scheduledMatchIdParam) {
+      const { data: scheduledMatch } = await supabase
+        .from("matches")
+        .select("*")
+        .eq("id", scheduledMatchIdParam)
+        .eq("academy_id", academy.id)
+        .maybeSingle();
+
+      if (scheduledMatch && scheduledMatch.status === "scheduled") {
+        setScheduledMatchId(scheduledMatch.id);
+        setOpponent(scheduledMatch.opponent);
+        setMatchDate(scheduledMatch.match_date);
+
+        const [{ data: scheduledSeason }, { data: playerList }] = await Promise.all([
+          supabase
+            .from("seasons")
+            .select("*")
+            .eq("id", scheduledMatch.season_id)
+            .maybeSingle(),
+          supabase
+            .from("players")
+            .select("*")
+            .eq("academy_id", academy.id)
+            .order("last_name", { ascending: true }),
+        ]);
+
+        setSeason(scheduledSeason);
+        setPlayers(playerList ?? []);
+        setCaptures(
+          (playerList ?? []).map((player) => ({
+            player_id: player.id,
+            played: false,
+            minutes: 0,
+            goals: 0,
+            assists: 0,
+            yellow: false,
+            red: false,
+          })),
+        );
+        setLoading(false);
+        return;
+      }
+    }
+
+    setScheduledMatchId(null);
 
     const [seasonResult, playersResult] = await Promise.all([
       supabase
@@ -221,7 +270,7 @@ export function PartidosNuevoContent() {
       })),
     );
     setLoading(false);
-  }, [academy]);
+  }, [academy, scheduledMatchIdParam]);
 
   useEffect(() => {
     loadData();
@@ -270,19 +319,34 @@ export function PartidosNuevoContent() {
         }
       }
 
-      const { data: match, error: matchError } = await supabase
-        .from("matches")
-        .insert({
-          season_id: season.id,
-          academy_id: academy.id,
-          opponent: opponent.trim(),
-          match_date: matchDate,
-          result,
-          goals_for: goalsFor,
-          goals_against: goalsAgainst,
-        })
-        .select("*")
-        .single();
+      const { data: match, error: matchError } = scheduledMatchId
+        ? await supabase
+            .from("matches")
+            .update({
+              opponent: opponent.trim(),
+              match_date: matchDate,
+              result,
+              goals_for: goalsFor,
+              goals_against: goalsAgainst,
+              status: "completed",
+            })
+            .eq("id", scheduledMatchId)
+            .select("*")
+            .single()
+        : await supabase
+            .from("matches")
+            .insert({
+              season_id: season.id,
+              academy_id: academy.id,
+              opponent: opponent.trim(),
+              match_date: matchDate,
+              result,
+              goals_for: goalsFor,
+              goals_against: goalsAgainst,
+              status: "completed",
+            })
+            .select("*")
+            .single();
 
       if (matchError || !match) throw matchError ?? new Error("No se creó el partido.");
 
@@ -427,8 +491,19 @@ export function PartidosNuevoContent() {
 
         {step === 1 ? (
           <div className="mt-6 rounded-2xl bg-white p-6 shadow-sm sm:p-8">
-            <h1 className="text-2xl font-bold text-slate-900">Nuevo partido</h1>
-            <p className="mt-1 text-slate-600">Paso 1 de 2 · Datos del partido</p>
+            <h1 className="text-2xl font-bold text-slate-900">
+              {scheduledMatchId ? "Registrar resultado" : "Nuevo partido"}
+            </h1>
+            <p className="mt-1 text-slate-600">
+              Paso 1 de 2 · {scheduledMatchId ? "Partido programado" : "Datos del partido"}
+            </p>
+
+            {scheduledMatchId ? (
+              <p className="mt-4 rounded-xl bg-[#1B4F8C]/5 px-4 py-3 text-sm text-slate-700">
+                Completando el juego vs <strong>{opponent}</strong> que ya publicaste en
+                el calendario.
+              </p>
+            ) : null}
 
             <div className="mt-8 space-y-6">
               <div>

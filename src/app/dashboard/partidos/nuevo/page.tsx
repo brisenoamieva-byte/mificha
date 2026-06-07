@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { PartidosNuevoContent } from "@/components/dashboard/partidos-nuevo-content";
 
 export const metadata: Metadata = {
@@ -6,5 +7,9 @@ export const metadata: Metadata = {
 };
 
 export default function PartidosNuevoPage() {
-  return <PartidosNuevoContent />;
+  return (
+    <Suspense fallback={<p className="p-6 text-slate-500">Cargando...</p>}>
+      <PartidosNuevoContent />
+    </Suspense>
+  );
 }

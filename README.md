@@ -76,6 +76,7 @@ En **Supabase → SQL Editor**, ejecuta en este orden:
 10. `supabase/academy-league-fields.sql` (enlace a calendario oficial de liga)
 11. `supabase/player-guardian-contact.sql` (email del tutor para reportes)
 12. `supabase/privacy-rls-hardening.sql` (endurecer privacidad RLS — ejecutar al final)
+13. `supabase/match-schedule.sql` (calendario público: fecha, hora, sede)
 
 ### 4. Auth en Supabase
 

@@ -3,10 +3,12 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { ExploreDirectory } from "@/components/marketing/explore-directory";
 import { ExploreHeroAside } from "@/components/marketing/explore-hero-aside";
+import { PublicScheduleExploreSection } from "@/components/marketing/public-schedule-explore-section";
 import { MarketingPageHero } from "@/components/marketing/marketing-page-hero";
 import { SiteFooter, SiteHeader } from "@/components/marketing/site-header";
 import { fetchWeeklyCompetitionData } from "@/lib/ideal-xi";
 import { fetchPublicDirectory } from "@/lib/public-directory";
+import { fetchPublicUpcomingMatches } from "@/lib/public-schedule";
 
 export const metadata: Metadata = {
   title: "Explorar talento | MiFicha",
@@ -15,9 +17,10 @@ export const metadata: Metadata = {
 };
 
 export default async function ExplorarPage() {
-  const [data, weeklyStats] = await Promise.all([
+  const [data, weeklyStats, upcomingMatches] = await Promise.all([
     fetchPublicDirectory(),
     fetchWeeklyCompetitionData(),
+    fetchPublicUpcomingMatches(),
   ]);
 
   const playerCount = data.players.length;
@@ -50,6 +53,8 @@ export default async function ExplorarPage() {
           ]}
           aside={<ExploreHeroAside />}
         />
+
+        <PublicScheduleExploreSection matches={upcomingMatches} />
 
         <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:py-16">
           <ExploreDirectory
