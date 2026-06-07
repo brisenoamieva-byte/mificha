@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Presentation } from "lucide-react";
+import { supabase } from "@/lib/supabase";
 
 export function PitchDeckNavLink({ onClose }: { onClose?: () => void }) {
   const [allowed, setAllowed] = useState(false);
@@ -10,14 +11,24 @@ export function PitchDeckNavLink({ onClose }: { onClose?: () => void }) {
   useEffect(() => {
     let cancelled = false;
 
-    fetch("/api/interno/pitch-access")
-      .then((response) => response.json())
-      .then((data: { allowed?: boolean }) => {
-        if (!cancelled) setAllowed(Boolean(data.allowed));
-      })
-      .catch(() => {
-        if (!cancelled) setAllowed(false);
+    async function checkAccess() {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!session) return;
+
+      const response = await fetch("/api/interno/pitch-access", {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
       });
+
+      const data = (await response.json()) as { allowed?: boolean };
+      if (!cancelled) setAllowed(Boolean(data.allowed));
+    }
+
+    void checkAccess();
 
     return () => {
       cancelled = true;

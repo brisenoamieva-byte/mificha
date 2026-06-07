@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 import { canAccessPitchDeck } from "@/lib/pitch-access";
-import { createSupabaseServerClient } from "@/lib/supabase-server";
+import { getAuthedSupabaseClient } from "@/lib/supabase-server";
 
-export async function GET() {
-  const supabase = await createSupabaseServerClient();
+export async function GET(request: Request) {
+  const supabase = await getAuthedSupabaseClient(request);
   const {
     data: { user },
   } = await supabase.auth.getUser();

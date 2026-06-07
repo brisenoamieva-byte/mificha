@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { signIn } from "@/lib/auth";
 
@@ -22,6 +22,8 @@ const inputClassName = "mf-input mt-1";
 
 export function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const nextPath = searchParams.get("next") || "/dashboard";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -34,7 +36,7 @@ export function LoginForm() {
 
     try {
       await signIn(email, password);
-      router.push("/dashboard");
+      router.push(nextPath.startsWith("/") ? nextPath : "/dashboard");
       router.refresh();
     } catch (submitError) {
       setError(getErrorMessage(submitError));
