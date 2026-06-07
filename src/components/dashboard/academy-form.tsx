@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useDashboard } from "@/components/dashboard/dashboard-context";
 import { getCurrentUser } from "@/lib/auth";
+import { countAcademiesForOwner } from "@/lib/academy-owner";
 import { buildPublicAcademyUrl } from "@/lib/public-academy";
 import { slugify } from "@/lib/slugify";
 import { uploadAcademyLogo } from "@/lib/storage";
@@ -57,6 +58,8 @@ export function AcademyForm() {
   const [address, setAddress] = useState("");
   const [phone, setPhone] = useState("");
   const [website, setWebsite] = useState("");
+  const [leagueName, setLeagueName] = useState("");
+  const [leagueCalendarUrl, setLeagueCalendarUrl] = useState("");
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [primaryColor, setPrimaryColor] = useState("#1B4F8C");
   const [isPublic, setIsPublic] = useState(false);
@@ -82,6 +85,8 @@ export function AcademyForm() {
     setAddress(academy.address ?? "");
     setPhone(academy.phone ?? "");
     setWebsite(academy.website ?? "");
+    setLeagueName(academy.league_name ?? "");
+    setLeagueCalendarUrl(academy.league_calendar_url ?? "");
     setLogoUrl(academy.logo_url);
     setPrimaryColor(academy.primary_color || "#1B4F8C");
     setIsPublic(academy.is_public);
@@ -140,6 +145,8 @@ export function AcademyForm() {
         address: address.trim() || null,
         phone: phone.trim() || null,
         website: website.trim() || null,
+        league_name: leagueName.trim() || null,
+        league_calendar_url: leagueCalendarUrl.trim() || null,
         logo_url: logoUrl,
         primary_color: primaryColor,
         is_public: isPublic,
@@ -154,6 +161,13 @@ export function AcademyForm() {
         if (updateError) throw updateError;
         setSuccess("Academia actualizada correctamente.");
       } else {
+        const existingCount = await countAcademiesForOwner(user.id);
+        if (existingCount > 0) {
+          throw new Error(
+            "Ya tienes una academia registrada. Recarga la página o guarda cambios en la academia activa.",
+          );
+        }
+
         const { error: insertError } = await supabase.from("academies").insert({
           ...payload,
           owner_id: user.id,
@@ -257,6 +271,47 @@ export function AcademyForm() {
           className={inputClassName}
           placeholder="Av. Universidad 123, Col. Centro"
         />
+      </div>
+
+      <div className="rounded-xl border border-slate-200 bg-slate-50 p-5">
+        <h3 className="text-sm font-semibold text-slate-900">Liga oficial (complemento)</h3>
+        <p className="mt-1 text-sm text-slate-600">
+          MiFicha no reemplaza tu federación ni liga. Enlaza el calendario oficial para
+          que entrenadores y padres consulten resultados institucionales.
+        </p>
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          <div>
+            <label htmlFor="leagueName" className="block text-sm font-medium text-slate-700">
+              Nombre de la liga
+            </label>
+            <input
+              id="leagueName"
+              name="leagueName"
+              type="text"
+              value={leagueName}
+              onChange={(event) => setLeagueName(event.target.value)}
+              className={inputClassName}
+              placeholder="Ej. Liga MX Sub-15 CDMX"
+            />
+          </div>
+          <div>
+            <label
+              htmlFor="leagueCalendarUrl"
+              className="block text-sm font-medium text-slate-700"
+            >
+              URL calendario / clasificación
+            </label>
+            <input
+              id="leagueCalendarUrl"
+              name="leagueCalendarUrl"
+              type="url"
+              value={leagueCalendarUrl}
+              onChange={(event) => setLeagueCalendarUrl(event.target.value)}
+              className={inputClassName}
+              placeholder="https://..."
+            />
+          </div>
+        </div>
       </div>
 
       <div className="grid gap-6 sm:grid-cols-2">

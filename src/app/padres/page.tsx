@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { SiteFooter, SiteHeader } from "@/components/marketing/site-header";
+import { ArrowRight } from "lucide-react";
+import { HomeFichaPreview } from "@/components/marketing/home-ficha-preview";
+import { MarketingPageHero } from "@/components/marketing/marketing-page-hero";
 import { ParentLinkForm } from "@/components/marketing/parent-link-form";
+import { SiteFooter, SiteHeader } from "@/components/marketing/site-header";
 
 export const metadata: Metadata = {
   title: "Padres y jugadores | MiFicha",
@@ -15,59 +18,41 @@ export default function PadresPage() {
       <SiteHeader actionHref="/padres" actionLabel="Padres" />
 
       <main className="flex-1">
-        <section className="border-b border-mf-border bg-mf-surface">
-          <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
-            <p className="mf-section-kicker">Soy padre o jugador</p>
-            <h1 className="mt-2 mf-page-title">
-              ¿Tienes el link de tu hijo?
-            </h1>
-            <p className="mt-3 text-sm leading-7 text-mf-text-secondary">
-              No necesitas crear cuenta. La academia te comparte un enlace o QR
-              para ver stats verificados, Passport Score y el historial de tu hijo.
-            </p>
-          </div>
-        </section>
+        <MarketingPageHero
+          eyebrow="Padres y jugadores"
+          title="La ficha de tu hijo, sin app ni contraseña"
+          description="La academia te comparte un QR o link por WhatsApp. Consulta Passport Score, stats de temporada e historial verificado al instante."
+          actions={
+            <Link href="#abrir-ficha" className="mf-btn-primary">
+              Abrir ficha
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          }
+          stats={[
+            { value: "QR", label: "En la cancha" },
+            { value: "0", label: "Registro requerido" },
+            { value: "100", label: "Passport Score" },
+          ]}
+          aside={<HomeFichaPreview />}
+        />
 
-        <section className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
+        <section id="abrir-ficha" className="mx-auto max-w-3xl px-4 py-14 sm:px-6 lg:py-16">
           <ParentLinkForm />
         </section>
 
         <section className="border-t border-mf-border bg-mf-surface">
-          <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
-            <h2 className="mf-section-title">Ejemplo de ficha pública</h2>
-            <p className="mt-2 text-sm text-mf-text-secondary">
-              Así se ve una ficha cuando la academia la tiene activa.
+          <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
+            <p className="mf-marketing-eyebrow">Directorio público</p>
+            <h2 className="mt-3 text-xl font-semibold tracking-[-0.02em] text-mf-text">
+              ¿Buscas fichas de referencia?
+            </h2>
+            <p className="mt-2 text-sm leading-7 text-mf-text-secondary">
+              Explora jugadores con ficha pública activa y consentimiento parental.
             </p>
-
-            <div className="mf-card-elevated mt-6 overflow-hidden">
-              <div className="border-b border-mf-border-subtle px-5 py-4">
-                <p className="text-sm font-semibold text-mf-text">
-                  Ficha verificada · Santiago H.
-                </p>
-                <p className="text-sm text-mf-text-secondary">
-                  Delantero · Passport 78 · Academia Norteños
-                </p>
-              </div>
-              <div className="grid grid-cols-3 gap-px bg-mf-border-subtle">
-                {[
-                  { label: "Partidos", value: "12" },
-                  { label: "Goles", value: "9" },
-                  { label: "Asist.", value: "4" },
-                ].map((stat) => (
-                  <div key={stat.label} className="bg-mf-surface px-4 py-5 text-center">
-                    <p className="text-2xl font-semibold tabular-nums text-mf-text">
-                      {stat.value}
-                    </p>
-                    <p className="mt-1 text-xs text-mf-text-muted">{stat.label}</p>
-                  </div>
-                ))}
-              </div>
-              <div className="px-5 py-5">
-                <Link href="/explorar" className="text-sm font-semibold text-mf-brand hover:underline">
-                  Ver jugadores públicos en el directorio →
-                </Link>
-              </div>
-            </div>
+            <Link href="/explorar" className="mf-btn-secondary mt-6 inline-flex">
+              Ir al directorio
+              <ArrowRight className="h-4 w-4" />
+            </Link>
           </div>
         </section>
       </main>

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { BrandLogoLink } from "@/components/ui/brand-logo";
+import { SiteNav } from "@/components/marketing/site-nav";
 
 interface SiteHeaderProps {
   actionHref?: string;
@@ -12,10 +13,11 @@ export function SiteHeader({
 }: SiteHeaderProps) {
   return (
     <header className="sticky top-0 z-50 border-b border-mf-border bg-mf-surface/95 backdrop-blur-sm">
-      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6">
+      <div className="relative mx-auto flex h-14 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
         <BrandLogoLink />
-        <div className="flex items-center gap-2">
-          <Link href={actionHref} className="mf-btn-ghost">
+        <SiteNav />
+        <div className="flex shrink-0 items-center gap-2">
+          <Link href={actionHref} className="mf-btn-ghost hidden sm:inline-flex">
             {actionLabel}
           </Link>
           <Link href="/signup" className="mf-btn-primary hidden sm:inline-flex">
@@ -30,8 +32,27 @@ export function SiteHeader({
 export function SiteFooter() {
   return (
     <footer className="border-t border-mf-border bg-mf-surface">
-      <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-8 text-sm text-mf-text-secondary sm:flex-row sm:items-center sm:justify-between sm:px-6">
-        <BrandLogoLink showWordmark wordmarkClassName="text-mf-text-secondary" />
+      <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+        <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-mf-text-secondary">
+          <Link href="/#funciones" className="transition hover:text-mf-text">
+            Funciones
+          </Link>
+          <Link href="/#accesos" className="transition hover:text-mf-text">
+            Accesos
+          </Link>
+          <Link href="/explorar" className="transition hover:text-mf-text">
+            Explorar
+          </Link>
+          <Link href="/padres" className="transition hover:text-mf-text">
+            Padres
+          </Link>
+          <Link href="/aviso-privacidad" className="transition hover:text-mf-text">
+            Privacidad
+          </Link>
+        </div>
+      </div>
+      <div className="mx-auto flex max-w-6xl flex-col gap-3 border-t border-mf-border px-4 py-8 text-sm text-mf-text-muted sm:flex-row sm:items-center sm:justify-between sm:px-6">
+        <BrandLogoLink size="sm" />
         <div className="flex flex-wrap items-center gap-4">
           <Link href="/aviso-privacidad" className="hover:text-mf-text">
             Aviso de privacidad

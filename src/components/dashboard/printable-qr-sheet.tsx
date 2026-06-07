@@ -1,7 +1,9 @@
 "use client";
 
+import Image from "next/image";
 import QRCode from "react-qr-code";
 import { PlayerCategoryBadge } from "@/components/ui/player-category-badge";
+import { BRAND_LOGO } from "@/lib/brand";
 import { getPositionLabel } from "@/lib/dashboard-utils";
 import { buildPlayerShareUrl } from "@/lib/share-ficha";
 import { getPlayerInitials } from "@/lib/player-utils";
@@ -34,8 +36,16 @@ export function PrintableQrSheet({ academy, players }: PrintableQrSheetProps) {
       `}</style>
 
       <header className="mb-8 border-b border-slate-200 pb-6">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#1B4F8C]">
-          MiFicha · Fichas del plantel
+        <Image
+          src={BRAND_LOGO}
+          alt="MiFicha"
+          width={665}
+          height={173}
+          className="h-10 w-auto"
+          priority
+        />
+        <p className="mt-3 text-xs font-semibold uppercase tracking-[0.2em] text-[#1B4F8C]">
+          Fichas del plantel
         </p>
         <h1 className="mt-2 text-2xl font-bold">{academy.name}</h1>
         <p className="mt-2 text-sm text-slate-600">

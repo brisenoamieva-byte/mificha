@@ -151,21 +151,25 @@ export function ExploreDirectory({
         categoryFilter={categoryFilter}
       />
 
-      <IdealXIPanel
-        performances={weeklyPerformances}
-        weekLabel={weekLabel}
-        categoryFilter={categoryFilter}
-      />
+      <div id="ideal-11">
+        <IdealXIPanel
+          performances={weeklyPerformances}
+          weekLabel={weekLabel}
+          categoryFilter={categoryFilter}
+        />
+      </div>
 
-      <PositionRankingsPanel
-        players={data.players}
-        rankedPerformances={rankedPerformances}
-        weekLabel={weekLabel}
-        state={state}
-        city={city}
-        minPassport={minPassport}
-        categoryFilter={categoryFilter}
-      />
+      <div id="rankings">
+        <PositionRankingsPanel
+          players={data.players}
+          rankedPerformances={rankedPerformances}
+          weekLabel={weekLabel}
+          state={state}
+          city={city}
+          minPassport={minPassport}
+          categoryFilter={categoryFilter}
+        />
+      </div>
 
       <section className="space-y-4">
         <div className="flex items-center justify-between gap-3">

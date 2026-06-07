@@ -182,9 +182,13 @@ export function PartidosNuevoContent() {
   );
 
   const loadData = useCallback(async () => {
-    if (!academy) return;
+    if (!academy) {
+      setLoading(false);
+      return;
+    }
 
     setLoading(true);
+    setError(null);
 
     const [seasonResult, playersResult] = await Promise.all([
       supabase

@@ -11,6 +11,7 @@ import {
   X,
 } from "lucide-react";
 import { BrandLogo } from "@/components/ui/brand-logo";
+import { PitchDeckNavLink } from "@/components/dashboard/pitch-deck-nav-link";
 
 const navItems = [
   { href: "/dashboard", label: "Inicio", icon: LayoutDashboard },
@@ -61,6 +62,7 @@ export function DashboardSidebar({ open, onClose }: DashboardSidebarProps) {
             </Link>
           );
         })}
+        <PitchDeckNavLink onClose={onClose} />
       </nav>
     </div>
   );

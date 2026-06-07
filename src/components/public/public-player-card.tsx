@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import QRCode from "react-qr-code";
 import { useState } from "react";
+import { BrandLogoLink } from "@/components/ui/brand-logo";
 import { calculateAge, getPositionLabel } from "@/lib/dashboard-utils";
 import { PlayerCategoryBadge } from "@/components/ui/player-category-badge";
 import type { PublicPlayerData } from "@/lib/public-player";
@@ -120,7 +121,10 @@ export function PublicPlayerCard({ data }: PublicPlayerCardProps) {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#1B4F8C] to-[#0F2D52] px-4 py-8 sm:px-6">
       <div className="mx-auto w-full max-w-[800px] overflow-hidden rounded-2xl bg-white shadow-xl">
-        <section className="px-6 pb-8 pt-10 text-center sm:px-10">
+        <div className="flex justify-center border-b border-slate-100 px-6 py-4 sm:px-10">
+          <BrandLogoLink size="sm" />
+        </div>
+        <section className="px-6 pb-8 pt-8 text-center sm:px-10">
           <div className="mx-auto flex h-[150px] w-[150px] items-center justify-center overflow-hidden rounded-full border-4 border-white bg-slate-100 shadow-lg ring-4 ring-[#1B4F8C]/10">
             {player.photo_url ? (
               // eslint-disable-next-line @next/next/no-img-element
@@ -298,13 +302,8 @@ export function PublicPlayerCard({ data }: PublicPlayerCardProps) {
         </section>
 
         <footer className="border-t border-slate-100 bg-slate-50 px-6 py-5 text-center sm:px-10">
-          <p className="text-sm text-slate-500">
-            Creado con{" "}
-            <Link href="/" className="font-medium text-[#1B4F8C] hover:underline">
-              MiFicha
-            </Link>{" "}
-            · mificha.mx
-          </p>
+          <BrandLogoLink className="justify-center" size="sm" />
+          <p className="mt-2 text-xs text-slate-400">mificha.mx</p>
           <p className="mx-auto mt-3 max-w-lg text-xs leading-5 text-slate-400">
             Ficha compartida con autorización parental. Si deseas rectificar o
             eliminar estos datos, contacta a la academia.{" "}

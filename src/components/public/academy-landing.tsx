@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Award, MapPin, Shield, Trophy, Users } from "lucide-react";
+import { BrandLogoLink } from "@/components/ui/brand-logo";
 import { getPositionLabel } from "@/lib/dashboard-utils";
 import {
   formatWhatsAppUrl,
@@ -51,7 +52,8 @@ export function AcademyLanding({ data }: AcademyLandingProps) {
         }}
       >
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.12),transparent_40%)]" />
-        <div className="relative mx-auto max-w-6xl px-6 pb-20 pt-16 sm:px-10 sm:pt-24">
+        <div className="relative mx-auto max-w-6xl px-6 pb-20 pt-10 sm:px-10 sm:pt-14">
+          <BrandLogoLink variant="onDark" size="sm" className="mb-10" />
           <div className="flex flex-col gap-10 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-3xl">
               {academy.logo_url ? (
@@ -209,11 +211,12 @@ export function AcademyLanding({ data }: AcademyLandingProps) {
       </section>
 
       <footer className="border-t border-slate-800 px-6 py-8 text-center text-sm text-slate-500">
-        Powered by{" "}
-        <Link href="/" className="font-semibold text-white hover:underline">
-          MiFicha
-        </Link>{" "}
-        · mificha.mx
+        <BrandLogoLink
+          className="justify-center"
+          variant="onDark"
+          size="sm"
+        />
+        <p className="mt-2">mificha.mx</p>
       </footer>
     </div>
   );

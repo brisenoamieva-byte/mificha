@@ -51,6 +51,8 @@ export type Database = {
           address: string | null;
           phone: string | null;
           website: string | null;
+          league_name: string | null;
+          league_calendar_url: string | null;
           owner_id: string;
           plan_status: Database["public"]["Enums"]["plan_status"];
           stripe_customer_id: string | null;
@@ -73,6 +75,8 @@ export type Database = {
           address?: string | null;
           phone?: string | null;
           website?: string | null;
+          league_name?: string | null;
+          league_calendar_url?: string | null;
           owner_id: string;
           plan_status?: Database["public"]["Enums"]["plan_status"];
           stripe_customer_id?: string | null;
@@ -95,6 +99,8 @@ export type Database = {
           address?: string | null;
           phone?: string | null;
           website?: string | null;
+          league_name?: string | null;
+          league_calendar_url?: string | null;
           owner_id?: string;
           plan_status?: Database["public"]["Enums"]["plan_status"];
           stripe_customer_id?: string | null;

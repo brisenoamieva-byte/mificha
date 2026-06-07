@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { getCurrentUser } from "@/lib/auth";
+import { fetchAcademyForOwner } from "@/lib/academy-owner";
 import { supabase } from "@/lib/supabase";
 import type { Academy, Profile } from "@/types/database";
 import { DashboardContext } from "@/components/dashboard/dashboard-context";
@@ -25,7 +26,14 @@ export function DashboardShell({ children }: DashboardShellProps) {
     setLoading(true);
 
     try {
-      const user = await getCurrentUser();
+      const {
+        data: { session },
+        error: sessionError,
+      } = await supabase.auth.getSession();
+
+      if (sessionError) throw sessionError;
+
+      const user = session?.user ?? (await getCurrentUser());
       if (!user) {
         router.replace("/login");
         return;
@@ -39,11 +47,7 @@ export function DashboardShell({ children }: DashboardShellProps) {
 
       if (profileError) throw profileError;
 
-      const { data: academyData } = await supabase
-        .from("academies")
-        .select("*")
-        .eq("owner_id", user.id)
-        .maybeSingle();
+      const academyData = await fetchAcademyForOwner(user.id);
 
       setProfile(profileData);
       setAcademy(academyData);

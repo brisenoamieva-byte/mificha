@@ -44,12 +44,16 @@ export function ParentLinkForm() {
 
   return (
     <div className="space-y-8">
-      <form onSubmit={handleSubmit} className="mf-card p-6">
-        <label htmlFor="player-link" className="block text-sm font-medium text-mf-text">
-          ¿Tienes el link de tu hijo?
+      <form
+        onSubmit={handleSubmit}
+        className="rounded-xl border border-mf-border bg-mf-surface p-6 shadow-[var(--mf-shadow)] sm:p-8"
+      >
+        <p className="mf-marketing-eyebrow">Acceso directo</p>
+        <label htmlFor="player-link" className="mt-3 block text-lg font-semibold text-mf-text">
+          Pega el link de la ficha
         </label>
-        <p className="mt-1 text-sm text-mf-text-secondary">
-          Pega la URL completa o solo el identificador al final del link.
+        <p className="mt-2 text-sm leading-7 text-mf-text-secondary">
+          URL completa o solo el identificador al final del enlace.
         </p>
         <input
           id="player-link"
@@ -57,12 +61,10 @@ export function ParentLinkForm() {
           value={input}
           onChange={(event) => setInput(event.target.value)}
           placeholder="https://mificha.mx/j/nombre-jugador-abc123"
-          className="mf-input mt-4"
+          className="mf-input mt-5"
         />
-        {error ? (
-          <p className="mt-3 text-sm text-mf-danger">{error}</p>
-        ) : null}
-        <button type="submit" className="mf-btn-primary mt-4">
+        {error ? <p className="mt-3 text-sm text-mf-danger">{error}</p> : null}
+        <button type="submit" className="mf-btn-primary mt-5">
           Abrir ficha
           <ArrowRight className="h-4 w-4" />
         </button>
@@ -70,26 +72,30 @@ export function ParentLinkForm() {
 
       <div className="grid gap-4 sm:grid-cols-3">
         {steps.map((step) => (
-          <div key={step.title} className="mf-card p-5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-md bg-mf-brand-soft text-mf-brand">
-              <step.icon className="h-4 w-4" />
+          <article
+            key={step.title}
+            className="rounded-xl border border-mf-border bg-mf-surface p-5 transition hover:border-mf-brand/20"
+          >
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-mf-brand-soft text-mf-brand">
+              <step.icon className="h-5 w-5" strokeWidth={1.75} />
             </div>
             <h3 className="mt-4 text-sm font-semibold text-mf-text">{step.title}</h3>
             <p className="mt-2 text-sm leading-6 text-mf-text-secondary">
               {step.description}
             </p>
-          </div>
+          </article>
         ))}
       </div>
 
-      <div className="mf-card p-6">
-        <p className="text-sm font-medium text-mf-text">¿Aún no tienes link?</p>
-        <p className="mt-2 text-sm leading-6 text-mf-text-secondary">
+      <div className="rounded-xl border border-mf-border bg-mf-canvas p-6">
+        <p className="text-sm font-semibold text-mf-text">¿Aún no tienes link?</p>
+        <p className="mt-2 text-sm leading-7 text-mf-text-secondary">
           Pídele a la academia de tu hijo que active la ficha pública. Ellos te
           comparten el QR o el enlace por WhatsApp.
         </p>
-        <Link href="/explorar" className="mf-btn-secondary mt-4 inline-flex">
+        <Link href="/explorar" className="mf-btn-secondary mt-5 inline-flex">
           Explorar fichas públicas
+          <ArrowRight className="h-4 w-4" />
         </Link>
       </div>
     </div>

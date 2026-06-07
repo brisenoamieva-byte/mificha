@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Plus, Trophy } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { useDashboard } from "@/components/dashboard/dashboard-context";
+import { LeagueOfficialBanner } from "@/components/dashboard/league-official-banner";
 import { NoAcademyState } from "@/components/dashboard/no-academy-state";
 import { Skeleton } from "@/components/dashboard/skeletons";
 import {
@@ -31,12 +32,15 @@ export function PartidosContent() {
 
     setLoading(true);
 
-    const { data: activeSeason } = await supabase
+    const { data: seasons } = await supabase
       .from("seasons")
       .select("*")
       .eq("academy_id", academy.id)
       .eq("is_active", true)
-      .maybeSingle();
+      .order("created_at", { ascending: false })
+      .limit(1);
+
+    const activeSeason = seasons?.[0] ?? null;
 
     setSeason(activeSeason);
 
@@ -82,6 +86,8 @@ export function PartidosContent() {
           Capturar partido
         </Link>
       </div>
+
+      <LeagueOfficialBanner academy={academy} />
 
       {!season && !loading ? (
         <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center">

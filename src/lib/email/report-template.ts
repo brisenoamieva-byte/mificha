@@ -1,4 +1,5 @@
 import { buildPublicPlayerUrl } from "@/lib/player-utils";
+import { getBrandLogoUrl } from "@/lib/brand";
 import {
   getPassportBarColor,
   getReportSubject,
@@ -44,6 +45,7 @@ export function buildReportEmailHtml(data: ReportEmailData) {
   const profileUrl = buildPublicPlayerUrl(data.playerSlug);
   const appUrl =
     process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ?? "https://mificha.mx";
+  const logoUrl = getBrandLogoUrl(appUrl);
   const score = Math.min(Math.max(data.passportScore, 0), 100);
   const barColor = getPassportBarColor(score);
   const photoBlock = data.playerPhotoUrl
@@ -69,10 +71,11 @@ export function buildReportEmailHtml(data: ReportEmailData) {
                     <td>
                       <table cellpadding="0" cellspacing="0">
                         <tr>
-                          <td style="width:42px;height:42px;border-radius:12px;background:rgba(255,255,255,0.16);color:#ffffff;font-size:16px;font-weight:800;text-align:center;line-height:42px;">MF</td>
-                          <td style="padding-left:12px;">
-                            <div style="font-size:22px;font-weight:800;color:#ffffff;line-height:1.1;">MiFicha</div>
-                            <div style="margin-top:4px;font-size:12px;color:rgba(255,255,255,0.78);letter-spacing:0.04em;text-transform:uppercase;">Reporte mensual · ${data.academyName}</div>
+                          <td style="background:#ffffff;border-radius:12px;padding:10px 16px;">
+                            <img src="${logoUrl}" alt="MiFicha" height="36" style="display:block;height:36px;width:auto;" />
+                          </td>
+                          <td style="padding-left:14px;vertical-align:middle;">
+                            <div style="font-size:12px;color:rgba(255,255,255,0.78);letter-spacing:0.04em;text-transform:uppercase;">Reporte mensual · ${data.academyName}</div>
                           </td>
                         </tr>
                       </table>
