@@ -9,6 +9,6 @@ export async function GET(request: Request) {
   } = await supabase.auth.getUser();
 
   return NextResponse.json({
-    allowed: canAccessPitchDeck(user?.id),
+    allowed: canAccessPitchDeck(user?.id, user?.email),
   });
 }
