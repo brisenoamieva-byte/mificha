@@ -70,6 +70,7 @@ En **Supabase → SQL Editor**, ejecuta en este orden:
 6. `supabase/public-weekly-stats-rls.sql` (11 ideal semanal en `/explorar`)
 7. `supabase/privacy-minors.sql` (consentimiento parental y directorio)
 8. `supabase/privacy-storage-rls.sql` (fotos/videos de jugadores protegidos)
+9. `supabase/passport-score-trigger.sql` (Passport Score automático tras partidos)
 
 ### 4. Auth en Supabase
 

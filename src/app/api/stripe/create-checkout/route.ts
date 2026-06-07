@@ -6,6 +6,7 @@ import {
   type SubscriptionPlan,
 } from "@/lib/stripe";
 import { getAuthedSupabaseClient } from "@/lib/supabase-server";
+import { isLaunchFreeMode } from "@/lib/launch-mode";
 import type { Profile } from "@/types/database";
 
 interface CheckoutBody {
@@ -15,6 +16,16 @@ interface CheckoutBody {
 
 export async function POST(request: Request) {
   try {
+    if (isLaunchFreeMode()) {
+      return NextResponse.json(
+        {
+          error:
+            "MiFicha está en lanzamiento gratuito. Los planes de pago se activarán más adelante.",
+        },
+        { status: 403 },
+      );
+    }
+
     const body = (await request.json()) as CheckoutBody;
     const { plan, academy_id } = body;
 

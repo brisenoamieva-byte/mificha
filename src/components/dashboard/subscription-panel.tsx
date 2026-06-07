@@ -2,9 +2,11 @@
 
 import { CreditCard, ExternalLink } from "lucide-react";
 import { useState } from "react";
+import { LaunchAccessPanel } from "@/components/dashboard/launch-access-panel";
 import { useDashboard } from "@/components/dashboard/dashboard-context";
 import { toast } from "@/components/ui/toast";
 import { isSubscriptionActive } from "@/lib/dashboard-utils";
+import { isLaunchFreeMode } from "@/lib/launch-mode";
 import { supabase } from "@/lib/supabase";
 import {
   getPlanStatusLabel,
@@ -19,6 +21,10 @@ export function SubscriptionPanel() {
   const [loadingPortal, setLoadingPortal] = useState(false);
 
   if (!academy) return null;
+
+  if (isLaunchFreeMode()) {
+    return <LaunchAccessPanel />;
+  }
 
   const academyId = academy.id;
   const active = isSubscriptionActive(academy.plan_status);

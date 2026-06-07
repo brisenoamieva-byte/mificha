@@ -2,13 +2,19 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { MatchSavedSummary, type SavedPlayerSummary } from "@/components/dashboard/match-saved-summary";
+import {
+  MinuteQuickInput,
+  QuickGoalPicker,
+} from "@/components/dashboard/match-stat-capture";
 import { PlayerAvatar } from "@/components/ui/player-avatar";
 import { toast } from "@/components/ui/toast";
 import { useDashboard } from "@/components/dashboard/dashboard-context";
 import { NoAcademyState } from "@/components/dashboard/no-academy-state";
 import { getPositionLabel } from "@/lib/dashboard-utils";
 import { defaultSeasonName } from "@/lib/match-utils";
+import { calculatePassportScoreForPlayer } from "@/lib/passport-score";
 import { supabase } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
 import type { MatchResult, Player, Season } from "@/types/database";
@@ -155,10 +161,11 @@ function SeasonQuickForm({
 export function PartidosNuevoContent() {
   const router = useRouter();
   const { academy } = useDashboard();
-  const [step, setStep] = useState<1 | 2>(1);
+  const [step, setStep] = useState<1 | 2 | 3>(1);
   const [season, setSeason] = useState<Season | null>(null);
   const [players, setPlayers] = useState<Player[]>([]);
   const [captures, setCaptures] = useState<PlayerCapture[]>([]);
+  const [savedSummaries, setSavedSummaries] = useState<SavedPlayerSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -168,6 +175,11 @@ export function PartidosNuevoContent() {
   const [result, setResult] = useState<MatchResult>("win");
   const [goalsFor, setGoalsFor] = useState(0);
   const [goalsAgainst, setGoalsAgainst] = useState(0);
+
+  const playedCount = useMemo(
+    () => captures.filter((item) => item.played).length,
+    [captures],
+  );
 
   const loadData = useCallback(async () => {
     if (!academy) return;
@@ -211,14 +223,24 @@ export function PartidosNuevoContent() {
     loadData();
   }, [loadData]);
 
-  function updateCapture(
-    playerId: string,
-    patch: Partial<PlayerCapture>,
-  ) {
+  function updateCapture(playerId: string, patch: Partial<PlayerCapture>) {
     setCaptures((current) =>
-      current.map((item) =>
-        item.player_id === playerId ? { ...item, ...patch } : item,
-      ),
+      current.map((item) => {
+        if (item.player_id !== playerId) return item;
+
+        const next = { ...item, ...patch };
+        const hasActivity =
+          next.goals > 0 || next.assists > 0 || next.minutes > 0 || next.played;
+
+        if (hasActivity) {
+          next.played = true;
+          if (next.minutes === 0 && (next.goals > 0 || next.assists > 0)) {
+            next.minutes = 45;
+          }
+        }
+
+        return next;
+      }),
     );
   }
 
@@ -229,6 +251,21 @@ export function PartidosNuevoContent() {
     setError(null);
 
     try {
+      const playedStats = captures.filter((item) => item.played);
+      const playedIds = playedStats.map((item) => item.player_id);
+
+      const previousScores = new Map<string, number>();
+      if (playedIds.length > 0) {
+        const { data: beforePlayers } = await supabase
+          .from("players")
+          .select("id, passport_score, slug, first_name, last_name, is_public, public_consent_at")
+          .in("id", playedIds);
+
+        for (const player of beforePlayers ?? []) {
+          previousScores.set(player.id, player.passport_score);
+        }
+      }
+
       const { data: match, error: matchError } = await supabase
         .from("matches")
         .insert({
@@ -245,8 +282,6 @@ export function PartidosNuevoContent() {
 
       if (matchError || !match) throw matchError ?? new Error("No se creó el partido.");
 
-      const playedStats = captures.filter((item) => item.played);
-
       if (playedStats.length > 0) {
         const { error: statsError } = await supabase.from("match_stats").insert(
           playedStats.map((item) => ({
@@ -262,10 +297,59 @@ export function PartidosNuevoContent() {
         );
 
         if (statsError) throw statsError;
+
+        for (const capture of playedStats) {
+          const player = players.find((item) => item.id === capture.player_id);
+          if (!player) continue;
+
+          const { data: seasonStat } = await supabase
+            .from("player_season_stats")
+            .select("*")
+            .eq("player_id", capture.player_id)
+            .eq("season_id", season.id)
+            .maybeSingle();
+
+          const nextScore = calculatePassportScoreForPlayer(player, seasonStat);
+          await supabase
+            .from("players")
+            .update({ passport_score: nextScore })
+            .eq("id", capture.player_id);
+        }
       }
 
-      toast.success("Partido guardado. Stats actualizados.");
-      setTimeout(() => router.push("/dashboard/partidos"), 900);
+      let summaries: SavedPlayerSummary[] = [];
+
+      if (playedIds.length > 0) {
+        const { data: afterPlayers } = await supabase
+          .from("players")
+          .select("id, slug, first_name, last_name, passport_score, is_public, public_consent_at")
+          .in("id", playedIds);
+
+        summaries = playedStats.map((capture) => {
+          const updated = afterPlayers?.find(
+            (player) => player.id === capture.player_id,
+          );
+
+          return {
+            player_id: capture.player_id,
+            first_name: updated?.first_name ?? "",
+            last_name: updated?.last_name ?? "",
+            slug: updated?.slug ?? "",
+            goals: capture.goals,
+            assists: capture.assists,
+            minutes: capture.minutes,
+            passport_score: updated?.passport_score ?? 0,
+            previous_passport_score:
+              previousScores.get(capture.player_id) ?? updated?.passport_score ?? 0,
+            is_public: updated?.is_public ?? false,
+            public_consent_at: updated?.public_consent_at ?? null,
+          };
+        });
+      }
+
+      setSavedSummaries(summaries);
+      setStep(3);
+      toast.success("Partido guardado. Passport Score actualizado.");
     } catch (saveError) {
       setError(
         saveError instanceof Error
@@ -297,18 +381,27 @@ export function PartidosNuevoContent() {
           <p className="mt-2 text-slate-600">
             Necesitas una temporada activa para capturar partidos.
           </p>
-          <SeasonQuickForm
-            academyId={academy.id}
-            onCreated={() => loadData()}
-          />
+          <SeasonQuickForm academyId={academy.id} onCreated={() => loadData()} />
         </div>
+      </div>
+    );
+  }
+
+  if (step === 3) {
+    return (
+      <div className="mx-auto max-w-3xl pb-12">
+        <MatchSavedSummary
+          opponent={opponent}
+          players={savedSummaries}
+          onDone={() => router.push("/dashboard/partidos")}
+        />
       </div>
     );
   }
 
   return (
     <>
-      <div className="mx-auto max-w-4xl pb-28">
+      <div className="mx-auto max-w-3xl pb-28">
         <Link
           href="/dashboard/partidos"
           className="text-sm font-medium text-[#1B4F8C] hover:underline"
@@ -317,18 +410,15 @@ export function PartidosNuevoContent() {
         </Link>
 
         <div className="mt-4 flex items-center gap-2">
-          <span
-            className={cn(
-              "h-2 flex-1 rounded-full",
-              step >= 1 ? "bg-[#1B4F8C]" : "bg-slate-200",
-            )}
-          />
-          <span
-            className={cn(
-              "h-2 flex-1 rounded-full",
-              step >= 2 ? "bg-[#1B4F8C]" : "bg-slate-200",
-            )}
-          />
+          {[1, 2].map((value) => (
+            <span
+              key={value}
+              className={cn(
+                "h-2 flex-1 rounded-full",
+                step >= value ? "bg-[#1B4F8C]" : "bg-slate-200",
+              )}
+            />
+          ))}
         </div>
 
         {step === 1 ? (
@@ -413,16 +503,22 @@ export function PartidosNuevoContent() {
                 onClick={() => setStep(2)}
                 className="w-full rounded-2xl bg-[#1B4F8C] px-5 py-4 text-base font-semibold text-white disabled:opacity-50"
               >
-                Siguiente
+                Siguiente · stats por jugador
               </button>
             </div>
           </div>
         ) : (
           <div className="mt-6 space-y-4">
-            <div>
-              <h1 className="text-2xl font-bold text-slate-900">Stats del plantel</h1>
+            <div className="rounded-2xl bg-white p-5 shadow-sm">
+              <h1 className="text-2xl font-bold text-slate-900">
+                Stats por jugador
+              </h1>
               <p className="mt-1 text-slate-600">
                 Paso 2 de 2 · vs {opponent}
+              </p>
+              <p className="mt-3 text-sm text-slate-500">
+                Partido registrado → captura rápida → guardar → Passport Score
+                se recalcula → avisa al padre por WhatsApp.
               </p>
             </div>
 
@@ -433,7 +529,7 @@ export function PartidosNuevoContent() {
                 </p>
               </div>
             ) : (
-              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              <div className="space-y-3">
                 {players.map((player) => {
                   const capture = captures.find(
                     (item) => item.player_id === player.id,
@@ -443,114 +539,112 @@ export function PartidosNuevoContent() {
                   return (
                     <div
                       key={player.id}
-                      className="rounded-2xl bg-white p-5 shadow-sm"
+                      className={cn(
+                        "rounded-2xl border bg-white p-4 shadow-sm",
+                        capture.played
+                          ? "border-[#1B4F8C]/30 ring-1 ring-[#1B4F8C]/10"
+                          : "border-slate-200",
+                      )}
                     >
-                      <div className="flex flex-col items-center text-center">
+                      <div className="flex items-center gap-3">
                         <PlayerAvatar
                           firstName={player.first_name}
                           lastName={player.last_name}
                           photoUrl={player.photo_url}
-                          size="md"
+                          size="sm"
                         />
-                        <p className="mt-3 font-semibold text-slate-900">
-                          {player.first_name} {player.last_name}
-                        </p>
-                        <p className="mt-1 text-xs text-slate-500">
-                          {getPositionLabel(player.position)}
-                        </p>
-                      </div>
-
-                      <label className="mt-5 flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3">
-                        <span className="text-sm font-medium text-slate-700">
-                          ¿Jugó?
-                        </span>
-                        <input
-                          type="checkbox"
-                          checked={capture.played}
-                          onChange={(event) =>
-                            updateCapture(player.id, {
-                              played: event.target.checked,
-                            })
-                          }
-                          className="h-5 w-5 rounded border-slate-300"
-                        />
-                      </label>
-
-                      <div className="mt-4 space-y-4">
-                        <div>
-                          <label className="block text-sm font-medium text-slate-600">
-                            Minutos
-                          </label>
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate font-semibold text-slate-900">
+                            {player.first_name} {player.last_name}
+                          </p>
+                          <p className="text-xs text-slate-500">
+                            {getPositionLabel(player.position)} · Passport{" "}
+                            {player.passport_score}
+                          </p>
+                        </div>
+                        <label className="inline-flex items-center gap-2 text-sm font-medium text-slate-700">
                           <input
-                            type="number"
-                            min={0}
-                            max={120}
-                            disabled={!capture.played}
-                            value={capture.minutes || ""}
+                            type="checkbox"
+                            checked={capture.played}
                             onChange={(event) =>
                               updateCapture(player.id, {
-                                minutes: Number(event.target.value) || 0,
+                                played: event.target.checked,
+                                minutes: event.target.checked
+                                  ? capture.minutes || 45
+                                  : 0,
+                                goals: event.target.checked ? capture.goals : 0,
+                                assists: event.target.checked
+                                  ? capture.assists
+                                  : 0,
                               })
                             }
-                            className="mt-1 w-full rounded-xl border border-slate-300 px-4 py-3 text-center text-lg disabled:bg-slate-50"
+                            className="h-4 w-4 rounded border-slate-300"
                           />
-                        </div>
+                          Jugó
+                        </label>
+                      </div>
 
-                        <div className="grid grid-cols-2 gap-4">
-                          <Counter
-                            label="Goles"
-                            value={capture.goals}
-                            onChange={(value) =>
-                              updateCapture(player.id, { goals: value })
-                            }
-                            max={10}
-                            disabled={!capture.played}
-                          />
-                          <Counter
-                            label="Asistencias"
-                            value={capture.assists}
-                            onChange={(value) =>
-                              updateCapture(player.id, { assists: value })
-                            }
-                            max={10}
-                            disabled={!capture.played}
-                          />
-                        </div>
+                      <div className="mt-4 grid gap-4 sm:grid-cols-3">
+                        <QuickGoalPicker
+                          label="Goles"
+                          value={capture.goals}
+                          max={3}
+                          disabled={!capture.played}
+                          onChange={(value) =>
+                            updateCapture(player.id, { goals: value })
+                          }
+                        />
+                        <QuickGoalPicker
+                          label="Asistencias"
+                          value={capture.assists}
+                          max={3}
+                          disabled={!capture.played}
+                          onChange={(value) =>
+                            updateCapture(player.id, { assists: value })
+                          }
+                        />
+                        <MinuteQuickInput
+                          value={capture.minutes}
+                          disabled={!capture.played}
+                          onChange={(value) =>
+                            updateCapture(player.id, { minutes: value })
+                          }
+                        />
+                      </div>
 
-                        <div className="grid grid-cols-2 gap-3">
-                          <button
-                            type="button"
-                            disabled={!capture.played}
-                            onClick={() =>
-                              updateCapture(player.id, {
-                                yellow: !capture.yellow,
-                              })
-                            }
-                            className={cn(
-                              "rounded-xl border-2 px-3 py-3 text-sm font-semibold disabled:opacity-40",
-                              capture.yellow
-                                ? "border-amber-400 bg-amber-50"
-                                : "border-slate-200",
-                            )}
-                          >
-                            🟨 Amarilla
-                          </button>
-                          <button
-                            type="button"
-                            disabled={!capture.played}
-                            onClick={() =>
-                              updateCapture(player.id, { red: !capture.red })
-                            }
-                            className={cn(
-                              "rounded-xl border-2 px-3 py-3 text-sm font-semibold disabled:opacity-40",
-                              capture.red
-                                ? "border-red-500 bg-red-50"
-                                : "border-slate-200",
-                            )}
-                          >
-                            🟥 Roja
-                          </button>
-                        </div>
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        <button
+                          type="button"
+                          disabled={!capture.played}
+                          onClick={() =>
+                            updateCapture(player.id, {
+                              yellow: !capture.yellow,
+                            })
+                          }
+                          className={cn(
+                            "rounded-lg border px-3 py-1.5 text-xs font-semibold disabled:opacity-40",
+                            capture.yellow
+                              ? "border-amber-400 bg-amber-50"
+                              : "border-slate-200",
+                          )}
+                        >
+                          🟨 Amarilla
+                        </button>
+                        <button
+                          type="button"
+                          disabled={!capture.played}
+                          onClick={() =>
+                            updateCapture(player.id, { red: !capture.red })
+                          }
+                          className={cn(
+                            "rounded-lg border px-3 py-1.5 text-xs font-semibold disabled:opacity-40",
+                            capture.red
+                              ? "border-red-500 bg-red-50"
+                              : "border-slate-200",
+                          )}
+                        >
+                          🟥 Roja
+                        </button>
                       </div>
                     </div>
                   );
@@ -569,7 +663,7 @@ export function PartidosNuevoContent() {
 
       {step === 2 ? (
         <div className="fixed inset-x-0 bottom-0 border-t border-slate-200 bg-white p-4 shadow-lg">
-          <div className="mx-auto flex max-w-4xl gap-3">
+          <div className="mx-auto flex max-w-3xl flex-col gap-2 sm:flex-row">
             <button
               type="button"
               onClick={() => setStep(1)}
@@ -577,18 +671,22 @@ export function PartidosNuevoContent() {
             >
               Atrás
             </button>
-            <button
-              type="button"
-              disabled={saving}
-              onClick={handleSave}
-              className="flex-1 rounded-2xl bg-green-600 px-5 py-4 text-base font-semibold text-white hover:bg-green-700 disabled:opacity-60"
-            >
-              {saving ? "Guardando..." : "Guardar partido"}
-            </button>
+            <div className="flex flex-1 flex-col gap-2 sm:flex-row">
+              <p className="flex items-center justify-center text-sm text-slate-500 sm:mr-2">
+                {playedCount} jugador{playedCount === 1 ? "" : "es"} marcados
+              </p>
+              <button
+                type="button"
+                disabled={saving}
+                onClick={handleSave}
+                className="flex-1 rounded-2xl bg-green-600 px-5 py-4 text-base font-semibold text-white hover:bg-green-700 disabled:opacity-60"
+              >
+                {saving ? "Guardando..." : "Guardar · recalcular Score"}
+              </button>
+            </div>
           </div>
         </div>
       ) : null}
-
     </>
   );
 }

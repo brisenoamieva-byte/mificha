@@ -4,13 +4,14 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import {
   AlertCircle,
-  CreditCard,
+  Sparkles,
   Trophy,
   Users,
 } from "lucide-react";
 import { useDashboard } from "@/components/dashboard/dashboard-context";
 import { MetricCard } from "@/components/dashboard/metric-card";
 import { NoAcademyState } from "@/components/dashboard/no-academy-state";
+import { AcademyOnboardingPanel } from "@/components/dashboard/academy-onboarding-panel";
 import { SubscriptionPanel } from "@/components/dashboard/subscription-panel";
 import { AcademyWeeklyCompetition } from "@/components/dashboard/academy-weekly-competition";
 import { TeamInsightsPanel } from "@/components/dashboard/team-insights-panel";
@@ -22,8 +23,8 @@ import { toast } from "@/components/ui/toast";
 import {
   calculateAge,
   getPositionLabel,
-  isSubscriptionActive,
 } from "@/lib/dashboard-utils";
+import { isLaunchFreeMode } from "@/lib/launch-mode";
 import { supabase } from "@/lib/supabase";
 import type { Player, PlayerPosition, PlayerSeasonStat } from "@/types/database";
 
@@ -31,7 +32,6 @@ interface DashboardStats {
   totalPlayers: number;
   seasonMatches: number;
   incompleteProfiles: number;
-  subscriptionActive: boolean;
 }
 
 interface RecentPlayer {
@@ -142,7 +142,6 @@ export function DashboardHome() {
           totalPlayers: playersCountResult.count ?? 0,
           seasonMatches,
           incompleteProfiles: incompleteCountResult.count ?? 0,
-          subscriptionActive: isSubscriptionActive(academy.plan_status),
         });
         setRecentPlayers(recentPlayersResult.data ?? []);
       } finally {
@@ -170,6 +169,8 @@ export function DashboardHome() {
         </p>
       </div>
 
+      <AcademyOnboardingPanel />
+
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         {stats ? (
           <>
@@ -189,12 +190,12 @@ export function DashboardHome() {
               icon={AlertCircle}
             />
             <MetricCard
-              title="Estado de suscripción"
+              title={isLaunchFreeMode() ? "Acceso" : "Suscripción"}
               value=""
-              icon={CreditCard}
+              icon={Sparkles}
               badge={{
-                label: stats.subscriptionActive ? "Activa" : "Inactiva",
-                active: stats.subscriptionActive,
+                label: isLaunchFreeMode() ? "Gratuito" : "Ver planes",
+                active: isLaunchFreeMode(),
               }}
             />
           </>

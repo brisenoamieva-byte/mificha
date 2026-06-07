@@ -5,16 +5,18 @@ import {
   QrCode,
   Search,
   ShieldCheck,
+  Sparkles,
   TrendingUp,
 } from "lucide-react";
 import { SiteFooter, SiteHeader } from "@/components/marketing/site-header";
+import { isLaunchFreeMode, LAUNCH_COPY } from "@/lib/launch-mode";
 
 const audiences = [
   {
     icon: Building2,
     emoji: "🏟️",
     title: "Soy academia",
-    description: "Gestiona plantel, stats y reportes comparativos a padres.",
+    description: "Gestiona plantel, stats y reportes. Acceso gratuito en lanzamiento.",
     href: "/signup",
     secondaryHref: "/login",
     secondaryLabel: "Iniciar sesión",
@@ -49,11 +51,28 @@ const proofPoints = [
 ];
 
 export default function Home() {
+  const launchFree = isLaunchFreeMode();
+
   return (
     <div className="flex min-h-full flex-col bg-mf-canvas">
       <SiteHeader />
 
       <main className="flex-1">
+        {launchFree ? (
+          <section className="border-b border-mf-brand/20 bg-mf-brand-soft">
+            <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3 sm:px-6">
+              <Sparkles className="h-4 w-4 shrink-0 text-mf-brand" />
+              <p className="text-sm text-mf-text-secondary">
+                <span className="font-semibold text-mf-brand">
+                  {LAUNCH_COPY.badge}.
+                </span>{" "}
+                Academias, padres y scouts pueden usar MiFicha sin costo mientras
+                construimos la red de talento verificado.
+              </p>
+            </div>
+          </section>
+        ) : null}
+
         <section className="border-b border-mf-border bg-mf-surface">
           <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:py-16">
             <div className="max-w-3xl">

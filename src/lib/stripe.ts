@@ -9,18 +9,18 @@ export const PLAN_CONFIG: Record<
 > = {
   starter: {
     label: "Starter",
-    priceLabel: "$4,990/mes",
-    amount: 499_000,
+    priceLabel: "$699/mes",
+    amount: 69_900,
   },
   pro: {
     label: "Pro",
-    priceLabel: "$6,990/mes",
-    amount: 699_000,
+    priceLabel: "$1,199/mes",
+    amount: 119_900,
   },
   elite: {
     label: "Elite",
-    priceLabel: "$9,990/mes",
-    amount: 999_000,
+    priceLabel: "$1,999/mes",
+    amount: 199_900,
   },
 };
 

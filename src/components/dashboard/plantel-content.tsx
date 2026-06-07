@@ -6,6 +6,7 @@ import {
   FileSpreadsheet,
   Pencil,
   Plus,
+  Printer,
   Trash2,
   UserPlus,
 } from "lucide-react";
@@ -19,6 +20,7 @@ import { Skeleton } from "@/components/dashboard/skeletons";
 import { PassportBar } from "@/components/ui/passport-bar";
 import { PlayerAvatar } from "@/components/ui/player-avatar";
 import { PositionBadge } from "@/components/ui/position-badge";
+import { SharePlayerButton } from "@/components/ui/share-player-button";
 import { toast } from "@/components/ui/toast";
 import { MiniStatCard } from "@/components/ui/visual-stats";
 import { CategoryFilterSelect } from "@/components/ui/category-filter-select";
@@ -166,6 +168,13 @@ export function PlantelContent() {
           </div>
 
           <div className="flex flex-wrap gap-3">
+            <Link
+              href="/dashboard/plantel/imprimir"
+              className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50"
+            >
+              <Printer className="h-4 w-4" />
+              QR imprimibles
+            </Link>
             <button
               type="button"
               onClick={downloadPlayerImportTemplate}
@@ -363,6 +372,14 @@ export function PlantelContent() {
                       </td>
                       <td className="px-4 py-4 sm:px-6">
                         <div className="flex items-center gap-2">
+                          <SharePlayerButton
+                            slug={player.slug}
+                            firstName={player.first_name}
+                            lastName={player.last_name}
+                            isPublic={player.is_public}
+                            publicConsentAt={player.public_consent_at}
+                            compact
+                          />
                           <Link
                             href={`/j/${player.slug}`}
                             target="_blank"
