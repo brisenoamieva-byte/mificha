@@ -1,5 +1,6 @@
 "use client";
 
+import { PassportScoreDisplay } from "@/components/ui/passport-score-display";
 import { cn } from "@/lib/utils";
 
 interface ComparisonBarProps {
@@ -87,43 +88,22 @@ interface PassportRingProps {
 }
 
 const ringSizes = {
-  sm: { box: "h-16 w-16", text: "text-lg", label: "text-[10px]" },
-  md: { box: "h-24 w-24", text: "text-3xl", label: "text-xs" },
-  lg: { box: "h-32 w-32", text: "text-4xl", label: "text-sm" },
+  sm: "max-w-[88px]",
+  md: "max-w-[120px]",
+  lg: "max-w-[160px]",
 };
 
 export function PassportRing({
   score,
-  label = "Passport",
   size = "md",
 }: PassportRingProps) {
-  const clamped = Math.min(Math.max(score, 0), 100);
-  const styles = ringSizes[size];
-  const strokeColor =
-    clamped < 50 ? "#b24020" : clamped <= 70 ? "#915907" : "#057642";
-
   return (
-    <div className={cn("relative flex items-center justify-center", styles.box)}>
-      <svg className="absolute inset-0 -rotate-90" viewBox="0 0 100 100">
-        <circle cx="50" cy="50" r="42" fill="none" stroke="#ebebeb" strokeWidth="8" />
-        <circle
-          cx="50"
-          cy="50"
-          r="42"
-          fill="none"
-          stroke={strokeColor}
-          strokeWidth="8"
-          strokeLinecap="round"
-          strokeDasharray={`${(clamped / 100) * 264} 264`}
-        />
-      </svg>
-      <div className="text-center">
-        <p className={cn("font-semibold tabular-nums text-mf-text", styles.text)}>
-          {clamped}
-        </p>
-        <p className={cn("font-medium text-mf-text-muted", styles.label)}>{label}</p>
-      </div>
-    </div>
+    <PassportScoreDisplay
+      score={score}
+      variant="hero"
+      showLabel={false}
+      className={ringSizes[size]}
+    />
   );
 }
 

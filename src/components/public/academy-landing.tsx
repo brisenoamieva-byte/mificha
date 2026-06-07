@@ -1,14 +1,14 @@
 import Link from "next/link";
 import { Award, ExternalLink, MapPin, Shield, Trophy, Users } from "lucide-react";
 import { AcademyScheduleSection } from "@/components/marketing/match-schedule-card";
+import { PassportSegments } from "@/components/ui/passport-score-display";
 import { BrandLogoLink } from "@/components/ui/brand-logo";
 import { getPositionLabel } from "@/lib/dashboard-utils";
 import {
   formatWhatsAppUrl,
   type PublicAcademyData,
 } from "@/lib/public-academy";
-import { getPassportBarClass, getPlayerInitials } from "@/lib/player-utils";
-import { cn } from "@/lib/utils";
+import { getPlayerInitials } from "@/lib/player-utils";
 
 interface AcademyLandingProps {
   data: PublicAcademyData;
@@ -162,7 +162,6 @@ export function AcademyLanding({ data }: AcademyLandingProps) {
           <div className="mt-10 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
             {featuredPlayers.map((player) => {
               const fullName = `${player.first_name} ${player.last_name}`;
-              const scoreWidth = Math.min(Math.max(player.passport_score, 0), 100);
 
               return (
                 <Link
@@ -196,20 +195,10 @@ export function AcademyLanding({ data }: AcademyLandingProps) {
                   </div>
 
                   <div className="p-5">
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="text-xs font-bold uppercase tracking-[0.18em] text-slate-500">
-                        Passport Score
-                      </span>
-                      <span className="text-lg font-black" style={{ color: accent }}>
-                        {player.passport_score}
-                      </span>
-                    </div>
-                    <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-800">
-                      <div
-                        className={cn("h-full rounded-full", getPassportBarClass(player.passport_score))}
-                        style={{ width: `${scoreWidth}%` }}
-                      />
-                    </div>
+                    <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-500">
+                      Passport Score
+                    </p>
+                    <PassportSegments score={player.passport_score} className="mt-3" />
                   </div>
                 </Link>
               );

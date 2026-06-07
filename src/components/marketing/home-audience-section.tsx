@@ -30,7 +30,7 @@ const audiences: AudienceItem[] = [
     icon: QrCode,
     title: "Padres",
     description:
-      "Escanea el QR en la cancha o abre el link. Stats y Passport Score sin registro ni contraseña.",
+      "Abre el link o QR que te comparte la academia. Stats y Passport Score sin registro.",
     href: "/padres",
     cta: "Abrir ficha",
   },
@@ -50,7 +50,7 @@ export function HomeAudienceSection() {
       <div className="max-w-2xl">
         <p className="mf-marketing-eyebrow">Tres accesos, una plataforma</p>
         <h2 className="mt-3 text-2xl font-semibold tracking-[-0.02em] text-mf-text sm:text-3xl">
-          Diseñado para cada actor del ecosistema
+          Para academias, padres y scouts
         </h2>
       </div>
 

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { BarChart3, Crown } from "lucide-react";
 import { useMemo, useState } from "react";
+import { PassportScoreDisplay } from "@/components/ui/passport-score-display";
 import { TrendBadge } from "@/components/ui/trend-badge";
 import type { RankedWeeklyPerformance } from "@/lib/ideal-xi";
 import {
@@ -104,11 +105,13 @@ function PassportRankingRow({
           {player.academies?.name ?? "Academia"}
         </p>
       </div>
-      <div className="text-right">
-        <p className="text-base font-semibold tabular-nums text-mf-brand">
-          {player.passport_score}
-        </p>
-      </div>
+      <PassportScoreDisplay
+        score={player.passport_score}
+        variant="compact"
+        showLabel={false}
+        showTier={false}
+        className="min-w-[52px] px-2 py-1"
+      />
     </Link>
   );
 }

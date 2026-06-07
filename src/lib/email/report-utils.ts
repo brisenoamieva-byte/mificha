@@ -1,11 +1,10 @@
 import type { PlayerSeasonStat } from "@/types/database";
+import { getPassportTier } from "@/lib/passport-score";
 
 export const REPORT_COOLDOWN_DAYS = 7;
 
 export function getPassportBarColor(score: number) {
-  if (score < 50) return "#ef4444";
-  if (score <= 70) return "#f59e0b";
-  return "#22c55e";
+  return getPassportTier(score).accent;
 }
 
 export function getReportCooldownStart() {

@@ -133,7 +133,7 @@ export const HOME_FEATURES = [
     title: "Padres sin app",
     federation: "Portal federado con registro y pagos",
     mificha:
-      "Escanean QR en la cancha. WhatsApp con ficha verificada al instante.",
+      "La academia comparte QR o link. Padres consultan stats sin registro.",
     href: "/padres",
   },
   {

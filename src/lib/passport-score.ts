@@ -1,5 +1,20 @@
 import type { Player, PlayerSeasonStat } from "@/types/database";
 
+export type PassportTier = "elite" | "pro" | "desarrollo" | "base";
+
+export interface PassportTierStyle {
+  tier: PassportTier;
+  label: string;
+  scoreText: string;
+  badgeBg: string;
+  badgeText: string;
+  panelBg: string;
+  panelBorder: string;
+  accent: string;
+  segmentFilled: string;
+  segmentEmpty: string;
+}
+
 export interface PassportScoreInput {
   photo_url: string | null;
   video_url: string | null;
@@ -88,4 +103,82 @@ export function buildMatchUpdateWhatsAppMessage(options: {
     deltaLine,
     `Ver ficha: ${options.fichaUrl}`,
   ].join("\n");
+}
+
+export function clampPassportScore(score: number) {
+  return Math.min(Math.max(score, 0), 100);
+}
+
+export function getPassportTier(score: number): PassportTierStyle {
+  const value = clampPassportScore(score);
+
+  if (value >= 80) {
+    return {
+      tier: "elite",
+      label: "ELITE",
+      scoreText: "text-amber-300",
+      badgeBg: "bg-gradient-to-r from-amber-500 to-yellow-400",
+      badgeText: "text-slate-950",
+      panelBg: "bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800",
+      panelBorder: "border-amber-400/40",
+      accent: "#fbbf24",
+      segmentFilled: "bg-amber-400",
+      segmentEmpty: "bg-white/10",
+    };
+  }
+
+  if (value >= 65) {
+    return {
+      tier: "pro",
+      label: "PRO",
+      scoreText: "text-emerald-300",
+      badgeBg: "bg-gradient-to-r from-emerald-500 to-green-400",
+      badgeText: "text-slate-950",
+      panelBg: "bg-gradient-to-br from-[#0a1f3d] via-[#0f2d52] to-[#163a66]",
+      panelBorder: "border-emerald-400/30",
+      accent: "#34d399",
+      segmentFilled: "bg-emerald-400",
+      segmentEmpty: "bg-white/10",
+    };
+  }
+
+  if (value >= 50) {
+    return {
+      tier: "desarrollo",
+      label: "DESARROLLO",
+      scoreText: "text-amber-200",
+      badgeBg: "bg-gradient-to-r from-amber-600 to-orange-500",
+      badgeText: "text-white",
+      panelBg: "bg-gradient-to-br from-slate-800 via-slate-700 to-slate-800",
+      panelBorder: "border-amber-500/30",
+      accent: "#f59e0b",
+      segmentFilled: "bg-amber-400",
+      segmentEmpty: "bg-white/10",
+    };
+  }
+
+  return {
+    tier: "base",
+    label: "BASE",
+    scoreText: "text-slate-200",
+    badgeBg: "bg-gradient-to-r from-slate-600 to-slate-500",
+    badgeText: "text-white",
+    panelBg: "bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900",
+    panelBorder: "border-slate-500/30",
+    accent: "#94a3b8",
+    segmentFilled: "bg-slate-400",
+    segmentEmpty: "bg-white/10",
+  };
+}
+
+export function getPassportFilledSegments(score: number, total = 10) {
+  return Math.round((clampPassportScore(score) / 100) * total);
+}
+
+export function getPassportBarClass(score: number) {
+  const tier = getPassportTier(score);
+  if (tier.tier === "elite") return "bg-amber-400";
+  if (tier.tier === "pro") return "bg-emerald-400";
+  if (tier.tier === "desarrollo") return "bg-amber-400";
+  return "bg-slate-400";
 }

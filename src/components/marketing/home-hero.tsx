@@ -6,9 +6,9 @@ import { MarketingPageHero } from "@/components/marketing/marketing-page-hero";
 export function HomeHero() {
   return (
     <MarketingPageHero
-      eyebrow="La ficha técnica digital"
-      title="Stats verificados que padres comparten y scouts evalúan"
-      description="MiFicha complementa tu liga oficial con fichas individuales, captura post-partido en segundos y reportes listos para WhatsApp."
+      eyebrow="Ficha digital del jugador"
+      title="Stats verificados por tu academia"
+      description="Captura el partido en 60 segundos. Comparte la ficha con padres por QR. Scouts la ven en el directorio."
       actions={
         <>
           <Link href="/signup" className="mf-btn-primary">

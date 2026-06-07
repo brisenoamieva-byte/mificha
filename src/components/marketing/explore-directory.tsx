@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Award, MapPin, Search, Shield } from "lucide-react";
 import { useMemo, useState } from "react";
+import { PassportScoreDisplay } from "@/components/ui/passport-score-display";
 import { CategoryFilterSelect } from "@/components/ui/category-filter-select";
 import { PlayerCategoryBadge } from "@/components/ui/player-category-badge";
 import { MexicoLocationSelect } from "@/components/ui/mexico-location-select";
@@ -272,14 +273,11 @@ export function ExploreDirectory({
                       {player.academies?.name ?? "Academia"}
                     </p>
                   </div>
-                  <div className="text-right">
-                    <p className="text-xl font-semibold tabular-nums text-mf-brand">
-                      {player.passport_score}
-                    </p>
-                    <p className="text-[11px] font-medium text-mf-text-muted">
-                      Passport
-                    </p>
-                  </div>
+                  <PassportScoreDisplay
+                    score={player.passport_score}
+                    variant="compact"
+                    showLabel
+                  />
                 </div>
                 <div className="mt-4 flex flex-wrap items-center gap-2">
                   <PlayerCategoryBadge birthDate={player.birth_date} compact />

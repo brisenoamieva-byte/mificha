@@ -1,51 +1,7 @@
 import { BadgeCheck, TrendingUp } from "lucide-react";
-import { getPassportCircleStyles } from "@/lib/player-utils";
-import { cn } from "@/lib/utils";
+import { PassportScoreDisplay } from "@/components/ui/passport-score-display";
 
 const PREVIEW_SCORE = 78;
-
-function PreviewPassportScore({ score }: { score: number }) {
-  const styles = getPassportCircleStyles(score);
-  const radius = 42;
-  const circumference = 2 * Math.PI * radius;
-  const progress = (Math.min(Math.max(score, 0), 100) / 100) * circumference;
-
-  return (
-    <div className="flex flex-col items-center">
-      <p className="text-xs font-medium uppercase tracking-wide text-mf-text-muted">
-        Passport Score
-      </p>
-      <div
-        className={cn(
-          "relative mt-3 flex h-[7.5rem] w-[7.5rem] items-center justify-center rounded-full",
-          styles.bg,
-        )}
-      >
-        <svg className="absolute inset-0 -rotate-90" viewBox="0 0 100 100">
-          <circle
-            cx="50"
-            cy="50"
-            r={radius}
-            fill="none"
-            stroke="#e2e8f0"
-            strokeWidth="6"
-          />
-          <circle
-            cx="50"
-            cy="50"
-            r={radius}
-            fill="none"
-            stroke={styles.stroke}
-            strokeWidth="6"
-            strokeLinecap="round"
-            strokeDasharray={`${progress} ${circumference}`}
-          />
-        </svg>
-        <p className={cn("text-3xl font-bold tabular-nums", styles.text)}>{score}</p>
-      </div>
-    </div>
-  );
-}
 
 export function HomeFichaPreview() {
   return (
@@ -66,7 +22,7 @@ export function HomeFichaPreview() {
         </div>
 
         <div className="px-5 py-6">
-          <PreviewPassportScore score={PREVIEW_SCORE} />
+          <PassportScoreDisplay score={PREVIEW_SCORE} variant="hero" />
 
           <div className="mt-5 grid grid-cols-3 gap-3">
             {[

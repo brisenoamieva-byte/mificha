@@ -18,10 +18,10 @@ import { BrandLogoLink } from "@/components/ui/brand-logo";
 import { calculateAge, getPositionLabel } from "@/lib/dashboard-utils";
 import { PlayerCategoryBadge } from "@/components/ui/player-category-badge";
 import type { PublicPlayerData } from "@/lib/public-player";
+import { PassportScoreDisplay } from "@/components/ui/passport-score-display";
 import {
   buildPublicPlayerUrl,
   getDominantFootLabel,
-  getPassportCircleStyles,
   getPlayerInitials,
   getPositionBadgeClass,
 } from "@/lib/player-utils";
@@ -47,46 +47,6 @@ function StatTile({
       <p className="mt-1 text-xs font-medium uppercase tracking-wide text-slate-500">
         {label}
       </p>
-    </div>
-  );
-}
-
-function PassportScoreCircle({ score }: { score: number }) {
-  const styles = getPassportCircleStyles(score);
-  const radius = 54;
-  const circumference = 2 * Math.PI * radius;
-  const progress = (Math.min(Math.max(score, 0), 100) / 100) * circumference;
-
-  return (
-    <div className={cn("mx-auto flex h-40 w-40 items-center justify-center rounded-full", styles.bg)}>
-      <div className="relative flex h-36 w-36 items-center justify-center">
-        <svg className="absolute inset-0 -rotate-90" viewBox="0 0 120 120">
-          <circle
-            cx="60"
-            cy="60"
-            r={radius}
-            fill="none"
-            stroke="#e2e8f0"
-            strokeWidth="8"
-          />
-          <circle
-            cx="60"
-            cy="60"
-            r={radius}
-            fill="none"
-            stroke={styles.stroke}
-            strokeWidth="8"
-            strokeLinecap="round"
-            strokeDasharray={`${progress} ${circumference}`}
-          />
-        </svg>
-        <div className="text-center">
-          <p className={cn("text-4xl font-bold", styles.text)}>{score}</p>
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-            PASSPORT
-          </p>
-        </div>
-      </div>
     </div>
   );
 }
@@ -194,8 +154,8 @@ export function PublicPlayerCard({ data }: PublicPlayerCardProps) {
           <h2 className="text-center text-lg font-semibold text-slate-900">
             PASSPORT Score
           </h2>
-          <div className="mt-6">
-            <PassportScoreCircle score={player.passport_score} />
+          <div className="mt-6 flex justify-center">
+            <PassportScoreDisplay score={player.passport_score} variant="hero" />
           </div>
           <p className="mt-4 text-center text-sm text-slate-500">
             Basado en stats verificados por la academia

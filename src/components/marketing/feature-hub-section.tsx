@@ -13,9 +13,8 @@ export function FeatureHubSection() {
               Todo lo que tu portal de liga no cubre
             </h2>
             <p className="mt-4 text-sm leading-7 text-mf-text-secondary">
-              Calendario y tabla oficial en la federación. MiFicha en la capa de
-              academia: fichas individuales, engagement de padres y visibilidad para
-              scouts.
+              La liga publica calendario y tabla. MiFicha registra el rendimiento
+              de cada jugador: fichas, reportes y directorio público.
             </p>
           </div>
 

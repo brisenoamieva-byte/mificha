@@ -62,21 +62,7 @@ export function getPositionBadgeClass(position: PlayerPosition) {
   }
 }
 
-export function getPassportBarClass(score: number) {
-  if (score < 50) return "bg-red-500";
-  if (score <= 70) return "bg-amber-400";
-  return "bg-green-500";
-}
-
-export function getPassportCircleStyles(score: number) {
-  if (score < 50) {
-    return { stroke: "#ef4444", text: "text-red-600", bg: "bg-red-50" };
-  }
-  if (score <= 70) {
-    return { stroke: "#f59e0b", text: "text-amber-600", bg: "bg-amber-50" };
-  }
-  return { stroke: "#22c55e", text: "text-green-600", bg: "bg-green-50" };
-}
+export { getPassportBarClass } from "@/lib/passport-score";
 
 export function isProfileComplete(player: Player) {
   return Boolean(player.photo_url && player.video_url);
