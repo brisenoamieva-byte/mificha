@@ -14,10 +14,10 @@ export function ExploreHeroAside() {
       <div className="relative overflow-hidden rounded-xl border border-mf-border bg-mf-surface shadow-[0_24px_48px_-12px_rgba(15,45,82,0.18)]">
         <div className="border-b border-mf-border-subtle px-5 py-4">
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-text-muted">
-            Marcador semanal
+            Destacados de la semana
           </p>
           <p className="mt-1 text-lg font-semibold tracking-tight text-mf-text">
-            Top rendimientos verificados
+            Actividad verificada por categoría
           </p>
         </div>
         <ul className="divide-y divide-mf-border-subtle">

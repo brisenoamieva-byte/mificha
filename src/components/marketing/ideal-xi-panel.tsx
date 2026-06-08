@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Sparkles, Trophy } from "lucide-react";
 import { useMemo, useState } from "react";
+import { CategoryRequiredNotice } from "@/components/ui/category-required-notice";
 import { MexicoLocationSelect } from "@/components/ui/mexico-location-select";
 import { getPositionLabel } from "@/lib/dashboard-utils";
 import {
@@ -12,6 +13,11 @@ import {
   type WeeklyPlayerPerformance,
 } from "@/lib/ideal-xi";
 import { getPlayerInitials } from "@/lib/player-utils";
+import {
+  getCategoryFilterLabel,
+  isCompetitionCategoryFilter,
+  parseCategoryFilter,
+} from "@/lib/player-category";
 import { cn } from "@/lib/utils";
 
 interface IdealXIPanelProps {
@@ -83,6 +89,9 @@ export function IdealXIPanel({
   const [state, setState] = useState("");
   const [city, setCity] = useState("");
 
+  const categoryLabel = getCategoryFilterLabel(parseCategoryFilter(categoryFilter));
+  const categorySelected = isCompetitionCategoryFilter(categoryFilter);
+
   const idealXI = useMemo(
     () => buildIdealXI(performances, scope, state, city, categoryFilter),
     [performances, scope, state, city, categoryFilter],
@@ -105,14 +114,15 @@ export function IdealXIPanel({
         <div>
           <div className="inline-flex items-center gap-2 rounded-full bg-mf-brand-soft px-3 py-1 text-xs font-semibold text-mf-brand">
             <Sparkles className="h-3.5 w-3.5" />
-            11 ideal de la semana
+            Destacados de la semana
           </div>
           <h2 className="mt-3 mf-section-title">
-            Los mejores de {idealXI.scopeLabel}
+            Once destacado · {idealXI.scopeLabel}
           </h2>
           <p className="mt-2 text-sm text-mf-text-secondary">
-            Semana {weekLabel}. Ranking por goles, asistencias y minutos jugados
-            en partidos verificados.
+            Semana {weekLabel}. Jugadores con mayor actividad verificada
+            {categoryLabel ? ` · ${categoryLabel}` : ""} — una forma ordenada de
+            ser visto, no una sentencia.
           </p>
         </div>
 
@@ -161,7 +171,9 @@ export function IdealXIPanel({
         </div>
       ) : null}
 
-      {!scopeReady ? null : performances.length === 0 ? (
+      {!categorySelected ? (
+        <CategoryRequiredNotice title="El once destacado es por categoría" />
+      ) : !scopeReady ? null : performances.length === 0 ? (
         <div className="mf-card border-dashed p-8 text-center">
           <Trophy className="mx-auto h-8 w-8 text-mf-text-muted" />
           <p className="mt-3 text-sm font-medium text-mf-text">

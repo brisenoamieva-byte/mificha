@@ -115,4 +115,15 @@ body {
   .mf-divider {
     @apply h-px w-full bg-mf-border-subtle;
   }
+
+  .marketing-cover-photo {
+    object-fit: cover;
+    object-position: var(--photo-pos-mobile, center);
+  }
+
+  @media (min-width: 1024px) {
+    .marketing-cover-photo {
+      object-position: var(--photo-pos-desktop, var(--photo-pos-mobile, center));
+    }
+  }
 }

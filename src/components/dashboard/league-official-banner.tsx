@@ -30,8 +30,9 @@ export function LeagueOfficialBanner({ academy, compact }: LeagueOfficialBannerP
       <div>
         <p className="text-sm font-semibold text-slate-900">{leagueLabel}</p>
         <p className="mt-1 text-sm text-slate-600">
-          Calendario y clasificación oficial de tu competición. MiFicha complementa con
-          stats individuales del plantel.
+          Calendario y clasificación oficial de tu competición (FMF, estatal,
+          intercolegial o municipal). MiFicha no reemplaza esa fuente — aquí capturas
+          el rendimiento individual del plantel.
         </p>
       </div>
       <a

@@ -22,7 +22,11 @@ export function HomeFichaPreview() {
         </div>
 
         <div className="px-5 py-6">
-          <PassportScoreDisplay score={PREVIEW_SCORE} variant="hero" />
+          <PassportScoreDisplay
+            score={PREVIEW_SCORE}
+            variant="hero"
+            scoreLabel="Progreso verificado"
+          />
 
           <div className="mt-5 grid grid-cols-3 gap-3">
             {[
@@ -51,7 +55,7 @@ export function HomeFichaPreview() {
             </span>
             <span className="inline-flex items-center gap-1.5 rounded-full bg-mf-brand-soft px-3 py-1 text-xs font-semibold text-mf-brand">
               <TrendingUp className="h-3.5 w-3.5" />
-              +6 esta semana
+              Activo esta semana
             </span>
           </div>
         </div>

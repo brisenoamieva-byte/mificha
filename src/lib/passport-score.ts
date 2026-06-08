@@ -115,7 +115,7 @@ export function getPassportTier(score: number): PassportTierStyle {
   if (value >= 80) {
     return {
       tier: "elite",
-      label: "ELITE",
+      label: "Consolidado",
       scoreText: "text-amber-300",
       badgeBg: "bg-gradient-to-r from-amber-500 to-yellow-400",
       badgeText: "text-slate-950",
@@ -130,7 +130,7 @@ export function getPassportTier(score: number): PassportTierStyle {
   if (value >= 65) {
     return {
       tier: "pro",
-      label: "PRO",
+      label: "En ascenso",
       scoreText: "text-emerald-300",
       badgeBg: "bg-gradient-to-r from-emerald-500 to-green-400",
       badgeText: "text-slate-950",
@@ -145,7 +145,7 @@ export function getPassportTier(score: number): PassportTierStyle {
   if (value >= 50) {
     return {
       tier: "desarrollo",
-      label: "DESARROLLO",
+      label: "En progreso",
       scoreText: "text-amber-200",
       badgeBg: "bg-gradient-to-r from-amber-600 to-orange-500",
       badgeText: "text-white",
@@ -159,7 +159,7 @@ export function getPassportTier(score: number): PassportTierStyle {
 
   return {
     tier: "base",
-    label: "BASE",
+    label: "Comenzando",
     scoreText: "text-slate-200",
     badgeBg: "bg-gradient-to-r from-slate-600 to-slate-500",
     badgeText: "text-white",

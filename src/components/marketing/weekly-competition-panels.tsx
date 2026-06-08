@@ -3,11 +3,16 @@
 import Link from "next/link";
 import { Crown, Flame, Trophy } from "lucide-react";
 import { useMemo } from "react";
+import { CategoryRequiredNotice } from "@/components/ui/category-required-notice";
 import { TrendBadge } from "@/components/ui/trend-badge";
 import { getPositionLabel } from "@/lib/dashboard-utils";
 import type { RankedWeeklyPerformance } from "@/lib/competition";
 import { locationMatches } from "@/lib/mexico-locations";
-import { matchesCategoryFilter, parseCategoryFilter } from "@/lib/player-category";
+import {
+  isCompetitionCategoryFilter,
+  matchesCategoryFilter,
+  parseCategoryFilter,
+} from "@/lib/player-category";
 import { getPlayerInitials } from "@/lib/player-utils";
 
 interface WeeklyCompetitionPanelsProps {
@@ -85,11 +90,16 @@ export function WeeklyCompetitionPanels({
       .slice(0, 6);
   }, [rising, filteredRanked]);
 
+  if (!isCompetitionCategoryFilter(categoryFilter)) {
+    return (
+      <CategoryRequiredNotice title="Los destacados semanales son por categoría" />
+    );
+  }
+
   if (filteredRanked.length === 0) {
     return (
       <div className="mf-card border-dashed p-8 text-center text-sm text-mf-text-secondary">
-        Aún no hay partidos esta semana para armar el marcador competitivo.
-        Cuando las academias registren resultados, verás quién sube y quién lidera.
+        Aún no hay partidos esta semana en esta categoría.
       </div>
     );
   }
@@ -100,11 +110,11 @@ export function WeeklyCompetitionPanels({
         <div className="border-b border-mf-border-subtle px-5 py-4">
           <div className="inline-flex items-center gap-2 rounded-full bg-mf-brand-soft px-3 py-1 text-xs font-semibold text-mf-brand">
             <Trophy className="h-3.5 w-3.5" />
-            Marcador de la semana
+            Destacados de la semana
           </div>
           <h2 className="mt-3 mf-section-title">Top 10 · {weekLabel}</h2>
           <p className="mt-1 text-sm text-mf-text-secondary">
-            Puntos = goles×5 + asistencias×3 + bonus por minutos jugados.
+            Actividad verificada en partidos — por categoría, estado y ciudad.
           </p>
         </div>
 
@@ -152,7 +162,7 @@ export function WeeklyCompetitionPanels({
         </div>
         <h2 className="mt-3 mf-section-title">Subiendo esta semana</h2>
         <p className="mt-1 text-sm text-mf-text-secondary">
-          Jugadores con mayor salto vs la semana anterior.
+          Jugadores con mayor actividad respecto a la semana anterior.
         </p>
 
         {filteredRising.length === 0 ? (

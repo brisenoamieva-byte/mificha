@@ -10,6 +10,8 @@ interface PassportScoreDisplayProps {
   variant?: "hero" | "card" | "compact" | "inline";
   showLabel?: boolean;
   showTier?: boolean;
+  /** Player-facing copy; default keeps product name for coaches */
+  scoreLabel?: string;
   className?: string;
 }
 
@@ -46,6 +48,7 @@ export function PassportScoreDisplay({
   variant = "hero",
   showLabel = true,
   showTier = true,
+  scoreLabel = "Passport Score",
   className,
 }: PassportScoreDisplayProps) {
   const value = clampPassportScore(score);
@@ -87,7 +90,7 @@ export function PassportScoreDisplay({
         {showTier ? (
           <span
             className={cn(
-              "relative inline-flex rounded px-1.5 py-0.5 text-[9px] font-black uppercase tracking-[0.14em]",
+              "relative inline-flex rounded px-1.5 py-0.5 text-[10px] font-semibold tracking-normal",
               tier.badgeBg,
               tier.badgeText,
             )}
@@ -97,15 +100,15 @@ export function PassportScoreDisplay({
         ) : null}
         <p
           className={cn(
-            "relative mt-1 text-2xl font-black italic tabular-nums leading-none tracking-tight",
+            "relative mt-1 text-2xl font-bold tabular-nums leading-none tracking-tight",
             tier.scoreText,
           )}
         >
           {value}
         </p>
         {showLabel ? (
-          <p className="relative mt-1 text-[9px] font-semibold uppercase tracking-[0.16em] text-white/55">
-            Passport
+          <p className="relative mt-1 text-[9px] font-medium text-white/55">
+            {scoreLabel}
           </p>
         ) : null}
       </div>
@@ -129,7 +132,7 @@ export function PassportScoreDisplay({
             {showTier ? (
               <span
                 className={cn(
-                  "inline-flex rounded-md px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.18em]",
+                  "inline-flex rounded-md px-2 py-0.5 text-[10px] font-semibold tracking-normal",
                   tier.badgeBg,
                   tier.badgeText,
                 )}
@@ -139,15 +142,15 @@ export function PassportScoreDisplay({
             ) : null}
             <p
               className={cn(
-                "mt-2 text-5xl font-black italic tabular-nums leading-none tracking-tight drop-shadow-sm",
+                "mt-2 text-5xl font-bold tabular-nums leading-none tracking-tight drop-shadow-sm",
                 tier.scoreText,
               )}
             >
               {value}
             </p>
             {showLabel ? (
-              <p className="mt-2 text-[11px] font-bold uppercase tracking-[0.2em] text-white/50">
-                Passport Score
+              <p className="mt-2 text-[11px] font-medium text-white/50">
+                {scoreLabel}
               </p>
             ) : null}
           </div>
@@ -155,7 +158,7 @@ export function PassportScoreDisplay({
             className="flex h-16 w-14 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-black/20"
             style={{ clipPath: "polygon(50% 0%, 100% 22%, 100% 78%, 50% 100%, 0% 78%, 0% 22%)" }}
           >
-            <span className={cn("text-xl font-black italic tabular-nums", tier.scoreText)}>
+            <span className={cn("text-xl font-bold tabular-nums", tier.scoreText)}>
               {value}
             </span>
           </div>
@@ -181,7 +184,7 @@ export function PassportScoreDisplay({
         {showTier ? (
           <span
             className={cn(
-              "inline-flex rounded-md px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.22em]",
+              "inline-flex rounded-md px-2.5 py-1 text-[10px] font-semibold tracking-normal",
               tier.badgeBg,
               tier.badgeText,
             )}
@@ -197,7 +200,7 @@ export function PassportScoreDisplay({
           />
           <span
             className={cn(
-              "relative text-4xl font-black italic tabular-nums leading-none tracking-tight drop-shadow-md",
+              "relative text-4xl font-bold tabular-nums leading-none tracking-tight drop-shadow-md",
               tier.scoreText,
             )}
           >
@@ -206,8 +209,8 @@ export function PassportScoreDisplay({
         </div>
 
         {showLabel ? (
-          <p className="mt-3 text-[11px] font-bold uppercase tracking-[0.24em] text-white/55">
-            Passport Score
+          <p className="mt-3 text-[11px] font-medium text-white/55">
+            {scoreLabel}
           </p>
         ) : null}
 

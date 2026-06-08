@@ -11,7 +11,8 @@ import {
   Trophy,
   Users,
 } from "lucide-react";
-import { MARKETING_IMAGES } from "@/lib/marketing-assets";
+import type { MarketingImageKey } from "@/lib/marketing-assets";
+import { MARKETING_MEDIA } from "@/lib/marketing-assets";
 
 export interface NavLink {
   href: string;
@@ -84,7 +85,7 @@ export const MARKETING_NAV: NavSection[] = [
       },
       {
         href: "/explorar#rankings",
-        label: "Rankings por posición",
+        label: "Referencia por posición",
         description: "Top por categoría y zona",
       },
       {
@@ -104,16 +105,16 @@ export const HOME_FEATURES = [
     mificha:
       "Captura post-partido en 60 s: rival, marcador y stats por jugador. Enlace a tu liga oficial.",
     href: "/signup",
-    image: MARKETING_IMAGES.featureCalendario,
+    imageKey: "featureCalendario" satisfies MarketingImageKey,
   },
   {
     icon: BarChart3,
     title: "Clasificaciones",
     federation: "Tabla de la competición (puntos del equipo)",
     mificha:
-      "Marcador semanal del plantel, tendencias ↑↓ y Passport Score individual.",
+      "Marcador semanal del plantel y progreso individual por categoría.",
     href: "/explorar",
-    image: MARKETING_IMAGES.featurePassport,
+    imageKey: "featurePassport" satisfies MarketingImageKey,
   },
   {
     icon: Scale,
@@ -130,7 +131,7 @@ export const HOME_FEATURES = [
     mificha:
       "Import Excel, fichas privadas por defecto, QR imprimible para padres.",
     href: "/signup",
-    image: MARKETING_IMAGES.featureCaptura,
+    imageKey: "featureCaptura" satisfies MarketingImageKey,
   },
   {
     icon: QrCode,
@@ -139,7 +140,7 @@ export const HOME_FEATURES = [
     mificha:
       "La academia comparte QR o link. Padres consultan stats sin registro.",
     href: "/padres",
-    image: MARKETING_IMAGES.featureQr,
+    imageKey: "featureQr" satisfies MarketingImageKey,
   },
   {
     icon: ShieldCheck,

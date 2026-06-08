@@ -14,6 +14,12 @@ import { useDashboard } from "@/components/dashboard/dashboard-context";
 import { NoAcademyState } from "@/components/dashboard/no-academy-state";
 import { getPositionLabel } from "@/lib/dashboard-utils";
 import { defaultSeasonName } from "@/lib/match-utils";
+import {
+  getCategoryFilterLabel,
+  inferCategoryFilterFromMatchCategory,
+  matchesCategoryFilter,
+  parseCategoryFilter,
+} from "@/lib/player-category";
 import { calculatePassportScoreForPlayer } from "@/lib/passport-score";
 import { supabase } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
@@ -166,6 +172,9 @@ export function PartidosNuevoContent() {
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [season, setSeason] = useState<Season | null>(null);
   const [scheduledMatchId, setScheduledMatchId] = useState<string | null>(null);
+  const [scheduledMatchCategory, setScheduledMatchCategory] = useState<string | null>(
+    null,
+  );
   const [players, setPlayers] = useState<Player[]>([]);
   const [captures, setCaptures] = useState<PlayerCapture[]>([]);
   const [savedSummaries, setSavedSummaries] = useState<SavedPlayerSummary[]>([]);
@@ -183,6 +192,20 @@ export function PartidosNuevoContent() {
     () => captures.filter((item) => item.played).length,
     [captures],
   );
+
+  const rosterCategoryFilter = useMemo(() => {
+    const inferred = inferCategoryFilterFromMatchCategory(scheduledMatchCategory);
+    return inferred ? parseCategoryFilter(inferred) : { kind: "all" as const };
+  }, [scheduledMatchCategory]);
+
+  const visiblePlayers = useMemo(() => {
+    if (rosterCategoryFilter.kind === "all") return players;
+    return players.filter((player) =>
+      matchesCategoryFilter(player.birth_date, rosterCategoryFilter),
+    );
+  }, [players, rosterCategoryFilter]);
+
+  const rosterCategoryLabel = getCategoryFilterLabel(rosterCategoryFilter);
 
   const loadData = useCallback(async () => {
     if (!academy) {
@@ -203,6 +226,7 @@ export function PartidosNuevoContent() {
 
       if (scheduledMatch && scheduledMatch.status === "scheduled") {
         setScheduledMatchId(scheduledMatch.id);
+        setScheduledMatchCategory(scheduledMatch.category);
         setOpponent(scheduledMatch.opponent);
         setMatchDate(scheduledMatch.match_date);
 
@@ -238,6 +262,7 @@ export function PartidosNuevoContent() {
     }
 
     setScheduledMatchId(null);
+    setScheduledMatchCategory(null);
 
     const [seasonResult, playersResult] = await Promise.all([
       supabase
@@ -599,17 +624,28 @@ export function PartidosNuevoContent() {
                 Partido registrado → captura rápida → guardar → Passport Score
                 se recalcula → avisa al padre por WhatsApp.
               </p>
+              {rosterCategoryLabel ? (
+                <p className="mt-3 rounded-xl bg-[#1B4F8C]/10 px-4 py-3 text-sm text-[#1B4F8C]">
+                  Mostrando jugadores de {rosterCategoryLabel} según la categoría
+                  del partido programado
+                  {scheduledMatchCategory ? ` (${scheduledMatchCategory})` : ""}.
+                </p>
+              ) : null}
             </div>
 
-            {players.length === 0 ? (
+            {visiblePlayers.length === 0 ? (
               <div className="rounded-2xl bg-white p-8 text-center shadow-sm">
                 <p className="text-slate-600">
-                  Agrega jugadores en Mi Plantel primero.
+                  {players.length === 0
+                    ? "Agrega jugadores en Mi Plantel primero."
+                    : rosterCategoryLabel
+                      ? `No hay jugadores de ${rosterCategoryLabel} en tu plantel.`
+                      : "No hay jugadores para capturar."}
                 </p>
               </div>
             ) : (
               <div className="space-y-3">
-                {players.map((player) => {
+                {visiblePlayers.map((player) => {
                   const capture = captures.find(
                     (item) => item.player_id === player.id,
                   );

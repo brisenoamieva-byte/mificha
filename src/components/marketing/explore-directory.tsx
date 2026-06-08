@@ -27,6 +27,7 @@ interface ExploreDirectoryProps {
   risingPerformances: RankedWeeklyPerformance[];
   leaderboard: RankedWeeklyPerformance[];
   weekLabel: string;
+  initialCategoryFilter?: string;
 }
 
 const positionOptions: { value: PlayerPosition | "all"; label: string }[] = [
@@ -44,13 +45,14 @@ export function ExploreDirectory({
   risingPerformances,
   leaderboard,
   weekLabel,
+  initialCategoryFilter = "all",
 }: ExploreDirectoryProps) {
   const [query, setQuery] = useState("");
   const [position, setPosition] = useState<PlayerPosition | "all">("all");
   const [minPassport, setMinPassport] = useState(0);
   const [state, setState] = useState("");
   const [city, setCity] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState("all");
+  const [categoryFilter, setCategoryFilter] = useState(initialCategoryFilter);
 
   const birthDates = useMemo(
     () => collectBirthDatesFromDirectory(data.players, weeklyPerformances),
@@ -128,6 +130,7 @@ export function ExploreDirectory({
             value={categoryFilter}
             onChange={setCategoryFilter}
             birthDates={birthDates}
+            hint="Destacados y directorio usan esta categoría. El listado inferior puede ampliarse a «Todas»."
           />
           <MexicoLocationSelect
             allowAll
@@ -140,6 +143,11 @@ export function ExploreDirectory({
             onCityChange={setCity}
           />
         </div>
+      </div>
+
+      <div className="rounded-xl border border-mf-border-subtle bg-mf-canvas/80 px-4 py-3 text-sm leading-6 text-mf-text-secondary">
+        MiFicha ordena tu participación y te da visibilidad ante visorías — siempre
+        por categoría y con consentimiento. No es una calificación ni un examen.
       </div>
 
       <WeeklyCompetitionPanels

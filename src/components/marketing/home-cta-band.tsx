@@ -1,20 +1,13 @@
-import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { MARKETING_IMAGES } from "@/lib/marketing-assets";
+import { MarketingBackgroundPhoto } from "@/components/marketing/marketing-hero-visual";
+import { MARKETING_MEDIA } from "@/lib/marketing-assets";
 
 export function HomeCtaBand() {
   return (
     <section className="relative min-h-[300px] overflow-hidden border-t border-mf-brand-dark">
-      <Image
-        src={MARKETING_IMAGES.ctaBand}
-        alt=""
-        fill
-        className="object-cover object-center"
-        sizes="100vw"
-        aria-hidden
-      />
-      <div className="absolute inset-0 bg-gradient-to-r from-mf-brand-dark/95 via-mf-brand/90 to-mf-brand-dark/80" />
+      <MarketingBackgroundPhoto meta={MARKETING_MEDIA.ctaBand} />
+      <div className="absolute inset-0 bg-gradient-to-r from-mf-brand-dark/95 via-mf-brand/88 to-mf-brand-dark/55 lg:to-transparent" />
       <div className="relative mx-auto flex max-w-6xl flex-col items-start gap-6 px-4 py-14 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:py-16">
         <div className="max-w-xl">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-white/60">

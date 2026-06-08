@@ -84,10 +84,9 @@ export function AcademyWeeklyCompetition({ academyId }: AcademyWeeklyCompetition
   if (rows.length === 0) {
     return (
       <div className="mf-card border-dashed p-6">
-        <p className="text-sm font-medium text-mf-text">Competencia semanal</p>
+        <p className="text-sm font-medium text-mf-text">Actividad semanal del plantel</p>
         <p className="mt-2 text-sm text-mf-text-secondary">
-          Registra partidos esta semana para activar el ranking interno y ver quién
-          está en racha en tu plantel.
+          Registra partidos esta semana para ver destacados internos por categoría.
         </p>
       </div>
     );
@@ -96,10 +95,10 @@ export function AcademyWeeklyCompetition({ academyId }: AcademyWeeklyCompetition
   return (
     <section className="space-y-4">
       <div>
-        <p className="mf-section-kicker">Competencia interna</p>
-        <h2 className="mt-1 mf-section-title">Marcador semanal del plantel</h2>
+        <p className="mf-section-kicker">Actividad semanal</p>
+        <h2 className="mt-1 mf-section-title">Destacados del plantel</h2>
         <p className="mt-1 text-sm text-mf-text-secondary">
-          Motiva a tu grupo con ranking y tendencias vs la semana pasada.
+          Referencia interna por categoría — celebra participación, no presión.
         </p>
       </div>
 

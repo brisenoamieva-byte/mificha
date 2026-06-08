@@ -13,19 +13,99 @@ import {
   X,
 } from "lucide-react";
 import { PITCH_SLIDES, type PitchSlide } from "@/lib/pitch-deck-content";
-import { BRAND_LOGO } from "@/lib/brand";
+import {
+  MARKETING_MEDIA,
+  marketingPhotoStyle,
+  type MarketingImageMeta,
+} from "@/lib/marketing-assets";
+import { BrandLogo } from "@/components/ui/brand-logo";
 import { cn } from "@/lib/utils";
 
-function SlideContent({ slide }: { slide: PitchSlide }) {
+function PitchBrandMark({ size = "sm" }: { size?: "sm" | "md" }) {
+  return (
+    <div className="inline-flex shrink-0 rounded-lg bg-white px-3 py-1.5 shadow-sm ring-1 ring-black/5">
+      <BrandLogo size={size} />
+    </div>
+  );
+}
+
+function PitchSlidePhoto({
+  meta,
+  priority = false,
+  overlay = "split",
+  className,
+}: {
+  meta: MarketingImageMeta;
+  priority?: boolean;
+  overlay?: "split" | "cover" | "cta" | "banner";
+  className?: string;
+}) {
+  return (
+    <div
+      className={cn("relative overflow-hidden", className)}
+      style={marketingPhotoStyle(meta)}
+    >
+      <Image
+        src={meta.src}
+        alt={meta.alt}
+        fill
+        priority={priority}
+        className="marketing-cover-photo"
+        sizes={
+          overlay === "banner"
+            ? "100vw"
+            : overlay === "cover" || overlay === "cta"
+              ? "100vw"
+              : "(max-width: 1024px) 100vw, 50vw"
+        }
+      />
+      {overlay === "split" ? (
+        <div
+          className="absolute inset-0 bg-gradient-to-r from-[#0a1628] via-[#0a1628]/35 to-transparent lg:from-[#0a1628]/90 lg:via-[#0a1628]/20"
+          aria-hidden
+        />
+      ) : null}
+      {overlay === "cover" ? (
+        <div
+          className="absolute inset-0 bg-gradient-to-t from-[#0a1628] via-[#0a1628]/75 to-[#0a1628]/45"
+          aria-hidden
+        />
+      ) : null}
+      {overlay === "cta" ? (
+        <div
+          className="absolute inset-0 bg-gradient-to-r from-[#0a1628]/95 via-[#0a1628]/88 to-[#0a1628]/55 lg:to-[#0a1628]/70"
+          aria-hidden
+        />
+      ) : null}
+      {overlay === "banner" ? (
+        <div
+          className="absolute inset-0 bg-gradient-to-t from-[#0a1628] via-[#0a1628]/40 to-transparent"
+          aria-hidden
+        />
+      ) : null}
+    </div>
+  );
+}
+
+function SlideContent({
+  slide,
+  className,
+}: {
+  slide: PitchSlide;
+  className?: string;
+}) {
   const isCover = slide.variant === "cover";
   const isCta = slide.variant === "cta";
+  const isSplit = slide.variant === "split";
 
   return (
     <div
       className={cn(
-        "flex h-full flex-col justify-center px-8 py-12 sm:px-14 lg:px-20",
-        isCover && "items-center text-center",
-        isCta && "items-center text-center",
+        "flex flex-col justify-center px-6 py-10 sm:px-10 lg:px-14 lg:py-12",
+        isCover && "relative z-10 items-center text-center",
+        isCta && "relative z-10 items-center text-center",
+        isSplit && "min-h-0",
+        className,
       )}
     >
       {slide.kicker ? (
@@ -35,8 +115,11 @@ function SlideContent({ slide }: { slide: PitchSlide }) {
       <h2
         className={cn(
           "mt-4 font-semibold tracking-[-0.03em] text-white",
-          isCover ? "text-4xl sm:text-5xl lg:text-6xl" : "text-3xl sm:text-4xl lg:text-[2.75rem] leading-tight",
+          isCover
+            ? "text-4xl sm:text-5xl lg:text-6xl"
+            : "text-2xl sm:text-3xl lg:text-[2.35rem] leading-tight",
           isCta && "max-w-3xl",
+          isSplit && "max-w-xl",
         )}
       >
         {slide.title}
@@ -45,9 +128,9 @@ function SlideContent({ slide }: { slide: PitchSlide }) {
       {slide.subtitle ? (
         <p
           className={cn(
-            "mt-5 text-lg leading-8 text-white/75",
-            isCover ? "max-w-2xl" : "max-w-3xl",
-            !isCover && !isCta && "mt-4 text-base sm:text-lg",
+            "mt-4 text-base leading-7 text-white/75 sm:text-lg sm:leading-8",
+            isCover ? "max-w-2xl" : "max-w-2xl",
+            isSplit && "max-w-lg",
           )}
         >
           {slide.subtitle}
@@ -57,14 +140,14 @@ function SlideContent({ slide }: { slide: PitchSlide }) {
       {slide.bullets && slide.bullets.length > 0 ? (
         <ul
           className={cn(
-            "mt-8 space-y-4",
-            isCta ? "max-w-xl text-left" : "max-w-3xl",
+            "mt-6 space-y-3 sm:mt-8 sm:space-y-4",
+            isCta ? "max-w-xl text-left" : isSplit ? "max-w-lg" : "max-w-3xl",
           )}
         >
           {slide.bullets.map((bullet) => (
             <li
               key={bullet}
-              className="flex gap-3 text-base leading-7 text-white/85 sm:text-lg sm:leading-8"
+              className="flex gap-3 text-sm leading-7 text-white/85 sm:text-base sm:leading-8"
             >
               <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-400" />
               <span>{bullet}</span>
@@ -76,20 +159,20 @@ function SlideContent({ slide }: { slide: PitchSlide }) {
       {slide.stats && slide.stats.length > 0 ? (
         <dl
           className={cn(
-            "mt-10 grid gap-6",
+            "mt-8 grid gap-4 sm:mt-10 sm:gap-6",
             slide.stats.length === 3 ? "grid-cols-3" : "grid-cols-1 sm:grid-cols-3",
-            isCover || isCta ? "max-w-2xl" : "max-w-3xl",
+            isCover || isCta ? "max-w-2xl" : "max-w-lg",
           )}
         >
           {slide.stats.map((stat) => (
             <div
               key={stat.label}
-              className="rounded-xl border border-white/10 bg-white/5 px-4 py-5 text-center backdrop-blur-sm"
+              className="rounded-xl border border-white/10 bg-white/5 px-3 py-4 text-center backdrop-blur-sm sm:px-4 sm:py-5"
             >
-              <dt className="text-2xl font-semibold tabular-nums tracking-tight text-white sm:text-3xl">
+              <dt className="text-xl font-semibold tabular-nums tracking-tight text-white sm:text-2xl lg:text-3xl">
                 {stat.value}
               </dt>
-              <dd className="mt-2 text-xs font-medium uppercase tracking-wide text-white/55">
+              <dd className="mt-1.5 text-[10px] font-medium uppercase tracking-wide text-white/55 sm:mt-2 sm:text-xs">
                 {stat.label}
               </dd>
             </div>
@@ -100,13 +183,89 @@ function SlideContent({ slide }: { slide: PitchSlide }) {
       {slide.highlight ? (
         <p
           className={cn(
-            "mt-10 rounded-full border border-white/15 bg-white/10 px-5 py-2.5 text-sm font-medium text-white/90",
+            "mt-8 rounded-full border border-white/15 bg-white/10 px-5 py-2.5 text-sm font-medium text-white/90 sm:mt-10",
             isCover && "mt-8",
           )}
         >
           {slide.highlight}
         </p>
       ) : null}
+    </div>
+  );
+}
+
+function PitchSlideFrame({
+  slide,
+  priority = false,
+}: {
+  slide: PitchSlide;
+  priority?: boolean;
+}) {
+  const meta = slide.imageKey ? MARKETING_MEDIA[slide.imageKey] : null;
+
+  if (slide.variant === "cover" && meta) {
+    return (
+      <div className="relative flex min-h-[min(100%,720px)] flex-1 flex-col">
+        <PitchSlidePhoto
+          meta={meta}
+          priority={priority}
+          overlay="cover"
+          className="absolute inset-0"
+        />
+        <div className="relative flex flex-1 flex-col justify-center">
+          <SlideContent slide={slide} />
+          <div className="relative z-10 flex justify-center pb-8">
+            <PitchBrandMark size="md" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (slide.variant === "cta" && meta) {
+    return (
+      <div className="relative flex min-h-[min(100%,720px)] flex-1 flex-col">
+        <PitchSlidePhoto
+          meta={meta}
+          priority={priority}
+          overlay="cta"
+          className="absolute inset-0"
+        />
+        <div className="relative flex flex-1 items-center justify-center overflow-auto">
+          <SlideContent slide={slide} className="w-full max-w-4xl" />
+        </div>
+      </div>
+    );
+  }
+
+  if (slide.variant === "split" && meta) {
+    return (
+      <div className="grid min-h-[min(100%,720px)] flex-1 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
+        <div className="relative z-10 flex min-h-0 flex-col justify-center overflow-auto bg-[#0a1628] lg:bg-transparent">
+          <SlideContent slide={slide} />
+        </div>
+
+        <PitchSlidePhoto
+          meta={meta}
+          priority={priority}
+          overlay="split"
+          className="relative min-h-[200px] sm:min-h-[260px] lg:min-h-0 lg:h-full"
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative flex flex-1 flex-col overflow-auto">
+      {meta ? (
+        <PitchSlidePhoto
+          meta={meta}
+          priority={priority}
+          overlay="banner"
+          className="relative h-44 shrink-0 sm:h-52 lg:hidden"
+        />
+      ) : null}
+      <SlideContent slide={slide} className="flex-1" />
     </div>
   );
 }
@@ -168,14 +327,7 @@ export function PitchDeckView() {
       {!presenting ? (
         <header className="flex items-center justify-between border-b border-white/10 px-4 py-3 sm:px-6">
           <div className="flex items-center gap-4">
-            <Image
-              src={BRAND_LOGO}
-              alt="MiFicha"
-              width={665}
-              height={173}
-              className="h-7 w-auto brightness-0 invert"
-              priority
-            />
+            <PitchBrandMark />
             <span className="hidden text-xs font-medium uppercase tracking-widest text-white/40 sm:inline">
               Pitch · uso interno
             </span>
@@ -203,30 +355,31 @@ export function PitchDeckView() {
 
       <main className="relative flex flex-1 flex-col overflow-hidden">
         <div
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_50%_at_50%_0%,rgba(27,79,140,0.35),transparent)]"
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_50%_at_50%_0%,rgba(27,79,140,0.28),transparent)]"
           aria-hidden
         />
 
-        <div className="relative flex-1 overflow-auto">
-          <SlideContent slide={slide} />
+        <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
+          <PitchSlideFrame slide={slide} priority={index === 0} />
         </div>
 
-        <footer className="border-t border-white/10 bg-[#0a1628]/95 px-4 py-4 sm:px-6">
+        <footer className="shrink-0 border-t border-white/10 bg-[#0a1628]/95 px-4 py-4 sm:px-6">
           <div className="mx-auto flex max-w-6xl flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 overflow-x-auto pb-1">
               {PITCH_SLIDES.map((item, i) => (
                 <button
                   key={item.id}
                   type="button"
                   onClick={() => setIndex(i)}
                   className={cn(
-                    "h-2 rounded-full transition-all",
+                    "h-2 shrink-0 rounded-full transition-all",
                     i === index ? "w-8 bg-white" : "w-2 bg-white/25 hover:bg-white/40",
                   )}
-                  aria-label={`Ir a diapositiva ${i + 1}`}
+                  aria-label={`Ir a diapositiva ${i + 1}: ${item.title}`}
+                  title={item.title}
                 />
               ))}
-              <span className="ml-3 text-sm tabular-nums text-white/45">
+              <span className="ml-3 shrink-0 text-sm tabular-nums text-white/45">
                 {index + 1} / {total}
               </span>
             </div>
@@ -281,7 +434,7 @@ export function PitchDeckView() {
         <button
           type="button"
           onClick={() => setPresenting(false)}
-          className="absolute right-4 top-4 rounded-full bg-white/10 p-2 text-white hover:bg-white/20"
+          className="absolute right-4 top-4 z-[110] rounded-full bg-white/10 p-2 text-white hover:bg-white/20"
           aria-label="Salir de presentación"
         >
           <X className="h-5 w-5" />

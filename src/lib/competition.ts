@@ -164,7 +164,7 @@ export function getTrendLabel(trend: PerformanceTrend) {
     case "down":
       return `${Math.round(trend.delta)} pts`;
     case "new":
-      return "Nuevo en ranking";
+      return "Primera aparición";
     default:
       return "Estable";
   }

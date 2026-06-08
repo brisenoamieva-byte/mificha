@@ -96,7 +96,9 @@ export function getCategoryFilterLabel(filter: PlayerCategoryFilter): string | n
 
 export function buildCategoryFilterOptions(
   birthDates: Array<string | null | undefined>,
+  options: { includeAll?: boolean } = {},
 ): CategoryFilterOption[] {
+  const { includeAll = true } = options;
   const ages = new Set<number>();
   const generations = new Set<number>();
 
@@ -106,12 +108,14 @@ export function buildCategoryFilterOptions(
     generations.add(getPlayerGeneration(birthDate));
   }
 
-  const options: CategoryFilterOption[] = [
-    { value: "all", label: "Todas las categorías" },
-  ];
+  const filterOptions: CategoryFilterOption[] = [];
+
+  if (includeAll) {
+    filterOptions.push({ value: "all", label: "Todas las categorías" });
+  }
 
   for (const age of [...ages].sort((a, b) => a - b)) {
-    options.push({
+    filterOptions.push({
       value: `age:${age}`,
       label: getCategoryOptionLabel(age),
       group: "age",
@@ -119,11 +123,81 @@ export function buildCategoryFilterOptions(
   }
 
   for (const year of [...generations].sort((a, b) => b - a)) {
-    options.push({
+    filterOptions.push({
       value: `gen:${year}`,
       label: getGenerationLabel(year),
       group: "generation",
     });
+  }
+
+  return filterOptions;
+}
+
+/** Most common Sub-X in the dataset — used as default for competitive views. */
+export function getDefaultCategoryFilter(
+  birthDates: Array<string | null | undefined>,
+): string {
+  const ageCounts = new Map<number, number>();
+
+  for (const birthDate of birthDates) {
+    if (!birthDate) continue;
+    const age = getPlayerAge(birthDate);
+    ageCounts.set(age, (ageCounts.get(age) ?? 0) + 1);
+  }
+
+  if (ageCounts.size === 0) return "all";
+
+  const [topAge] = [...ageCounts.entries()].sort(
+    (left, right) => right[1] - left[1] || left[0] - right[0],
+  )[0];
+
+  return serializeCategoryFilter({ kind: "age", age: topAge });
+}
+
+export function isCompetitionCategoryFilter(value: string): boolean {
+  return parseCategoryFilter(value).kind !== "all";
+}
+
+/** Parse "Sub-15 Varonil" style labels from scheduled matches. */
+export function parseMatchCategoryAge(
+  category: string | null | undefined,
+): number | null {
+  if (!category?.trim()) return null;
+
+  const subMatch = category.match(/sub[\s-]?(\d{1,2})/i);
+  if (subMatch) {
+    const age = Number(subMatch[1]);
+    return Number.isFinite(age) ? age : null;
+  }
+
+  return null;
+}
+
+export function inferCategoryFilterFromMatchCategory(
+  category: string | null | undefined,
+): string | null {
+  const age = parseMatchCategoryAge(category);
+  if (age == null) return null;
+  return serializeCategoryFilter({ kind: "age", age });
+}
+
+export function buildMatchCategoryFilterOptions(
+  categories: Array<string | null | undefined>,
+): CategoryFilterOption[] {
+  const unique = [
+    ...new Set(
+      categories
+        .map((value) => value?.trim())
+        .filter((value): value is string => Boolean(value)),
+    ),
+  ].sort((a, b) => a.localeCompare(b, "es"));
+
+  const options: CategoryFilterOption[] = [
+    { value: "all", label: "Todas las categorías del calendario" },
+  ];
+
+  for (const label of unique) {
+    options.push({ value: label, label, group: "age" });
   }
 
   return options;

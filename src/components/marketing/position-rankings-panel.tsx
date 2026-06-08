@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { BarChart3, Crown } from "lucide-react";
 import { useMemo, useState } from "react";
+import { CategoryRequiredNotice } from "@/components/ui/category-required-notice";
 import { PassportScoreDisplay } from "@/components/ui/passport-score-display";
 import { TrendBadge } from "@/components/ui/trend-badge";
 import type { RankedWeeklyPerformance } from "@/lib/ideal-xi";
@@ -18,6 +19,7 @@ import {
 } from "@/lib/position-rankings";
 import type { DirectoryPlayer } from "@/lib/public-directory";
 import { getPlayerInitials } from "@/lib/player-utils";
+import { isCompetitionCategoryFilter } from "@/lib/player-category";
 import { cn } from "@/lib/utils";
 import type { PlayerPosition } from "@/types/database";
 
@@ -250,6 +252,21 @@ export function PositionRankingsPanel({
           (position) => weeklyRankings[position].length > 0,
         );
 
+  if (!isCompetitionCategoryFilter(categoryFilter)) {
+    return (
+      <section className="space-y-5">
+        <div>
+          <div className="inline-flex items-center gap-2 rounded-full bg-mf-brand-soft px-3 py-1 text-xs font-semibold text-mf-brand">
+            <BarChart3 className="h-3.5 w-3.5" />
+            Rankings por posición
+          </div>
+          <h2 className="mt-3 mf-section-title">Top por posición</h2>
+        </div>
+        <CategoryRequiredNotice title="Las referencias por posición son por categoría" />
+      </section>
+    );
+  }
+
   return (
     <section className="space-y-5">
       <div className="flex flex-wrap items-end justify-between gap-4">
@@ -259,12 +276,12 @@ export function PositionRankingsPanel({
             Rankings por posición
           </div>
           <h2 className="mt-3 mf-section-title">
-            Top por posición · {scopeLabel}
+            Referencia por posición · {scopeLabel}
           </h2>
           <p className="mt-2 text-sm text-mf-text-secondary">
             {metric === "passport"
-              ? "Los mejores Passport Score verificados en cada línea."
-              : `Mejores rendimientos de la semana ${weekLabel} por posición.`}
+              ? "Passport Score verificado en cada línea — contexto para visorías."
+              : `Actividad de la semana ${weekLabel} por posición.`}
           </p>
         </div>
 

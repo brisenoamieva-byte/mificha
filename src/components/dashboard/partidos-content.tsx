@@ -100,24 +100,25 @@ export function PartidosContent() {
         <div>
           <h1 className="text-2xl font-bold text-slate-900 sm:text-3xl">Partidos</h1>
           <p className="mt-1 text-slate-600">
-            {season ? season.name : "Sin temporada activa"}
+            Calendario oficial de liga + captura de stats en MiFicha
+            {season ? ` · ${season.name}` : ""}
           </p>
         </div>
 
         <div className="flex flex-wrap gap-2">
-          <Link
-            href="/dashboard/partidos/programar"
-            className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#1B4F8C] px-5 py-4 text-sm font-semibold text-white hover:bg-[#164278]"
-          >
-            <CalendarPlus className="h-4 w-4" />
-            Programar partido
-          </Link>
           <Link
             href="/dashboard/partidos/nuevo"
             className="inline-flex items-center justify-center gap-2 rounded-2xl bg-green-600 px-5 py-4 text-sm font-semibold text-white hover:bg-green-700"
           >
             <Plus className="h-4 w-4" />
             Capturar resultado
+          </Link>
+          <Link
+            href="/dashboard/partidos/programar"
+            className="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-5 py-4 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+          >
+            <CalendarPlus className="h-4 w-4" />
+            Amistoso
           </Link>
         </div>
       </div>

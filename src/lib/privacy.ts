@@ -8,7 +8,7 @@ export const PRIVACY_COPY = {
   publicProfileLabel:
     "Ficha accesible por link o QR (no indexada en buscadores; solo quien tenga el enlace).",
   discoverableLabel:
-    "Permitir aparición en directorio, rankings e ideal 11 de MiFicha (visorías/scouts).",
+    "Permitir aparición en directorio y destacados de MiFicha (visorías), siempre por categoría y con consentimiento.",
   publicProfileHint:
     "Ideal para compartir con padres por WhatsApp. No aparece en listados abiertos salvo que actives la opción de directorio.",
   discoverableHint:

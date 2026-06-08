@@ -7,7 +7,11 @@ import { PublicScheduleExploreSection } from "@/components/marketing/public-sche
 import { MarketingPageHero } from "@/components/marketing/marketing-page-hero";
 import { SiteFooter, SiteHeader } from "@/components/marketing/site-header";
 import { fetchWeeklyCompetitionData } from "@/lib/ideal-xi";
-import { MARKETING_IMAGES } from "@/lib/marketing-assets";
+import { MARKETING_MEDIA } from "@/lib/marketing-assets";
+import {
+  collectBirthDatesFromDirectory,
+  getDefaultCategoryFilter,
+} from "@/lib/player-category";
 import { fetchPublicDirectory } from "@/lib/public-directory";
 import { fetchPublicUpcomingMatches } from "@/lib/public-schedule";
 
@@ -26,6 +30,9 @@ export default async function ExplorarPage() {
 
   const playerCount = data.players.length;
   const academyCount = data.academies.length;
+  const initialCategoryFilter = getDefaultCategoryFilter(
+    collectBirthDatesFromDirectory(data.players, weeklyStats.performances),
+  );
 
   return (
     <div className="flex min-h-full flex-col bg-mf-canvas">
@@ -35,9 +42,8 @@ export default async function ExplorarPage() {
         <MarketingPageHero
           eyebrow="Visorías y scouts"
           title="Explora talento verificado en México"
-          description="Marcador semanal, jugadores en tendencia, 11 ideal y rankings por posición. Filtra por categoría, estado o ciudad."
-          photoSrc={MARKETING_IMAGES.heroExplorar}
-          photoAlt="Partido escolar visto desde la banda en torneo intercolegial"
+          description="Directorio por categoría, destacados de la semana y fichas verificadas para visorías — oportunidad ordenada, no presión."
+          photo={MARKETING_MEDIA.heroExplorar}
           actions={
             <>
               <Link href="/padres" className="mf-btn-secondary">
@@ -52,7 +58,7 @@ export default async function ExplorarPage() {
           stats={[
             { value: String(playerCount), label: "Jugadores públicos" },
             { value: String(academyCount), label: "Academias" },
-            { value: "11", label: "Ideal semanal" },
+            { value: "11", label: "Destacados semanales" },
           ]}
           aside={<ExploreHeroAside />}
         />
@@ -67,6 +73,7 @@ export default async function ExplorarPage() {
             risingPerformances={weeklyStats.rising}
             leaderboard={weeklyStats.leaderboard}
             weekLabel={weeklyStats.weekLabel}
+            initialCategoryFilter={initialCategoryFilter}
           />
         </section>
       </main>

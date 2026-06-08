@@ -20,6 +20,7 @@ interface ComparativeReportPanelProps {
   selectedPlayerId: string;
   onSelectPlayer: (playerId: string) => void;
   seasonName?: string;
+  categoryLabel?: string | null;
 }
 
 export function ComparativeReportPanel({
@@ -28,6 +29,7 @@ export function ComparativeReportPanel({
   selectedPlayerId,
   onSelectPlayer,
   seasonName,
+  categoryLabel,
 }: ComparativeReportPanelProps) {
   const selectedPlayer = players.find((player) => player.id === selectedPlayerId);
   const insights = getComparisonInsights(seasonStats, selectedPlayerId);
@@ -58,7 +60,8 @@ export function ComparativeReportPanel({
           <div>
             <p className="mf-section-kicker">Reporte comparativo</p>
             <h2 className="mt-1 text-xl font-semibold tracking-[-0.02em] text-mf-text">
-              {selectedPlayer.first_name} vs plantel
+              {selectedPlayer.first_name} · progreso del grupo
+              {categoryLabel ? ` (${categoryLabel})` : ""}
             </h2>
             {seasonName ? (
               <p className="mt-1 text-sm text-mf-text-muted">{seasonName}</p>
@@ -132,7 +135,7 @@ export function ComparativeReportPanel({
           </p>
         </div>
         <div className="bg-mf-surface px-5 py-4 text-center">
-          <p className="text-xs font-medium text-mf-text-secondary">Mejor ranking</p>
+          <p className="text-xs font-medium text-mf-text-secondary">Referencia del grupo</p>
           <p className="mt-2 text-2xl font-semibold tabular-nums text-mf-text">
             #{Math.min(...insights.map((item) => item.rank))}
           </p>

@@ -13,6 +13,8 @@ interface CategoryFilterSelectProps {
   className?: string;
   selectClassName?: string;
   label?: string;
+  hint?: string;
+  includeAll?: boolean;
 }
 
 function renderOptions(options: CategoryFilterOption[]) {
@@ -56,12 +58,17 @@ export function CategoryFilterSelect({
   className,
   selectClassName,
   label = "Categoría / generación",
+  hint,
+  includeAll = true,
 }: CategoryFilterSelectProps) {
-  const options = buildCategoryFilterOptions(birthDates);
+  const options = buildCategoryFilterOptions(birthDates, { includeAll });
 
   return (
     <label className={cn("block", className)}>
       <span className="text-sm font-medium text-mf-text">{label}</span>
+      {hint ? (
+        <span className="mt-1 block text-xs leading-5 text-mf-text-muted">{hint}</span>
+      ) : null}
       <select
         value={value}
         onChange={(event) => onChange(event.target.value)}

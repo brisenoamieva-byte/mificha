@@ -1,3 +1,5 @@
+import type { MarketingImageKey } from "@/lib/marketing-assets";
+
 export interface PitchSlide {
   id: string;
   kicker?: string;
@@ -5,8 +7,10 @@ export interface PitchSlide {
   subtitle?: string;
   bullets?: string[];
   highlight?: string;
+  /** cover = foto a pantalla completa · split = texto + foto · cta = cierre con foto de fondo */
   variant?: "cover" | "default" | "cta" | "split";
   stats?: { value: string; label: string }[];
+  imageKey?: MarketingImageKey;
 }
 
 export const PITCH_SLIDES: PitchSlide[] = [
@@ -17,6 +21,7 @@ export const PITCH_SLIDES: PitchSlide[] = [
     title: "MiFicha",
     subtitle: "La ficha técnica digital que tu academia comparte con padres y scouts.",
     highlight: "Lanzamiento · academias fundadoras",
+    imageKey: "heroHome",
   },
   {
     id: "problema",
@@ -31,6 +36,7 @@ export const PITCH_SLIDES: PitchSlide[] = [
   },
   {
     id: "solucion",
+    variant: "split",
     kicker: "La solución",
     title: "Una ficha verificada por jugador",
     subtitle:
@@ -40,9 +46,11 @@ export const PITCH_SLIDES: PitchSlide[] = [
       { value: "0", label: "App para padres" },
       { value: "100", label: "Passport Score" },
     ],
+    imageKey: "featurePassport",
   },
   {
     id: "flujo",
+    variant: "split",
     kicker: "Cómo funciona",
     title: "Tres pasos, un ciclo que se repite cada semana",
     bullets: [
@@ -50,21 +58,25 @@ export const PITCH_SLIDES: PitchSlide[] = [
       "2. Publicas calendario: rival, fecha, hora y sede para padres y scouts.",
       "3. Tras cada partido capturas stats · Passport sube · compartes QR o WhatsApp.",
     ],
+    imageKey: "featureCaptura",
   },
   {
     id: "academia",
+    variant: "split",
     kicker: "Para tu academia",
     title: "Panel operativo, no otro Excel",
     bullets: [
       "Plantel, temporadas y calendario público con hora y sede.",
       "Reporte comparativo: jugador vs promedio del plantel.",
-      "Marcador semanal interno y competencia entre categorías.",
+      "Referencia semanal interna por categoría.",
       "QR imprimible para la cancha — onboarding del padre sin fricción.",
       "Enlace opcional al calendario oficial de tu liga (FMF, estatal, municipal).",
     ],
+    imageKey: "audienceAcademias",
   },
   {
     id: "padres",
+    variant: "split",
     kicker: "Para padres",
     title: "Cero fricción = más engagement",
     bullets: [
@@ -74,28 +86,46 @@ export const PITCH_SLIDES: PitchSlide[] = [
       "Puede reenviar la ficha por WhatsApp a familia o visorías.",
       "Consentimiento parental y privacidad LFPDPPP integrados.",
     ],
+    imageKey: "heroPadres",
   },
   {
     id: "scouts",
+    variant: "split",
     kicker: "Para visorías",
     title: "Talento visible, stats verificados",
     bullets: [
       "Directorio público en mificha.mx/explorar.",
-      "Rankings por posición, 11 ideal semanal y tendencias ↑↓.",
+      "Directorio público y destacados por categoría para visorías.",
       "Ficha con sello «verificada por academia» — no auto-reportado.",
     ],
+    imageKey: "heroExplorar",
   },
   {
     id: "passport",
+    variant: "split",
     kicker: "Passport Score",
-    title: "El número que motiva al jugador",
+    title: "El número que refleja tu progreso",
     subtitle:
-      "Combina perfil completo + rendimiento en temporada. Sube con cada partido registrado — el eslabón que activa engagement y viralidad.",
+      "Combina perfil completo y participación en temporada. Sube con cada partido registrado — motivación sana, no presión.",
     stats: [
       { value: "+6", label: "Tras un buen partido" },
-      { value: "↑↓", label: "Tendencia semanal" },
-      { value: "QR", label: "Link al padre" },
+      { value: "↑↓", label: "Ritmo semanal" },
+      { value: "QR", label: "Ficha al padre" },
     ],
+    imageKey: "featureQr",
+  },
+  {
+    id: "complemento",
+    variant: "split",
+    kicker: "MiFicha + liga oficial",
+    title: "Complementa, no compite",
+    subtitle:
+      "Enlazas el calendario de tu competición. MiFicha registra el rendimiento individual; la liga sigue siendo la fuente del marcador oficial.",
+    bullets: [
+      "Liga: resultados, tabla y licencias federativas.",
+      "MiFicha: stats individuales, reportes y ficha digital para padres.",
+    ],
+    imageKey: "featureCalendario",
   },
   {
     id: "lanzamiento",
@@ -109,6 +139,7 @@ export const PITCH_SLIDES: PitchSlide[] = [
       "Te acompañamos a cargar plantel y registrar el primer partido.",
       "Padres y scouts usan MiFicha sin fricción desde el día uno.",
     ],
+    imageKey: "ctaBand",
   },
   {
     id: "cierre",
@@ -121,5 +152,6 @@ export const PITCH_SLIDES: PitchSlide[] = [
       "QR listo para el siguiente juego.",
     ],
     highlight: "Ricardo Briseño · mificha.mx · hola@mificha.mx",
+    imageKey: "ogDefault",
   },
 ];

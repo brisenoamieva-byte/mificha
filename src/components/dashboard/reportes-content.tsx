@@ -7,9 +7,15 @@ import { useDashboard } from "@/components/dashboard/dashboard-context";
 import { ComparativeReportPanel } from "@/components/dashboard/comparative-report-panel";
 import { NoAcademyState } from "@/components/dashboard/no-academy-state";
 import { Skeleton } from "@/components/dashboard/skeletons";
+import { CategoryFilterSelect } from "@/components/ui/category-filter-select";
 import { toast } from "@/components/ui/toast";
 import { buildReportEmailHtml } from "@/lib/email/report-template";
 import { emptySeasonStats, wasSentThisWeek } from "@/lib/email/report-utils";
+import {
+  getCategoryFilterLabel,
+  matchesCategoryFilter,
+  parseCategoryFilter,
+} from "@/lib/player-category";
 import { supabase } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
 import type { EmailLog, Player, PlayerSeasonStat, Season } from "@/types/database";
@@ -28,6 +34,7 @@ export function ReportesContent() {
   const [seasonStats, setSeasonStats] = useState<PlayerSeasonStat[]>([]);
   const [logs, setLogs] = useState<EmailLogRow[]>([]);
   const [selectedPlayerId, setSelectedPlayerId] = useState<string>("");
+  const [categoryFilter, setCategoryFilter] = useState("all");
   const [emailReady, setEmailReady] = useState<boolean | null>(null);
   const [emailHint, setEmailHint] = useState<string | null>(null);
 
@@ -131,8 +138,41 @@ export function ReportesContent() {
   }, [selectedSeasonId]);
 
   const selectedSeason = seasons.find((season) => season.id === selectedSeasonId);
+
+  const birthDates = useMemo(
+    () => players.map((player) => player.birth_date),
+    [players],
+  );
+
+  const filteredPlayers = useMemo(() => {
+    const category = parseCategoryFilter(categoryFilter);
+    return players.filter((player) =>
+      matchesCategoryFilter(player.birth_date, category),
+    );
+  }, [players, categoryFilter]);
+
+  const filteredSeasonStats = useMemo(() => {
+    const ids = new Set(filteredPlayers.map((player) => player.id));
+    return seasonStats.filter((stat) => ids.has(stat.player_id));
+  }, [filteredPlayers, seasonStats]);
+
+  const categoryLabel = getCategoryFilterLabel(parseCategoryFilter(categoryFilter));
+
   const previewPlayer =
-    players.find((player) => player.id === selectedPlayerId) ?? players[0] ?? null;
+    filteredPlayers.find((player) => player.id === selectedPlayerId) ??
+    filteredPlayers[0] ??
+    null;
+
+  useEffect(() => {
+    if (
+      selectedPlayerId &&
+      filteredPlayers.some((player) => player.id === selectedPlayerId)
+    ) {
+      return;
+    }
+
+    setSelectedPlayerId(filteredPlayers[0]?.id ?? "");
+  }, [filteredPlayers, selectedPlayerId]);
 
   const previewStats = useMemo(() => {
     if (!previewPlayer) return emptySeasonStats();
@@ -172,8 +212,8 @@ export function ReportesContent() {
   }, [logs]);
 
   const playersWithGuardianEmail = useMemo(
-    () => players.filter((player) => player.guardian_email?.trim()),
-    [players],
+    () => filteredPlayers.filter((player) => player.guardian_email?.trim()),
+    [filteredPlayers],
   );
 
   async function handleSendReports() {
@@ -285,12 +325,22 @@ export function ReportesContent() {
         </div>
       ) : null}
 
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_280px]">
+        <CategoryFilterSelect
+          value={categoryFilter}
+          onChange={setCategoryFilter}
+          birthDates={birthDates}
+          hint="La comparativa usa el promedio de la categoría seleccionada — contexto, no castigo."
+        />
+      </div>
+
       <ComparativeReportPanel
-        players={players}
-        seasonStats={seasonStats}
+        players={filteredPlayers}
+        seasonStats={filteredSeasonStats}
         selectedPlayerId={previewPlayer?.id ?? ""}
         onSelectPlayer={setSelectedPlayerId}
         seasonName={selectedSeason?.name}
+        categoryLabel={categoryLabel}
       />
 
       <div className="grid gap-6 lg:grid-cols-[280px_minmax(0,1fr)]">
@@ -335,11 +385,12 @@ export function ReportesContent() {
           </button>
 
           <p className="text-xs leading-relaxed text-slate-500">
-            {playersWithGuardianEmail.length} de {players.length} jugadores tienen
-            email del tutor en Plantel. Solo esos recibirán el reporte.
+            {playersWithGuardianEmail.length} de {filteredPlayers.length} jugadores
+            en esta categoría tienen email del tutor en Plantel.
+            {categoryLabel ? ` (${categoryLabel})` : ""}
           </p>
 
-          {players.length > 0 && playersWithGuardianEmail.length === 0 ? (
+          {filteredPlayers.length > 0 && playersWithGuardianEmail.length === 0 ? (
             <p className="flex items-start gap-2 rounded-lg bg-amber-50 px-3 py-2 text-xs leading-relaxed text-amber-800">
               <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
               Edita cada jugador y agrega el email del padre o tutor en Contacto.

@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import type { MarketingImageMeta } from "@/lib/marketing-assets";
 import { MarketingHeroVisual } from "@/components/marketing/marketing-hero-visual";
 import { cn } from "@/lib/utils";
 
@@ -14,8 +15,7 @@ interface MarketingPageHeroProps {
   actions?: ReactNode;
   stats?: MarketingStat[];
   aside?: ReactNode;
-  photoSrc?: string;
-  photoAlt?: string;
+  photo?: MarketingImageMeta;
   photoPriority?: boolean;
   className?: string;
 }
@@ -27,12 +27,11 @@ export function MarketingPageHero({
   actions,
   stats,
   aside,
-  photoSrc,
-  photoAlt,
+  photo,
   photoPriority = false,
   className,
 }: MarketingPageHeroProps) {
-  const hasVisual = Boolean(photoSrc && photoAlt);
+  const hasVisual = Boolean(photo);
 
   return (
     <section
@@ -49,7 +48,7 @@ export function MarketingPageHero({
         className={cn(
           "relative mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:py-18",
           hasVisual &&
-            "grid gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:py-20",
+            "grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-12 lg:py-20",
         )}
       >
         <div className={hasVisual ? "max-w-xl" : "max-w-3xl"}>
@@ -84,8 +83,7 @@ export function MarketingPageHero({
         </div>
         {hasVisual ? (
           <MarketingHeroVisual
-            src={photoSrc!}
-            alt={photoAlt!}
+            meta={photo!}
             aside={aside}
             priority={photoPriority}
           />

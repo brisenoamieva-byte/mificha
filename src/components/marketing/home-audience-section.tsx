@@ -2,7 +2,8 @@ import Link from "next/link";
 import type { LucideIcon } from "lucide-react";
 import { ArrowRight, Building2, QrCode, Search } from "lucide-react";
 import { MarketingCardPhoto } from "@/components/marketing/marketing-hero-visual";
-import { MARKETING_IMAGES } from "@/lib/marketing-assets";
+import type { MarketingImageKey } from "@/lib/marketing-assets";
+import { MARKETING_MEDIA } from "@/lib/marketing-assets";
 import { cn } from "@/lib/utils";
 
 interface AudienceItem {
@@ -11,8 +12,7 @@ interface AudienceItem {
   description: string;
   href: string;
   cta: string;
-  imageSrc: string;
-  imageAlt: string;
+  imageKey: MarketingImageKey;
   secondaryHref?: string;
   secondaryLabel?: string;
   featured?: boolean;
@@ -28,8 +28,7 @@ const audiences: AudienceItem[] = [
     secondaryHref: "/login",
     secondaryLabel: "Iniciar sesión",
     cta: "Crear cuenta",
-    imageSrc: MARKETING_IMAGES.audienceAcademias,
-    imageAlt: "Coordinador deportivo con plantel en cancha escolar",
+    imageKey: "audienceAcademias",
     featured: true,
   },
   {
@@ -39,18 +38,16 @@ const audiences: AudienceItem[] = [
       "Abre el link o QR que te comparte el colegio. Stats y Passport Score sin registro.",
     href: "/padres",
     cta: "Abrir ficha",
-    imageSrc: MARKETING_IMAGES.audiencePadres,
-    imageAlt: "Padre e hija saliendo de la cancha revisando el celular",
+    imageKey: "audiencePadres",
   },
   {
     icon: Search,
     title: "Torneos y visorías",
     description:
-      "Directorio, marcador semanal, rankings por posición e 11 ideal verificado.",
+      "Directorio, destacados semanales y referencia por posición — siempre por categoría.",
     href: "/explorar",
     cta: "Explorar directorio",
-    imageSrc: MARKETING_IMAGES.audienceScouts,
-    imageAlt: "Torneo escolar de fin de semana en Querétaro",
+    imageKey: "audienceScouts",
   },
 ];
 
@@ -75,11 +72,11 @@ export function HomeAudienceSection() {
                 : "border-mf-border hover:border-mf-brand/20",
             )}
           >
-            <MarketingCardPhoto src={item.imageSrc} alt={item.imageAlt} />
-            <div className="flex flex-1 flex-col px-6 pb-6">
+            <MarketingCardPhoto meta={MARKETING_MEDIA[item.imageKey]} />
+            <div className="flex flex-1 flex-col px-6 pb-6 pt-6">
               <div
                 className={cn(
-                  "flex h-10 w-10 items-center justify-center rounded-lg",
+                  "flex h-10 w-10 shrink-0 items-center justify-center rounded-lg",
                   item.featured
                     ? "bg-mf-brand text-white"
                     : "bg-mf-brand-soft text-mf-brand",

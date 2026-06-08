@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { BrandLogoLink } from "@/components/ui/brand-logo";
-import { SiteNav } from "@/components/marketing/site-nav";
+import { SiteNavDesktop, SiteNavMobile } from "@/components/marketing/site-nav";
 
 interface SiteHeaderProps {
   actionHref?: string;
@@ -13,16 +13,21 @@ export function SiteHeader({
 }: SiteHeaderProps) {
   return (
     <header className="sticky top-0 z-50 border-b border-mf-border bg-mf-surface/95 backdrop-blur-sm">
-      <div className="relative mx-auto flex h-14 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
-        <BrandLogoLink />
-        <SiteNav />
-        <div className="flex shrink-0 items-center gap-2">
+      <div className="relative mx-auto flex h-14 max-w-6xl items-center gap-3 px-4 sm:gap-4 sm:px-6">
+        <BrandLogoLink className="shrink-0" />
+
+        <div className="hidden min-w-0 flex-1 justify-center lg:flex">
+          <SiteNavDesktop />
+        </div>
+
+        <div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-2">
           <Link href={actionHref} className="mf-btn-ghost hidden sm:inline-flex">
             {actionLabel}
           </Link>
           <Link href="/signup" className="mf-btn-primary hidden sm:inline-flex">
             Registrar academia
           </Link>
+          <SiteNavMobile actionHref={actionHref} actionLabel={actionLabel} />
         </div>
       </div>
     </header>

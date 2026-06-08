@@ -44,7 +44,7 @@ export function PartidosProgramarContent() {
   const [venueAddress, setVenueAddress] = useState("");
   const [category, setCategory] = useState("");
   const [notes, setNotes] = useState("");
-  const [isPublic, setIsPublic] = useState(true);
+  const [isPublic, setIsPublic] = useState(false);
 
   const [seasonName, setSeasonName] = useState(defaultSeasonName());
   const [seasonStart, setSeasonStart] = useState("");
@@ -136,8 +136,8 @@ export function PartidosProgramarContent() {
 
       toast.success(
         isPublic
-          ? "Partido publicado en el calendario de tu academia."
-          : "Partido programado en tu panel.",
+          ? "Evento publicado en tu calendario MiFicha."
+          : "Evento guardado en tu panel.",
       );
       router.push("/dashboard/partidos");
       router.refresh();
@@ -169,15 +169,26 @@ export function PartidosProgramarContent() {
 
       <div>
         <h1 className="text-2xl font-bold text-slate-900 sm:text-3xl">
-          Programar partido
+          Amistoso o entrenamiento
         </h1>
         <p className="mt-1 text-slate-600">
-          Padres, jugadores y scouts verán fecha, hora y sede en tu calendario
-          público.
+          Solo para partidos que no están en el calendario oficial de tu liga. Los
+          juegos de torneo los publica el organizador — aquí capturas stats después
+          de jugar.
         </p>
       </div>
 
       <LeagueOfficialBanner academy={academy} compact />
+
+      <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-4 text-sm leading-6 text-slate-600">
+        <p className="font-medium text-slate-900">¿Partido de liga o torneo?</p>
+        <p className="mt-1">
+          No lo dupliques aquí. Enlaza el calendario oficial en Configuración y usa{" "}
+          <strong className="font-semibold text-slate-800">Capturar resultado</strong>{" "}
+          cuando termine el juego. Si dos escuelas publican el mismo partido por
+          separado, padres y scouts verían dos eventos distintos.
+        </p>
+      </div>
 
       <form
         onSubmit={handleSubmit}
@@ -333,10 +344,11 @@ export function PartidosProgramarContent() {
           />
           <span>
             <span className="block text-sm font-medium text-slate-900">
-              Mostrar en calendario público
+              Mostrar en calendario de MiFicha
             </span>
             <span className="mt-1 block text-sm text-slate-500">
-              Visible en tu landing /a/{academy.slug} para padres y visitantes.
+              Solo amistosos o entrenamientos abiertos al público. Los partidos de
+              liga deben vivir en el calendario oficial del torneo.
             </span>
           </span>
         </label>
@@ -351,7 +363,7 @@ export function PartidosProgramarContent() {
           className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[#1B4F8C] px-5 py-4 text-sm font-semibold text-white hover:bg-[#164278] disabled:opacity-60"
         >
           <CalendarPlus className="h-4 w-4" />
-          {saving ? "Guardando..." : "Publicar en calendario"}
+          {saving ? "Guardando..." : "Guardar evento"}
         </button>
       </form>
     </div>

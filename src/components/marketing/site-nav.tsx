@@ -6,62 +6,74 @@ import { useState } from "react";
 import { MARKETING_NAV } from "@/lib/marketing-nav";
 import { cn } from "@/lib/utils";
 
-export function SiteNav() {
-  const [mobileOpen, setMobileOpen] = useState(false);
+export function SiteNavDesktop() {
   const [openSection, setOpenSection] = useState<string | null>(null);
 
   return (
-    <>
-      <nav className="hidden items-center gap-1 lg:flex">
-        {MARKETING_NAV.map((section) => (
-          <div
-            key={section.id}
-            className="relative"
-            onMouseEnter={() => setOpenSection(section.id)}
-            onMouseLeave={() => setOpenSection(null)}
-          >
-            <button
-              type="button"
-              className="inline-flex items-center gap-1 rounded-full px-3 py-2 text-sm font-medium text-mf-text-secondary transition hover:bg-black/[0.04] hover:text-mf-text"
-            >
-              {section.label}
-              <ChevronDown className="h-3.5 w-3.5 opacity-60" />
-            </button>
-
-            {openSection === section.id ? (
-              <div className="absolute left-0 top-full z-50 w-72 pt-2">
-                <div className="overflow-hidden rounded-xl border border-mf-border bg-mf-surface py-2 shadow-lg">
-                  {section.links.map((link) => (
-                    <Link
-                      key={link.href + link.label}
-                      href={link.href}
-                      className="block px-4 py-3 transition hover:bg-mf-brand-soft"
-                    >
-                      <p className="text-sm font-semibold text-mf-text">{link.label}</p>
-                      {link.description ? (
-                        <p className="mt-0.5 text-xs leading-5 text-mf-text-muted">
-                          {link.description}
-                        </p>
-                      ) : null}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            ) : null}
-          </div>
-        ))}
-
-        <Link
-          href="/aviso-privacidad"
-          className="rounded-full px-3 py-2 text-sm font-medium text-mf-text-secondary transition hover:bg-black/[0.04] hover:text-mf-text"
+    <nav className="flex items-center gap-1">
+      {MARKETING_NAV.map((section) => (
+        <div
+          key={section.id}
+          className="relative"
+          onMouseEnter={() => setOpenSection(section.id)}
+          onMouseLeave={() => setOpenSection(null)}
         >
-          Privacidad
-        </Link>
-      </nav>
+          <button
+            type="button"
+            className="inline-flex items-center gap-1 rounded-full px-3 py-2 text-sm font-medium text-mf-text-secondary transition hover:bg-black/[0.04] hover:text-mf-text"
+          >
+            {section.label}
+            <ChevronDown className="h-3.5 w-3.5 opacity-60" />
+          </button>
 
+          {openSection === section.id ? (
+            <div className="absolute left-0 top-full z-50 w-72 pt-2">
+              <div className="overflow-hidden rounded-xl border border-mf-border bg-mf-surface py-2 shadow-lg">
+                {section.links.map((link) => (
+                  <Link
+                    key={link.href + link.label}
+                    href={link.href}
+                    className="block px-4 py-3 transition hover:bg-mf-brand-soft"
+                  >
+                    <p className="text-sm font-semibold text-mf-text">{link.label}</p>
+                    {link.description ? (
+                      <p className="mt-0.5 text-xs leading-5 text-mf-text-muted">
+                        {link.description}
+                      </p>
+                    ) : null}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          ) : null}
+        </div>
+      ))}
+
+      <Link
+        href="/aviso-privacidad"
+        className="rounded-full px-3 py-2 text-sm font-medium text-mf-text-secondary transition hover:bg-black/[0.04] hover:text-mf-text"
+      >
+        Privacidad
+      </Link>
+    </nav>
+  );
+}
+
+export function SiteNavMobile({
+  actionHref = "/login",
+  actionLabel = "Iniciar sesión",
+}: {
+  actionHref?: string;
+  actionLabel?: string;
+}) {
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  return (
+    <>
       <button
         type="button"
-        className="rounded-md p-2 text-mf-text-secondary hover:bg-black/[0.04] lg:hidden"
+        className="inline-flex h-9 w-9 items-center justify-center rounded-full text-mf-text-secondary transition hover:bg-black/[0.04] lg:hidden"
+        aria-expanded={mobileOpen}
         aria-label={mobileOpen ? "Cerrar menú" : "Abrir menú"}
         onClick={() => setMobileOpen((value) => !value)}
       >
@@ -89,6 +101,22 @@ export function SiteNav() {
               </div>
             </div>
           ))}
+          <div className="mt-4 space-y-2 border-t border-mf-border-subtle pt-4 sm:hidden">
+            <Link
+              href={actionHref}
+              className="block rounded-lg px-2 py-2.5 text-center text-sm font-semibold text-mf-text hover:bg-mf-brand-soft"
+              onClick={() => setMobileOpen(false)}
+            >
+              {actionLabel}
+            </Link>
+            <Link
+              href="/signup"
+              className="mf-btn-primary w-full justify-center"
+              onClick={() => setMobileOpen(false)}
+            >
+              Registrar academia
+            </Link>
+          </div>
           <Link
             href="/aviso-privacidad"
             className={cn(
@@ -101,6 +129,18 @@ export function SiteNav() {
           </Link>
         </div>
       ) : null}
+    </>
+  );
+}
+
+/** @deprecated Use SiteNavDesktop + SiteNavMobile in the header layout. */
+export function SiteNav() {
+  return (
+    <>
+      <div className="hidden lg:block">
+        <SiteNavDesktop />
+      </div>
+      <SiteNavMobile />
     </>
   );
 }

@@ -152,13 +152,18 @@ export function PublicPlayerCard({ data }: PublicPlayerCardProps) {
 
         <section className="border-t border-slate-100 px-6 py-8 sm:px-10">
           <h2 className="text-center text-lg font-semibold text-slate-900">
-            PASSPORT Score
+            Tu progreso
           </h2>
           <div className="mt-6 flex justify-center">
-            <PassportScoreDisplay score={player.passport_score} variant="hero" />
+            <PassportScoreDisplay
+              score={player.passport_score}
+              variant="hero"
+              scoreLabel="Progreso verificado"
+            />
           </div>
-          <p className="mt-4 text-center text-sm text-slate-500">
-            Basado en stats verificados por la academia
+          <p className="mx-auto mt-4 max-w-sm text-center text-sm leading-6 text-slate-500">
+            Participación y rendimiento registrados por tu academia. Crece partido
+            a partido — no es una calificación escolar.
           </p>
         </section>
 
