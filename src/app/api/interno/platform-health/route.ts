@@ -5,9 +5,13 @@ import { createSupabaseAdminClient } from "@/lib/supabase-admin";
 import { getAuthedSupabaseClient } from "@/lib/supabase-server";
 
 async function probeColumn(table: "matches" | "players", column: string) {
-  const admin = createSupabaseAdminClient();
-  const { error } = await admin.from(table).select(column).limit(0);
-  return !error;
+  try {
+    const admin = createSupabaseAdminClient();
+    const { error } = await admin.from(table).select(column).limit(0);
+    return !error;
+  } catch {
+    return null;
+  }
 }
 
 export async function GET(request: Request) {
@@ -26,14 +30,18 @@ export async function GET(request: Request) {
     probeColumn("players", "guardian_email"),
   ]);
 
+  const scheduleKnown = matchStatusOk !== null && kickoffOk !== null;
+  const guardianKnown = guardianOk !== null;
+
   return NextResponse.json({
     sql: {
-      matchSchedule: matchStatusOk && kickoffOk,
-      guardianContact: guardianOk,
+      matchSchedule: scheduleKnown ? matchStatusOk && kickoffOk : null,
+      guardianContact: guardianKnown ? guardianOk : null,
     },
     resend: {
       ready: isResendProductionReady(),
     },
     launchFree: process.env.NEXT_PUBLIC_LAUNCH_FREE !== "false",
+    checksAvailable: scheduleKnown && guardianKnown,
   });
 }

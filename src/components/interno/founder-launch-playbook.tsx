@@ -21,13 +21,14 @@ import { toast } from "@/components/ui/toast";
 
 interface PlatformHealth {
   sql: {
-    matchSchedule: boolean;
-    guardianContact: boolean;
+    matchSchedule: boolean | null;
+    guardianContact: boolean | null;
   };
   resend: {
     ready: boolean;
   };
   launchFree: boolean;
+  checksAvailable?: boolean;
 }
 
 const defaultOutreach = buildFounderOutreachMessage({
@@ -37,6 +38,7 @@ const defaultOutreach = buildFounderOutreachMessage({
 
 export function FounderLaunchPlaybook() {
   const [health, setHealth] = useState<PlatformHealth | null>(null);
+  const [healthError, setHealthError] = useState(false);
 
   useEffect(() => {
     async function loadHealth() {
@@ -54,11 +56,20 @@ export function FounderLaunchPlaybook() {
 
       if (response.ok) {
         setHealth((await response.json()) as PlatformHealth);
+        setHealthError(false);
+        return;
       }
+
+      setHealthError(true);
     }
 
     void loadHealth();
   }, []);
+
+  const sqlReady =
+    health?.sql.matchSchedule === true && health?.sql.guardianContact === true;
+  const sqlPending =
+    health?.sql.matchSchedule === false || health?.sql.guardianContact === false;
 
   async function copyOutreach() {
     await navigator.clipboard.writeText(defaultOutreach);
@@ -125,6 +136,19 @@ export function FounderLaunchPlaybook() {
               label="Modo lanzamiento gratis activo"
             />
           </ul>
+          {sqlReady ? (
+            <p className="mt-5 rounded-xl border border-emerald-400/30 bg-emerald-400/10 px-4 py-3 text-sm text-emerald-100">
+              Base de datos lista — scripts #11 y #13 aplicados. No necesitas volver a
+              correrlos.
+            </p>
+          ) : null}
+          {healthError ? (
+            <p className="mt-5 rounded-xl border border-amber-400/30 bg-amber-400/10 px-4 py-3 text-sm text-amber-100">
+              No se pudo verificar automáticamente. Corre{" "}
+              <code className="text-amber-200">verify-production-readiness.sql</code> en
+              Supabase; si todo es true, estás listo.
+            </p>
+          ) : null}
         </section>
 
         <section className="rounded-2xl border border-white/10 bg-white/[0.04] p-6">
@@ -208,20 +232,29 @@ export function FounderLaunchPlaybook() {
           </ul>
         </section>
 
-        <section className="rounded-2xl border border-white/10 bg-white/[0.04] p-6">
-          <h2 className="text-lg font-semibold">SQL pendiente en Supabase</h2>
-          <p className="mt-2 text-sm text-white/60">
-            Ejecutar en SQL Editor si el estado de plataforma marca pendiente.
-          </p>
-          <ul className="mt-4 space-y-2 text-sm text-white/75">
-            {PRODUCTION_SQL_SCRIPTS.map((script) => (
-              <li key={script.id}>
-                #{script.id} · <code className="text-amber-200">{script.file}</code> —{" "}
-                {script.label}
-              </li>
-            ))}
-          </ul>
-        </section>
+        {sqlPending ? (
+          <section className="rounded-2xl border border-amber-400/30 bg-amber-400/10 p-6">
+            <h2 className="text-lg font-semibold text-amber-100">
+              SQL pendiente en Supabase
+            </h2>
+            <p className="mt-2 text-sm text-amber-50/80">
+              El estado de plataforma arriba marca scripts faltantes. Ejecuta solo los
+              que correspondan en SQL Editor.
+            </p>
+            <ul className="mt-4 space-y-2 text-sm text-amber-50/90">
+              {PRODUCTION_SQL_SCRIPTS.filter((script) => {
+                if (script.id === 11) return health?.sql.guardianContact === false;
+                if (script.id === 13) return health?.sql.matchSchedule === false;
+                return false;
+              }).map((script) => (
+                <li key={script.id}>
+                  #{script.id} · <code className="text-amber-200">{script.file}</code> —{" "}
+                  {script.label}
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
       </main>
     </div>
   );
@@ -232,13 +265,13 @@ function HealthRow({
   label,
   hint,
 }: {
-  done?: boolean;
+  done?: boolean | null;
   label: string;
   hint?: string;
 }) {
   return (
     <li className="flex items-start gap-3 text-sm">
-      {done ? (
+      {done === true ? (
         <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" />
       ) : done === false ? (
         <Circle className="mt-0.5 h-4 w-4 shrink-0 text-amber-400" />
