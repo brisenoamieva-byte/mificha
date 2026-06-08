@@ -145,7 +145,7 @@ export function ExploreDirectory({
         </div>
       </div>
 
-      <div className="rounded-xl border border-mf-border-subtle bg-mf-canvas/80 px-4 py-3 text-sm leading-6 text-mf-text-secondary">
+      <div className="rounded-xl border border-mf-border-subtle border-l-4 border-l-mf-accent bg-mf-accent-soft/40 px-4 py-3 text-sm leading-6 text-mf-text-secondary">
         MiFicha ordena tu participación y te da visibilidad ante visorías — siempre
         por categoría y con consentimiento. No es una calificación ni un examen.
       </div>
@@ -226,7 +226,7 @@ export function ExploreDirectory({
                   </div>
                 </div>
                 {academy.is_certified ? (
-                  <span className="mt-4 inline-flex items-center gap-1 rounded-full bg-mf-warning-soft px-2.5 py-1 text-xs font-semibold text-mf-warning">
+                  <span className="mf-badge-accent mt-4">
                     <Award className="h-3.5 w-3.5" />
                     Certificada
                   </span>

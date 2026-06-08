@@ -7,7 +7,7 @@ export function HomeFichaPreview() {
   return (
     <div className="relative mx-auto w-full max-w-[380px] lg:mx-0 lg:max-w-none">
       <div
-        className="absolute -inset-4 rounded-2xl bg-mf-brand/[0.06] blur-2xl"
+        className="absolute -inset-4 rounded-2xl bg-[radial-gradient(circle,rgba(52,211,153,0.12)_0%,rgba(27,79,140,0.06)_55%,transparent_70%)] blur-2xl"
         aria-hidden
       />
       <div className="relative overflow-hidden rounded-xl border border-mf-border bg-mf-surface shadow-[0_24px_48px_-12px_rgba(15,45,82,0.18)]">
@@ -49,11 +49,11 @@ export function HomeFichaPreview() {
           </div>
 
           <div className="mt-5 flex flex-wrap gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-mf-success-soft px-3 py-1 text-xs font-semibold text-mf-success">
+            <span className="mf-badge-accent">
               <BadgeCheck className="h-3.5 w-3.5" />
               Verificada por academia
             </span>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-mf-brand-soft px-3 py-1 text-xs font-semibold text-mf-brand">
+            <span className="mf-badge-brand">
               <TrendingUp className="h-3.5 w-3.5" />
               Activo esta semana
             </span>

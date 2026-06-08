@@ -8,7 +8,7 @@ export function ExploreHeroAside() {
   return (
     <div className="relative mx-auto w-full max-w-[380px] lg:mx-0 lg:max-w-none">
       <div
-        className="absolute -inset-4 rounded-2xl bg-mf-brand/[0.06] blur-2xl"
+        className="absolute -inset-4 rounded-2xl bg-[radial-gradient(circle,rgba(52,211,153,0.1)_0%,rgba(27,79,140,0.05)_60%,transparent_75%)] blur-2xl"
         aria-hidden
       />
       <div className="relative overflow-hidden rounded-xl border border-mf-border bg-mf-surface shadow-[0_24px_48px_-12px_rgba(15,45,82,0.18)]">
@@ -27,7 +27,13 @@ export function ExploreHeroAside() {
               className="flex items-center justify-between gap-3 px-5 py-4"
             >
               <div className="flex items-center gap-3">
-                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-mf-brand-soft text-xs font-bold text-mf-brand">
+                <span
+                  className={
+                    player.rank === 1
+                      ? "flex h-8 w-8 items-center justify-center rounded-full bg-mf-accent text-xs font-bold text-slate-950"
+                      : "flex h-8 w-8 items-center justify-center rounded-full bg-mf-brand-soft text-xs font-bold text-mf-brand"
+                  }
+                >
                   {player.rank}
                 </span>
                 <div>
@@ -36,10 +42,16 @@ export function ExploreHeroAside() {
                 </div>
               </div>
               <div className="text-right">
-                <p className="text-lg font-semibold tabular-nums text-mf-brand">
+                <p
+                  className={
+                    player.rank === 1
+                      ? "text-lg font-semibold tabular-nums text-mf-accent-dark"
+                      : "text-lg font-semibold tabular-nums text-mf-brand"
+                  }
+                >
                   {player.score}
                 </p>
-                <p className="text-[11px] font-medium text-mf-success">{player.trend}</p>
+                <p className="text-[11px] font-medium text-mf-accent-dark">{player.trend}</p>
               </div>
             </li>
           ))}

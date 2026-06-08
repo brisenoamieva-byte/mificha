@@ -18,7 +18,7 @@ export function HomeHero() {
             Registrar colegio
             <ArrowRight className="h-4 w-4" />
           </Link>
-          <Link href="/explorar" className="mf-btn-secondary">
+          <Link href="/explorar" className="mf-btn-accent">
             Explorar talento
           </Link>
         </>
@@ -26,7 +26,7 @@ export function HomeHero() {
       stats={[
         { value: "60 s", label: "Captura post-partido" },
         { value: "0", label: "App para padres" },
-        { value: "100", label: "Progreso verificado" },
+        { value: "100", label: "Progreso verificado", accent: true },
       ]}
       aside={<HomeFichaPreview />}
     />

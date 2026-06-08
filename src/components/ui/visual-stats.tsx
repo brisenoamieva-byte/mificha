@@ -116,7 +116,7 @@ interface MiniStatCardProps {
 
 const toneClasses = {
   blue: "text-mf-brand",
-  green: "text-mf-success",
+  green: "text-mf-accent-dark",
   amber: "text-mf-warning",
   slate: "text-mf-text",
 };

@@ -46,7 +46,7 @@ export default async function ExplorarPage() {
           photo={MARKETING_MEDIA.heroExplorar}
           actions={
             <>
-              <Link href="/padres" className="mf-btn-secondary">
+              <Link href="/padres" className="mf-btn-accent">
                 Soy padre
               </Link>
               <Link href="/signup" className="mf-btn-primary">
@@ -58,7 +58,7 @@ export default async function ExplorarPage() {
           stats={[
             { value: String(playerCount), label: "Jugadores públicos" },
             { value: String(academyCount), label: "Academias" },
-            { value: "11", label: "Destacados semanales" },
+            { value: "11", label: "Destacados semanales", accent: true },
           ]}
           aside={<ExploreHeroAside />}
         />

@@ -3,6 +3,7 @@ import { ArrowRight } from "lucide-react";
 import { MarketingCardPhoto } from "@/components/marketing/marketing-hero-visual";
 import { COMPLEMENT_ROWS, HOME_FEATURES } from "@/lib/marketing-nav";
 import { MARKETING_MEDIA } from "@/lib/marketing-assets";
+import { cn } from "@/lib/utils";
 
 export function FeatureHubSection() {
   return (
@@ -21,7 +22,7 @@ export function FeatureHubSection() {
           </div>
 
           <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {HOME_FEATURES.map((feature) => (
+            {HOME_FEATURES.map((feature, index) => (
               <article
                 key={feature.title}
                 className="group flex flex-col overflow-hidden rounded-xl border border-mf-border bg-mf-surface transition hover:border-mf-brand/25 hover:shadow-[var(--mf-shadow)]"
@@ -31,7 +32,12 @@ export function FeatureHubSection() {
                   className="h-36 sm:h-40"
                 />
                 <div className="flex flex-1 flex-col px-6 pb-6 pt-6">
-                  <div className="mb-4 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-mf-brand-soft text-mf-brand">
+                  <div
+                    className={cn(
+                      "mb-4",
+                      index % 2 === 1 ? "mf-icon-accent" : "mf-icon-brand",
+                    )}
+                  >
                     <feature.icon className="h-5 w-5" strokeWidth={1.75} />
                   </div>
                   <h3 className="text-base font-semibold tracking-[-0.01em] text-mf-text">
@@ -42,7 +48,12 @@ export function FeatureHubSection() {
                   </p>
                   <Link
                     href={feature.href}
-                    className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-mf-brand opacity-90 transition group-hover:opacity-100"
+                    className={cn(
+                      "mt-5 inline-flex items-center gap-1.5 text-sm font-semibold opacity-90 transition group-hover:opacity-100",
+                      index % 2 === 1
+                        ? "text-mf-accent-dark"
+                        : "text-mf-brand",
+                    )}
                   >
                     Conocer más
                     <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-0.5" />
@@ -78,7 +89,7 @@ export function FeatureHubSection() {
                 <div className="px-5 py-3.5 text-xs font-semibold uppercase tracking-[0.12em] text-mf-text-muted">
                   Portal de liga
                 </div>
-                <div className="border-l border-mf-border-subtle px-5 py-3.5 text-xs font-semibold uppercase tracking-[0.12em] text-mf-brand">
+                <div className="border-l border-mf-border-subtle bg-mf-accent-soft/50 px-5 py-3.5 text-xs font-semibold uppercase tracking-[0.12em] text-mf-accent-dark">
                   MiFicha
                 </div>
               </div>
@@ -90,7 +101,7 @@ export function FeatureHubSection() {
                   <div className="px-5 py-4 text-sm leading-6 text-mf-text-secondary">
                     {row.official}
                   </div>
-                  <div className="border-l border-mf-border-subtle bg-mf-brand-soft/30 px-5 py-4 text-sm font-medium leading-6 text-mf-text">
+                  <div className="border-l border-mf-border-subtle bg-mf-accent-soft/30 px-5 py-4 text-sm font-medium leading-6 text-mf-text">
                     {row.mificha}
                   </div>
                 </div>

@@ -34,7 +34,7 @@ export default function PadresPage() {
           stats={[
             { value: "QR", label: "En la cancha" },
             { value: "0", label: "Registro requerido" },
-            { value: "100", label: "Passport Score" },
+            { value: "100", label: "Passport Score", accent: true },
           ]}
           aside={<HomeFichaPreview />}
         />

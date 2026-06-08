@@ -14,6 +14,7 @@ export function SiteHeader({
 }: SiteHeaderProps) {
   return (
     <header className="sticky top-0 z-50 border-b border-mf-border bg-mf-surface/95 backdrop-blur-sm">
+      <div className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-mf-brand via-mf-accent/80 to-mf-brand" />
       <div className="relative mx-auto flex h-14 max-w-6xl items-center gap-3 px-4 sm:gap-4 sm:px-6">
         <BrandLogoLink className="shrink-0" />
 

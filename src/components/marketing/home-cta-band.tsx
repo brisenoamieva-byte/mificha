@@ -8,6 +8,11 @@ export function HomeCtaBand() {
     <section className="relative min-h-[300px] overflow-hidden border-t border-mf-brand-dark">
       <MarketingBackgroundPhoto meta={MARKETING_MEDIA.ctaBand} />
       <div className="absolute inset-0 bg-gradient-to-r from-mf-brand-dark/95 via-mf-brand/88 to-mf-brand-dark/55 lg:to-transparent" />
+      <div
+        className="absolute inset-0 bg-[radial-gradient(ellipse_40%_80%_at_100%_50%,rgba(52,211,153,0.15),transparent)]"
+        aria-hidden
+      />
+      <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-mf-accent via-mf-accent-bright to-mf-accent-dark" />
       <div className="relative mx-auto flex max-w-6xl flex-col items-start gap-6 px-4 py-14 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:py-16">
         <div className="max-w-xl">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-white/60">
@@ -31,7 +36,7 @@ export function HomeCtaBand() {
           </Link>
           <Link
             href="/padres"
-            className="inline-flex items-center gap-2 rounded-full border border-white/30 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
+            className="inline-flex items-center gap-2 rounded-full border border-mf-accent/40 bg-mf-accent/10 px-6 py-3 text-sm font-semibold text-mf-accent-bright transition hover:bg-mf-accent/20"
           >
             Soy padre
           </Link>

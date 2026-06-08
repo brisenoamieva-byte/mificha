@@ -13,6 +13,7 @@ interface AudienceItem {
   href: string;
   cta: string;
   imageKey: MarketingImageKey;
+  iconTone?: "brand" | "accent";
   secondaryHref?: string;
   secondaryLabel?: string;
   featured?: boolean;
@@ -29,6 +30,7 @@ const audiences: AudienceItem[] = [
     secondaryLabel: "Iniciar sesión",
     cta: "Crear cuenta",
     imageKey: "audienceAcademias",
+    iconTone: "brand",
     featured: true,
   },
   {
@@ -39,6 +41,7 @@ const audiences: AudienceItem[] = [
     href: "/padres",
     cta: "Abrir ficha",
     imageKey: "audiencePadres",
+    iconTone: "accent",
   },
   {
     icon: Search,
@@ -48,6 +51,7 @@ const audiences: AudienceItem[] = [
     href: "/explorar",
     cta: "Explorar directorio",
     imageKey: "audienceScouts",
+    iconTone: "accent",
   },
 ];
 
@@ -69,17 +73,19 @@ export function HomeAudienceSection() {
               "group flex flex-col overflow-hidden rounded-xl border bg-mf-surface transition",
               item.featured
                 ? "border-mf-brand/25 shadow-[0_0_0_1px_rgba(27,79,140,0.08)]"
-                : "border-mf-border hover:border-mf-brand/20",
+                : item.iconTone === "accent"
+                  ? "border-mf-border hover:border-mf-accent/35 hover:shadow-[0_0_0_1px_rgba(52,211,153,0.12)]"
+                  : "border-mf-border hover:border-mf-brand/20",
             )}
           >
             <MarketingCardPhoto meta={MARKETING_MEDIA[item.imageKey]} />
             <div className="flex flex-1 flex-col px-6 pb-6 pt-6">
               <div
                 className={cn(
-                  "flex h-10 w-10 shrink-0 items-center justify-center rounded-lg",
-                  item.featured
-                    ? "bg-mf-brand text-white"
-                    : "bg-mf-brand-soft text-mf-brand",
+                  item.featured || item.iconTone === "brand"
+                    ? "mf-icon-brand"
+                    : "mf-icon-accent",
+                  item.featured && "bg-mf-brand text-white",
                 )}
               >
                 <item.icon className="h-5 w-5" strokeWidth={1.75} />
@@ -97,7 +103,9 @@ export function HomeAudienceSection() {
                     "inline-flex items-center gap-1.5 text-sm font-semibold transition",
                     item.featured
                       ? "text-mf-brand hover:text-mf-brand-dark"
-                      : "text-mf-text hover:text-mf-brand",
+                      : item.iconTone === "accent"
+                        ? "text-mf-accent-dark hover:text-[#047857]"
+                        : "text-mf-text hover:text-mf-brand",
                   )}
                 >
                   {item.cta}

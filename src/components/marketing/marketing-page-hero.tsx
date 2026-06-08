@@ -6,6 +6,8 @@ import { cn } from "@/lib/utils";
 interface MarketingStat {
   value: string;
   label: string;
+  /** Resalta con verde acento (progreso / Passport) */
+  accent?: boolean;
 }
 
 interface MarketingPageHeroProps {
@@ -45,6 +47,10 @@ export function MarketingPageHero({
         aria-hidden
       />
       <div
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_50%_40%_at_90%_10%,rgba(52,211,153,0.07),transparent)]"
+        aria-hidden
+      />
+      <div
         className={cn(
           "relative mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:py-18",
           hasVisual &&
@@ -70,7 +76,12 @@ export function MarketingPageHero({
             >
               {stats.map((item) => (
                 <div key={item.label}>
-                  <dt className="text-lg font-semibold tabular-nums tracking-tight text-mf-text">
+                  <dt
+                    className={cn(
+                      "text-lg font-semibold tabular-nums tracking-tight",
+                      item.accent ? "mf-stat-accent" : "text-mf-text",
+                    )}
+                  >
                     {item.value}
                   </dt>
                   <dd className="mt-1 text-xs leading-5 text-mf-text-muted">

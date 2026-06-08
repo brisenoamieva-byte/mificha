@@ -131,13 +131,13 @@ export function getPassportTier(score: number): PassportTierStyle {
     return {
       tier: "pro",
       label: "En ascenso",
-      scoreText: "text-emerald-300",
-      badgeBg: "bg-gradient-to-r from-emerald-500 to-green-400",
+      scoreText: "text-mf-accent-bright",
+      badgeBg: "bg-gradient-to-r from-mf-accent-dark to-mf-accent",
       badgeText: "text-slate-950",
       panelBg: "bg-gradient-to-br from-[#0a1f3d] via-[#0f2d52] to-[#163a66]",
-      panelBorder: "border-emerald-400/30",
+      panelBorder: "border-mf-accent/30",
       accent: "#34d399",
-      segmentFilled: "bg-emerald-400",
+      segmentFilled: "bg-mf-accent",
       segmentEmpty: "bg-white/10",
     };
   }
@@ -178,7 +178,7 @@ export function getPassportFilledSegments(score: number, total = 10) {
 export function getPassportBarClass(score: number) {
   const tier = getPassportTier(score);
   if (tier.tier === "elite") return "bg-amber-400";
-  if (tier.tier === "pro") return "bg-emerald-400";
+  if (tier.tier === "pro") return "bg-mf-accent";
   if (tier.tier === "desarrollo") return "bg-amber-400";
   return "bg-slate-400";
 }
