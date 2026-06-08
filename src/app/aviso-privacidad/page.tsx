@@ -94,8 +94,8 @@ export default function AvisoPrivacidadPage() {
           items={[
             "Crear, autenticar y administrar cuentas de academia.",
             "Almacenar planteles, partidos, estadísticas y generar fichas digitales.",
-            "Permitir compartir fichas por link o QR y, si la academia lo autoriza, mostrar perfiles en el directorio público.",
-            "Enviar reportes y comunicaciones operativas solicitadas por la academia (correo o WhatsApp).",
+            "Permitir compartir fichas por link (y avisos automáticos al tutor) y, si la academia lo autoriza, mostrar perfiles en el directorio público.",
+            "Enviar avisos post-partido, reportes y comunicaciones operativas (correo o WhatsApp).",
             "Cobrar suscripciones y cumplir obligaciones fiscales cuando aplique.",
             "Mantener la seguridad, integridad y disponibilidad de la plataforma.",
           ]}
@@ -128,7 +128,7 @@ export default function AvisoPrivacidadPage() {
 
       <LegalSection title="Dos niveles de visibilidad">
         <LegalParagraph>
-          <strong className="text-mf-text">Ficha por link o QR:</strong> accesible
+          <strong className="text-mf-text">Ficha por link:</strong> accesible
           solo para quien tenga el enlace. No está pensada para indexación en
           buscadores; aplicamos metadatos acotados en perfiles de menores.
         </LegalParagraph>

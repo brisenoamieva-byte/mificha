@@ -30,8 +30,8 @@ export function NoFixturesState({
         </h1>
         <p className="mt-3 text-sm leading-7 text-mf-text-secondary">
           MiFicha publicará el calendario oficial de tu competición (rival, fecha,
-          sede y categoría). Cuando aparezca aquí, podrás capturar stats en ~2
-          minutos post-partido.
+          sede y categoría). Cuando aparezca aquí, capturas convocados y minutos en ~1
+          minuto post-partido (tras marcador y acta oficial).
         </p>
         <p className="mt-3 text-sm leading-7 text-mf-text-secondary">
           Los amistosos fuera de torneo también los agenda el equipo MiFicha para

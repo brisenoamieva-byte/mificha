@@ -1,6 +1,6 @@
 /**
- * WhatsApp outbound — preparado para Twilio o Meta Cloud API.
- * Mientras no haya credenciales, usa enlaces wa.me desde el cliente.
+ * WhatsApp outbound — Twilio o Meta Cloud API.
+ * Sin credenciales, el envío automático usa email (Resend) o queda en modo omitido.
  */
 
 export type WhatsAppProvider = "twilio" | "meta" | "link_only";
@@ -45,7 +45,7 @@ export async function sendWhatsAppMessage(
       ok: false,
       provider,
       error:
-        "WhatsApp API no configurada. Usa enlaces wa.me o configura Twilio/Meta.",
+        "WhatsApp API no configurada. Agrega email del tutor o configura Twilio/Meta en Vercel.",
     };
   }
 

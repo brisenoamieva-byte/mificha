@@ -31,7 +31,7 @@ export default function TerminosPage() {
         </LegalParagraph>
         <LegalParagraph>
           MiFicha es una herramienta digital para gestionar planteles, registrar
-          estadísticas de partidos, generar fichas técnicas con QR y, opcionalmente,
+          estadísticas de partidos, generar fichas técnicas compartibles por link y, opcionalmente,
           publicar perfiles en un directorio de visorías. Complementa — no sustituye —
           los sistemas oficiales de ligas o federaciones.
         </LegalParagraph>
@@ -68,7 +68,7 @@ export default function TerminosPage() {
 
       <LegalSection title="4. Fichas públicas y directorio">
         <LegalParagraph>
-          Las fichas son privadas por defecto. La activación de link/QR o aparición en
+          Las fichas son privadas por defecto. La activación de link compartible o aparición en
           /explorar requiere consentimiento registrado en la plataforma. MiFicha puede
           retirar perfiles que violen estos Términos, la ley o derechos de menores, sin
           previo aviso cuando exista riesgo inmediato.

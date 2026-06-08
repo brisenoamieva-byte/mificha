@@ -4,7 +4,7 @@ export async function POST() {
   return NextResponse.json(
     {
       error:
-        "Envío automático deshabilitado. Usa los botones de WhatsApp (wa.me) en Plantel y Partidos.",
+        "Este endpoint está deprecado. Usa /api/notifications/match-update y /api/notifications/welcome-ficha para envío automático.",
     },
     { status: 501 },
   );

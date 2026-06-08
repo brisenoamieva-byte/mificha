@@ -6,11 +6,11 @@ export const PRIVACY_COPY = {
   consentLabel:
     "Confirmo contar con autorización del padre, madre o tutor para tratar y compartir los datos deportivos de este menor conforme al aviso de privacidad.",
   publicProfileLabel:
-    "Ficha accesible por link o QR (no indexada en buscadores; solo quien tenga el enlace).",
+    "Ficha accesible por link (no indexada en buscadores; solo quien tenga el enlace).",
   discoverableLabel:
     "Permitir aparición en directorio y destacados de MiFicha (visorías), siempre por categoría y con consentimiento.",
   publicProfileHint:
-    "Ideal para compartir con padres por WhatsApp. No aparece en listados abiertos salvo que actives la opción de directorio.",
+    "MiFicha envía el link al tutor automáticamente tras cada partido. No aparece en listados abiertos salvo que actives directorio.",
   discoverableHint:
     "Solo para jugadores que la academia decide promover públicamente. Requiere autorización parental.",
   minorNotice:

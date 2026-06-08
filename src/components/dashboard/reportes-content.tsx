@@ -322,10 +322,10 @@ export function ReportesContent({ embedded = false }: ReportesContentProps) {
               </div>
             </div>
             <Link
-              href="/dashboard/plantel"
+              href="/dashboard/plantel/tutores"
               className="inline-flex shrink-0 items-center justify-center rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700"
             >
-              Ir a Plantel
+              Avisos a tutores
             </Link>
           </div>
         </div>

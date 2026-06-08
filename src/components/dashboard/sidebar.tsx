@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   LineChart,
+  Mail,
   Settings,
   Trophy,
   Users,
@@ -16,6 +17,7 @@ import { PitchDeckNavLink } from "@/components/dashboard/pitch-deck-nav-link";
 const navItems = [
   { href: "/dashboard", label: "Inicio", icon: LayoutDashboard },
   { href: "/dashboard/plantel", label: "Plantel", icon: Users },
+  { href: "/dashboard/plantel/tutores", label: "Avisos a tutores", icon: Mail },
   { href: "/dashboard/partidos", label: "Partidos", icon: Trophy },
   { href: "/dashboard/rendimiento", label: "Rendimiento", icon: LineChart },
   { href: "/dashboard/configuracion", label: "Configuración", icon: Settings },
@@ -48,7 +50,9 @@ export function DashboardSidebar({ open, onClose }: DashboardSidebarProps) {
           const isActive =
             href === "/dashboard"
               ? pathname === href
-              : pathname.startsWith(href);
+              : href === "/dashboard/plantel"
+                ? pathname === href
+                : pathname.startsWith(href);
 
           return (
             <Link

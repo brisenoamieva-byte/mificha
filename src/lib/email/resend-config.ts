@@ -13,4 +13,4 @@ export function isResendProductionReady() {
 }
 
 export const RESEND_NOT_READY_HINT =
-  "Los reportes por email solo llegan a tutores con dominio verificado. Mientras tanto, comparte fichas por WhatsApp desde Plantel.";
+  "Los reportes por email requieren dominio verificado en Resend. Los avisos post-partido y el link de bienvenida funcionan desde Plantel → Avisos a tutores (email o WhatsApp automático).";

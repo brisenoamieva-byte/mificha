@@ -231,9 +231,8 @@ export function PlayerImportModal({
               <div className="flex items-start gap-2 rounded-lg bg-slate-50 px-4 py-3 text-sm text-slate-600">
                 <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[#1B4F8C]" />
                 <p>
-                  Se importarán como fichas privadas. Después puedes filtrar por
-                  generación, completar foto/video y activar consentimiento para
-                  compartir con padres o visorías.
+                  Se importarán como fichas privadas. Agrega contacto del tutor y activa
+                  consentimiento; luego envía el link desde Avisos a tutores.
                 </p>
               </div>
             </div>

@@ -68,8 +68,8 @@ export function buildOnboardingSteps(progress: OnboardingProgress): OnboardingSt
       optional: true,
       title: "Padres abrieron la ficha",
       description: `Meta del piloto: ${PARENT_ENGAGEMENT_GOAL}+ visitas únicas (${progress.parentUniqueViews} hasta ahora).`,
-      href: "/dashboard/plantel",
-      cta: "Compartir fichas",
+      href: "/dashboard/plantel/tutores",
+      cta: "Ver avisos",
     },
     {
       id: "profile",

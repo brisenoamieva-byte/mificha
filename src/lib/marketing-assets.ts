@@ -73,7 +73,7 @@ export const MARKETING_MEDIA: Record<MarketingImageKey, MarketingImageMeta> = {
   },
   featureQr: {
     src: MARKETING_IMAGES.featureQr,
-    alt: "Entrega de ficha con código QR a padre de familia",
+    alt: "Padre recibiendo link de ficha por WhatsApp en el celular",
     objectPosition: "center center",
   },
   featurePassport: {

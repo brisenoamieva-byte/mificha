@@ -95,7 +95,11 @@ export function MatchSavedSummary({
         </h2>
         <p className="text-sm text-slate-600">
           MiFicha envía la actualización sola a quien tenga consentimiento, ficha pública
-          y WhatsApp o email en Plantel. No hace falta compartir manualmente tras cada partido.
+          y contacto del tutor. Configura avisos en{" "}
+          <Link href="/dashboard/plantel/tutores" className="font-semibold text-[#1B4F8C] hover:underline">
+            Avisos a tutores
+          </Link>
+          .
         </p>
 
         {notificationSummary ? (

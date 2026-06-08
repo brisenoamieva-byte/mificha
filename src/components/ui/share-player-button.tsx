@@ -45,7 +45,7 @@ export function SharePlayerButton({
 
     await navigator.clipboard.writeText(buildPlayerShareUrl(slug));
     setCopied(true);
-    toast.success("Link copiado. Envíalo al padre por WhatsApp.");
+    toast.success("Link copiado. Para envío automático, usa Avisos a tutores.");
     setTimeout(() => setCopied(false), 2000);
   }
 
@@ -71,7 +71,7 @@ export function SharePlayerButton({
           type="button"
           onClick={handleWhatsApp}
           className="rounded-lg p-2 text-green-700 hover:bg-green-50"
-          title="Compartir por WhatsApp"
+          title="WhatsApp manual (respaldo)"
         >
           <MessageCircle className="h-4 w-4" />
         </button>
@@ -95,7 +95,7 @@ export function SharePlayerButton({
         className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-3 py-2 text-sm font-semibold text-white hover:bg-green-700"
       >
         <MessageCircle className="h-4 w-4" />
-        WhatsApp
+        WhatsApp manual
       </button>
       <button
         type="button"

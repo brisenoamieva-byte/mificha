@@ -253,8 +253,12 @@ export function PublicPlayerCard({ data }: PublicPlayerCardProps) {
 
         <section className="border-t border-slate-100 px-6 py-8 sm:px-10">
           <h2 className="text-center text-lg font-semibold text-slate-900">
-            Compartir ficha
+            Link de la ficha
           </h2>
+          <p className="mx-auto mt-2 max-w-md text-center text-sm leading-6 text-slate-500">
+            MiFicha envía este enlace al tutor automáticamente. También puedes copiarlo
+            o escanearlo desde pantalla.
+          </p>
           <div className="mx-auto mt-6 flex max-w-[220px] justify-center rounded-2xl bg-white p-4 shadow-inner ring-1 ring-slate-100">
             <QRCode value={publicUrl} size={180} />
           </div>
@@ -265,7 +269,7 @@ export function PublicPlayerCard({ data }: PublicPlayerCardProps) {
               rel="noopener noreferrer"
               className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-mf-accent-dark px-4 py-3 text-sm font-semibold text-white hover:bg-[#047857]"
             >
-              Compartir en WhatsApp
+              Compartir manual
             </a>
             <button
               type="button"

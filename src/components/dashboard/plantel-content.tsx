@@ -119,8 +119,12 @@ export function PlantelContent() {
     [players],
   );
 
-  const guardiansWithEmailCount = useMemo(
-    () => players.filter((player) => player.guardian_email?.trim()).length,
+  const guardiansWithContactCount = useMemo(
+    () =>
+      players.filter(
+        (player) =>
+          player.guardian_email?.trim() || player.guardian_phone?.trim(),
+      ).length,
     [players],
   );
 
@@ -214,7 +218,7 @@ export function PlantelContent() {
               <li>Descarga la plantilla Excel (incluye columnas opcionales de tutor).</li>
               <li>Importa todo el roster (ideal al inicio de temporada).</li>
               <li>Filtra por generación o Sub-X y completa foto, video y consentimiento.</li>
-              <li>Envía el link de la ficha por email o WhatsApp; los padres no necesitan cuenta.</li>
+              <li>Registra contacto del tutor y envía el link desde Avisos a tutores.</li>
             </ol>
           </div>
         ) : null}
@@ -237,9 +241,9 @@ export function PlantelContent() {
               tone="green"
             />
             <MiniStatCard
-              label="Tutores con email"
-              value={guardiansWithEmailCount}
-              hint={`${publicProfilesCount} fichas públicas · de ${players.length}`}
+              label="Tutores con contacto"
+              value={guardiansWithContactCount}
+              hint={`${publicProfilesCount} fichas públicas · avisos en /tutores`}
               tone="amber"
             />
           </div>

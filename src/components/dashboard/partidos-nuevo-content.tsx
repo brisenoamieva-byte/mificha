@@ -692,7 +692,7 @@ export function PartidosNuevoContent() {
                 </p>
                 <p className="mt-3 text-sm text-slate-500">
                   {matchGovernance.isOfficial
-                    ? "El marcador lo publica el organizador. Aquí solo confirmas convocados y stats individuales."
+                    ? "El marcador y acta los publica el organizador. Aquí solo registras convocados y minutos."
                     : "Marcador y stats del plantel. En el paso 2 eliges convocados y captura rápida o detallada."}
                 </p>
 

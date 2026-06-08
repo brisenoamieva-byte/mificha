@@ -2,7 +2,7 @@
 
 **Dominio:** [mificha.mx](https://mificha.mx)
 
-Plataforma para academias de fútbol en México. Cada jugador tiene una ficha técnica digital verificada que los padres pueden compartir con clubes, scouts y familiares.
+Plataforma para academias de fútbol en México. Cada jugador tiene una ficha técnica digital verificada; los tutores reciben el link automáticamente tras cada partido.
 
 ## Stack
 
@@ -62,21 +62,20 @@ PITCH_ALLOWED_USER_IDS=tu-user-uuid-de-supabase
 
 ### 3. Base de datos Supabase
 
-En **Supabase → SQL Editor**, ejecuta en este orden:
+En **Supabase → SQL Editor**, ejecuta el schema base (pasos 1–10 del README histórico) y luego el rollout de producción:
 
-1. `supabase/schema.sql`
-2. `supabase/fix-auth.sql`
-3. `supabase/storage-and-triggers.sql`
-4. `supabase/public-profile-rls.sql`
-5. `supabase/academy-landing.sql`
-6. `supabase/public-weekly-stats-rls.sql` (11 ideal semanal en `/explorar`)
-7. `supabase/privacy-minors.sql` (consentimiento parental y directorio)
-8. `supabase/privacy-storage-rls.sql` (fotos/videos de jugadores protegidos)
-9. `supabase/passport-score-trigger.sql` (Passport Score automático tras partidos)
-10. `supabase/academy-league-fields.sql` (enlace a calendario oficial de liga)
-11. `supabase/player-guardian-contact.sql` (email del tutor para reportes)
-12. `supabase/privacy-rls-hardening.sql` (endurecer privacidad RLS — ejecutar al final)
-13. `supabase/match-schedule.sql` (calendario público: fecha, hora, sede)
+```bash
+# Orden recomendado (ver supabase/production-rollout.sql):
+# 11 → 13 → 14 → 15 → 20 → 21 → 22 → 16 → 17 → 18 → 19 → 12
+```
+
+Verifica con `supabase/verify-production-readiness.sql`.
+
+Scripts clave del flujo actual:
+
+1. `supabase/schema.sql` … (base)
+2. `supabase/production-rollout.sql` — contacto tutor, jornadas, gobernanza, avisos automáticos, logros
+3. `supabase/privacy-rls-hardening.sql` — al final
 
 ### 4. Auth en Supabase
 
@@ -108,7 +107,7 @@ Crea la academia **Academia Norteños Querétaro** con 5 jugadores, 1 temporada 
 
 ## Checklist de lanzamiento (prod)
 
-Ejecuta **todos** los scripts SQL en Supabase (pasos 1–13) antes de pláticas con academias.
+Ejecuta **`supabase/production-rollout.sql`** (orden 11→…→12) y verifica con `verify-production-readiness.sql` antes de pláticas con academias.
 
 En la app, valida este flujo con tu academia real:
 
@@ -132,9 +131,12 @@ Pitch deck privado: `/interno/pitch` · one-pager: `/interno/demo-one-pager` · 
 | `/signup`, `/login` | Auth |
 | `/dashboard` | Panel de academia |
 | `/dashboard/plantel` | Gestión de jugadores |
-| `/dashboard/partidos` | Partidos y stats |
-| `/dashboard/reportes` | Reportes a padres |
+| `/dashboard/plantel/tutores` | Avisos automáticos a tutores (link email/WhatsApp) |
+| `/dashboard/partidos` | Partidos · convocados y minutos |
+| `/dashboard/rendimiento` | Rendimiento y reportes |
 | `/dashboard/configuracion` | Configuración de academia |
+| `/interno/pitch` | Pitch deck (privado) |
+| `/interno/lanzamiento` | Playbook venta + demo |
 | `/j/[slug]` | Ficha pública del jugador |
 | `/a/[slug]` | Landing pública de academia |
 
@@ -145,7 +147,7 @@ Pitch deck privado: `/interno/pitch` · one-pager: `/interno/demo-one-pager` · 
 3. Deploy:
 
 ```bash
-git push origin main
+git push origin master
 ```
 
 Vercel despliega automáticamente en cada push a `main`.
