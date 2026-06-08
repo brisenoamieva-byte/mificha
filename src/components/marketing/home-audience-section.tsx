@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { LucideIcon } from "lucide-react";
-import { ArrowRight, Building2, QrCode, Search } from "lucide-react";
+import { ArrowRight, Building2, MessageCircle, Search } from "lucide-react";
 import { MarketingCardPhoto } from "@/components/marketing/marketing-hero-visual";
 import type { MarketingImageKey } from "@/lib/marketing-assets";
 import { MARKETING_MEDIA } from "@/lib/marketing-assets";
@@ -24,7 +24,7 @@ const audiences: AudienceItem[] = [
     icon: Building2,
     title: "Colegios y academias",
     description:
-      "Plantel, partidos, reportes y QR imprimible. Todo el plantel escolar en un panel.",
+      "Plantel, captura de minutos, acta oficial y avisos automáticos a tutores. Todo el plantel en un panel.",
     href: "/signup",
     secondaryHref: "/login",
     secondaryLabel: "Iniciar sesión",
@@ -34,10 +34,10 @@ const audiences: AudienceItem[] = [
     featured: true,
   },
   {
-    icon: QrCode,
+    icon: MessageCircle,
     title: "Padres",
     description:
-      "Abre el link o QR que te comparte el colegio. Stats y Passport Score sin registro.",
+      "Recibe el link por email o WhatsApp tras cada partido. Stats y Passport Score sin registro.",
     href: "/padres",
     cta: "Abrir ficha",
     imageKey: "audiencePadres",

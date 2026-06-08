@@ -1,10 +1,5 @@
-import type { Metadata } from "next";
-import { PlantelPrintContent } from "@/components/dashboard/plantel-print-content";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = {
-  title: "QR imprimibles | MiFicha",
-};
-
-export default function PlantelPrintPage() {
-  return <PlantelPrintContent />;
+export default function PlantelPrintRedirectPage() {
+  redirect("/dashboard/plantel/tutores");
 }

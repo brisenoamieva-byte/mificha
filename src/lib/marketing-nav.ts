@@ -4,7 +4,7 @@ import {
   Building2,
   Calendar,
   FileSpreadsheet,
-  QrCode,
+  MessageCircle,
   Scale,
   Search,
   ShieldCheck,
@@ -37,7 +37,7 @@ export const MARKETING_NAV: NavSection[] = [
       {
         href: "/#funciones",
         label: "Funciones",
-        description: "Calendario, stats, reportes y QR",
+        description: "Calendario, stats, reportes y avisos a tutores",
       },
       {
         href: "/#complemento",
@@ -64,7 +64,7 @@ export const MARKETING_NAV: NavSection[] = [
       {
         href: "/padres",
         label: "Soy padre",
-        description: "QR o link sin cuenta",
+        description: "Link automático sin cuenta",
       },
       {
         href: "/explorar",
@@ -103,7 +103,7 @@ export const HOME_FEATURES = [
     title: "Calendario y partidos",
     federation: "Calendarios y resultados oficiales",
     mificha:
-      "Captura post-partido en 60 s: rival, marcador y stats por jugador. Enlace a tu liga oficial.",
+      "Jornadas oficiales MiFicha: acta del organizador + convocados y minutos de tu plantel (~1 min).",
     href: "/signup",
     imageKey: "featureCalendario" satisfies MarketingImageKey,
   },
@@ -130,16 +130,16 @@ export const HOME_FEATURES = [
     title: "Plantel",
     federation: "Altas federativas y licencias",
     mificha:
-      "Import Excel, fichas privadas por defecto, QR imprimible para padres.",
+      "Import Excel, fichas privadas por defecto, link automático para padres.",
     href: "/signup",
     imageKey: "featureCaptura" satisfies MarketingImageKey,
   },
   {
-    icon: QrCode,
-    title: "Padres sin app",
+    icon: MessageCircle,
+    title: "Avisos automáticos",
     federation: "Portal federado con registro y pagos",
     mificha:
-      "La academia comparte QR o link. Padres consultan stats sin registro.",
+      "MiFicha envía link por email o WhatsApp tras cada partido. Padres consultan sin registro.",
     href: "/padres",
     imageKey: "featureQr" satisfies MarketingImageKey,
   },
@@ -165,7 +165,7 @@ export const COMPLEMENT_ROWS = [
   },
   {
     official: "Noticias institucionales",
-    mificha: "Reporte mensual y alertas WhatsApp al padre",
+    mificha: "Aviso automático post-partido y reporte mensual al tutor",
   },
   {
     official: "Carnet del federado",

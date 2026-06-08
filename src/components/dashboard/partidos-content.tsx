@@ -102,7 +102,7 @@ export function PartidosContent() {
         <div>
           <h1 className="text-2xl font-bold text-slate-900 sm:text-3xl">Partidos</h1>
           <p className="mt-1 text-slate-600">
-            Captura post-partido en ~2 min: convocados, minutos y WhatsApp al padre
+            Captura post-partido en ~1 min: convocados, minutos y aviso automático al tutor
             {season ? ` · ${season.name}` : ""}
           </p>
         </div>
@@ -182,7 +182,7 @@ export function PartidosContent() {
                   Sin resultados todavía
                 </h3>
                 <p className="mt-2 text-sm text-slate-500">
-                  Captura stats post-partido en menos de 60 segundos.
+                  Captura convocados y minutos cuando el acta oficial esté publicada.
                 </p>
               </div>
             ) : (

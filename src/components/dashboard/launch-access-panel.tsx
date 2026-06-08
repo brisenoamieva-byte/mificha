@@ -36,10 +36,10 @@ export function LaunchAccessPanel() {
               Programar partido
             </Link>
             <Link
-              href="/dashboard/plantel/imprimir"
+              href="/dashboard/plantel/tutores"
               className="rounded-lg border border-[#1B4F8C]/25 bg-white px-3 py-2 text-xs font-semibold text-[#1B4F8C] hover:bg-white"
             >
-              QR imprimibles
+              Avisos a tutores
             </Link>
           </div>
         </div>

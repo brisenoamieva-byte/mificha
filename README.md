@@ -113,21 +113,21 @@ Ejecuta **todos** los scripts SQL en Supabase (pasos 1–13) antes de pláticas 
 En la app, valida este flujo con tu academia real:
 
 1. Configuración → perfil completo + landing pública
-2. Plantel → importar Excel o manual (+ email tutor)
-3. Partidos → **Programar partido** (fecha, hora, sede)
+2. Plantel → importar Excel o manual (+ contacto del tutor)
+3. Partidos → elegir jornada oficial MiFicha
 4. Ver calendario en `/a/tu-slug` y `/explorar`
-5. Partidos → **Registrar resultado** + stats
-6. Plantel → consentimiento + compartir QR/WhatsApp
+5. Partidos → capturar convocados + minutos (acta oficial primero)
+6. Plantel → tutores → enviar link / avisos automáticos
 7. Reportes → preview (email requiere Resend con dominio verificado)
 
-Pitch deck privado: `/interno/pitch` (solo owner).
+Pitch deck privado: `/interno/pitch` · one-pager: `/interno/demo-one-pager` · playbook: `/interno/lanzamiento`
 
 ## Rutas principales
 
 | Ruta | Descripción |
 |------|-------------|
 | `/` | Landing con 3 accesos |
-| `/padres` | Acceso padres (link/QR, sin cuenta) |
+| `/padres` | Acceso padres (link automático, sin cuenta) |
 | `/explorar` | Directorio público scouts/visorías |
 | `/signup`, `/login` | Auth |
 | `/dashboard` | Panel de academia |

@@ -10,7 +10,7 @@ export const LAUNCH_COPY = {
   badge: "Lanzamiento",
   title: "MiFicha está en lanzamiento",
   description:
-    "Acceso completo gratis como academia fundadora. Carga plantel, registra partidos y comparte fichas por WhatsApp con padres.",
+    "Acceso completo gratis como academia fundadora. Carga plantel, captura minutos post-partido y MiFicha avisa a tutores por email o WhatsApp.",
   footnote:
     "Las academias que entren ahora quedan registradas como fundadoras.",
 } as const;

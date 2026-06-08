@@ -10,7 +10,7 @@ import { MARKETING_MEDIA } from "@/lib/marketing-assets";
 export const metadata: Metadata = {
   title: "Padres y jugadores | MiFicha",
   description:
-    "Abre la ficha técnica de tu hijo con el link o QR de su academia. Sin cuenta necesaria.",
+    "Abre la ficha técnica de tu hijo con el link que envía su academia. Sin cuenta necesaria.",
 };
 
 export default function PadresPage() {
@@ -22,7 +22,7 @@ export default function PadresPage() {
         <MarketingPageHero
           eyebrow="Padres y jugadores"
           title="La ficha de tu hijo, sin app ni contraseña"
-          description="El colegio te comparte un QR o link por WhatsApp. Consulta Passport Score, stats de temporada e historial verificado al instante."
+          description="Tu academia te envía el link por email o WhatsApp — también tras cada partido. Consulta Passport Score, stats e historial verificado al instante."
           photo={MARKETING_MEDIA.heroPadres}
           photoPriority
           actions={
@@ -32,7 +32,7 @@ export default function PadresPage() {
             </Link>
           }
           stats={[
-            { value: "QR", label: "En la cancha" },
+            { value: "Auto", label: "Aviso post-partido" },
             { value: "0", label: "Registro requerido" },
             { value: "100", label: "Passport Score", accent: true },
           ]}

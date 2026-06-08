@@ -35,7 +35,7 @@ export function PartidosProgramarContent() {
         <p className="mt-3 text-sm leading-7 text-slate-600">
           Cuando publiquemos tu próximo partido, aparecerá en{" "}
           <strong className="font-semibold text-slate-800">Partidos → Capturar stats</strong>
-          . El marcador lo publica el organizador; tú registras convocados y rendimiento del plantel (~2 min).
+          . El marcador y acta los publica el organizador; tú registras convocados y minutos (~1 min).
         </p>
 
         <div className="mt-6 flex flex-wrap gap-3">

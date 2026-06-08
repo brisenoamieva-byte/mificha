@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { CheckCircle2, ExternalLink, Eye, MessageCircle, Printer } from "lucide-react";
+import { CheckCircle2, ExternalLink, Eye, Mail, MessageCircle } from "lucide-react";
 import {
   PARENT_ENGAGEMENT_GOAL,
   type AcademyProfileViewStats,
@@ -27,7 +27,7 @@ export function AcademyLaunchCompletePanel({
           MiFicha activo — rutina de sábado
         </h2>
         <p className="mt-1 text-sm text-slate-600">
-          Convocados + captura rápida (~2 min) + WhatsApp al padre. El resto es
+          Convocados + minutos (~1 min) + aviso automático al tutor. El resto es
           opcional cuando quieras visorías o calendario público.
         </p>
       </div>
@@ -72,18 +72,18 @@ export function AcademyLaunchCompletePanel({
 
       <div className="grid gap-3 px-5 py-4 sm:grid-cols-3">
         <Link
-          href="/dashboard/plantel/imprimir"
+          href="/dashboard/plantel/tutores"
           className="flex items-center gap-3 rounded-lg border border-emerald-100 bg-white px-4 py-3 text-sm font-semibold text-slate-800 transition hover:border-emerald-200"
         >
-          <Printer className="h-4 w-4 text-emerald-700" />
-          QR imprimibles
+          <Mail className="h-4 w-4 text-emerald-700" />
+          Enviar link a tutores
         </Link>
         <Link
           href="/dashboard/plantel"
           className="flex items-center gap-3 rounded-lg border border-emerald-100 bg-white px-4 py-3 text-sm font-semibold text-slate-800 transition hover:border-emerald-200"
         >
           <MessageCircle className="h-4 w-4 text-green-700" />
-          WhatsApp desde plantel
+          Editar plantel
         </Link>
         <Link
           href={`/a/${academySlug}`}

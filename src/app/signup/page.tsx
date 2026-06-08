@@ -11,7 +11,7 @@ export default function SignUpPage() {
   return (
     <AuthShell
       title="Crea tu cuenta de academia"
-      subtitle="Gestiona planteles, stats y fichas con QR"
+      subtitle="Plantel, captura post-partido y avisos automáticos a tutores"
       footer={
         <>
           <Link href="/" className="text-[#1B4F8C] hover:underline">

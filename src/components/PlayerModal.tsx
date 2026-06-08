@@ -174,7 +174,7 @@ export function PlayerModal({
         });
 
         if (insertError) throw insertError;
-        onSaved("Ficha creada. Comparte el QR con el padre.");
+        onSaved("Ficha creada. Envía el link al tutor desde Avisos a tutores.");
       }
 
       onOpenChange(false);

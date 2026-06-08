@@ -2,19 +2,19 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Link2, QrCode, ShieldCheck } from "lucide-react";
+import { ArrowRight, Link2, MessageCircle, ShieldCheck } from "lucide-react";
 import { useState } from "react";
 import { parsePlayerSlugFromInput } from "@/lib/public-directory";
 
 const steps = [
   {
-    icon: QrCode,
-    title: "Escanea el QR",
-    description: "Tu academia te lo comparte por WhatsApp o en la cancha.",
+    icon: MessageCircle,
+    title: "Recibe el link",
+    description: "Tu academia te lo envía por email o WhatsApp — también tras cada partido.",
   },
   {
     icon: Link2,
-    title: "Abre el link",
+    title: "Abre la ficha",
     description: "Pega la URL que te enviaron o escríbela abajo.",
   },
   {
@@ -90,8 +90,8 @@ export function ParentLinkForm() {
       <div className="rounded-xl border border-mf-border bg-mf-canvas p-6">
         <p className="text-sm font-semibold text-mf-text">¿Aún no tienes link?</p>
         <p className="mt-2 text-sm leading-7 text-mf-text-secondary">
-          Pídele a la academia de tu hijo que active la ficha pública. Ellos te
-          comparten el QR o el enlace por WhatsApp.
+          Pídele a la academia de tu hijo que active la ficha pública y registre tu
+          contacto. MiFicha te enviará el enlace automáticamente.
         </p>
         <Link href="/explorar" className="mf-btn-secondary mt-5 inline-flex">
           Explorar fichas públicas

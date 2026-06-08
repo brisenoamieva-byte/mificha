@@ -1,19 +1,19 @@
 export const FOUNDER_WEEK_PLAN = [
   {
     day: "Lunes",
-    task: "Ejecutar production-rollout.sql en Supabase · verify-production-readiness = true.",
+    task: "Ejecutar production-rollout.sql en Supabase · verify-production-readiness = true (#11–#22).",
   },
   {
     day: "Martes",
-    task: "Pre-configurar academia demo: temporada + 1 jornada publicada antes de la llamada.",
+    task: "Pre-configurar academia demo: temporada + 1 jornada + jugador con tutor listo en /plantel/tutores.",
   },
   {
     day: "Miércoles",
-    task: "Demo en vivo (15 min): plantel → captura → WhatsApp con preview OG al director.",
+    task: "Demo en vivo (15 min): plantel → marcador/acta → captura minutos → aviso automático al tutor.",
   },
   {
     day: "Fin de semana",
-    task: "Acompañar captura post-partido real; validar que sube Passport y contador de padres.",
+    task: "Acompañar captura post-partido real; validar avisos enviados + contador de padres.",
   },
   {
     day: "Lunes siguiente",
@@ -31,11 +31,13 @@ export function buildFounderOutreachMessage(options: {
   return [
     `Hola ${options.contactName}, lanzamos MiFicha en Querétaro — ficha digital verificada para escuelas.`,
     "",
-    `En 15 min te enseño en vivo: cargas plantel, capturas stats post-partido en ~2 min y el padre recibe un link con Passport Score (sin app).`,
+    `En 15 min te enseño en vivo: cargas plantel, capturas convocados y minutos en ~1 min, y el padre recibe el link con Passport Score automáticamente (sin app).`,
+    "",
+    `Marcador y acta los registra MiFicha como organizador — stats comparables y creíbles entre colegios.`,
     "",
     `Después del partido del ${options.matchDate} lo probamos con ${academy} — gratis como academia fundadora.`,
     "",
-    `¿Martes o jueves 15 min por videollamada? Te mando el link de la ficha de ejemplo por WhatsApp.`,
+    `¿Martes o jueves 15 min por videollamada?`,
   ].join("\n");
 }
 
@@ -55,20 +57,21 @@ export function buildFounderDemoWhatsAppSample(options: {
 
 export const FOUNDER_CONVERSION_CRITERIA = [
   "Plantel cargado (Excel o manual)",
-  "1 partido capturado con stats",
+  "Contacto del tutor en al menos 3 jugadores",
+  "1 partido con acta oficial + convocados/minutos capturados",
   "3+ fichas públicas con consentimiento",
-  "3+ padres abrieron el link (contador en dashboard)",
+  "3+ tutores avisados y padres abrieron el link (contador en dashboard)",
   "Perfil de academia completo (opcional)",
 ] as const;
 
 export const FOUNDER_DEMO_PRECHECK = [
-  "SQL #11–#19 aplicado (supabase/production-rollout.sql + verify-production-readiness)",
+  "SQL #11–#22 aplicado (supabase/production-rollout.sql + verify-production-readiness)",
   "Temporada MiFicha creada y asignada a la academia demo",
   "Al menos 1 jornada publicada en /interno/jornadas",
-  "Jugador demo con foto + consentimiento listo para activar",
-  "Tu celular listo para enviar WhatsApp y mostrar preview de link",
+  "Jugador demo con foto + consentimiento + tel/email del tutor",
+  "Resend o Twilio configurado en Vercel (email o WhatsApp automático)",
   "Pitch en /interno/pitch en modo Presentar (tecla F)",
-  "Conoce /interno/gobernanza — quién registra marcador vs acta vs minutos",
+  "Conoce /interno/gobernanza — marcador/acta vs minutos vs avisos",
 ] as const;
 
 export interface FounderDemoStep {
@@ -89,41 +92,42 @@ export const FOUNDER_LIVE_DEMO_SCRIPT: FounderDemoStep[] = [
   },
   {
     minute: "2–4",
-    title: "Prueba social",
+    title: "Datos creíbles",
     action:
-      "Muestra mificha.mx/explorar o academias verificadas en Home. «Escuelas de Querétaro ya en la red.»",
-    wow: "Logos certificados = FOMO inmediato",
-    href: "/explorar",
+      "Slide «Cada quien registra lo suyo» o /interno/gobernanza. «Nadie infla goles — el organizador pone marcador y acta.»",
+    wow: "Credibilidad > promesas de software",
+    href: "/interno/gobernanza",
   },
   {
     minute: "4–7",
-    title: "Plantel en vivo",
+    title: "Plantel + tutores",
     action:
-      "Inicia sesión juntos → /dashboard/plantel → importa 3–5 jugadores reales (Excel o manual). Activa consentimiento en 1 jugador estrella.",
-    href: "/dashboard/plantel",
+      "Inicia sesión → /dashboard/plantel → importa 3–5 jugadores. Activa consentimiento y contacto del tutor. Abre /dashboard/plantel/tutores.",
+    href: "/dashboard/plantel/tutores",
   },
   {
     minute: "7–9",
-    title: "Calendario oficial MiFicha",
+    title: "Calendario y acta oficial",
     action:
-      "Abre /interno/jornadas: publica jornada y, tras el partido, el marcador oficial. En /dashboard/partidos la academia solo captura plantel.",
-    wow: "Marcador = organizador · stats = academia · datos comparables y no manipulables",
+      "/interno/jornadas: publica jornada, marcador y acta. En /dashboard/partidos la academia solo ve convocados + minutos bloqueados hasta acta.",
+    wow: "Marcador = organizador · minutos = academia · comparable entre escuelas",
     href: "/interno/jornadas",
   },
   {
-    minute: "9–12",
+    minute: "9–11",
     title: "Captura post-partido",
     action:
-      "/dashboard/partidos/nuevo → elige jornada → modo convocados → 2 min → Guardar. Señala Passport subiendo, insignias y ranking semanal del plantel.",
-    wow: "Recompensas desbloqueadas + «Subió X puestos» — el padre siente progreso inmediato",
+      "/dashboard/partidos/nuevo → convocados + minutos (~1 min) → Guardar. Señala Passport, insignias y ranking semanal.",
+    wow: "Recompensas desbloqueadas + «Subió X puestos»",
     href: "/dashboard/partidos/nuevo",
   },
   {
-    minute: "12–14",
-    title: "Aviso automático al padre",
+    minute: "11–14",
+    title: "Aviso automático al tutor",
     action:
-      "Tras guardar, MiFicha envía email/WhatsApp al tutor registrado en Plantel. Muestra contador «X tutores avisados» — sin pegar mensajes a mano.",
-    wow: "El director no hace soporte: el padre recibe link + Passport sin intervención",
+      "Tras guardar: contador «X tutores avisados». Opcional: envío de bienvenida bulk en /plantel/tutores. Muestra preview OG en celular.",
+    wow: "El director no pega WhatsApp — MiFicha envía solo",
+    href: "/dashboard/plantel/tutores",
   },
   {
     minute: "14–15",
@@ -135,8 +139,13 @@ export const FOUNDER_LIVE_DEMO_SCRIPT: FounderDemoStep[] = [
 
 export const FOUNDER_DEMO_WOW_MOMENTS = [
   {
+    title: "Aviso automático al tutor",
+    detail:
+      "Tras guardar captura, «X tutores avisados» — email/WhatsApp sin intervención del entrenador.",
+  },
+  {
     title: "Passport sube en vivo",
-    detail: "Tras guardar captura, el +N en verde es tangible — no es promesa, es dato.",
+    detail: "El +N en verde es tangible — no es promesa, es dato con acta oficial.",
   },
   {
     title: "Preview en WhatsApp",
@@ -144,15 +153,13 @@ export const FOUNDER_DEMO_WOW_MOMENTS = [
   },
   {
     title: "Tarjeta del logro",
-    detail: "/j/slug/logro/hat_trick genera preview épico de la insignia — ideal para presumir en grupos de padres.",
+    detail:
+      "/j/slug/logro/hat_trick genera preview épico de la insignia — ideal para grupos de padres.",
   },
   {
-    title: "Cero app para padres",
-    detail: "Abren link → ven progreso partido a partido. El director no da soporte técnico.",
-  },
-  {
-    title: "Red verificada",
-    detail: "Explorar + temporada compartida = «su hijo en la misma liga digital que otras escuelas».",
+    title: "Gobernanza clara",
+    detail:
+      "Organizador = marcador/acta · academia = minutos · padres = solo consultan. Stats creíbles en toda la red.",
   },
 ] as const;
 

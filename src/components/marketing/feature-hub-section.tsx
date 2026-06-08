@@ -16,8 +16,8 @@ export function FeatureHubSection() {
               Todo lo que tu portal de liga no cubre
             </h2>
             <p className="mt-4 text-sm leading-7 text-mf-text-secondary">
-              La liga publica calendario y tabla. MiFicha registra el rendimiento
-              de cada jugador: fichas, reportes y directorio público.
+              La liga publica calendario y tabla. MiFicha registra rendimiento individual
+              con acta verificada, avisos automáticos a tutores y directorio público.
             </p>
           </div>
 

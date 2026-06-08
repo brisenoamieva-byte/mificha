@@ -96,7 +96,7 @@ export function AcademyOnboardingPanel() {
           Primer valor en 3 pasos
         </div>
         <h2 className="mt-2 text-lg font-semibold text-slate-900">
-          Plantel → captura → WhatsApp a un padre
+          Plantel → captura → aviso automático al tutor
         </h2>
         <p className="mt-1 text-sm text-slate-600">
           {summary.essentialDone} de {summary.essentialTotal} esenciales ·{" "}

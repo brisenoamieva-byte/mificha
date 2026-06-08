@@ -22,8 +22,8 @@ export function HomeCtaBand() {
             Tu plantel merece más que una hoja de Excel
           </h2>
           <p className="mt-3 text-sm leading-7 text-white/80">
-            Carga el roster, captura el primer partido y comparte la ficha con padres
-            el mismo sábado.
+            Carga el roster, captura convocados y minutos post-partido, y MiFicha
+            avisa a los tutores el mismo sábado.
           </p>
         </div>
         <div className="flex flex-wrap gap-3">

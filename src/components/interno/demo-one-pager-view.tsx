@@ -119,10 +119,24 @@ export function DemoOnePagerView() {
 
         <section className="mt-8">
           <h2 className="text-sm font-bold uppercase tracking-wide text-[#1B4F8C]">
+            {DIRECTOR_ONE_PAGER.governanceTitle}
+          </h2>
+          <ul className="mt-3 space-y-2">
+            {DIRECTOR_ONE_PAGER.governancePoints.map((item) => (
+              <li key={item} className="flex gap-2 text-sm leading-6 text-slate-700">
+                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-600" />
+                {item}
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <section className="mt-8">
+          <h2 className="text-sm font-bold uppercase tracking-wide text-[#1B4F8C]">
             {DIRECTOR_ONE_PAGER.demoTitle}
           </h2>
           <p className="mt-2 text-sm text-slate-600">{DIRECTOR_ONE_PAGER.demoIntro}</p>
-          <div className="mt-4 grid gap-3 sm:grid-cols-3 print:grid-cols-3">
+          <div className="mt-4 grid gap-3 sm:grid-cols-2 print:grid-cols-2">
             {DIRECTOR_ONE_PAGER.demoSteps.map((step) => (
               <div
                 key={step.step}

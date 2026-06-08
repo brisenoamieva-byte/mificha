@@ -96,7 +96,7 @@ export function FounderLaunchPlaybook() {
               Playbook venta + demo en vivo
             </h1>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-white/60">
-              Convence en 15 min: pitch → plantel → captura → WhatsApp con preview.
+              Convence en 15 min: pitch → gobernanza → plantel → captura → aviso automático al tutor.
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
@@ -149,8 +149,8 @@ export function FounderLaunchPlaybook() {
             <div>
               <h2 className="text-lg font-semibold">Demo en vivo · 15 minutos</h2>
               <p className="mt-2 text-sm leading-6 text-white/65">
-                Sigue este guión en la llamada. El wow es captura + WhatsApp con preview OG —
-                ensáyalo una vez antes de la academia real.
+                Sigue este guión en la llamada. El wow es gobernanza + aviso automático al tutor
+                con preview OG — ensáyalo una vez antes de la academia real.
               </p>
             </div>
           </div>
@@ -190,7 +190,7 @@ export function FounderLaunchPlaybook() {
         </section>
 
         <section className="rounded-2xl border border-emerald-400/25 bg-emerald-500/[0.08] p-6">
-          <h2 className="text-lg font-semibold">Efectos wow (memoriza estos 4)</h2>
+          <h2 className="text-lg font-semibold">Efectos wow (memoriza estos 5)</h2>
           <ul className="mt-4 grid gap-3 sm:grid-cols-2">
             {FOUNDER_DEMO_WOW_MOMENTS.map((item) => (
               <li
@@ -225,7 +225,7 @@ export function FounderLaunchPlaybook() {
             />
             <HealthRow
               done={health?.sql.guardianContact}
-              label="SQL #11 — email del tutor"
+              label="SQL #11 + #22 — contacto y avisos automáticos a tutores"
             />
             <HealthRow
               done={health?.sql.profileViews}
@@ -320,9 +320,9 @@ export function FounderLaunchPlaybook() {
         <section className="rounded-2xl border border-white/10 bg-white/[0.04] p-6">
           <h2 className="text-lg font-semibold">Sesión B · post-partido real</h2>
           <ol className="mt-4 space-y-2 text-sm text-white/75">
-            <li>1. Captura en cancha juntos (modo convocados, 2 min).</li>
-            <li>2. WhatsApp a 3 padres reales — pide que abran el link.</li>
-            <li>3. Dashboard → confirma contador «3 visitas únicas».</li>
+            <li>1. Organizador publica marcador + acta; academia captura convocados + minutos (~1 min).</li>
+            <li>2. MiFicha avisa tutores automáticamente — confirma contador de enviados.</li>
+            <li>3. Dashboard → confirma «3 visitas únicas» de padres.</li>
             <li>4. Pide testimonio al director (audio 30 s o WhatsApp escrito).</li>
           </ol>
           <div className="mt-5 flex flex-wrap gap-3">
@@ -333,11 +333,11 @@ export function FounderLaunchPlaybook() {
               Captura
             </Link>
             <Link
-              href="/dashboard/plantel/imprimir"
+              href="/dashboard/plantel/tutores"
               className="inline-flex items-center gap-2 rounded-lg border border-white/15 px-4 py-2 text-sm font-semibold hover:bg-white/10"
             >
               <MessageCircle className="h-4 w-4" />
-              QR
+              Tutores
             </Link>
           </div>
         </section>

@@ -4,9 +4,9 @@ import {
   Download,
   ExternalLink,
   FileSpreadsheet,
+  Mail,
   Pencil,
   Plus,
-  Printer,
   Trash2,
   UserPlus,
 } from "lucide-react";
@@ -169,11 +169,11 @@ export function PlantelContent() {
 
           <div className="flex flex-wrap gap-3">
             <Link
-              href="/dashboard/plantel/imprimir"
+              href="/dashboard/plantel/tutores"
               className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50"
             >
-              <Printer className="h-4 w-4" />
-              QR imprimibles
+              <Mail className="h-4 w-4" />
+              Avisos a tutores
             </Link>
             <button
               type="button"
@@ -214,7 +214,7 @@ export function PlantelContent() {
               <li>Descarga la plantilla Excel (incluye columnas opcionales de tutor).</li>
               <li>Importa todo el roster (ideal al inicio de temporada).</li>
               <li>Filtra por generación o Sub-X y completa foto, video y consentimiento.</li>
-              <li>Comparte el QR con padres; ellos no necesitan cuenta.</li>
+              <li>Envía el link de la ficha por email o WhatsApp; los padres no necesitan cuenta.</li>
             </ol>
           </div>
         ) : null}

@@ -73,7 +73,7 @@ export function MatchCaptureStep({
         <p className="mt-3 text-sm text-slate-500">
           {rosterMinutesOnly
             ? "Marca convocados y minutos. Goles y tarjetas los publica el organizador en el acta oficial."
-            : "Marca convocados, captura en modo rápido o detallado, guarda y avisa por WhatsApp."}
+            : "Marca convocados, captura minutos, guarda y MiFicha avisa al tutor automáticamente."}
         </p>
 
         {rosterCategoryLabel ? (

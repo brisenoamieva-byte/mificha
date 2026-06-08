@@ -5,8 +5,11 @@ import {
   pickPrimaryAchievementKey,
 } from "@/lib/player-achievements";
 import { buildAchievementShareUrl, buildPlayerShareUrl } from "@/lib/share-ficha";
+import { getGuardianNotificationReadiness } from "@/lib/guardian-readiness";
 import { getWhatsAppProvider, sendWhatsAppMessage } from "@/lib/whatsapp";
 import type { SupabaseClient } from "@supabase/supabase-js";
+
+export { getGuardianNotificationReadiness } from "@/lib/guardian-readiness";
 
 export type NotificationChannel = "whatsapp" | "email";
 export type NotificationStatus = "sent" | "failed" | "skipped";
@@ -57,29 +60,115 @@ export interface DispatchMatchNotificationsInput {
 }
 
 function canNotifyPlayer(player: NotifyPlayerRow) {
-  if (!player.notify_guardian_on_match) {
-    return { ok: false as const, reason: "Avisos automáticos desactivados." };
+  return getGuardianNotificationReadiness(player);
+}
+
+export function buildWelcomeFichaMessage(options: {
+  firstName: string;
+  lastName: string;
+  academyName: string;
+  slug: string;
+}) {
+  const url = buildPlayerShareUrl(options.slug);
+
+  return [
+    `Ficha verificada de ${options.firstName} ${options.lastName}`,
+    `${options.academyName} · MiFicha`,
+    `Consulta Passport Score y stats oficiales: ${url}`,
+    "Recibirás avisos automáticos después de cada partido.",
+  ].join("\n");
+}
+
+async function deliverGuardianMessage(options: {
+  supabase: SupabaseClient;
+  academyId: string;
+  player: NotifyPlayerRow;
+  matchId: string | null;
+  message: string;
+  emailSubject: string;
+}): Promise<GuardianNotificationResult> {
+  const { supabase, academyId, player, matchId, message, emailSubject } = options;
+  const resendKey = process.env.RESEND_API_KEY;
+  const resend =
+    resendKey && resendKey !== "re_..." ? new Resend(resendKey) : null;
+  const fromEmail =
+    process.env.RESEND_FROM_EMAIL ?? "MiFicha <onboarding@resend.dev>";
+  const whatsAppProvider = getWhatsAppProvider();
+  const phone = player.guardian_phone?.trim();
+  const email = player.guardian_email?.trim().toLowerCase();
+
+  if (phone && whatsAppProvider !== "link_only") {
+    const sendResult = await sendWhatsAppMessage({ to: phone, message });
+    const status: NotificationStatus = sendResult.ok ? "sent" : "failed";
+
+    await logNotification(supabase, {
+      academy_id: academyId,
+      player_id: player.id,
+      match_id: matchId,
+      channel: "whatsapp",
+      recipient: phone,
+      status,
+      error_message: sendResult.error,
+    });
+
+    if (sendResult.ok) {
+      return { player_id: player.id, channel: "whatsapp", status: "sent" };
+    }
+
+    if (!email || !resend) {
+      return {
+        player_id: player.id,
+        channel: "whatsapp",
+        status: "failed",
+        reason: sendResult.error,
+      };
+    }
   }
 
-  if (!player.public_consent_at) {
-    return { ok: false as const, reason: "Sin consentimiento del tutor." };
-  }
+  if (email && resend) {
+    const { error: sendError } = await resend.emails.send({
+      from: fromEmail,
+      to: email,
+      subject: emailSubject,
+      text: message,
+    });
 
-  if (!player.is_public) {
-    return { ok: false as const, reason: "Ficha pública no activa." };
-  }
+    const status: NotificationStatus = sendError ? "failed" : "sent";
 
-  const hasEmail = Boolean(player.guardian_email?.trim());
-  const hasPhone = Boolean(player.guardian_phone?.trim());
+    await logNotification(supabase, {
+      academy_id: academyId,
+      player_id: player.id,
+      match_id: matchId,
+      channel: "email",
+      recipient: email,
+      status,
+      error_message: sendError?.message,
+    });
 
-  if (!hasEmail && !hasPhone) {
     return {
-      ok: false as const,
-      reason: "Agrega WhatsApp o email del tutor en Plantel.",
+      player_id: player.id,
+      channel: "email",
+      status,
+      reason: sendError?.message,
     };
   }
 
-  return { ok: true as const };
+  if (phone && whatsAppProvider === "link_only") {
+    return {
+      player_id: player.id,
+      channel: "none",
+      status: "skipped",
+      reason:
+        "WhatsApp API no configurada. Agrega email del tutor o configura Twilio/Meta.",
+    };
+  }
+
+  return {
+    player_id: player.id,
+    channel: "none",
+    status: "skipped",
+    reason: "Configura RESEND_API_KEY para email automático.",
+  };
 }
 
 function buildNotificationMessage(options: {
@@ -128,7 +217,7 @@ async function logNotification(
   row: {
     academy_id: string;
     player_id: string;
-    match_id: string;
+    match_id: string | null;
     channel: NotificationChannel;
     recipient: string;
     status: NotificationStatus;
@@ -176,13 +265,6 @@ export async function dispatchMatchUpdateNotifications(
     (statsRows ?? []).map((row) => [row.player_id, row as MatchStatRow]),
   );
 
-  const resendKey = process.env.RESEND_API_KEY;
-  const resend =
-    resendKey && resendKey !== "re_..." ? new Resend(resendKey) : null;
-  const fromEmail =
-    process.env.RESEND_FROM_EMAIL ?? "MiFicha <onboarding@resend.dev>";
-  const whatsAppProvider = getWhatsAppProvider();
-
   const results: GuardianNotificationResult[] = [];
 
   for (const player of (players ?? []) as NotifyPlayerRow[]) {
@@ -206,88 +288,72 @@ export async function dispatchMatchUpdateNotifications(
       weekly: input.weeklyByPlayer.get(player.id),
     });
 
-    const phone = player.guardian_phone?.trim();
-    const email = player.guardian_email?.trim().toLowerCase();
+    results.push(
+      await deliverGuardianMessage({
+        supabase,
+        academyId,
+        player,
+        matchId,
+        message,
+        emailSubject: `Actualización de partido · ${player.first_name} ${player.last_name}`,
+      }),
+    );
+  }
 
-    if (phone && whatsAppProvider !== "link_only") {
-      const sendResult = await sendWhatsAppMessage({ to: phone, message });
-      const status: NotificationStatus = sendResult.ok ? "sent" : "failed";
+  return results;
+}
 
-      await logNotification(supabase, {
-        academy_id: academyId,
-        player_id: player.id,
-        match_id: matchId,
-        channel: "whatsapp",
-        recipient: phone,
-        status,
-        error_message: sendResult.error,
-      });
+export async function dispatchWelcomeFichaNotifications(input: {
+  supabase: SupabaseClient;
+  academyId: string;
+  academyName: string;
+  playerIds?: string[];
+}): Promise<GuardianNotificationResult[]> {
+  const { supabase, academyId, academyName, playerIds } = input;
 
-      if (sendResult.ok) {
-        results.push({ player_id: player.id, channel: "whatsapp", status: "sent" });
-        continue;
-      }
+  let query = supabase
+    .from("players")
+    .select(
+      "id, first_name, last_name, slug, passport_score, is_public, public_consent_at, guardian_name, guardian_email, guardian_phone, notify_guardian_on_match",
+    )
+    .eq("academy_id", academyId);
 
-      if (email && resend) {
-        // Fallback a email si WhatsApp falló
-      } else {
-        results.push({
-          player_id: player.id,
-          channel: "whatsapp",
-          status: "failed",
-          reason: sendResult.error,
-        });
-        continue;
-      }
-    }
+  if (playerIds?.length) {
+    query = query.in("id", playerIds);
+  }
 
-    if (email && resend) {
-      const subject = `Actualización de partido · ${player.first_name} ${player.last_name}`;
-      const { error: sendError } = await resend.emails.send({
-        from: fromEmail,
-        to: email,
-        subject,
-        text: message,
-      });
+  const { data: players } = await query.order("last_name", { ascending: true });
+  const results: GuardianNotificationResult[] = [];
 
-      const status: NotificationStatus = sendError ? "failed" : "sent";
-
-      await logNotification(supabase, {
-        academy_id: academyId,
-        player_id: player.id,
-        match_id: matchId,
-        channel: "email",
-        recipient: email,
-        status,
-        error_message: sendError?.message,
-      });
-
-      results.push({
-        player_id: player.id,
-        channel: "email",
-        status,
-        reason: sendError?.message,
-      });
-      continue;
-    }
-
-    if (phone && whatsAppProvider === "link_only") {
+  for (const player of (players ?? []) as NotifyPlayerRow[]) {
+    const eligibility = canNotifyPlayer(player);
+    if (!eligibility.ok) {
       results.push({
         player_id: player.id,
         channel: "none",
         status: "skipped",
-        reason:
-          "WhatsApp API no configurada. Agrega email del tutor o configura Twilio/Meta.",
+        reason: eligibility.reason,
       });
       continue;
     }
 
-    results.push({
-      player_id: player.id,
-      channel: "none",
-      status: "skipped",
-      reason: "Configura RESEND_API_KEY para email automático.",
+    const message = buildWelcomeFichaMessage({
+      firstName: player.first_name,
+      lastName: player.last_name,
+      academyName,
+      slug: player.slug,
     });
+
+    results.push(
+      await deliverGuardianMessage({
+        supabase,
+        academyId,
+        player,
+        matchId: null,
+        message,
+        emailSubject: `Ficha verificada · ${player.first_name} ${player.last_name}`,
+      }),
+    );
   }
 
   return results;

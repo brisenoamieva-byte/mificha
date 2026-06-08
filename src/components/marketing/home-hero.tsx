@@ -9,7 +9,7 @@ export function HomeHero() {
     <MarketingPageHero
       eyebrow="Ficha digital del jugador"
       title="Participa, compite y comparte tu juego"
-      description="Una ficha ordenada y verificada por tu academia. Padres consultan sin app; scouts descubren talento por categoría — sin presión, con progreso claro."
+      description="Ficha verificada por tu academia. Padres reciben el link automáticamente; scouts descubren talento por categoría — sin presión, con progreso claro."
       photo={MARKETING_MEDIA.heroHome}
       photoPriority
       actions={
@@ -24,7 +24,7 @@ export function HomeHero() {
         </>
       }
       stats={[
-        { value: "60 s", label: "Captura post-partido" },
+        { value: "~1 min", label: "Convocados + minutos" },
         { value: "0", label: "App para padres" },
         { value: "100", label: "Progreso verificado", accent: true },
       ]}
