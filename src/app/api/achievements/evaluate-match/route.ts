@@ -1,38 +1,12 @@
 import { NextResponse } from "next/server";
-import { fetchAcademyWeeklyRankSnapshots } from "@/lib/academy-weekly-stats";
-import { computeConsecutiveMatchStreak } from "@/lib/match-streak";
-import {
-  evaluateNewAchievementKeys,
-  getAchievementDefinition,
-  resolveTeamMvpPlayerIds,
-  type MatchCaptureAchievementInput,
-} from "@/lib/player-achievements";
+import { evaluateMatchAchievements } from "@/lib/evaluate-match-achievements";
+import type { MatchCaptureAchievementInput } from "@/lib/player-achievements";
 import { getAuthedSupabaseClient } from "@/lib/supabase-server";
-import type { PlayerSeasonStat } from "@/types/database";
 
 interface EvaluateMatchBody {
   match_id?: string;
   season_id?: string;
   captures?: MatchCaptureAchievementInput[];
-}
-
-async function computeConsecutiveStreak(
-  supabase: Awaited<ReturnType<typeof getAuthedSupabaseClient>>,
-  playerId: string,
-  seasonId: string,
-) {
-  const { data: rows } = await supabase
-    .from("match_stats")
-    .select("matches!inner(match_date, season_id, status)")
-    .eq("player_id", playerId)
-    .eq("matches.season_id", seasonId)
-    .eq("matches.status", "completed");
-
-  const dates = (rows ?? [])
-    .map((row) => row.matches?.match_date)
-    .filter((date): date is string => Boolean(date));
-
-  return computeConsecutiveMatchStreak(dates);
 }
 
 export async function POST(request: Request) {
@@ -67,131 +41,19 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Partido no encontrado." }, { status: 404 });
   }
 
-  const playerIds = captures.map((capture) => capture.player_id);
-  const mvpPlayerIds = resolveTeamMvpPlayerIds(captures);
+  const result = await evaluateMatchAchievements(supabase, {
+    matchId,
+    seasonId,
+    academyId: match.academy_id,
+    captures,
+  });
 
-  const [{ data: seasonStatsRows }, { data: existingRows }] = await Promise.all([
-    supabase
-      .from("player_season_stats")
-      .select("*")
-      .eq("season_id", seasonId)
-      .in("player_id", playerIds),
-    supabase
-      .from("player_achievements")
-      .select("player_id, achievement_key")
-      .in("player_id", playerIds),
-  ]);
-
-  const seasonStatsByPlayer = new Map<string, PlayerSeasonStat | null>();
-  for (const playerId of playerIds) {
-    seasonStatsByPlayer.set(
-      playerId,
-      seasonStatsRows?.find((row) => row.player_id === playerId) ?? null,
+  if (!result.ok) {
+    return NextResponse.json(
+      { error: result.error, migrationPending: result.migrationPending },
+      { status: result.migrationPending ? 503 : 500 },
     );
   }
 
-  const existingKeysByPlayer = new Map<string, Set<string>>();
-  for (const playerId of playerIds) {
-    existingKeysByPlayer.set(playerId, new Set());
-  }
-  for (const row of existingRows ?? []) {
-    existingKeysByPlayer.get(row.player_id)?.add(row.achievement_key);
-  }
-
-  const streakMatchesByPlayer = new Map<string, number>();
-  await Promise.all(
-    playerIds.map(async (playerId) => {
-      streakMatchesByPlayer.set(
-        playerId,
-        await computeConsecutiveStreak(supabase, playerId, seasonId),
-      );
-    }),
-  );
-
-  const results: Array<{
-    player_id: string;
-    unlocked: Array<{
-      key: string;
-      title: string;
-      description: string;
-      rarity: string;
-      emoji: string;
-    }>;
-    weekly?: {
-      rank: number;
-      total: number;
-      weekly_score: number;
-      positions_delta: number | null;
-      week_label: string;
-    };
-  }> = [];
-
-  for (const capture of captures) {
-    const newKeys = evaluateNewAchievementKeys(capture, {
-      matchId,
-      seasonId,
-      seasonStats: seasonStatsByPlayer.get(capture.player_id),
-      existingKeys: existingKeysByPlayer.get(capture.player_id) ?? new Set(),
-      streakMatches: streakMatchesByPlayer.get(capture.player_id) ?? 0,
-      isTeamMvp: mvpPlayerIds.has(capture.player_id),
-    });
-
-    if (newKeys.length === 0) {
-      results.push({ player_id: capture.player_id, unlocked: [] });
-      continue;
-    }
-
-    const { error: insertError } = await supabase.from("player_achievements").insert(
-      newKeys.map((key) => ({
-        player_id: capture.player_id,
-        academy_id: match.academy_id,
-        achievement_key: key,
-        match_id: matchId,
-      })),
-    );
-
-    if (insertError && insertError.code !== "23505") {
-      if (insertError.code === "42P01") {
-        return NextResponse.json(
-          { error: "Ejecuta player-achievements.sql en Supabase.", migrationPending: true },
-          { status: 503 },
-        );
-      }
-
-      return NextResponse.json({ error: insertError.message }, { status: 500 });
-    }
-
-    for (const key of newKeys) {
-      existingKeysByPlayer.get(capture.player_id)?.add(key);
-    }
-
-    results.push({
-      player_id: capture.player_id,
-      unlocked: newKeys
-        .map((key) => getAchievementDefinition(key))
-        .filter((item): item is NonNullable<typeof item> => Boolean(item))
-        .map((item) => ({
-          key: item.key,
-          title: item.title,
-          description: item.description,
-          rarity: item.rarity,
-          emoji: item.emoji,
-        })),
-    });
-  }
-
-  const weeklySnapshots = await fetchAcademyWeeklyRankSnapshots(
-    supabase,
-    match.academy_id,
-    playerIds,
-  );
-
-  for (const result of results) {
-    const weekly = weeklySnapshots.get(result.player_id);
-    if (weekly) {
-      result.weekly = weekly;
-    }
-  }
-
-  return NextResponse.json({ players: results });
+  return NextResponse.json({ players: result.players });
 }

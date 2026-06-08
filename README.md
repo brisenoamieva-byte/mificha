@@ -10,7 +10,7 @@ Plataforma para academias de fútbol en México. Cada jugador tiene una ficha t�
 - **Supabase** (Auth, Postgres, Storage, RLS)
 - **Tailwind CSS**
 - **Stripe** (suscripciones)
-- **Resend** (reportes por email)
+- **Resend** (avisos a tutores y reportes mensuales)
 - **Vercel** (deploy)
 
 ## Requisitos
@@ -45,9 +45,9 @@ STRIPE_SECRET_KEY=sk_test_...
 STRIPE_WEBHOOK_SECRET=whsec_...
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
 
-# Resend
+# Resend (avisos post-partido + reportes)
 RESEND_API_KEY=re_...
-RESEND_FROM_EMAIL=MiFicha <onboarding@resend.dev>
+RESEND_FROM_EMAIL=MiFicha <notificaciones@mificha.mx>
 
 # App
 NEXT_PUBLIC_APP_URL=http://localhost:3000
@@ -150,7 +150,42 @@ Pitch deck privado: `/interno/pitch` · one-pager: `/interno/demo-one-pager` · 
 git push origin master
 ```
 
-Vercel despliega automáticamente en cada push a `main`.
+Vercel despliega automáticamente en cada push a `master`.
+
+## Estado del proyecto (cierre de sesión)
+
+**Producción:** [mificha.mx](https://mificha.mx) · repo `brisenoamieva-byte/mificha` · branch `master`
+
+### Listo en código y deploy
+
+- Gobernanza: organizador (marcador + acta) · academia (plantel + minutos) · avisos automáticos a tutores
+- Centro **Avisos a tutores** (`/dashboard/plantel/tutores`) + APIs `welcome-ficha` y `match-update`
+- Pitch, one-pager, playbook y marketing alineados al flujo digital (sin QR imprimibles)
+- Insignias se re-evalúan al publicar acta oficial (si la academia capturó minutos antes)
+- Gamificación: Passport, logros OG, ranking semanal
+
+### Tú debes hacer manual (una vez)
+
+1. **Supabase SQL** — ejecutar `production-rollout.sql` en orden `11→13→14→15→20→21→22→16→17→18→19→12`
+2. Verificar con `supabase/verify-production-readiness.sql` (todas las columnas `true`)
+3. **Vercel env:** `RESEND_API_KEY` + `RESEND_FROM_EMAIL` (avisos email) · opcional `TWILIO_*` o `WHATSAPP_*`
+4. **Primera academia piloto:** temporada + jornada en `/interno/jornadas` → demo con `/interno/lanzamiento`
+
+### Backlog (no bloquea piloto)
+
+- Ranking por categoría Querétaro en ficha pública
+- Barra de progreso de temporada dinámica vs jornadas oficiales
+- Re-envío automático de avisos si acta se publica después de la captura (hoy solo insignias)
+
+### Rutas clave para vender
+
+| Uso | Ruta |
+|-----|------|
+| Presentar | `/interno/pitch` (F) |
+| One-pager | `/interno/demo-one-pager` |
+| Guión demo | `/interno/lanzamiento` |
+| Quién hace qué | `/interno/gobernanza` |
+| Operación | `/interno/jornadas` |
 
 ### Stripe en producción
 

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { evaluateAchievementsAfterActa } from "@/lib/evaluate-match-achievements";
 import { canAccessPitchDeck } from "@/lib/pitch-access";
 import { createSupabaseAdminClient } from "@/lib/supabase-admin";
 import { getAuthedSupabaseClient } from "@/lib/supabase-server";
@@ -146,6 +147,12 @@ export async function POST(request: Request) {
 
   if (matchUpdateError) {
     return NextResponse.json({ error: matchUpdateError.message }, { status: 500 });
+  }
+
+  try {
+    await evaluateAchievementsAfterActa(auth.admin, fixtureId);
+  } catch {
+    // Insignias opcionales hasta SQL #19
   }
 
   return NextResponse.json({ ok: true, updated: rows.length });
