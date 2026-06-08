@@ -13,6 +13,7 @@ import { NoAcademyState } from "@/components/dashboard/no-academy-state";
 import { FixturePicker } from "@/components/dashboard/fixture-picker";
 import { NoFixturesState } from "@/components/dashboard/no-fixtures-state";
 import { NoSeasonState } from "@/components/dashboard/no-season-state";
+import { OfficialMatchNotice } from "@/components/dashboard/official-match-notice";
 import { toast } from "@/components/ui/toast";
 import {
   applyCapturePatch,
@@ -139,7 +140,17 @@ export function PartidosNuevoContent() {
   );
 
   const matchGovernance = useMemo(
-    () => getMatchGovernance(selectedFixture ?? { is_official: false, result: null, goals_for: null, goals_against: null, result_locked_at: null }),
+    () =>
+      getMatchGovernance(
+        selectedFixture ?? {
+          is_official: false,
+          result: null,
+          goals_for: null,
+          goals_against: null,
+          result_locked_at: null,
+          acta_published_at: null,
+        },
+      ),
     [selectedFixture],
   );
 
@@ -148,6 +159,7 @@ export function PartidosNuevoContent() {
     : goalsFor;
 
   const goalsMismatch =
+    !matchGovernance.isOfficial &&
     captureStyle === "detailed" &&
     effectiveGoalsFor > 0 &&
     playedCount > 0 &&
@@ -312,6 +324,13 @@ export function PartidosNuevoContent() {
       return;
     }
 
+    if (matchGovernance.isOfficial && !matchGovernance.hasOfficialActa) {
+      setError(
+        "El acta oficial aún no está publicada. El organizador registrará goles y tarjetas antes de tu captura de minutos.",
+      );
+      return;
+    }
+
     setSaving(true);
     setError(null);
 
@@ -362,11 +381,11 @@ export function PartidosNuevoContent() {
           playedStats.map((item) => ({
             match_id: match.id,
             player_id: item.player_id,
-            goals: item.goals,
-            assists: item.assists,
+            goals: matchGovernance.isOfficial ? 0 : item.goals,
+            assists: matchGovernance.isOfficial ? 0 : item.assists,
             minutes_played: item.minutes,
-            yellow_cards: item.yellow ? 1 : 0,
-            red_cards: item.red ? 1 : 0,
+            yellow_cards: matchGovernance.isOfficial ? 0 : item.yellow ? 1 : 0,
+            red_cards: matchGovernance.isOfficial ? 0 : item.red ? 1 : 0,
             captured_by: "coach" as const,
           })),
         );
@@ -612,23 +631,39 @@ export function PartidosNuevoContent() {
                   {matchGovernance.isOfficial ? " · Oficial MiFicha" : ""}
                 </p>
 
+                {matchGovernance.isOfficial ? (
+                  <OfficialMatchNotice className="mt-6" />
+                ) : null}
+
                 {captureBlockedMessage ? (
                   <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-950">
-                    <p className="font-semibold">Marcador oficial pendiente</p>
+                    <p className="font-semibold">Captura no disponible aún</p>
                     <p className="mt-2 leading-6">{captureBlockedMessage}</p>
                   </div>
                 ) : null}
 
-                {matchGovernance.hasOfficialResult && selectedFixture ? (
+                {matchGovernance.hasOfficialResult && selectedFixture && !matchGovernance.hasOfficialActa ? (
+                  <div className="mt-6 rounded-2xl border border-sky-200 bg-sky-50 px-5 py-4 text-sm text-sky-950">
+                    <p className="font-semibold">Acta oficial pendiente</p>
+                    <p className="mt-2 leading-6">
+                      Marcador publicado: {formatOfficialScoreLine(selectedFixture)}. Falta
+                      el acta con goles y tarjetas por jugador.
+                    </p>
+                  </div>
+                ) : null}
+
+                {matchGovernance.hasOfficialResult &&
+                matchGovernance.hasOfficialActa &&
+                selectedFixture ? (
                   <div className="mt-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4">
                     <p className="text-xs font-semibold uppercase tracking-wide text-emerald-800">
-                      Marcador oficial · organizador
+                      Listo para captura de plantel
                     </p>
                     <p className="mt-2 text-2xl font-bold text-emerald-950">
                       {formatOfficialScoreLine(selectedFixture)}
                     </p>
                     <p className="mt-2 text-sm text-emerald-900/80">
-                      Verificado por MiFicha. La academia no puede modificar este resultado.
+                      Marcador y acta verificados. Solo captura convocados y minutos.
                     </p>
                   </div>
                 ) : null}
@@ -734,7 +769,7 @@ export function PartidosNuevoContent() {
         ) : (
           <MatchCaptureStep
             opponent={opponent}
-            captureStyle={captureStyle}
+            captureStyle={matchGovernance.isOfficial ? "quick" : captureStyle}
             listMode={listMode}
             convocadoIds={convocadoIds}
             visiblePlayers={visiblePlayers}
@@ -742,6 +777,7 @@ export function PartidosNuevoContent() {
             rosterCategoryLabel={rosterCategoryLabel}
             scheduledMatchCategory={scheduledMatchCategory}
             playedCount={playedCount}
+            academyCaptureScope={matchGovernance.academyCaptureScope}
             onCaptureStyleChange={setCaptureStyle}
             onListModeChange={setListMode}
             onToggleConvocado={toggleConvocado}

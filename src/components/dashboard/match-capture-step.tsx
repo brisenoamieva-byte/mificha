@@ -9,6 +9,7 @@ import {
 import { PlayerAvatar } from "@/components/ui/player-avatar";
 import { getPositionLabel } from "@/lib/dashboard-utils";
 import type { CaptureStyle, PlayerCapture, RosterListMode } from "@/lib/match-capture";
+import type { AcademyCaptureScope } from "@/lib/match-data-governance";
 import { applyCapturePatch } from "@/lib/match-capture";
 import type { Player } from "@/types/database";
 import { cn } from "@/lib/utils";
@@ -23,6 +24,7 @@ interface MatchCaptureStepProps {
   rosterCategoryLabel: string | null;
   scheduledMatchCategory: string | null;
   playedCount: number;
+  academyCaptureScope?: AcademyCaptureScope;
   onCaptureStyleChange: (style: CaptureStyle) => void;
   onListModeChange: (mode: RosterListMode) => void;
   onToggleConvocado: (playerId: string) => void;
@@ -43,6 +45,7 @@ export function MatchCaptureStep({
   rosterCategoryLabel,
   scheduledMatchCategory,
   playedCount,
+  academyCaptureScope = "full",
   onCaptureStyleChange,
   onListModeChange,
   onToggleConvocado,
@@ -60,14 +63,17 @@ export function MatchCaptureStep({
   const showConvocadoPicker =
     listMode === "convocados" && convocadoIds.length === 0 && visiblePlayers.length > 0;
 
+  const rosterMinutesOnly = academyCaptureScope === "roster_minutes";
+
   return (
     <div className="mt-6 space-y-4">
       <div className="rounded-2xl bg-white p-5 shadow-sm">
         <h1 className="text-2xl font-bold text-slate-900">Stats por jugador</h1>
         <p className="mt-1 text-slate-600">Paso 2 de 2 · vs {opponent}</p>
         <p className="mt-3 text-sm text-slate-500">
-          Marca convocados, captura en modo rápido o detallado, guarda y avisa por
-          WhatsApp.
+          {rosterMinutesOnly
+            ? "Marca convocados y minutos. Goles y tarjetas los publica el organizador en el acta oficial."
+            : "Marca convocados, captura en modo rápido o detallado, guarda y avisa por WhatsApp."}
         </p>
 
         {rosterCategoryLabel ? (
@@ -78,33 +84,35 @@ export function MatchCaptureStep({
         ) : null}
 
         <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-          <div className="inline-flex rounded-xl border border-slate-200 bg-slate-50 p-1">
-            <button
-              type="button"
-              onClick={() => onCaptureStyleChange("quick")}
-              className={cn(
-                "inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold transition",
-                captureStyle === "quick"
-                  ? "bg-white text-[#1B4F8C] shadow-sm"
-                  : "text-slate-600 hover:text-slate-900",
-              )}
-            >
-              <Zap className="h-4 w-4" />
-              Rápida (~1 min)
-            </button>
-            <button
-              type="button"
-              onClick={() => onCaptureStyleChange("detailed")}
-              className={cn(
-                "inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold transition",
-                captureStyle === "detailed"
-                  ? "bg-white text-[#1B4F8C] shadow-sm"
-                  : "text-slate-600 hover:text-slate-900",
-              )}
-            >
-              Detallada
-            </button>
-          </div>
+          {!rosterMinutesOnly ? (
+            <div className="inline-flex rounded-xl border border-slate-200 bg-slate-50 p-1">
+              <button
+                type="button"
+                onClick={() => onCaptureStyleChange("quick")}
+                className={cn(
+                  "inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold transition",
+                  captureStyle === "quick"
+                    ? "bg-white text-[#1B4F8C] shadow-sm"
+                    : "text-slate-600 hover:text-slate-900",
+                )}
+              >
+                <Zap className="h-4 w-4" />
+                Rápida (~1 min)
+              </button>
+              <button
+                type="button"
+                onClick={() => onCaptureStyleChange("detailed")}
+                className={cn(
+                  "inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold transition",
+                  captureStyle === "detailed"
+                    ? "bg-white text-[#1B4F8C] shadow-sm"
+                    : "text-slate-600 hover:text-slate-900",
+                )}
+              >
+                Detallada
+              </button>
+            </div>
+          ) : null}
 
           <div className="inline-flex rounded-xl border border-slate-200 bg-slate-50 p-1">
             <button
@@ -289,7 +297,7 @@ export function MatchCaptureStep({
                   </label>
                 </div>
 
-                {captureStyle === "quick" ? (
+                {captureStyle === "quick" || rosterMinutesOnly ? (
                   <MinuteRolePresets
                     className="mt-4"
                     disabled={!capture.played}

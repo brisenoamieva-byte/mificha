@@ -120,6 +120,12 @@ export function FounderLaunchPlaybook() {
               Jornadas
             </Link>
             <Link
+              href="/interno/gobernanza"
+              className="inline-flex items-center gap-2 rounded-full border border-violet-400/30 bg-violet-500/10 px-4 py-2 text-sm font-semibold text-violet-200 hover:bg-violet-500/15"
+            >
+              Quién hace qué
+            </Link>
+            <Link
               href="/interno/temporadas"
               className="inline-flex items-center gap-2 rounded-full border border-white/20 px-4 py-2 text-sm font-semibold text-white/90 hover:bg-white/10"
             >

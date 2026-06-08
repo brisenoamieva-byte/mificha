@@ -68,7 +68,14 @@ select
     where table_schema = 'public'
       and table_name = 'matches'
       and column_name = 'result_locked_at'
-  ) as official_match_scoring_sql;
+  ) as official_match_scoring_sql,
+  exists (
+    select 1
+    from information_schema.columns
+    where table_schema = 'public'
+      and table_name = 'matches'
+      and column_name = 'acta_published_at'
+  ) as official_match_acta_sql;
 
 -- Si alguna columna es false, ejecuta el script correspondiente:
 -- #11 player-guardian-contact.sql
@@ -81,3 +88,4 @@ select
 -- #18 player-profile-views.sql
 -- #19 player-achievements.sql
 -- #20 official-match-scoring-rls.sql
+-- #21 official-match-stats-rls.sql

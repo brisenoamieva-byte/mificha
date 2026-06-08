@@ -10,6 +10,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { FixtureImportSection } from "@/components/interno/fixture-import-section";
+import { OfficialActaEntry } from "@/components/interno/official-acta-entry";
 import { OfficialResultEntry } from "@/components/interno/official-result-entry";
 import { formatKickoffDateTime } from "@/lib/match-utils";
 import { supabase } from "@/lib/supabase";
@@ -198,6 +199,12 @@ export function FixturesAdminPanel() {
           </div>
           <div className="flex flex-wrap gap-3">
             <Link
+              href="/interno/gobernanza"
+              className="rounded-full border border-white/15 px-4 py-2 text-sm font-semibold text-white/80 hover:bg-white/5"
+            >
+              Quién hace qué
+            </Link>
+            <Link
               href="/interno/temporadas"
               className="inline-flex items-center gap-2 rounded-full border border-white/20 px-4 py-2 text-sm font-semibold text-white/90 hover:bg-white/10"
             >
@@ -286,11 +293,18 @@ export function FixturesAdminPanel() {
                       </div>
                       <div className="flex flex-col items-end gap-2">
                         {fixture.is_official ? (
-                          <OfficialResultEntry
-                            fixture={fixture}
-                            onSaved={() => void loadFixtures(selectedAcademyId)}
-                            authedFetch={authedFetch}
-                          />
+                          <>
+                            <OfficialResultEntry
+                              fixture={fixture}
+                              onSaved={() => void loadFixtures(selectedAcademyId)}
+                              authedFetch={authedFetch}
+                            />
+                            <OfficialActaEntry
+                              fixture={fixture}
+                              onSaved={() => void loadFixtures(selectedAcademyId)}
+                              authedFetch={authedFetch}
+                            />
+                          </>
                         ) : null}
                         <button
                           type="button"

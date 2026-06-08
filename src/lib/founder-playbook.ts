@@ -68,6 +68,7 @@ export const FOUNDER_DEMO_PRECHECK = [
   "Jugador demo con foto + consentimiento listo para activar",
   "Tu celular listo para enviar WhatsApp y mostrar preview de link",
   "Pitch en /interno/pitch en modo Presentar (tecla F)",
+  "Conoce /interno/gobernanza — quién registra marcador vs acta vs minutos",
 ] as const;
 
 export interface FounderDemoStep {
@@ -162,12 +163,15 @@ export const PRODUCTION_SQL_SCRIPTS = [
   { id: 14, file: "platform-seasons-rls.sql", label: "Temporadas solo admin" },
   { id: 15, file: "platform-fixtures-rls.sql", label: "Jornadas solo admin" },
   { id: 20, file: "official-match-scoring-rls.sql", label: "Marcador solo organizador" },
+  { id: 21, file: "official-match-stats-rls.sql", label: "Acta oficial · stats individuales" },
   { id: 16, file: "public-ficha-match-history.sql", label: "Historial en ficha pública" },
   { id: 17, file: "platform-seasons-shared.sql", label: "Temporada compartida MiFicha" },
   { id: 18, file: "player-profile-views.sql", label: "Aperturas de ficha pública" },
   { id: 19, file: "player-achievements.sql", label: "Insignias y logros verificados" },
 ] as const;
 
-export const PRODUCTION_SQL_ORDER = [11, 13, 14, 15, 20, 16, 17, 18, 19, 12] as const;
+export const PRODUCTION_SQL_ORDER = [11, 13, 14, 15, 20, 21, 16, 17, 18, 19, 12] as const;
+
+export const MIFICHA_GOVERNANCE_PATH = "/interno/gobernanza" as const;
 
 export const PRODUCTION_ROLLOUT_FILE = "production-rollout.sql" as const;

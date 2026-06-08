@@ -299,6 +299,7 @@ export type Database = {
           notes: string | null;
           is_official: boolean;
           result_locked_at: string | null;
+          acta_published_at: string | null;
           created_at: string;
         };
         Insert: {
@@ -319,6 +320,7 @@ export type Database = {
           notes?: string | null;
           is_official?: boolean;
           result_locked_at?: string | null;
+          acta_published_at?: string | null;
           created_at?: string;
         };
         Update: {
@@ -339,6 +341,7 @@ export type Database = {
           notes?: string | null;
           is_official?: boolean;
           result_locked_at?: string | null;
+          acta_published_at?: string | null;
           created_at?: string;
         };
         Relationships: [
