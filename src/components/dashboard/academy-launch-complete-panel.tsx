@@ -16,10 +16,11 @@ export function AcademyLaunchCompletePanel({
           MiFicha activo en tu academia
         </div>
         <h2 className="mt-2 text-lg font-semibold text-slate-900">
-          Siguiente: comparte con padres
+          MiFicha activo — rutina de sábado
         </h2>
         <p className="mt-1 text-sm text-slate-600">
-          Tu plantel ya captura stats. Imprime QR o manda WhatsApp desde Plantel.
+          Convocados + captura rápida (~2 min) + WhatsApp al padre. El resto es
+          opcional cuando quieras visorías o calendario público.
         </p>
       </div>
 

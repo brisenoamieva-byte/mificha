@@ -19,6 +19,7 @@ export interface OnboardingStep {
   href: string;
   cta: string;
   optional?: boolean;
+  essential?: boolean;
 }
 
 export function isAcademyProfileReady(academy: Academy) {
@@ -32,77 +33,90 @@ export function isAcademyProfileReady(academy: Academy) {
 export function buildOnboardingSteps(progress: OnboardingProgress): OnboardingStep[] {
   return [
     {
-      id: "profile",
-      done: progress.profileReady,
-      title: "Completa el perfil de tu academia",
-      description: "Ciudad, estado y descripción para generar confianza.",
-      href: "/dashboard/configuracion",
-      cta: "Ir a configuración",
-    },
-    {
       id: "plantel",
       done: progress.hasPlayers,
+      essential: true,
       title: "Carga tu plantel",
-      description: "Importa Excel (con email del tutor) o agrega jugadores manualmente.",
+      description: "Importa Excel una vez o agrega jugadores manualmente.",
       href: "/dashboard/plantel",
       cta: "Ir a plantel",
     },
     {
-      id: "calendar",
-      done: progress.hasScheduledMatch,
-      title: "Publica tu calendario",
-      description: "Fecha, hora y sede visibles para padres y scouts.",
-      href: "/dashboard/partidos/programar",
-      cta: "Programar partido",
-    },
-    {
       id: "match",
       done: progress.hasCompletedMatch,
-      title: "Captura stats post-partido",
-      description: "Activa Passport Score y el marcador semanal.",
+      essential: true,
+      title: "Primera captura post-partido",
+      description: "Modo convocados + captura rápida: ~2 min en celular.",
       href: "/dashboard/partidos/nuevo",
-      cta: "Registrar resultado",
-    },
-    {
-      id: "guardians",
-      done: progress.hasGuardianEmails,
-      title: "Agrega contacto del tutor",
-      description: "Email del padre/madre para reportes (opcional si usas WhatsApp).",
-      href: "/dashboard/plantel",
-      cta: "Editar jugadores",
+      cta: "Registrar partido",
     },
     {
       id: "share",
       done: progress.hasShareableFicha,
-      title: "Activa y comparte una ficha con padres",
-      description: "Consentimiento parental + ficha pública + WhatsApp.",
+      essential: true,
+      title: "Comparte con un padre",
+      description: "Consentimiento + ficha pública + WhatsApp tras guardar.",
       href: "/dashboard/plantel",
-      cta: "Compartir desde plantel",
+      cta: "Activar ficha",
+    },
+    {
+      id: "profile",
+      done: progress.profileReady,
+      optional: true,
+      title: "Perfil de academia",
+      description: "Ciudad, estado y descripción para generar confianza.",
+      href: "/dashboard/configuracion",
+      cta: "Completar perfil",
+    },
+    {
+      id: "calendar",
+      done: progress.hasScheduledMatch,
+      optional: true,
+      title: "Calendario público",
+      description: "Fecha, hora y sede visibles para padres (opcional).",
+      href: "/dashboard/partidos/programar",
+      cta: "Programar partido",
+    },
+    {
+      id: "guardians",
+      done: progress.hasGuardianEmails,
+      optional: true,
+      title: "Email del tutor",
+      description: "Para reportes automáticos si no usas solo WhatsApp.",
+      href: "/dashboard/plantel",
+      cta: "Editar jugadores",
     },
     {
       id: "explore",
       done: progress.hasDiscoverablePlayer,
-      title: "Opcional: aparece en Explorar",
-      description: "Para visorías — activa directorio en jugadores seleccionados.",
+      optional: true,
+      title: "Aparecer en Explorar",
+      description: "Solo si quieres visorías — directorio por categoría.",
       href: "/explorar",
       cta: "Ver directorio",
-      optional: true,
     },
   ];
 }
 
 export function getOnboardingSummary(steps: OnboardingStep[]) {
-  const requiredSteps = steps.filter((step) => !step.optional);
-  const requiredDone = requiredSteps.filter((step) => step.done).length;
+  const essentialSteps = steps.filter((step) => step.essential);
+  const optionalSteps = steps.filter((step) => step.optional);
+  const essentialDone = essentialSteps.filter((step) => step.done).length;
   const completedCount = steps.filter((step) => step.done).length;
-  const allRequiredDone = requiredDone === requiredSteps.length;
+  const allEssentialDone = essentialDone === essentialSteps.length;
 
   return {
-    requiredSteps,
-    requiredDone,
+    essentialSteps,
+    optionalSteps,
+    essentialDone,
+    essentialTotal: essentialSteps.length,
     completedCount,
     totalSteps: steps.length,
-    allRequiredDone,
+    allEssentialDone,
+    /** @deprecated use allEssentialDone */
+    allRequiredDone: allEssentialDone,
+    requiredSteps: essentialSteps,
+    requiredDone: essentialDone,
   };
 }
 

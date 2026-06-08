@@ -46,8 +46,8 @@ export function MatchSavedSummary({
           Avisar a padres por WhatsApp
         </h2>
         <p className="text-sm text-slate-600">
-          Comparte la actualización del partido. El padre abre la ficha sin
-          descargar nada.
+          Este es el cierre del flujo esencial. Comparte la actualización; el padre
+          abre la ficha sin descargar nada.
         </p>
 
         {players.length === 0 ? (
@@ -87,16 +87,22 @@ export function MatchSavedSummary({
                     <TrendingUp className="h-4 w-4" />
                     Passport {player.passport_score}
                     {delta > 0 ? (
-                      <span className="text-green-600">(+{delta})</span>
+                      <span className="text-mf-accent-dark">(+{delta})</span>
                     ) : null}
                   </p>
+                  {!player.is_public || !player.public_consent_at ? (
+                    <p className="mt-2 text-xs text-amber-700">
+                      Activa consentimiento y ficha pública en Plantel para que el
+                      link funcione al padre.
+                    </p>
+                  ) : null}
                 </div>
                 <div className="flex flex-wrap gap-2">
                   <a
                     href={whatsappUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 rounded-xl bg-green-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-green-700"
+                    className="mf-btn-accent-solid inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm"
                   >
                     <MessageCircle className="h-4 w-4" />
                     WhatsApp

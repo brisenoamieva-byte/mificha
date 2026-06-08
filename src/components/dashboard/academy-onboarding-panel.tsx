@@ -61,12 +61,13 @@ export function AcademyOnboardingPanel() {
     [progress],
   );
   const summary = useMemo(() => getOnboardingSummary(steps), [steps]);
+  const nextEssentialStep = summary.essentialSteps.find((step) => !step.done);
 
   if (!academy || loading || !progress) {
     return null;
   }
 
-  if (summary.allRequiredDone) {
+  if (summary.allEssentialDone) {
     return <AcademyLaunchCompletePanel academySlug={academy.slug} />;
   }
 
@@ -75,23 +76,28 @@ export function AcademyOnboardingPanel() {
       <div className="border-b border-mf-border-subtle bg-mf-canvas px-5 py-4">
         <div className="flex items-center gap-2 text-sm font-semibold text-[#1B4F8C]">
           <Rocket className="h-4 w-4" />
-          Primeros pasos
+          Primer valor en 3 pasos
         </div>
         <h2 className="mt-2 text-lg font-semibold text-slate-900">
-          Activa MiFicha en tu academia
+          Plantel → captura → WhatsApp a un padre
         </h2>
         <p className="mt-1 text-sm text-slate-600">
-          {summary.completedCount} de {summary.totalSteps} pasos completados · academia
-          fundadora
+          {summary.essentialDone} de {summary.essentialTotal} esenciales ·{" "}
+          {summary.completedCount} de {summary.totalSteps} incluyendo opcionales
         </p>
         <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-200">
           <div
-            className="h-full rounded-full bg-[#1B4F8C] transition-all"
+            className="h-full rounded-full bg-gradient-to-r from-[#1B4F8C] to-mf-accent-dark transition-all"
             style={{
-              width: `${(summary.completedCount / summary.totalSteps) * 100}%`,
+              width: `${(summary.essentialDone / summary.essentialTotal) * 100}%`,
             }}
           />
         </div>
+        {nextEssentialStep ? (
+          <p className="mt-3 text-sm text-mf-accent-dark">
+            Siguiente: {nextEssentialStep.title}
+          </p>
+        ) : null}
       </div>
 
       <ol className="divide-y divide-mf-border-subtle">
@@ -101,17 +107,28 @@ export function AcademyOnboardingPanel() {
             className={cn(
               "flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between",
               step.done && "bg-emerald-50/40",
+              step.essential && !step.done && "bg-mf-accent-soft/20",
             )}
           >
             <div className="flex items-start gap-3">
               {step.done ? (
                 <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" />
               ) : (
-                <Circle className="mt-0.5 h-5 w-5 shrink-0 text-slate-300" />
+                <Circle
+                  className={cn(
+                    "mt-0.5 h-5 w-5 shrink-0",
+                    step.essential ? "text-mf-accent-dark" : "text-slate-300",
+                  )}
+                />
               )}
               <div>
                 <p className="font-medium text-slate-900">
                   {step.title}
+                  {step.essential ? (
+                    <span className="ml-2 text-xs font-normal text-mf-accent-dark">
+                      esencial
+                    </span>
+                  ) : null}
                   {step.optional ? (
                     <span className="ml-2 text-xs font-normal text-slate-500">
                       (opcional)
@@ -124,7 +141,12 @@ export function AcademyOnboardingPanel() {
             {!step.done ? (
               <Link
                 href={step.href}
-                className="inline-flex shrink-0 items-center justify-center rounded-lg bg-[#1B4F8C] px-4 py-2 text-sm font-semibold text-white hover:bg-[#164278]"
+                className={cn(
+                  "inline-flex shrink-0 items-center justify-center rounded-lg px-4 py-2 text-sm font-semibold text-white",
+                  step.essential
+                    ? "bg-mf-accent-dark hover:bg-[#047857]"
+                    : "bg-[#1B4F8C] hover:bg-[#164278]",
+                )}
               >
                 {step.cta}
               </Link>

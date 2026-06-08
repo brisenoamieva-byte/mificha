@@ -5,15 +5,23 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { MatchSavedSummary, type SavedPlayerSummary } from "@/components/dashboard/match-saved-summary";
 import {
-  MinuteQuickInput,
-  QuickGoalPicker,
-} from "@/components/dashboard/match-stat-capture";
-import { PlayerAvatar } from "@/components/ui/player-avatar";
-import { toast } from "@/components/ui/toast";
+  MatchCaptureStep,
+  updateCapturesList,
+} from "@/components/dashboard/match-capture-step";
 import { useDashboard } from "@/components/dashboard/dashboard-context";
 import { NoAcademyState } from "@/components/dashboard/no-academy-state";
-import { getPositionLabel } from "@/lib/dashboard-utils";
+import { toast } from "@/components/ui/toast";
 import { defaultSeasonName } from "@/lib/match-utils";
+import {
+  applyCapturePatch,
+  createCapturesForPlayers,
+  markPlayedWithMinutes,
+  sumPlayerGoals,
+  toggleConvocadoId,
+  type CaptureStyle,
+  type PlayerCapture,
+  type RosterListMode,
+} from "@/lib/match-capture";
 import {
   getCategoryFilterLabel,
   inferCategoryFilterFromMatchCategory,
@@ -24,16 +32,6 @@ import { calculatePassportScoreForPlayer } from "@/lib/passport-score";
 import { supabase } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
 import type { MatchResult, Player, Season } from "@/types/database";
-
-interface PlayerCapture {
-  player_id: string;
-  played: boolean;
-  minutes: number;
-  goals: number;
-  assists: number;
-  yellow: boolean;
-  red: boolean;
-}
 
 function todayIsoDate() {
   return new Date().toISOString().split("T")[0];
@@ -187,6 +185,9 @@ export function PartidosNuevoContent() {
   const [result, setResult] = useState<MatchResult>("win");
   const [goalsFor, setGoalsFor] = useState(0);
   const [goalsAgainst, setGoalsAgainst] = useState(0);
+  const [captureStyle, setCaptureStyle] = useState<CaptureStyle>("quick");
+  const [listMode, setListMode] = useState<RosterListMode>("convocados");
+  const [convocadoIds, setConvocadoIds] = useState<string[]>([]);
 
   const playedCount = useMemo(
     () => captures.filter((item) => item.played).length,
@@ -206,6 +207,17 @@ export function PartidosNuevoContent() {
   }, [players, rosterCategoryFilter]);
 
   const rosterCategoryLabel = getCategoryFilterLabel(rosterCategoryFilter);
+
+  const playerGoalsTotal = useMemo(
+    () => sumPlayerGoals(captures.filter((item) => item.played)),
+    [captures],
+  );
+
+  const goalsMismatch =
+    captureStyle === "detailed" &&
+    goalsFor > 0 &&
+    playedCount > 0 &&
+    playerGoalsTotal !== goalsFor;
 
   const loadData = useCallback(async () => {
     if (!academy) {
@@ -245,17 +257,7 @@ export function PartidosNuevoContent() {
 
         setSeason(scheduledSeason);
         setPlayers(playerList ?? []);
-        setCaptures(
-          (playerList ?? []).map((player) => ({
-            player_id: player.id,
-            played: false,
-            minutes: 0,
-            goals: 0,
-            assists: 0,
-            yellow: false,
-            red: false,
-          })),
-        );
+        setCaptures(createCapturesForPlayers((playerList ?? []).map((player) => player.id)));
         setLoading(false);
         return;
       }
@@ -283,17 +285,7 @@ export function PartidosNuevoContent() {
 
     setSeason(activeSeason);
     setPlayers(playerList);
-    setCaptures(
-      playerList.map((player) => ({
-        player_id: player.id,
-        played: false,
-        minutes: 0,
-        goals: 0,
-        assists: 0,
-        yellow: false,
-        red: false,
-      })),
-    );
+    setCaptures(createCapturesForPlayers(playerList.map((player) => player.id)));
     setLoading(false);
   }, [academy, scheduledMatchIdParam]);
 
@@ -302,23 +294,31 @@ export function PartidosNuevoContent() {
   }, [loadData]);
 
   function updateCapture(playerId: string, patch: Partial<PlayerCapture>) {
+    setCaptures((current) => updateCapturesList(current, playerId, patch));
+  }
+
+  function toggleConvocado(playerId: string) {
+    setConvocadoIds((current) => toggleConvocadoId(current, playerId));
+  }
+
+  function selectAllConvocados() {
+    setConvocadoIds(visiblePlayers.map((player) => player.id));
+  }
+
+  function clearConvocados() {
+    setConvocadoIds([]);
     setCaptures((current) =>
-      current.map((item) => {
-        if (item.player_id !== playerId) return item;
+      current.map((item) => applyCapturePatch(item, { played: false })),
+    );
+  }
 
-        const next = { ...item, ...patch };
-        const hasActivity =
-          next.goals > 0 || next.assists > 0 || next.minutes > 0 || next.played;
-
-        if (hasActivity) {
-          next.played = true;
-          if (next.minutes === 0 && (next.goals > 0 || next.assists > 0)) {
-            next.minutes = 45;
-          }
-        }
-
-        return next;
-      }),
+  function bulkMinutes(minutes: number) {
+    setCaptures((current) =>
+      current.map((item) =>
+        convocadoIds.includes(item.player_id)
+          ? markPlayedWithMinutes(item, minutes)
+          : item,
+      ),
     );
   }
 
@@ -522,6 +522,10 @@ export function PartidosNuevoContent() {
             <p className="mt-1 text-slate-600">
               Paso 1 de 2 · {scheduledMatchId ? "Partido programado" : "Datos del partido"}
             </p>
+            <p className="mt-3 text-sm text-slate-500">
+              Solo marcador aquí. En el paso 2 eliges convocados y captura rápida (~1 min)
+              o detallada con goles y tarjetas.
+            </p>
 
             {scheduledMatchId ? (
               <p className="mt-4 rounded-xl bg-[#1B4F8C]/5 px-4 py-3 text-sm text-slate-700">
@@ -607,197 +611,68 @@ export function PartidosNuevoContent() {
                 onClick={() => setStep(2)}
                 className="w-full rounded-2xl bg-[#1B4F8C] px-5 py-4 text-base font-semibold text-white disabled:opacity-50"
               >
-                Siguiente · stats por jugador
+                Siguiente · convocados y minutos
               </button>
             </div>
           </div>
         ) : (
-          <div className="mt-6 space-y-4">
-            <div className="rounded-2xl bg-white p-5 shadow-sm">
-              <h1 className="text-2xl font-bold text-slate-900">
-                Stats por jugador
-              </h1>
-              <p className="mt-1 text-slate-600">
-                Paso 2 de 2 · vs {opponent}
-              </p>
-              <p className="mt-3 text-sm text-slate-500">
-                Partido registrado → captura rápida → guardar → Passport Score
-                se recalcula → avisa al padre por WhatsApp.
-              </p>
-              {rosterCategoryLabel ? (
-                <p className="mt-3 rounded-xl bg-[#1B4F8C]/10 px-4 py-3 text-sm text-[#1B4F8C]">
-                  Mostrando jugadores de {rosterCategoryLabel} según la categoría
-                  del partido programado
-                  {scheduledMatchCategory ? ` (${scheduledMatchCategory})` : ""}.
-                </p>
-              ) : null}
-            </div>
-
-            {visiblePlayers.length === 0 ? (
-              <div className="rounded-2xl bg-white p-8 text-center shadow-sm">
-                <p className="text-slate-600">
-                  {players.length === 0
-                    ? "Agrega jugadores en Mi Plantel primero."
-                    : rosterCategoryLabel
-                      ? `No hay jugadores de ${rosterCategoryLabel} en tu plantel.`
-                      : "No hay jugadores para capturar."}
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {visiblePlayers.map((player) => {
-                  const capture = captures.find(
-                    (item) => item.player_id === player.id,
-                  );
-                  if (!capture) return null;
-
-                  return (
-                    <div
-                      key={player.id}
-                      className={cn(
-                        "rounded-2xl border bg-white p-4 shadow-sm",
-                        capture.played
-                          ? "border-[#1B4F8C]/30 ring-1 ring-[#1B4F8C]/10"
-                          : "border-slate-200",
-                      )}
-                    >
-                      <div className="flex items-center gap-3">
-                        <PlayerAvatar
-                          firstName={player.first_name}
-                          lastName={player.last_name}
-                          photoUrl={player.photo_url}
-                          size="sm"
-                        />
-                        <div className="min-w-0 flex-1">
-                          <p className="truncate font-semibold text-slate-900">
-                            {player.first_name} {player.last_name}
-                          </p>
-                          <p className="text-xs text-slate-500">
-                            {getPositionLabel(player.position)} · Passport{" "}
-                            {player.passport_score}
-                          </p>
-                        </div>
-                        <label className="inline-flex items-center gap-2 text-sm font-medium text-slate-700">
-                          <input
-                            type="checkbox"
-                            checked={capture.played}
-                            onChange={(event) =>
-                              updateCapture(player.id, {
-                                played: event.target.checked,
-                                minutes: event.target.checked
-                                  ? capture.minutes || 45
-                                  : 0,
-                                goals: event.target.checked ? capture.goals : 0,
-                                assists: event.target.checked
-                                  ? capture.assists
-                                  : 0,
-                              })
-                            }
-                            className="h-4 w-4 rounded border-slate-300"
-                          />
-                          Jugó
-                        </label>
-                      </div>
-
-                      <div className="mt-4 grid gap-4 sm:grid-cols-3">
-                        <QuickGoalPicker
-                          label="Goles"
-                          value={capture.goals}
-                          max={3}
-                          disabled={!capture.played}
-                          onChange={(value) =>
-                            updateCapture(player.id, { goals: value })
-                          }
-                        />
-                        <QuickGoalPicker
-                          label="Asistencias"
-                          value={capture.assists}
-                          max={3}
-                          disabled={!capture.played}
-                          onChange={(value) =>
-                            updateCapture(player.id, { assists: value })
-                          }
-                        />
-                        <MinuteQuickInput
-                          value={capture.minutes}
-                          disabled={!capture.played}
-                          onChange={(value) =>
-                            updateCapture(player.id, { minutes: value })
-                          }
-                        />
-                      </div>
-
-                      <div className="mt-3 flex flex-wrap gap-2">
-                        <button
-                          type="button"
-                          disabled={!capture.played}
-                          onClick={() =>
-                            updateCapture(player.id, {
-                              yellow: !capture.yellow,
-                            })
-                          }
-                          className={cn(
-                            "rounded-lg border px-3 py-1.5 text-xs font-semibold disabled:opacity-40",
-                            capture.yellow
-                              ? "border-amber-400 bg-amber-50"
-                              : "border-slate-200",
-                          )}
-                        >
-                          🟨 Amarilla
-                        </button>
-                        <button
-                          type="button"
-                          disabled={!capture.played}
-                          onClick={() =>
-                            updateCapture(player.id, { red: !capture.red })
-                          }
-                          className={cn(
-                            "rounded-lg border px-3 py-1.5 text-xs font-semibold disabled:opacity-40",
-                            capture.red
-                              ? "border-red-500 bg-red-50"
-                              : "border-slate-200",
-                          )}
-                        >
-                          🟥 Roja
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-
-            {error ? (
-              <p className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
-                {error}
-              </p>
-            ) : null}
-          </div>
+          <MatchCaptureStep
+            opponent={opponent}
+            captureStyle={captureStyle}
+            listMode={listMode}
+            convocadoIds={convocadoIds}
+            visiblePlayers={visiblePlayers}
+            captures={captures}
+            rosterCategoryLabel={rosterCategoryLabel}
+            scheduledMatchCategory={scheduledMatchCategory}
+            playedCount={playedCount}
+            onCaptureStyleChange={setCaptureStyle}
+            onListModeChange={setListMode}
+            onToggleConvocado={toggleConvocado}
+            onSelectAllConvocados={selectAllConvocados}
+            onClearConvocados={clearConvocados}
+            onEditConvocados={() => setConvocadoIds([])}
+            onBulkMinutes={bulkMinutes}
+            onUpdateCapture={updateCapture}
+          />
         )}
+
+        {step === 2 && error ? (
+          <p className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>
+        ) : null}
       </div>
 
       {step === 2 ? (
         <div className="fixed inset-x-0 bottom-0 border-t border-slate-200 bg-white p-4 shadow-lg">
-          <div className="mx-auto flex max-w-3xl flex-col gap-2 sm:flex-row">
-            <button
-              type="button"
-              onClick={() => setStep(1)}
-              className="rounded-xl px-4 py-4 text-sm font-medium text-slate-600 hover:bg-slate-100"
-            >
-              Atrás
-            </button>
-            <div className="flex flex-1 flex-col gap-2 sm:flex-row">
-              <p className="flex items-center justify-center text-sm text-slate-500 sm:mr-2">
-                {playedCount} jugador{playedCount === 1 ? "" : "es"} marcados
+          <div className="mx-auto flex max-w-3xl flex-col gap-2">
+            {goalsMismatch ? (
+              <p className="rounded-lg bg-amber-50 px-3 py-2 text-center text-xs text-amber-900">
+                Suma de goles de jugadores ({playerGoalsTotal}) ≠ marcador (
+                {goalsFor}). Puedes guardar igual; revísalo si quieres coherencia.
               </p>
+            ) : null}
+            <div className="flex flex-col gap-2 sm:flex-row">
               <button
                 type="button"
-                disabled={saving}
-                onClick={handleSave}
-                className="flex-1 rounded-2xl bg-green-600 px-5 py-4 text-base font-semibold text-white hover:bg-green-700 disabled:opacity-60"
+                onClick={() => setStep(1)}
+                className="rounded-xl px-4 py-4 text-sm font-medium text-slate-600 hover:bg-slate-100"
               >
-                {saving ? "Guardando..." : "Guardar · recalcular Score"}
+                Atrás
               </button>
+              <div className="flex flex-1 flex-col gap-2 sm:flex-row">
+                <p className="flex items-center justify-center text-sm text-slate-500 sm:mr-2">
+                  {playedCount} jugador{playedCount === 1 ? "" : "es"} · modo{" "}
+                  {captureStyle === "quick" ? "rápida" : "detallada"}
+                </p>
+                <button
+                  type="button"
+                  disabled={saving}
+                  onClick={handleSave}
+                  className="mf-btn-accent-solid flex-1 rounded-2xl px-5 py-4 text-base disabled:opacity-60"
+                >
+                  {saving ? "Guardando..." : "Guardar · avisar padres"}
+                </button>
+              </div>
             </div>
           </div>
         </div>
