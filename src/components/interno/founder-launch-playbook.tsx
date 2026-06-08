@@ -101,6 +101,12 @@ export function FounderLaunchPlaybook() {
           </div>
           <div className="flex flex-wrap gap-3">
             <Link
+              href="/interno/demo-one-pager"
+              className="inline-flex items-center gap-2 rounded-full border border-sky-400/30 bg-sky-500/10 px-4 py-2 text-sm font-semibold text-sky-200 hover:bg-sky-500/15"
+            >
+              One-pager PDF
+            </Link>
+            <Link
               href="/interno/pitch"
               className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#0a1628] hover:bg-white/95"
             >

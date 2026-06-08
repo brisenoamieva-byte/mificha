@@ -345,6 +345,12 @@ export function PitchDeckView() {
           </div>
           <div className="flex items-center gap-2">
             <Link
+              href="/interno/demo-one-pager"
+              className="inline-flex items-center gap-2 rounded-full border border-sky-400/30 px-3 py-2 text-sm font-medium text-sky-200 transition hover:bg-sky-500/10"
+            >
+              One-pager
+            </Link>
+            <Link
               href="/interno/lanzamiento"
               className="inline-flex items-center gap-2 rounded-full border border-emerald-400/30 px-3 py-2 text-sm font-medium text-emerald-200 transition hover:bg-emerald-500/10"
             >
