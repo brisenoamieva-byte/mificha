@@ -1,10 +1,5 @@
-import type { Metadata } from "next";
-import { ReportesContent } from "@/components/dashboard/reportes-content";
-
-export const metadata: Metadata = {
-  title: "Reportes | MiFicha",
-};
+import { redirect } from "next/navigation";
 
 export default function ReportesPage() {
-  return <ReportesContent />;
+  redirect("/dashboard/rendimiento?tab=enviar");
 }

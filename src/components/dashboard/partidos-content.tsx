@@ -7,6 +7,7 @@ import { useDashboard } from "@/components/dashboard/dashboard-context";
 import { LeagueOfficialBanner } from "@/components/dashboard/league-official-banner";
 import { MatchScheduleCard } from "@/components/marketing/match-schedule-card";
 import { NoAcademyState } from "@/components/dashboard/no-academy-state";
+import { NoSeasonState } from "@/components/dashboard/no-season-state";
 import { Skeleton } from "@/components/dashboard/skeletons";
 import {
   formatKickoffDateTime,
@@ -43,7 +44,7 @@ export function PartidosContent() {
       .select("*")
       .eq("academy_id", academy.id)
       .eq("is_active", true)
-      .order("created_at", { ascending: false })
+      .order("start_date", { ascending: false })
       .limit(1);
 
     const activeSeason = seasons?.[0] ?? null;
@@ -126,25 +127,7 @@ export function PartidosContent() {
       <LeagueOfficialBanner academy={academy} />
 
       {!season && !loading ? (
-        <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center">
-          <p className="text-slate-600">
-            Programa tu primer partido o captura un resultado para crear la temporada.
-          </p>
-          <div className="mt-4 flex flex-wrap justify-center gap-3">
-            <Link
-              href="/dashboard/partidos/programar"
-              className="text-[#1B4F8C] hover:underline"
-            >
-              Programar partido
-            </Link>
-            <Link
-              href="/dashboard/partidos/nuevo"
-              className="text-[#1B4F8C] hover:underline"
-            >
-              Capturar resultado
-            </Link>
-          </div>
-        </div>
+        <NoSeasonState className="max-w-none" />
       ) : null}
 
       {loading ? (

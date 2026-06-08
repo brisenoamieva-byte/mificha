@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  BarChart3,
   LayoutDashboard,
+  LineChart,
   Settings,
   Trophy,
   Users,
@@ -17,7 +17,7 @@ const navItems = [
   { href: "/dashboard", label: "Inicio", icon: LayoutDashboard },
   { href: "/dashboard/plantel", label: "Plantel", icon: Users },
   { href: "/dashboard/partidos", label: "Partidos", icon: Trophy },
-  { href: "/dashboard/reportes", label: "Reportes", icon: BarChart3 },
+  { href: "/dashboard/rendimiento", label: "Rendimiento", icon: LineChart },
   { href: "/dashboard/configuracion", label: "Configuración", icon: Settings },
 ];
 

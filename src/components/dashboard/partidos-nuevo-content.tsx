@@ -10,8 +10,8 @@ import {
 } from "@/components/dashboard/match-capture-step";
 import { useDashboard } from "@/components/dashboard/dashboard-context";
 import { NoAcademyState } from "@/components/dashboard/no-academy-state";
+import { NoSeasonState } from "@/components/dashboard/no-season-state";
 import { toast } from "@/components/ui/toast";
-import { defaultSeasonName } from "@/lib/match-utils";
 import {
   applyCapturePatch,
   createCapturesForPlayers,
@@ -75,90 +75,6 @@ function Counter({
         </button>
       </div>
     </div>
-  );
-}
-
-function SeasonQuickForm({
-  academyId,
-  onCreated,
-}: {
-  academyId: string;
-  onCreated: () => void;
-}) {
-  const [name, setName] = useState(defaultSeasonName());
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  async function handleSubmit(event: React.FormEvent) {
-    event.preventDefault();
-    setSaving(true);
-    setError(null);
-
-    try {
-      await supabase
-        .from("seasons")
-        .update({ is_active: false })
-        .eq("academy_id", academyId);
-
-      const { error: insertError } = await supabase.from("seasons").insert({
-        academy_id: academyId,
-        name: name.trim(),
-        start_date: startDate,
-        end_date: endDate,
-        is_active: true,
-      });
-
-      if (insertError) throw insertError;
-      onCreated();
-    } catch (submitError) {
-      setError(
-        submitError instanceof Error
-          ? submitError.message
-          : "No se pudo crear la temporada.",
-      );
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  return (
-    <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-      <input
-        required
-        value={name}
-        onChange={(event) => setName(event.target.value)}
-        className="w-full rounded-xl border border-slate-300 px-4 py-3"
-        placeholder="Temporada 2026"
-      />
-      <div className="grid gap-4 sm:grid-cols-2">
-        <input
-          type="date"
-          required
-          value={startDate}
-          onChange={(event) => setStartDate(event.target.value)}
-          className="w-full rounded-xl border border-slate-300 px-4 py-3"
-        />
-        <input
-          type="date"
-          required
-          value={endDate}
-          onChange={(event) => setEndDate(event.target.value)}
-          className="w-full rounded-xl border border-slate-300 px-4 py-3"
-        />
-      </div>
-      {error ? (
-        <p className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>
-      ) : null}
-      <button
-        type="submit"
-        disabled={saving}
-        className="w-full rounded-xl bg-[#1B4F8C] px-4 py-3 font-semibold text-white disabled:opacity-60"
-      >
-        {saving ? "Creando..." : "Crear temporada"}
-      </button>
-    </form>
   );
 }
 
@@ -462,21 +378,10 @@ export function PartidosNuevoContent() {
 
   if (!season) {
     return (
-      <div className="mx-auto max-w-lg space-y-6">
-        <Link
-          href="/dashboard/partidos"
-          className="text-sm font-medium text-[#1B4F8C] hover:underline"
-        >
-          ← Volver
-        </Link>
-        <div className="rounded-2xl bg-white p-8 shadow-sm">
-          <h1 className="text-xl font-bold text-slate-900">Primero, crea una temporada</h1>
-          <p className="mt-2 text-slate-600">
-            Necesitas una temporada activa para capturar partidos.
-          </p>
-          <SeasonQuickForm academyId={academy.id} onCreated={() => loadData()} />
-        </div>
-      </div>
+      <NoSeasonState
+        backHref="/dashboard/partidos"
+        backLabel="← Volver a partidos"
+      />
     );
   }
 

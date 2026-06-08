@@ -4,6 +4,7 @@ import { ArrowRight } from "lucide-react";
 import { ExploreDirectory } from "@/components/marketing/explore-directory";
 import { ExploreHeroAside } from "@/components/marketing/explore-hero-aside";
 import { PublicScheduleExploreSection } from "@/components/marketing/public-schedule-explore-section";
+import { VerifiedAcademiesShowcase } from "@/components/marketing/verified-academies-showcase";
 import { MarketingPageHero } from "@/components/marketing/marketing-page-hero";
 import { SiteFooter, SiteHeader } from "@/components/marketing/site-header";
 import { fetchWeeklyCompetitionData } from "@/lib/ideal-xi";
@@ -61,6 +62,12 @@ export default async function ExplorarPage() {
             { value: "11", label: "Destacados semanales", accent: true },
           ]}
           aside={<ExploreHeroAside />}
+        />
+
+        <VerifiedAcademiesShowcase
+          academies={data.academies}
+          playerCount={playerCount}
+          variant="marquee"
         />
 
         <PublicScheduleExploreSection matches={upcomingMatches} />

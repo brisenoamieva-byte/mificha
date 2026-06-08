@@ -24,7 +24,11 @@ interface EmailLogRow extends EmailLog {
   players: Pick<Player, "first_name" | "last_name"> | null;
 }
 
-export function ReportesContent() {
+interface ReportesContentProps {
+  embedded?: boolean;
+}
+
+export function ReportesContent({ embedded = false }: ReportesContentProps) {
   const { academy } = useDashboard();
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
@@ -279,8 +283,8 @@ export function ReportesContent() {
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-6xl space-y-6">
-        <Skeleton className="h-10 w-64" />
+      <div className={embedded ? "space-y-6" : "mx-auto max-w-6xl space-y-6"}>
+        {!embedded ? <Skeleton className="h-10 w-64" /> : null}
         <Skeleton className="h-40 w-full" />
         <Skeleton className="h-[420px] w-full" />
       </div>
@@ -288,15 +292,17 @@ export function ReportesContent() {
   }
 
   return (
-    <div className="mx-auto max-w-6xl space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900 sm:text-3xl">
-          Reportes a padres
-        </h1>
-        <p className="mt-1 text-slate-600">
-          Comparativas visuales del plantel y envío del resumen mensual verificado.
-        </p>
-      </div>
+    <div className={embedded ? "space-y-6" : "mx-auto max-w-6xl space-y-6"}>
+      {!embedded ? (
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900 sm:text-3xl">
+            Reportes a padres
+          </h1>
+          <p className="mt-1 text-slate-600">
+            Comparativas visuales del plantel y envío del resumen mensual verificado.
+          </p>
+        </div>
+      ) : null}
 
       <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
         <div className="flex items-start gap-3">
@@ -330,18 +336,24 @@ export function ReportesContent() {
           value={categoryFilter}
           onChange={setCategoryFilter}
           birthDates={birthDates}
-          hint="La comparativa usa el promedio de la categoría seleccionada — contexto, no castigo."
+          hint={
+            embedded
+              ? "Filtra a qué tutores enviar según categoría."
+              : "La comparativa usa el promedio de la categoría seleccionada — contexto, no castigo."
+          }
         />
       </div>
 
-      <ComparativeReportPanel
-        players={filteredPlayers}
-        seasonStats={filteredSeasonStats}
-        selectedPlayerId={previewPlayer?.id ?? ""}
-        onSelectPlayer={setSelectedPlayerId}
-        seasonName={selectedSeason?.name}
-        categoryLabel={categoryLabel}
-      />
+      {!embedded ? (
+        <ComparativeReportPanel
+          players={filteredPlayers}
+          seasonStats={filteredSeasonStats}
+          selectedPlayerId={previewPlayer?.id ?? ""}
+          onSelectPlayer={setSelectedPlayerId}
+          seasonName={selectedSeason?.name}
+          categoryLabel={categoryLabel}
+        />
+      ) : null}
 
       <div className="grid gap-6 lg:grid-cols-[280px_minmax(0,1fr)]">
         <div className="space-y-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
