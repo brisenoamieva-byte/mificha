@@ -9,6 +9,7 @@ import {
   MapPin,
   ShieldCheck,
 } from "lucide-react";
+import { FixtureImportSection } from "@/components/interno/fixture-import-section";
 import { formatKickoffDateTime } from "@/lib/match-utils";
 import { supabase } from "@/lib/supabase";
 import { toast } from "@/components/ui/toast";
@@ -248,6 +249,13 @@ export function FixturesAdminPanel() {
                 </p>
               )}
             </section>
+
+            <FixtureImportSection
+              academyId={selectedAcademyId}
+              seasonId={activeSeason?.id}
+              disabled={!activeSeason}
+              onImported={() => void loadFixtures(selectedAcademyId)}
+            />
 
             <section className="rounded-2xl border border-white/10 bg-white/[0.04] p-6">
               <h2 className="text-lg font-semibold">Próximas jornadas</h2>
