@@ -25,7 +25,7 @@ export function HomeHero() {
       }
       stats={[
         { value: "~1 min", label: "Convocados + minutos" },
-        { value: "0", label: "App para padres" },
+        { value: "Sin app", label: "Padres abren el link" },
         { value: "100", label: "Progreso verificado", accent: true },
       ]}
       aside={<HomeFichaPreview />}

@@ -47,7 +47,7 @@ export const PITCH_SLIDES: PitchSlide[] = [
       "MiFicha centraliza temporada y jornadas escolares. Tu staff captura convocados y minutos en ~1 min; el padre recibe el link automático — sin app.",
     stats: [
       { value: "~1 min", label: "Convocados + minutos" },
-      { value: "0", label: "App para padres" },
+      { value: "Sin app", label: "Padres abren el link" },
       { value: "100", label: "Passport Score" },
     ],
     speakerNote: "No vendas software — vende «respuesta al padre el mismo día, sin que pegues WhatsApp».",

@@ -33,7 +33,7 @@ export default function PadresPage() {
           }
           stats={[
             { value: "Auto", label: "Aviso post-partido" },
-            { value: "0", label: "Registro requerido" },
+            { value: "Sin cuenta", label: "Abre el link" },
             { value: "100", label: "Passport Score", accent: true },
           ]}
           aside={<HomeFichaPreview />}
