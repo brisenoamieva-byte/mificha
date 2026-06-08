@@ -10,6 +10,8 @@ import {
 } from "@/components/dashboard/match-capture-step";
 import { useDashboard } from "@/components/dashboard/dashboard-context";
 import { NoAcademyState } from "@/components/dashboard/no-academy-state";
+import { FixturePicker } from "@/components/dashboard/fixture-picker";
+import { NoFixturesState } from "@/components/dashboard/no-fixtures-state";
 import { NoSeasonState } from "@/components/dashboard/no-season-state";
 import { toast } from "@/components/ui/toast";
 import {
@@ -31,7 +33,7 @@ import {
 import { calculatePassportScoreForPlayer } from "@/lib/passport-score";
 import { supabase } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
-import type { MatchResult, Player, Season } from "@/types/database";
+import type { Match, MatchResult, Player, Season } from "@/types/database";
 
 function todayIsoDate() {
   return new Date().toISOString().split("T")[0];
@@ -104,6 +106,7 @@ export function PartidosNuevoContent() {
   const [captureStyle, setCaptureStyle] = useState<CaptureStyle>("quick");
   const [listMode, setListMode] = useState<RosterListMode>("convocados");
   const [convocadoIds, setConvocadoIds] = useState<string[]>([]);
+  const [pendingFixtures, setPendingFixtures] = useState<Match[]>([]);
 
   const playedCount = useMemo(
     () => captures.filter((item) => item.played).length,
@@ -202,6 +205,21 @@ export function PartidosNuevoContent() {
     setSeason(activeSeason);
     setPlayers(playerList);
     setCaptures(createCapturesForPlayers(playerList.map((player) => player.id)));
+
+    if (activeSeason) {
+      const { data: pending } = await supabase
+        .from("matches")
+        .select("*")
+        .eq("academy_id", academy.id)
+        .eq("season_id", activeSeason.id)
+        .in("status", ["scheduled", "postponed"])
+        .order("kickoff_at", { ascending: true });
+
+      setPendingFixtures(pending ?? []);
+    } else {
+      setPendingFixtures([]);
+    }
+
     setLoading(false);
   }, [academy, scheduledMatchIdParam]);
 
@@ -238,8 +256,18 @@ export function PartidosNuevoContent() {
     );
   }
 
+  function selectFixture(fixture: Match) {
+    setScheduledMatchId(fixture.id);
+    setScheduledMatchCategory(fixture.category);
+    setOpponent(fixture.opponent);
+    setMatchDate(fixture.match_date);
+  }
+
   async function handleSave() {
-    if (!academy || !season) return;
+    if (!academy || !season || !scheduledMatchId) {
+      setError("Selecciona una jornada publicada por MiFicha.");
+      return;
+    }
 
     setSaving(true);
     setError(null);
@@ -260,34 +288,19 @@ export function PartidosNuevoContent() {
         }
       }
 
-      const { data: match, error: matchError } = scheduledMatchId
-        ? await supabase
-            .from("matches")
-            .update({
-              opponent: opponent.trim(),
-              match_date: matchDate,
-              result,
-              goals_for: goalsFor,
-              goals_against: goalsAgainst,
-              status: "completed",
-            })
-            .eq("id", scheduledMatchId)
-            .select("*")
-            .single()
-        : await supabase
-            .from("matches")
-            .insert({
-              season_id: season.id,
-              academy_id: academy.id,
-              opponent: opponent.trim(),
-              match_date: matchDate,
-              result,
-              goals_for: goalsFor,
-              goals_against: goalsAgainst,
-              status: "completed",
-            })
-            .select("*")
-            .single();
+      const { data: match, error: matchError } = await supabase
+        .from("matches")
+        .update({
+          opponent: opponent.trim(),
+          match_date: matchDate,
+          result,
+          goals_for: goalsFor,
+          goals_against: goalsAgainst,
+          status: "completed",
+        })
+        .eq("id", scheduledMatchId)
+        .select("*")
+        .single();
 
       if (matchError || !match) throw matchError ?? new Error("No se creó el partido.");
 
@@ -385,6 +398,10 @@ export function PartidosNuevoContent() {
     );
   }
 
+  if (!scheduledMatchId && pendingFixtures.length === 0 && step !== 3) {
+    return <NoFixturesState />;
+  }
+
   if (step === 3) {
     return (
       <div className="mx-auto max-w-3xl pb-12">
@@ -421,104 +438,120 @@ export function PartidosNuevoContent() {
 
         {step === 1 ? (
           <div className="mt-6 rounded-2xl bg-white p-6 shadow-sm sm:p-8">
-            <h1 className="text-2xl font-bold text-slate-900">
-              {scheduledMatchId ? "Registrar resultado" : "Nuevo partido"}
-            </h1>
-            <p className="mt-1 text-slate-600">
-              Paso 1 de 2 · {scheduledMatchId ? "Partido programado" : "Datos del partido"}
-            </p>
-            <p className="mt-3 text-sm text-slate-500">
-              Solo marcador aquí. En el paso 2 eliges convocados y captura rápida (~1 min)
-              o detallada con goles y tarjetas.
-            </p>
-
-            {scheduledMatchId ? (
-              <p className="mt-4 rounded-xl bg-[#1B4F8C]/5 px-4 py-3 text-sm text-slate-700">
-                Completando el juego vs <strong>{opponent}</strong> que ya publicaste en
-                el calendario.
-              </p>
-            ) : null}
-
-            <div className="mt-8 space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-slate-700">
-                  ¿Contra quién jugaron?
-                </label>
-                <input
-                  value={opponent}
-                  onChange={(event) => setOpponent(event.target.value)}
-                  className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-4 text-lg"
-                  placeholder="Halcones FC"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700">
-                  ¿Cuándo?
-                </label>
-                <input
-                  type="date"
-                  value={matchDate}
-                  onChange={(event) => setMatchDate(event.target.value)}
-                  className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-4 text-lg"
-                />
-              </div>
-
-              <div>
-                <p className="text-sm font-medium text-slate-700">¿Resultado?</p>
-                <div className="mt-3 grid gap-3 sm:grid-cols-3">
-                  {[
-                    { value: "win" as const, label: "🟢 Ganamos", tone: "border-green-500 bg-green-50" },
-                    { value: "draw" as const, label: "🟡 Empatamos", tone: "border-amber-400 bg-amber-50" },
-                    { value: "loss" as const, label: "🔴 Perdimos", tone: "border-red-500 bg-red-50" },
-                  ].map((option) => (
-                    <button
-                      key={option.value}
-                      type="button"
-                      onClick={() => setResult(option.value)}
-                      className={cn(
-                        "rounded-2xl border-2 px-4 py-5 text-base font-semibold transition-colors",
-                        result === option.value
-                          ? option.tone
-                          : "border-slate-200 bg-white text-slate-700",
-                      )}
-                    >
-                      {option.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="grid gap-6 sm:grid-cols-2">
-                <Counter
-                  label="Goles a favor"
-                  value={goalsFor}
-                  onChange={setGoalsFor}
-                  max={30}
-                />
-                <Counter
-                  label="Goles en contra"
-                  value={goalsAgainst}
-                  onChange={setGoalsAgainst}
-                  max={30}
-                />
-              </div>
-
-              {error ? (
-                <p className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
-                  {error}
+            {!scheduledMatchId ? (
+              <FixturePicker
+                fixtures={pendingFixtures}
+                onSelect={selectFixture}
+              />
+            ) : (
+              <>
+                <h1 className="text-2xl font-bold text-slate-900">
+                  Capturar resultado
+                </h1>
+                <p className="mt-1 text-slate-600">
+                  Paso 1 de 2 · Jornada publicada por MiFicha
                 </p>
-              ) : null}
+                <p className="mt-3 text-sm text-slate-500">
+                  Solo marcador aquí. En el paso 2 eliges convocados y captura
+                  rápida (~1 min) o detallada con goles y tarjetas.
+                </p>
 
-              <button
-                type="button"
-                disabled={!opponent.trim()}
-                onClick={() => setStep(2)}
-                className="w-full rounded-2xl bg-[#1B4F8C] px-5 py-4 text-base font-semibold text-white disabled:opacity-50"
-              >
-                Siguiente · convocados y minutos
-              </button>
-            </div>
+                <p className="mt-4 rounded-xl bg-[#1B4F8C]/5 px-4 py-3 text-sm text-slate-700">
+                  Jornada vs <strong>{opponent}</strong>
+                  {scheduledMatchCategory ? ` · ${scheduledMatchCategory}` : ""}
+                </p>
+
+                <div className="mt-8 space-y-6">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700">
+                      Rival
+                    </label>
+                    <input
+                      value={opponent}
+                      readOnly
+                      className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-4 text-lg text-slate-700"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700">
+                      Fecha del partido
+                    </label>
+                    <input
+                      type="date"
+                      value={matchDate}
+                      readOnly
+                      className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-4 text-lg text-slate-700"
+                    />
+                  </div>
+
+                  <div>
+                    <p className="text-sm font-medium text-slate-700">¿Resultado?</p>
+                    <div className="mt-3 grid gap-3 sm:grid-cols-3">
+                      {[
+                        { value: "win" as const, label: "🟢 Ganamos", tone: "border-green-500 bg-green-50" },
+                        { value: "draw" as const, label: "🟡 Empatamos", tone: "border-amber-400 bg-amber-50" },
+                        { value: "loss" as const, label: "🔴 Perdimos", tone: "border-red-500 bg-red-50" },
+                      ].map((option) => (
+                        <button
+                          key={option.value}
+                          type="button"
+                          onClick={() => setResult(option.value)}
+                          className={cn(
+                            "rounded-2xl border-2 px-4 py-5 text-base font-semibold transition-colors",
+                            result === option.value
+                              ? option.tone
+                              : "border-slate-200 bg-white text-slate-700",
+                          )}
+                        >
+                          {option.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="grid gap-6 sm:grid-cols-2">
+                    <Counter
+                      label="Goles a favor"
+                      value={goalsFor}
+                      onChange={setGoalsFor}
+                      max={30}
+                    />
+                    <Counter
+                      label="Goles en contra"
+                      value={goalsAgainst}
+                      onChange={setGoalsAgainst}
+                      max={30}
+                    />
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setScheduledMatchId(null);
+                      setScheduledMatchCategory(null);
+                    }}
+                    className="text-sm font-medium text-slate-500 hover:text-slate-700"
+                  >
+                    ← Elegir otra jornada
+                  </button>
+
+                  {error ? (
+                    <p className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
+                      {error}
+                    </p>
+                  ) : null}
+
+                  <button
+                    type="button"
+                    onClick={() => setStep(2)}
+                    className="w-full rounded-2xl bg-[#1B4F8C] px-5 py-4 text-base font-semibold text-white"
+                  >
+                    Siguiente · convocados y minutos
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         ) : (
           <MatchCaptureStep

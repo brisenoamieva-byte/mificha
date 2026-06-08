@@ -254,6 +254,7 @@ export type Database = {
           category: string | null;
           is_public: boolean;
           notes: string | null;
+          is_official: boolean;
           created_at: string;
         };
         Insert: {
@@ -272,6 +273,7 @@ export type Database = {
           category?: string | null;
           is_public?: boolean;
           notes?: string | null;
+          is_official?: boolean;
           created_at?: string;
         };
         Update: {
@@ -290,6 +292,7 @@ export type Database = {
           category?: string | null;
           is_public?: boolean;
           notes?: string | null;
+          is_official?: boolean;
           created_at?: string;
         };
         Relationships: [

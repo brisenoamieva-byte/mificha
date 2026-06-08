@@ -155,6 +155,12 @@ export function SeasonsAdminPanel() {
           </div>
           <div className="flex flex-wrap gap-3">
             <Link
+              href="/interno/jornadas"
+              className="inline-flex items-center gap-2 rounded-full border border-white/20 px-4 py-2 text-sm font-semibold text-white/90 hover:bg-white/10"
+            >
+              Jornadas
+            </Link>
+            <Link
               href="/interno/lanzamiento"
               className="inline-flex items-center gap-2 rounded-full border border-white/20 px-4 py-2 text-sm font-semibold text-white/90 hover:bg-white/10"
             >

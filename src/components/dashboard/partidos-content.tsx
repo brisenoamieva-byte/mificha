@@ -7,6 +7,7 @@ import { useDashboard } from "@/components/dashboard/dashboard-context";
 import { LeagueOfficialBanner } from "@/components/dashboard/league-official-banner";
 import { MatchScheduleCard } from "@/components/marketing/match-schedule-card";
 import { NoAcademyState } from "@/components/dashboard/no-academy-state";
+import { NoFixturesState } from "@/components/dashboard/no-fixtures-state";
 import { NoSeasonState } from "@/components/dashboard/no-season-state";
 import { Skeleton } from "@/components/dashboard/skeletons";
 import {
@@ -119,7 +120,7 @@ export function PartidosContent() {
             className="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-5 py-4 text-sm font-semibold text-slate-700 hover:bg-slate-50"
           >
             <CalendarPlus className="h-4 w-4" />
-            Amistoso
+            Calendario MiFicha
           </Link>
         </div>
       </div>
@@ -130,26 +131,30 @@ export function PartidosContent() {
         <NoSeasonState className="max-w-none" />
       ) : null}
 
+      {season && !loading && upcomingMatches.length === 0 && completedMatches.length === 0 ? (
+        <NoFixturesState className="max-w-none" backHref={null} />
+      ) : null}
+
       {loading ? (
         <div className="space-y-4">
           {Array.from({ length: 3 }).map((_, index) => (
             <Skeleton key={index} className="h-24 w-full" />
           ))}
         </div>
-      ) : (
+      ) : season && (upcomingMatches.length > 0 || completedMatches.length > 0) ? (
         <>
           <section className="space-y-4">
-            <h2 className="text-lg font-semibold text-slate-900">Próximos partidos</h2>
+            <h2 className="text-lg font-semibold text-slate-900">Jornadas oficiales</h2>
             {upcomingMatches.length === 0 ? (
               <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-10 text-center">
                 <p className="text-sm text-slate-500">
-                  Publica fecha, hora y sede para que padres y scouts se enteren.
+                  MiFicha publicará aquí las jornadas de tu competición.
                 </p>
                 <Link
                   href="/dashboard/partidos/programar"
                   className="mt-3 inline-block text-sm font-semibold text-[#1B4F8C] hover:underline"
                 >
-                  Programar partido →
+                  Más información →
                 </Link>
               </div>
             ) : (
@@ -211,7 +216,7 @@ export function PartidosContent() {
             )}
           </section>
         </>
-      )}
+      ) : null}
     </div>
   );
 }

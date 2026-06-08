@@ -47,4 +47,5 @@ export const PRODUCTION_SQL_SCRIPTS = [
   { id: 12, file: "privacy-rls-hardening.sql", label: "Endurecer privacidad RLS" },
   { id: 13, file: "match-schedule.sql", label: "Calendario público" },
   { id: 14, file: "platform-seasons-rls.sql", label: "Temporadas solo admin" },
+  { id: 15, file: "platform-fixtures-rls.sql", label: "Jornadas solo admin" },
 ] as const;
