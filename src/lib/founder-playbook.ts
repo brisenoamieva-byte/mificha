@@ -48,4 +48,5 @@ export const PRODUCTION_SQL_SCRIPTS = [
   { id: 13, file: "match-schedule.sql", label: "Calendario público" },
   { id: 14, file: "platform-seasons-rls.sql", label: "Temporadas solo admin" },
   { id: 15, file: "platform-fixtures-rls.sql", label: "Jornadas solo admin" },
+  { id: 16, file: "public-ficha-match-history.sql", label: "Historial en ficha pública" },
 ] as const;

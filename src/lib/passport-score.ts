@@ -96,13 +96,22 @@ export function buildMatchUpdateWhatsAppMessage(options: {
       ? `Passport Score: ${options.passportScore} (+${delta})`
       : `Passport Score: ${options.passportScore}`;
 
+  const contribution = options.goals + options.assists;
+  const contributionLine =
+    contribution > 0
+      ? `Este partido: +${contribution} (${options.goals}G · ${options.assists}A)`
+      : null;
+
   return [
     `Actualización de partido · ${options.firstName} ${options.lastName}`,
     `vs ${options.opponent}`,
     `${options.goals}G · ${options.assists}A · ${options.minutes} min`,
+    contributionLine,
     deltaLine,
-    `Ver ficha: ${options.fichaUrl}`,
-  ].join("\n");
+    `Ver progreso completo: ${options.fichaUrl}`,
+  ]
+    .filter(Boolean)
+    .join("\n");
 }
 
 export function clampPassportScore(score: number) {

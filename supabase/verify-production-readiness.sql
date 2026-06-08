@@ -29,7 +29,14 @@ select
     where table_schema = 'public'
       and table_name = 'matches'
       and column_name = 'is_official'
-  ) as platform_fixtures_sql;
+  ) as platform_fixtures_sql,
+  exists (
+    select 1
+    from pg_policies
+    where schemaname = 'public'
+      and tablename = 'matches'
+      and policyname = 'matches_select_public_ficha'
+  ) as public_ficha_match_history_sql;
 
 -- Si alguna columna es false, ejecuta el script correspondiente:
 -- #11 player-guardian-contact.sql
@@ -37,3 +44,4 @@ select
 -- #12 privacy-rls-hardening.sql (recomendado al final)
 -- #14 platform-seasons-rls.sql
 -- #15 platform-fixtures-rls.sql
+-- #16 public-ficha-match-history.sql

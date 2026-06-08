@@ -4,6 +4,11 @@ import {
 } from "@/lib/privacy";
 import { signPlayerPhotoUrl, signPlayerVideoUrl } from "@/lib/supabase-admin";
 import type { Player, PlayerSeasonStat } from "@/types/database";
+import type { MatchPerformanceRow } from "@/lib/performance-analytics";
+import {
+  getPerformanceHighlights,
+  normalizeMatchPerformanceRows,
+} from "@/lib/performance-analytics";
 
 export interface PublicPlayerAcademy {
   name: string;
@@ -23,6 +28,8 @@ export interface PublicPlayerData {
   currentSeasonStats: PlayerSeasonStat | null;
   currentSeasonName: string | null;
   history: PublicPlayerHistoryItem[];
+  seasonProgress: MatchPerformanceRow[];
+  seasonHighlights: ReturnType<typeof getPerformanceHighlights>;
 }
 
 function getSupabaseHeaders() {
@@ -74,6 +81,7 @@ export async function fetchPublicPlayerBySlug(
 
   let currentSeasonStats: PlayerSeasonStat | null = null;
   let currentSeasonName: string | null = null;
+  let activeSeasonId: string | null = null;
 
   if (activeSeasonResponse.ok) {
     const seasons = (await activeSeasonResponse.json()) as Array<{
@@ -83,6 +91,7 @@ export async function fetchPublicPlayerBySlug(
 
     const activeSeason = seasons[0];
     if (activeSeason) {
+      activeSeasonId = activeSeason.id;
       currentSeasonName = activeSeason.name;
 
       const statsResponse = await fetch(
@@ -140,6 +149,27 @@ export async function fetchPublicPlayerBySlug(
     ];
   }
 
+  let seasonProgress: MatchPerformanceRow[] = [];
+
+  if (activeSeasonId) {
+    const progressResponse = await fetch(
+      `${url}/rest/v1/match_stats?player_id=eq.${player.id}&select=goals,assists,minutes_played,yellow_cards,red_cards,matches!inner(id,opponent,match_date,result,goals_for,goals_against,status,season_id)&matches.season_id=eq.${activeSeasonId}&matches.status=eq.completed`,
+      {
+        headers: {
+          apikey: key,
+          Authorization: `Bearer ${key}`,
+        },
+        next: { revalidate: 60 },
+      },
+    );
+
+    if (progressResponse.ok) {
+      seasonProgress = normalizeMatchPerformanceRows(await progressResponse.json());
+    }
+  }
+
+  const seasonHighlights = getPerformanceHighlights(seasonProgress, []);
+
   return {
     player: {
       ...player,
@@ -149,6 +179,8 @@ export async function fetchPublicPlayerBySlug(
     currentSeasonStats,
     currentSeasonName,
     history,
+    seasonProgress,
+    seasonHighlights,
   };
 }
 
