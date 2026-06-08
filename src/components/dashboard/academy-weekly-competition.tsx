@@ -6,44 +6,17 @@ import { useCallback, useEffect, useState } from "react";
 import { TrendBadge } from "@/components/ui/trend-badge";
 import { getPositionLabel } from "@/lib/dashboard-utils";
 import {
-  aggregateAcademyWeeklyRows,
   getPreviousWeekRange,
   getWeekRangeFromReference,
   rankAcademyWeeklyRows,
   type AcademyWeeklyRow,
 } from "@/lib/competition";
+import { fetchAcademyWeekStats } from "@/lib/academy-weekly-stats";
 import { supabase } from "@/lib/supabase";
 import { getPlayerInitials } from "@/lib/player-utils";
 
 interface AcademyWeeklyCompetitionProps {
   academyId: string;
-}
-
-async function fetchAcademyWeekStats(
-  academyId: string,
-  start: string,
-  end: string,
-) {
-  const { data: matches } = await supabase
-    .from("matches")
-    .select("id")
-    .eq("academy_id", academyId)
-    .gte("match_date", start)
-    .lte("match_date", end);
-
-  if (!matches?.length) return [];
-
-  const { data: stats } = await supabase
-    .from("match_stats")
-    .select(
-      "goals, assists, minutes_played, player_id, players(slug, first_name, last_name, position, photo_url)",
-    )
-    .in(
-      "match_id",
-      matches.map((match) => match.id),
-    );
-
-  return aggregateAcademyWeeklyRows(stats ?? []);
 }
 
 export function AcademyWeeklyCompetition({ academyId }: AcademyWeeklyCompetitionProps) {
@@ -57,8 +30,8 @@ export function AcademyWeeklyCompetition({ academyId }: AcademyWeeklyCompetition
     const previousWeek = getPreviousWeekRange();
 
     const [current, previous] = await Promise.all([
-      fetchAcademyWeekStats(academyId, currentWeek.start, currentWeek.end),
-      fetchAcademyWeekStats(academyId, previousWeek.start, previousWeek.end),
+      fetchAcademyWeekStats(supabase, academyId, currentWeek.start, currentWeek.end),
+      fetchAcademyWeekStats(supabase, academyId, previousWeek.start, previousWeek.end),
     ]);
 
     setRows(rankAcademyWeeklyRows(current, previous));

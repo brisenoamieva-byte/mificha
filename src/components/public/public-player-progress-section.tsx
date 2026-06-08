@@ -6,9 +6,11 @@ import {
   MatchTimeline,
   MetricPulseCard,
 } from "@/components/ui/performance-charts";
+import { computeConsecutiveMatchStreak, getStreakLabel } from "@/lib/match-streak";
 import {
   buildTrendSeries,
   getResultTone,
+  getSeasonCaptureProgress,
   type MatchPerformanceRow,
   type PerformanceHighlights,
 } from "@/lib/performance-analytics";
@@ -45,6 +47,9 @@ export function PublicPlayerProgressSection({
   const goalsTrend = buildTrendSeries(progress, "goals");
   const assistsTrend = buildTrendSeries(progress, "assists");
   const contributionTrend = buildTrendSeries(progress, "contributions");
+  const matchStreak = computeConsecutiveMatchStreak(progress.map((row) => row.matchDate));
+  const streakLabel = getStreakLabel(matchStreak);
+  const seasonCapture = getSeasonCaptureProgress(progress.length);
 
   const timelineRows = progress.map((row) => ({
     matchId: row.matchId,
@@ -70,9 +75,30 @@ export function PublicPlayerProgressSection({
             <p className="mt-1 text-sm text-slate-500">{seasonName}</p>
           ) : null}
         </div>
-        <div className="inline-flex items-center gap-2 rounded-full bg-mf-accent-soft px-3 py-1.5 text-sm font-semibold text-mf-accent-dark">
-          <Flame className="h-4 w-4" />
-          +{highlights.recentForm} G+A últimos 3
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="inline-flex items-center gap-2 rounded-full bg-mf-accent-soft px-3 py-1.5 text-sm font-semibold text-mf-accent-dark">
+            <Flame className="h-4 w-4" />
+            +{highlights.recentForm} G+A últimos 3
+          </div>
+          {streakLabel ? (
+            <div className="inline-flex items-center gap-2 rounded-full bg-orange-50 px-3 py-1.5 text-sm font-semibold text-orange-800">
+              <Flame className="h-4 w-4" />
+              Racha: {streakLabel}
+            </div>
+          ) : null}
+        </div>
+      </div>
+
+      <div className="mt-5 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4">
+        <div className="flex items-center justify-between gap-3 text-sm">
+          <span className="font-semibold text-slate-800">Progreso de temporada</span>
+          <span className="text-slate-600">{seasonCapture.label}</span>
+        </div>
+        <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-200">
+          <div
+            className="h-full rounded-full bg-gradient-to-r from-[#1B4F8C] to-emerald-500 transition-all"
+            style={{ width: `${seasonCapture.percent}%` }}
+          />
         </div>
       </div>
 

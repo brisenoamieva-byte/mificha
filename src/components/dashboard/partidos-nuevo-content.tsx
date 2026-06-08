@@ -357,6 +357,16 @@ export function PartidosNuevoContent() {
             emoji: string;
           }>
         >();
+        const weeklyMap = new Map<
+          string,
+          {
+            rank: number;
+            total: number;
+            weekly_score: number;
+            positions_delta: number | null;
+            week_label: string;
+          }
+        >();
 
         try {
           const {
@@ -401,11 +411,21 @@ export function PartidosNuevoContent() {
                     rarity: string;
                     emoji: string;
                   }>;
+                  weekly?: {
+                    rank: number;
+                    total: number;
+                    weekly_score: number;
+                    positions_delta: number | null;
+                    week_label: string;
+                  };
                 }>;
               };
 
               for (const row of payload.players ?? []) {
                 achievementMap.set(row.player_id, row.unlocked);
+                if (row.weekly) {
+                  weeklyMap.set(row.player_id, row.weekly);
+                }
               }
             }
           }
@@ -432,6 +452,7 @@ export function PartidosNuevoContent() {
             is_public: updated?.is_public ?? false,
             public_consent_at: updated?.public_consent_at ?? null,
             unlocked_achievements: achievementMap.get(capture.player_id) ?? [],
+            weekly: weeklyMap.get(capture.player_id) ?? null,
           };
         });
       }

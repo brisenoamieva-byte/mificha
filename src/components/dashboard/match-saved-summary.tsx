@@ -1,10 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { MessageCircle, Sparkles, TrendingUp, Trophy } from "lucide-react";
+import { ArrowUp, MessageCircle, Share2, Sparkles, TrendingUp, Trophy } from "lucide-react";
 import { AchievementBadge } from "@/components/ui/achievement-badge";
-import { buildMatchRewardsWhatsAppMessage } from "@/lib/player-achievements";
-import { buildPlayerShareUrl } from "@/lib/share-ficha";
+import {
+  buildMatchRewardsWhatsAppMessage,
+  buildWeeklyRankShareLine,
+  pickPrimaryAchievementKey,
+} from "@/lib/player-achievements";
+import { buildAchievementShareUrl, buildPlayerShareUrl } from "@/lib/share-ficha";
 import { cn } from "@/lib/utils";
 
 export interface UnlockedAchievementSummary {
@@ -13,6 +17,14 @@ export interface UnlockedAchievementSummary {
   description: string;
   rarity: string;
   emoji: string;
+}
+
+export interface PlayerWeeklyRankSummary {
+  rank: number;
+  total: number;
+  weekly_score: number;
+  positions_delta: number | null;
+  week_label: string;
 }
 
 export interface SavedPlayerSummary {
@@ -28,6 +40,7 @@ export interface SavedPlayerSummary {
   is_public: boolean;
   public_consent_at: string | null;
   unlocked_achievements: UnlockedAchievementSummary[];
+  weekly?: PlayerWeeklyRankSummary | null;
 }
 
 interface MatchSavedSummaryProps {
@@ -85,6 +98,21 @@ export function MatchSavedSummary({
           players.map((player) => {
             const delta = player.passport_score - player.previous_passport_score;
             const fichaUrl = buildPlayerShareUrl(player.slug);
+            const achievementKeys = player.unlocked_achievements.map((item) => item.key);
+            const primaryAchievementKey =
+              achievementKeys.length > 0
+                ? pickPrimaryAchievementKey(achievementKeys)
+                : null;
+            const achievementShareUrl = primaryAchievementKey
+              ? buildAchievementShareUrl(player.slug, primaryAchievementKey)
+              : null;
+            const weeklyRankLine = player.weekly
+              ? buildWeeklyRankShareLine({
+                  rank: player.weekly.rank,
+                  total: player.weekly.total,
+                  positionsDelta: player.weekly.positions_delta,
+                })
+              : null;
             const message = buildMatchRewardsWhatsAppMessage({
               firstName: player.first_name,
               lastName: player.last_name,
@@ -95,7 +123,9 @@ export function MatchSavedSummary({
               passportScore: player.passport_score,
               previousPassportScore: player.previous_passport_score,
               fichaUrl,
-              achievementKeys: player.unlocked_achievements.map((item) => item.key),
+              achievementKeys,
+              achievementShareUrl,
+              weeklyRankLine,
             });
             const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
 
@@ -124,6 +154,21 @@ export function MatchSavedSummary({
                       ) : null}
                     </div>
                   </div>
+                  {player.weekly ? (
+                    <div className="mt-3 flex flex-wrap items-center gap-2">
+                      <span className="inline-flex items-center rounded-full bg-[#1B4F8C]/10 px-3 py-1 text-xs font-semibold text-[#1B4F8C]">
+                        #{player.weekly.rank} plantel · semana {player.weekly.week_label}
+                      </span>
+                      {player.weekly.positions_delta !== null &&
+                      player.weekly.positions_delta > 0 ? (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
+                          <ArrowUp className="h-3.5 w-3.5" />
+                          Subió {player.weekly.positions_delta} puesto
+                          {player.weekly.positions_delta === 1 ? "" : "s"}
+                        </span>
+                      ) : null}
+                    </div>
+                  ) : null}
                 </div>
 
                 {player.unlocked_achievements.length > 0 ? (
@@ -170,6 +215,16 @@ export function MatchSavedSummary({
                   >
                     Ver ficha
                   </Link>
+                  {achievementShareUrl ? (
+                    <Link
+                      href={achievementShareUrl}
+                      target="_blank"
+                      className="inline-flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-2.5 text-sm font-semibold text-amber-900 hover:bg-amber-100"
+                    >
+                      <Share2 className="h-4 w-4" />
+                      Tarjeta del logro
+                    </Link>
+                  ) : null}
                   {!player.is_public || !player.public_consent_at ? (
                     <p className="w-full text-xs text-amber-700">
                       Activa consentimiento y ficha pública en Plantel para que el link funcione.

@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { fetchAcademyWeeklyRankSnapshots } from "@/lib/academy-weekly-stats";
+import { computeConsecutiveMatchStreak } from "@/lib/match-streak";
 import {
   evaluateNewAchievementKeys,
   getAchievementDefinition,
@@ -28,21 +30,9 @@ async function computeConsecutiveStreak(
 
   const dates = (rows ?? [])
     .map((row) => row.matches?.match_date)
-    .filter((date): date is string => Boolean(date))
-    .sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
+    .filter((date): date is string => Boolean(date));
 
-  if (dates.length === 0) return 0;
-
-  let streak = 1;
-  for (let index = 0; index < dates.length - 1; index += 1) {
-    const current = new Date(dates[index]);
-    const older = new Date(dates[index + 1]);
-    const diffDays = (current.getTime() - older.getTime()) / 86_400_000;
-    if (diffDays <= 21) streak += 1;
-    else break;
-  }
-
-  return streak;
+  return computeConsecutiveMatchStreak(dates);
 }
 
 export async function POST(request: Request) {
@@ -127,6 +117,13 @@ export async function POST(request: Request) {
       rarity: string;
       emoji: string;
     }>;
+    weekly?: {
+      rank: number;
+      total: number;
+      weekly_score: number;
+      positions_delta: number | null;
+      week_label: string;
+    };
   }> = [];
 
   for (const capture of captures) {
@@ -181,6 +178,19 @@ export async function POST(request: Request) {
           emoji: item.emoji,
         })),
     });
+  }
+
+  const weeklySnapshots = await fetchAcademyWeeklyRankSnapshots(
+    supabase,
+    match.academy_id,
+    playerIds,
+  );
+
+  for (const result of results) {
+    const weekly = weeklySnapshots.get(result.player_id);
+    if (weekly) {
+      result.weekly = weekly;
+    }
   }
 
   return NextResponse.json({ players: results });

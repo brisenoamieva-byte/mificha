@@ -200,3 +200,18 @@ export function getResultTone(result: MatchResult | null) {
   if (result === "loss") return "loss" as const;
   return "neutral" as const;
 }
+
+export function getSeasonCaptureProgress(matchesCaptured: number, targetMatches = 12) {
+  const target = Math.max(targetMatches, matchesCaptured, 1);
+  const percent = Math.min(100, Math.round((matchesCaptured / target) * 100));
+
+  return {
+    captured: matchesCaptured,
+    target,
+    percent,
+    label:
+      matchesCaptured >= target
+        ? `${matchesCaptured} partidos registrados`
+        : `${matchesCaptured} de ${target} jornadas capturadas`,
+  };
+}

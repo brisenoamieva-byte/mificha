@@ -185,6 +185,36 @@ export function resolveTeamMvpPlayerIds(
   return new Set(ids);
 }
 
+export function pickPrimaryAchievementKey(keys: string[]) {
+  const rarityOrder = { epic: 0, rare: 1, common: 2 } as const;
+
+  return [...keys].sort((a, b) => {
+    const defA = ACHIEVEMENT_DEFINITIONS[a];
+    const defB = ACHIEVEMENT_DEFINITIONS[b];
+    const rankA = defA ? rarityOrder[defA.rarity] : 99;
+    const rankB = defB ? rarityOrder[defB.rarity] : 99;
+    return rankA - rankB;
+  })[0];
+}
+
+export function buildWeeklyRankShareLine(options: {
+  rank: number;
+  total: number;
+  positionsDelta: number | null;
+}) {
+  const base = `#${options.rank} en plantel esta semana (${options.total} jugadores)`;
+
+  if (options.positionsDelta === null || options.positionsDelta === 0) {
+    return base;
+  }
+
+  if (options.positionsDelta > 0) {
+    return `${base} · Subió ${options.positionsDelta} puesto${options.positionsDelta === 1 ? "" : "s"}`;
+  }
+
+  return `${base} · Bajó ${Math.abs(options.positionsDelta)} puesto${Math.abs(options.positionsDelta) === 1 ? "" : "s"}`;
+}
+
 export function buildAchievementShareLine(keys: string[]) {
   if (keys.length === 0) return null;
 
@@ -208,6 +238,8 @@ export function buildMatchRewardsWhatsAppMessage(options: {
   previousPassportScore?: number;
   fichaUrl: string;
   achievementKeys?: string[];
+  achievementShareUrl?: string | null;
+  weeklyRankLine?: string | null;
 }) {
   const delta =
     options.previousPassportScore !== undefined
@@ -227,7 +259,11 @@ export function buildMatchRewardsWhatsAppMessage(options: {
     `Actualización de partido · ${options.firstName} ${options.lastName}`,
     `vs ${options.opponent}`,
     `${options.goals}G · ${options.assists}A · ${options.minutes} min`,
+    options.weeklyRankLine,
     achievementLine,
+    options.achievementShareUrl
+      ? `Tarjeta del logro: ${options.achievementShareUrl}`
+      : null,
     deltaLine,
     `Ver progreso completo: ${options.fichaUrl}`,
   ]

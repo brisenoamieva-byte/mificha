@@ -212,7 +212,7 @@ export function PublicPlayerCard({ data }: PublicPlayerCardProps) {
           highlights={seasonHighlights}
         />
 
-        <PlayerAchievementsShelf achievements={achievements} />
+        <PlayerAchievementsShelf slug={player.slug} achievements={achievements} />
 
         {history.length > 0 ? (
           <section className="border-t border-slate-100 px-6 py-8 sm:px-10">

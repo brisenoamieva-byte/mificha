@@ -1,7 +1,7 @@
 export const FOUNDER_WEEK_PLAN = [
   {
     day: "Lunes",
-    task: "Confirmar SQL #11–#18 en Supabase · revisar /interno/lanzamiento y ensayar demo 15 min.",
+    task: "Ejecutar production-rollout.sql en Supabase · verify-production-readiness = true.",
   },
   {
     day: "Martes",
@@ -62,7 +62,7 @@ export const FOUNDER_CONVERSION_CRITERIA = [
 ] as const;
 
 export const FOUNDER_DEMO_PRECHECK = [
-  "SQL #11–#18 aplicado (verify-production-readiness = true)",
+  "SQL #11–#19 aplicado (supabase/production-rollout.sql + verify-production-readiness)",
   "Temporada MiFicha creada y asignada a la academia demo",
   "Al menos 1 jornada publicada en /interno/jornadas",
   "Jugador demo con foto + consentimiento listo para activar",
@@ -113,16 +113,16 @@ export const FOUNDER_LIVE_DEMO_SCRIPT: FounderDemoStep[] = [
     minute: "9–12",
     title: "Captura post-partido",
     action:
-      "/dashboard/partidos/nuevo → elige jornada → modo convocados → 2 min → Guardar. Señala Passport subiendo.",
-    wow: "El número verde en pantalla — «esto es lo que el padre va a ver»",
+      "/dashboard/partidos/nuevo → elige jornada → modo convocados → 2 min → Guardar. Señala Passport subiendo, insignias y ranking semanal del plantel.",
+    wow: "Recompensas desbloqueadas + «Subió X puestos» — el padre siente progreso inmediato",
     href: "/dashboard/partidos/nuevo",
   },
   {
     minute: "12–14",
     title: "WhatsApp al padre",
     action:
-      "Pantalla «Partido guardado» → WhatsApp → pega en TU celular primero. Abre el link: ficha + historial + tarjeta preview en WhatsApp.",
-    wow: "Preview OG con Passport — efecto wow garantizado",
+      "Pantalla «Partido guardado» → WhatsApp → pega en TU celular. Si hay insignia: abre /j/slug/logro/hat_trick y muestra preview OG del logro.",
+    wow: "Doble preview: ficha completa + tarjeta del logro épico en WhatsApp",
   },
   {
     minute: "14–15",
@@ -140,6 +140,10 @@ export const FOUNDER_DEMO_WOW_MOMENTS = [
   {
     title: "Preview en WhatsApp",
     detail: "El link /j/slug muestra tarjeta con nombre, stats y Passport antes de abrir.",
+  },
+  {
+    title: "Tarjeta del logro",
+    detail: "/j/slug/logro/hat_trick genera preview épico de la insignia — ideal para presumir en grupos de padres.",
   },
   {
     title: "Cero app para padres",
@@ -164,3 +168,5 @@ export const PRODUCTION_SQL_SCRIPTS = [
 ] as const;
 
 export const PRODUCTION_SQL_ORDER = [11, 13, 14, 15, 16, 17, 18, 19, 12] as const;
+
+export const PRODUCTION_ROLLOUT_FILE = "production-rollout.sql" as const;
