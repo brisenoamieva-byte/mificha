@@ -463,6 +463,45 @@ export type Database = {
           },
         ];
       };
+      player_profile_views: {
+        Row: {
+          id: string;
+          player_id: string;
+          academy_id: string;
+          visitor_key: string;
+          viewed_at: string;
+        };
+        Insert: {
+          id?: string;
+          player_id: string;
+          academy_id: string;
+          visitor_key: string;
+          viewed_at?: string;
+        };
+        Update: {
+          id?: string;
+          player_id?: string;
+          academy_id?: string;
+          visitor_key?: string;
+          viewed_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "player_profile_views_player_id_fkey";
+            columns: ["player_id"];
+            isOneToOne: false;
+            referencedRelation: "players";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "player_profile_views_academy_id_fkey";
+            columns: ["academy_id"];
+            isOneToOne: false;
+            referencedRelation: "academies";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       email_logs: {
         Row: {
           id: string;
@@ -513,7 +552,10 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
-      [_ in never]: never;
+      get_academy_profile_view_stats: {
+        Args: { p_academy_id: string };
+        Returns: Json;
+      };
     };
     Enums: {
       user_role: "academy_admin" | "scout" | "admin";

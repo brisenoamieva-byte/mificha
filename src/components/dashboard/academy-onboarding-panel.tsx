@@ -11,12 +11,17 @@ import {
   getOnboardingSummary,
   type OnboardingProgress,
 } from "@/lib/academy-readiness";
+import {
+  EMPTY_PROFILE_VIEW_STATS,
+  parseProfileViewStats,
+} from "@/lib/profile-view-tracking";
 import { supabase } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
 
 export function AcademyOnboardingPanel() {
   const { academy } = useDashboard();
   const [progress, setProgress] = useState<OnboardingProgress | null>(null);
+  const [viewStats, setViewStats] = useState(EMPTY_PROFILE_VIEW_STATS);
   const [loading, setLoading] = useState(true);
 
   const loadProgress = useCallback(async () => {
@@ -24,7 +29,8 @@ export function AcademyOnboardingPanel() {
 
     setLoading(true);
 
-    const [playersResult, scheduledResult, completedResult] = await Promise.all([
+    const [playersResult, scheduledResult, completedResult, viewStatsResult] =
+      await Promise.all([
       supabase
         .from("players")
         .select("is_public, public_consent_at, is_discoverable, guardian_email")
@@ -39,7 +45,15 @@ export function AcademyOnboardingPanel() {
         .select("*", { count: "exact", head: true })
         .eq("academy_id", academy.id)
         .eq("status", "completed"),
+      supabase.rpc("get_academy_profile_view_stats", {
+        p_academy_id: academy.id,
+      }),
     ]);
+
+    const parsedViewStats = viewStatsResult.error
+      ? EMPTY_PROFILE_VIEW_STATS
+      : parseProfileViewStats(viewStatsResult.data);
+    setViewStats(parsedViewStats);
 
     setProgress(
       computeOnboardingProgress(
@@ -47,6 +61,7 @@ export function AcademyOnboardingPanel() {
         playersResult.data ?? [],
         scheduledResult.count ?? 0,
         completedResult.count ?? 0,
+        parsedViewStats.unique_visitors,
       ),
     );
     setLoading(false);
@@ -68,7 +83,9 @@ export function AcademyOnboardingPanel() {
   }
 
   if (summary.allEssentialDone) {
-    return <AcademyLaunchCompletePanel academySlug={academy.slug} />;
+    return (
+      <AcademyLaunchCompletePanel academySlug={academy.slug} viewStats={viewStats} />
+    );
   }
 
   return (

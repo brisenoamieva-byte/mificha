@@ -19,6 +19,7 @@ import { calculateAge, getPositionLabel } from "@/lib/dashboard-utils";
 import { PlayerCategoryBadge } from "@/components/ui/player-category-badge";
 import type { PublicPlayerData } from "@/lib/public-player";
 import { PublicPlayerProgressSection } from "@/components/public/public-player-progress-section";
+import { ProfileViewTracker } from "@/components/public/profile-view-tracker";
 import { PassportScoreDisplay } from "@/components/ui/passport-score-display";
 import {
   buildPublicPlayerUrl,
@@ -81,6 +82,7 @@ export function PublicPlayerCard({ data }: PublicPlayerCardProps) {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#1B4F8C] to-[#0F2D52] px-4 py-8 sm:px-6">
+      <ProfileViewTracker slug={player.slug} />
       <div className="mx-auto w-full max-w-[800px] overflow-hidden rounded-2xl bg-white shadow-xl">
         <div className="flex justify-center border-b border-slate-100 px-6 py-4 sm:px-10">
           <BrandLogoLink size="sm" />

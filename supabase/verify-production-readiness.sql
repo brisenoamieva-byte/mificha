@@ -49,7 +49,13 @@ select
     where table_schema = 'public'
       and table_name = 'seasons'
       and column_name = 'platform_season_id'
-  ) as seasons_platform_link_sql;
+  ) as seasons_platform_link_sql,
+  exists (
+    select 1
+    from information_schema.tables
+    where table_schema = 'public'
+      and table_name = 'player_profile_views'
+  ) as player_profile_views_sql;
 
 -- Si alguna columna es false, ejecuta el script correspondiente:
 -- #11 player-guardian-contact.sql
@@ -59,3 +65,4 @@ select
 -- #15 platform-fixtures-rls.sql
 -- #16 public-ficha-match-history.sql
 -- #17 platform-seasons-shared.sql
+-- #18 player-profile-views.sql

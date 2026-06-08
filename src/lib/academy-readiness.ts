@@ -1,4 +1,5 @@
 import { hasPublicConsent } from "@/lib/privacy";
+import { PARENT_ENGAGEMENT_GOAL } from "@/lib/profile-view-tracking";
 import type { Academy } from "@/types/database";
 
 export interface OnboardingProgress {
@@ -9,6 +10,8 @@ export interface OnboardingProgress {
   hasGuardianEmails: boolean;
   hasShareableFicha: boolean;
   hasDiscoverablePlayer: boolean;
+  parentUniqueViews: number;
+  hasParentEngagement: boolean;
 }
 
 export interface OnboardingStep {
@@ -60,6 +63,15 @@ export function buildOnboardingSteps(progress: OnboardingProgress): OnboardingSt
       cta: "Activar ficha",
     },
     {
+      id: "parents",
+      done: progress.hasParentEngagement,
+      optional: true,
+      title: "Padres abrieron la ficha",
+      description: `Meta del piloto: ${PARENT_ENGAGEMENT_GOAL}+ visitas únicas (${progress.parentUniqueViews} hasta ahora).`,
+      href: "/dashboard/plantel",
+      cta: "Compartir fichas",
+    },
+    {
       id: "profile",
       done: progress.profileReady,
       optional: true,
@@ -72,10 +84,10 @@ export function buildOnboardingSteps(progress: OnboardingProgress): OnboardingSt
       id: "calendar",
       done: progress.hasScheduledMatch,
       optional: true,
-      title: "Calendario público",
-      description: "Fecha, hora y sede visibles para padres (opcional).",
-      href: "/dashboard/partidos/programar",
-      cta: "Programar partido",
+      title: "Calendario publicado",
+      description: "MiFicha publica jornadas oficiales; confirma en Partidos.",
+      href: "/dashboard/partidos",
+      cta: "Ver partidos",
     },
     {
       id: "guardians",
@@ -132,6 +144,7 @@ export function computeOnboardingProgress(
   players: PlayerOnboardingRow[],
   scheduledMatchCount: number,
   completedMatchCount: number,
+  parentUniqueViews = 0,
 ): OnboardingProgress {
   return {
     profileReady: isAcademyProfileReady(academy),
@@ -143,5 +156,7 @@ export function computeOnboardingProgress(
     hasDiscoverablePlayer: players.some(
       (player) => player.is_discoverable && hasPublicConsent(player),
     ),
+    parentUniqueViews,
+    hasParentEngagement: parentUniqueViews >= PARENT_ENGAGEMENT_GOAL,
   };
 }
