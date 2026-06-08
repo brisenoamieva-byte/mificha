@@ -1,6 +1,7 @@
 "use client";
 
-import { AlertTriangle, Mail, Send } from "lucide-react";
+import Link from "next/link";
+import { AlertTriangle, Mail, MessageCircle, Send } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDashboard } from "@/components/dashboard/dashboard-context";
 import { ComparativeReportPanel } from "@/components/dashboard/comparative-report-panel";
@@ -27,6 +28,8 @@ export function ReportesContent() {
   const [seasonStats, setSeasonStats] = useState<PlayerSeasonStat[]>([]);
   const [logs, setLogs] = useState<EmailLogRow[]>([]);
   const [selectedPlayerId, setSelectedPlayerId] = useState<string>("");
+  const [emailReady, setEmailReady] = useState<boolean | null>(null);
+  const [emailHint, setEmailHint] = useState<string | null>(null);
 
   const loadData = useCallback(async () => {
     if (!academy) return;
@@ -84,6 +87,30 @@ export function ReportesContent() {
   useEffect(() => {
     loadData();
   }, [loadData]);
+
+  useEffect(() => {
+    async function loadEmailStatus() {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!session) return;
+
+      const response = await fetch("/api/platform/email-status", {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
+
+      if (!response.ok) return;
+
+      const data = (await response.json()) as { ready?: boolean; hint?: string | null };
+      setEmailReady(data.ready ?? false);
+      setEmailHint(data.hint ?? null);
+    }
+
+    void loadEmailStatus();
+  }, []);
 
   useEffect(() => {
     async function loadSeasonStats() {
@@ -237,6 +264,26 @@ export function ReportesContent() {
           <p>Máximo 1 reporte por jugador por semana.</p>
         </div>
       </div>
+
+      {emailReady === false && emailHint ? (
+        <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div className="flex items-start gap-3">
+              <MessageCircle className="mt-0.5 h-4 w-4 shrink-0 text-green-700" />
+              <div>
+                <p className="font-medium text-slate-900">Reportes por email en configuración</p>
+                <p className="mt-1 leading-6">{emailHint}</p>
+              </div>
+            </div>
+            <Link
+              href="/dashboard/plantel"
+              className="inline-flex shrink-0 items-center justify-center rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700"
+            >
+              Ir a Plantel
+            </Link>
+          </div>
+        </div>
+      ) : null}
 
       <ComparativeReportPanel
         players={players}

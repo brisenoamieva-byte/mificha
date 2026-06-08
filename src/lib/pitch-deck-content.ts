@@ -34,7 +34,7 @@ export const PITCH_SLIDES: PitchSlide[] = [
     kicker: "La solución",
     title: "Una ficha verificada por jugador",
     subtitle:
-      "MiFicha complementa tu liga oficial. Tú capturas stats post-partido en 60 segundos; el padre recibe la ficha al instante.",
+      "MiFicha complementa tu liga oficial. Tú capturas stats post-partido en 60 segundos; el padre consulta la ficha al instante.",
     stats: [
       { value: "60 s", label: "Captura post-partido" },
       { value: "0", label: "App para padres" },
@@ -69,9 +69,9 @@ export const PITCH_SLIDES: PitchSlide[] = [
     title: "Cero fricción = más engagement",
     bullets: [
       "Consulta calendario con hora y sede en la landing de la academia.",
-      "Escanean QR en la cancha — sin descargar app ni crear cuenta.",
-      "Ven Passport Score, stats de temporada e historial verificado.",
-      "Comparten la ficha en WhatsApp con familia o visorías.",
+      "Abre el QR o link que comparte la academia — sin app ni cuenta.",
+      "Ve Passport Score, stats de temporada e historial verificado.",
+      "Puede reenviar la ficha por WhatsApp a familia o visorías.",
       "Consentimiento parental y privacidad LFPDPPP integrados.",
     ],
   },
@@ -94,7 +94,7 @@ export const PITCH_SLIDES: PitchSlide[] = [
     stats: [
       { value: "+6", label: "Tras un buen partido" },
       { value: "↑↓", label: "Tendencia semanal" },
-      { value: "QR", label: "Compartir al padre" },
+      { value: "QR", label: "Link al padre" },
     ],
   },
   {

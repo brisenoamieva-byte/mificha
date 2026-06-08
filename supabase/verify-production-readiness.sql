@@ -1,0 +1,30 @@
+-- MiFicha — Verificar readiness de producción (solo lectura)
+-- Ejecutar en Supabase → SQL Editor antes de la primera demo con academia real.
+
+select
+  exists (
+    select 1
+    from information_schema.columns
+    where table_schema = 'public'
+      and table_name = 'matches'
+      and column_name = 'status'
+  ) as match_schedule_sql,
+  exists (
+    select 1
+    from information_schema.columns
+    where table_schema = 'public'
+      and table_name = 'matches'
+      and column_name = 'kickoff_at'
+  ) as match_kickoff_sql,
+  exists (
+    select 1
+    from information_schema.columns
+    where table_schema = 'public'
+      and table_name = 'players'
+      and column_name = 'guardian_email'
+  ) as guardian_contact_sql;
+
+-- Si alguna columna es false, ejecuta el script correspondiente:
+-- #11 player-guardian-contact.sql
+-- #13 match-schedule.sql
+-- #12 privacy-rls-hardening.sql (recomendado al final)

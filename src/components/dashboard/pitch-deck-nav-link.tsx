@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Presentation } from "lucide-react";
+import { Presentation, Rocket } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
 export function PitchDeckNavLink({ onClose }: { onClose?: () => void }) {
@@ -38,15 +38,27 @@ export function PitchDeckNavLink({ onClose }: { onClose?: () => void }) {
   if (!allowed) return null;
 
   return (
-    <Link
-      href="/interno/pitch"
-      target="_blank"
-      rel="noopener noreferrer"
-      onClick={onClose}
-      className="mf-nav-link border-t border-mf-border mt-2 pt-3"
-    >
-      <Presentation className="h-[18px] w-[18px] shrink-0" />
-      Pitch deck
-    </Link>
+    <div className="mt-2 space-y-1 border-t border-mf-border pt-3">
+      <Link
+        href="/interno/pitch"
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={onClose}
+        className="mf-nav-link"
+      >
+        <Presentation className="h-[18px] w-[18px] shrink-0" />
+        Pitch deck
+      </Link>
+      <Link
+        href="/interno/lanzamiento"
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={onClose}
+        className="mf-nav-link"
+      >
+        <Rocket className="h-[18px] w-[18px] shrink-0" />
+        Playbook lanzamiento
+      </Link>
+    </div>
   );
 }
