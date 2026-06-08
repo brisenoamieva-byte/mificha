@@ -3,7 +3,6 @@ import { ArrowRight } from "lucide-react";
 import { MarketingCardPhoto } from "@/components/marketing/marketing-hero-visual";
 import { COMPLEMENT_ROWS, HOME_FEATURES } from "@/lib/marketing-nav";
 import { MARKETING_MEDIA } from "@/lib/marketing-assets";
-import { cn } from "@/lib/utils";
 
 export function FeatureHubSection() {
   return (
@@ -27,27 +26,14 @@ export function FeatureHubSection() {
                 key={feature.title}
                 className="group flex flex-col overflow-hidden rounded-xl border border-mf-border bg-mf-surface transition hover:border-mf-brand/25 hover:shadow-[var(--mf-shadow)]"
               >
-                {"imageKey" in feature && feature.imageKey ? (
-                  <MarketingCardPhoto
-                    meta={MARKETING_MEDIA[feature.imageKey]}
-                    className="h-36 sm:h-40"
-                  />
-                ) : (
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-mf-brand-soft text-mf-brand m-6 mb-0">
+                <MarketingCardPhoto
+                  meta={MARKETING_MEDIA[feature.imageKey]}
+                  className="h-36 sm:h-40"
+                />
+                <div className="flex flex-1 flex-col px-6 pb-6 pt-6">
+                  <div className="mb-4 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-mf-brand-soft text-mf-brand">
                     <feature.icon className="h-5 w-5" strokeWidth={1.75} />
                   </div>
-                )}
-                <div
-                  className={cn(
-                    "flex flex-1 flex-col px-6 pb-6",
-                    "imageKey" in feature && feature.imageKey ? "pt-6" : "pt-4",
-                  )}
-                >
-                  {"imageKey" in feature && feature.imageKey ? (
-                    <div className="mb-4 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-mf-brand-soft text-mf-brand">
-                      <feature.icon className="h-5 w-5" strokeWidth={1.75} />
-                    </div>
-                  ) : null}
                   <h3 className="text-base font-semibold tracking-[-0.01em] text-mf-text">
                     {feature.title}
                   </h3>

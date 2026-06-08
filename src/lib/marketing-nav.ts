@@ -123,6 +123,7 @@ export const HOME_FEATURES = [
     mificha:
       "Reporte jugador vs promedio del plantel — ideal para padres y visorías.",
     href: "/#funciones",
+    imageKey: "featureComparativa" satisfies MarketingImageKey,
   },
   {
     icon: FileSpreadsheet,
@@ -149,6 +150,7 @@ export const HOME_FEATURES = [
     mificha:
       "Consentimiento parental, fichas privadas y aviso de privacidad LFPDPPP.",
     href: "/aviso-privacidad",
+    imageKey: "featureMenores" satisfies MarketingImageKey,
   },
 ] as const;
 

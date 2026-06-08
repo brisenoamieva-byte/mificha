@@ -20,6 +20,8 @@ export const MARKETING_IMAGES = {
   featureQr: "/marketing/feature-qr.png",
   featurePassport: "/marketing/feature-passport.png",
   featureCalendario: "/marketing/feature-calendario.png",
+  featureComparativa: "/marketing/feature-comparativa.png",
+  featureMenores: "/marketing/feature-menores.png",
   ctaBand: "/marketing/cta-band.png",
   ogDefault: "/marketing/og-default.png",
 } as const;
@@ -83,6 +85,18 @@ export const MARKETING_MEDIA: Record<MarketingImageKey, MarketingImageMeta> = {
     src: MARKETING_IMAGES.featureCalendario,
     alt: "Día de partido en campus escolar",
     objectPosition: "50% 45%",
+  },
+  featureComparativa: {
+    src: MARKETING_IMAGES.featureComparativa,
+    alt: "Coordinador y padre revisando reporte comparativo en tablet",
+    objectPosition: "52% 42%",
+    objectPositionMobile: "48% 40%",
+  },
+  featureMenores: {
+    src: MARKETING_IMAGES.featureMenores,
+    alt: "Padres firmando consentimiento en oficina deportiva del colegio",
+    objectPosition: "48% 45%",
+    objectPositionMobile: "45% 42%",
   },
   ctaBand: {
     src: MARKETING_IMAGES.ctaBand,
