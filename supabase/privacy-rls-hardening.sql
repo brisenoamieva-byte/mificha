@@ -86,6 +86,8 @@ using (
 );
 
 -- Match stats: ficha individual /j/slug — consentimiento sin discoverable
+drop policy if exists "match_stats_select_public_ficha" on public.match_stats;
+
 create policy "match_stats_select_public_ficha"
 on public.match_stats
 for select
