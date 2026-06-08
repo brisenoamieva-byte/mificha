@@ -120,10 +120,10 @@ export const FOUNDER_LIVE_DEMO_SCRIPT: FounderDemoStep[] = [
   },
   {
     minute: "12–14",
-    title: "WhatsApp al padre",
+    title: "Aviso automático al padre",
     action:
-      "Pantalla «Partido guardado» → WhatsApp → pega en TU celular. Si hay insignia: abre /j/slug/logro/hat_trick y muestra preview OG del logro.",
-    wow: "Doble preview: ficha completa + tarjeta del logro épico en WhatsApp",
+      "Tras guardar, MiFicha envía email/WhatsApp al tutor registrado en Plantel. Muestra contador «X tutores avisados» — sin pegar mensajes a mano.",
+    wow: "El director no hace soporte: el padre recibe link + Passport sin intervención",
   },
   {
     minute: "14–15",
@@ -164,13 +164,14 @@ export const PRODUCTION_SQL_SCRIPTS = [
   { id: 15, file: "platform-fixtures-rls.sql", label: "Jornadas solo admin" },
   { id: 20, file: "official-match-scoring-rls.sql", label: "Marcador solo organizador" },
   { id: 21, file: "official-match-stats-rls.sql", label: "Acta oficial · stats individuales" },
+  { id: 22, file: "guardian-notifications.sql", label: "Avisos automáticos a tutores" },
   { id: 16, file: "public-ficha-match-history.sql", label: "Historial en ficha pública" },
   { id: 17, file: "platform-seasons-shared.sql", label: "Temporada compartida MiFicha" },
   { id: 18, file: "player-profile-views.sql", label: "Aperturas de ficha pública" },
   { id: 19, file: "player-achievements.sql", label: "Insignias y logros verificados" },
 ] as const;
 
-export const PRODUCTION_SQL_ORDER = [11, 13, 14, 15, 20, 21, 16, 17, 18, 19, 12] as const;
+export const PRODUCTION_SQL_ORDER = [11, 13, 14, 15, 20, 21, 22, 16, 17, 18, 19, 12] as const;
 
 export const MIFICHA_GOVERNANCE_PATH = "/interno/gobernanza" as const;
 

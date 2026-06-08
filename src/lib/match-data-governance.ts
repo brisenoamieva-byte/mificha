@@ -82,10 +82,10 @@ export const MIFICHA_DATA_GOVERNANCE = {
       why: "Automático a partir de datos con origen claro — credibilidad ante padres y scouts.",
     },
     {
-      id: "share",
-      label: "Compartir ficha por WhatsApp",
+      id: "parent_notify",
+      label: "Recibir aviso automático post-partido (email o WhatsApp)",
       owner: "parent",
-      why: "Cero fricción; el valor lo genera la captura previa de academia + acta oficial.",
+      why: "Con consentimiento + contacto en Plantel; MiFicha envía solo, sin botón manual.",
     },
   ] satisfies GovernanceResponsibility[],
   workflow: [
@@ -102,8 +102,8 @@ export const MIFICHA_DATA_GOVERNANCE = {
         "2. Publicar acta (G / A / tarjetas por jugador)",
       ],
       academy: [
-        "3. Capturar convocados + minutos (solo cuando hay marcador)",
-        "4. Compartir ficha con padres",
+        "3. Capturar convocados + minutos (solo cuando hay marcador y acta)",
+        "4. MiFicha avisa tutores automáticamente — sin WhatsApp manual",
       ],
       mificha: [
         "Passport e insignias se actualizan al completar acta + minutos",

@@ -144,6 +144,8 @@ export type Database = {
           public_consent_at: string | null;
           guardian_name: string | null;
           guardian_email: string | null;
+          guardian_phone: string | null;
+          notify_guardian_on_match: boolean;
           created_at: string;
         };
         Insert: {
@@ -167,6 +169,8 @@ export type Database = {
           public_consent_at?: string | null;
           guardian_name?: string | null;
           guardian_email?: string | null;
+          guardian_phone?: string | null;
+          notify_guardian_on_match?: boolean;
           created_at?: string;
         };
         Update: {
@@ -190,6 +194,8 @@ export type Database = {
           public_consent_at?: string | null;
           guardian_name?: string | null;
           guardian_email?: string | null;
+          guardian_phone?: string | null;
+          notify_guardian_on_match?: boolean;
           created_at?: string;
         };
         Relationships: [

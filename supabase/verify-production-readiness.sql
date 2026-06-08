@@ -75,7 +75,14 @@ select
     where table_schema = 'public'
       and table_name = 'matches'
       and column_name = 'acta_published_at'
-  ) as official_match_acta_sql;
+  ) as official_match_acta_sql,
+  exists (
+    select 1
+    from information_schema.columns
+    where table_schema = 'public'
+      and table_name = 'players'
+      and column_name = 'guardian_phone'
+  ) as guardian_notifications_sql;
 
 -- Si alguna columna es false, ejecuta el script correspondiente:
 -- #11 player-guardian-contact.sql

@@ -101,6 +101,11 @@ export function PartidosNuevoContent() {
   const [players, setPlayers] = useState<Player[]>([]);
   const [captures, setCaptures] = useState<PlayerCapture[]>([]);
   const [savedSummaries, setSavedSummaries] = useState<SavedPlayerSummary[]>([]);
+  const [notificationSummary, setNotificationSummary] = useState<{
+    sent: number;
+    failed: number;
+    skipped: number;
+  } | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -529,6 +534,71 @@ export function PartidosNuevoContent() {
         });
       }
 
+      let notificationByPlayer = new Map<
+        string,
+        SavedPlayerSummary["notification"]
+      >();
+
+      if (summaries.length > 0 && academy) {
+        try {
+          const {
+            data: { session },
+          } = await supabase.auth.getSession();
+
+          if (session) {
+            const notificationResponse = await fetch("/api/notifications/match-update", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${session.access_token}`,
+              },
+              body: JSON.stringify({
+                match_id: match.id,
+                academy_id: academy.id,
+                opponent,
+                player_ids: summaries.map((row) => row.player_id),
+                previous_passport_by_player: Object.fromEntries(
+                  summaries.map((row) => [row.player_id, row.previous_passport_score]),
+                ),
+                achievement_keys_by_player: Object.fromEntries(
+                  summaries.map((row) => [
+                    row.player_id,
+                    row.unlocked_achievements.map((item) => item.key),
+                  ]),
+                ),
+                weekly_by_player: Object.fromEntries(
+                  summaries
+                    .filter((row) => row.weekly)
+                    .map((row) => [row.player_id, row.weekly!]),
+                ),
+              }),
+            });
+
+            if (notificationResponse.ok) {
+              const payload = (await notificationResponse.json()) as {
+                summary?: { sent: number; failed: number; skipped: number };
+                results?: Array<NonNullable<SavedPlayerSummary["notification"]>>;
+              };
+
+              if (payload.summary) {
+                setNotificationSummary(payload.summary);
+              }
+
+              for (const row of payload.results ?? []) {
+                notificationByPlayer.set(row.player_id, row);
+              }
+            }
+          }
+        } catch {
+          // Notificaciones opcionales hasta SQL #22 / Resend / WhatsApp API.
+        }
+      }
+
+      summaries = summaries.map((row) => ({
+        ...row,
+        notification: notificationByPlayer.get(row.player_id) ?? null,
+      }));
+
       setSavedSummaries(summaries);
       setStep(3);
       const unlockedCount = summaries.reduce(
@@ -576,6 +646,7 @@ export function PartidosNuevoContent() {
         <MatchSavedSummary
           opponent={opponent}
           players={savedSummaries}
+          notificationSummary={notificationSummary ?? undefined}
           onDone={() => router.push("/dashboard/partidos")}
         />
       </div>

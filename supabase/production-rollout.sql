@@ -1,5 +1,5 @@
 ﻿-- MiFicha production rollout
--- Order: 11 -> 13 -> 14-15 -> 20-21 -> 16-19 -> 12
+-- Order: 11 -> 13 -> 14-15 -> 20-22 -> 16-19 -> 12
 
 -- ===== player-guardian-contact.sql =====
 -- MiFicha â€” Contacto del padre/tutor para reportes
@@ -346,6 +346,69 @@ execute function public.enforce_official_match_stats();
 
 comment on function public.enforce_official_match_stats() is
   'Academias solo minutos en jornadas oficiales; scoring stats vÃ­a acta del organizador.';
+
+
+-- ===== guardian-notifications.sql =====
+-- MiFicha â€” Notificaciones automÃ¡ticas a tutores post-partido
+-- Ejecutar en Supabase â†’ SQL Editor (paso 22)
+
+alter table public.players
+  add column if not exists guardian_phone text,
+  add column if not exists notify_guardian_on_match boolean not null default true;
+
+comment on column public.players.guardian_phone is
+  'WhatsApp del tutor (10 dÃ­gitos MX). Para avisos automÃ¡ticos post-partido.';
+comment on column public.players.notify_guardian_on_match is
+  'Si true, MiFicha envÃ­a actualizaciÃ³n automÃ¡tica cuando hay stats nuevas del jugador.';
+
+create index if not exists players_guardian_phone_idx
+  on public.players (guardian_phone)
+  where guardian_phone is not null;
+
+create table if not exists public.guardian_notifications (
+  id uuid primary key default gen_random_uuid(),
+  academy_id uuid not null references public.academies (id) on delete cascade,
+  player_id uuid not null references public.players (id) on delete cascade,
+  match_id uuid references public.matches (id) on delete set null,
+  channel text not null check (channel in ('whatsapp', 'email')),
+  recipient text not null,
+  status text not null check (status in ('sent', 'failed', 'skipped')),
+  error_message text,
+  sent_at timestamptz not null default now()
+);
+
+create index if not exists guardian_notifications_player_idx
+  on public.guardian_notifications (player_id, sent_at desc);
+
+create index if not exists guardian_notifications_match_idx
+  on public.guardian_notifications (match_id);
+
+alter table public.guardian_notifications enable row level security;
+
+drop policy if exists "guardian_notifications_select_owner" on public.guardian_notifications;
+
+create policy "guardian_notifications_select_owner"
+on public.guardian_notifications
+for select
+to authenticated
+using (
+  public.is_academy_owner(academy_id)
+  or public.get_user_role() = 'admin'
+);
+
+drop policy if exists "guardian_notifications_insert_service" on public.guardian_notifications;
+
+create policy "guardian_notifications_insert_service"
+on public.guardian_notifications
+for insert
+to authenticated
+with check (
+  public.is_academy_owner(academy_id)
+  or public.get_user_role() = 'admin'
+);
+
+comment on table public.guardian_notifications is
+  'Log de avisos automÃ¡ticos a tutores (WhatsApp o email) tras captura de partido.';
 
 
 -- ===== public-ficha-match-history.sql =====

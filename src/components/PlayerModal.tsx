@@ -60,6 +60,8 @@ export function PlayerModal({
   const [hasConsent, setHasConsent] = useState(false);
   const [guardianName, setGuardianName] = useState("");
   const [guardianEmail, setGuardianEmail] = useState("");
+  const [guardianPhone, setGuardianPhone] = useState("");
+  const [notifyGuardianOnMatch, setNotifyGuardianOnMatch] = useState(true);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [videoPreview, setVideoPreview] = useState<string | null>(null);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
@@ -86,6 +88,8 @@ export function PlayerModal({
       setHasConsent(Boolean(player.public_consent_at));
       setGuardianName(player.guardian_name ?? "");
       setGuardianEmail(player.guardian_email ?? "");
+      setGuardianPhone(player.guardian_phone ?? "");
+      setNotifyGuardianOnMatch(player.notify_guardian_on_match ?? true);
       setPhotoPreview(player.photo_url);
       setVideoPreview(player.video_url);
       return;
@@ -145,6 +149,8 @@ export function PlayerModal({
         video_url: videoUrl,
         guardian_name: guardianName.trim() || null,
         guardian_email: guardianEmail.trim().toLowerCase() || null,
+        guardian_phone: guardianPhone.trim() || null,
+        notify_guardian_on_match: notifyGuardianOnMatch,
         ...privacy,
       };
 
@@ -372,8 +378,8 @@ export function PlayerModal({
                 Contacto del padre o tutor
               </p>
               <p className="mt-1 text-xs leading-relaxed text-slate-500">
-                Opcional. Se usa para enviar reportes mensuales verificados desde
-                Reportes.
+                MiFicha avisa automáticamente tras cada partido (email o WhatsApp). El
+                entrenador no tiene que compartir manualmente cada vez.
               </p>
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
                 <div>
@@ -389,7 +395,19 @@ export function PlayerModal({
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-slate-700">
-                    Email del tutor
+                    WhatsApp del tutor
+                  </label>
+                  <input
+                    type="tel"
+                    value={guardianPhone}
+                    onChange={(event) => setGuardianPhone(event.target.value)}
+                    className={inputClassName}
+                    placeholder="4421234567"
+                  />
+                </div>
+                <div className="sm:col-span-2">
+                  <label className="block text-sm font-medium text-slate-700">
+                    Email del tutor (alternativa)
                   </label>
                   <input
                     type="email"
@@ -399,6 +417,15 @@ export function PlayerModal({
                     placeholder="tutor@email.com"
                   />
                 </div>
+                <label className="sm:col-span-2 inline-flex items-center gap-2 text-sm text-slate-700">
+                  <input
+                    type="checkbox"
+                    checked={notifyGuardianOnMatch}
+                    onChange={(event) => setNotifyGuardianOnMatch(event.target.checked)}
+                    className="h-4 w-4 rounded border-slate-300"
+                  />
+                  Enviar actualización automática después de cada partido
+                </label>
               </div>
             </div>
 

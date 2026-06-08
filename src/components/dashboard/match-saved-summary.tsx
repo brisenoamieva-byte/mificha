@@ -9,6 +9,7 @@ import {
   pickPrimaryAchievementKey,
 } from "@/lib/player-achievements";
 import { buildAchievementShareUrl, buildPlayerShareUrl } from "@/lib/share-ficha";
+import type { GuardianNotificationResult } from "@/lib/guardian-notifications";
 import { cn } from "@/lib/utils";
 
 export interface UnlockedAchievementSummary {
@@ -41,17 +42,20 @@ export interface SavedPlayerSummary {
   public_consent_at: string | null;
   unlocked_achievements: UnlockedAchievementSummary[];
   weekly?: PlayerWeeklyRankSummary | null;
+  notification?: GuardianNotificationResult | null;
 }
 
 interface MatchSavedSummaryProps {
   opponent: string;
   players: SavedPlayerSummary[];
+  notificationSummary?: { sent: number; failed: number; skipped: number };
   onDone: () => void;
 }
 
 export function MatchSavedSummary({
   opponent,
   players,
+  notificationSummary,
   onDone,
 }: MatchSavedSummaryProps) {
   const totalUnlocked = players.reduce(
@@ -76,6 +80,9 @@ export function MatchSavedSummary({
               {totalUnlocked > 0
                 ? ` · ${totalUnlocked} insignia${totalUnlocked === 1 ? "" : "s"} nueva${totalUnlocked === 1 ? "" : "s"}`
                 : ""}
+              {notificationSummary && notificationSummary.sent > 0
+                ? ` · ${notificationSummary.sent} tutor${notificationSummary.sent === 1 ? "" : "es"} avisado${notificationSummary.sent === 1 ? "" : "s"} automáticamente`
+                : ""}
               .
             </p>
           </div>
@@ -84,11 +91,29 @@ export function MatchSavedSummary({
 
       <div className="space-y-4">
         <h2 className="text-lg font-semibold text-slate-900">
-          Comparte el logro con padres
+          Avisos a tutores
         </h2>
         <p className="text-sm text-slate-600">
-          Cada jugador puede presumir Passport e insignias verificadas por WhatsApp.
+          MiFicha envía la actualización sola a quien tenga consentimiento, ficha pública
+          y WhatsApp o email en Plantel. No hace falta compartir manualmente tras cada partido.
         </p>
+
+        {notificationSummary ? (
+          <div className="grid gap-2 sm:grid-cols-3">
+            <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-center">
+              <p className="text-2xl font-bold text-emerald-800">{notificationSummary.sent}</p>
+              <p className="text-xs font-medium text-emerald-700">Enviados</p>
+            </div>
+            <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-center">
+              <p className="text-2xl font-bold text-amber-800">{notificationSummary.skipped}</p>
+              <p className="text-xs font-medium text-amber-700">Omitidos</p>
+            </div>
+            <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-center">
+              <p className="text-2xl font-bold text-red-800">{notificationSummary.failed}</p>
+              <p className="text-xs font-medium text-red-700">Fallidos</p>
+            </div>
+          </div>
+        ) : null}
 
         {players.length === 0 ? (
           <p className="rounded-xl border border-dashed border-slate-200 p-6 text-sm text-slate-500">
@@ -199,14 +224,24 @@ export function MatchSavedSummary({
                 )}
 
                 <div className="flex flex-wrap gap-2 border-t border-slate-100 px-4 py-4 sm:px-5">
+                  {player.notification?.status === "sent" ? (
+                    <span className="inline-flex items-center rounded-xl bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-800">
+                      Aviso automático ·{" "}
+                      {player.notification.channel === "whatsapp" ? "WhatsApp" : "Email"}
+                    </span>
+                  ) : player.notification?.status === "skipped" ? (
+                    <span className="inline-flex items-center rounded-xl bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-900">
+                      Sin aviso: {player.notification.reason ?? "Revisa Plantel"}
+                    </span>
+                  ) : null}
                   <a
                     href={whatsappUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="mf-btn-accent-solid inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm"
+                    className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
                   >
                     <MessageCircle className="h-4 w-4" />
-                    WhatsApp
+                    Reenviar manual
                   </a>
                   <Link
                     href={`/j/${player.slug}`}
