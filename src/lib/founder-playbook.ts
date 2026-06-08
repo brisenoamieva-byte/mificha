@@ -105,9 +105,9 @@ export const FOUNDER_LIVE_DEMO_SCRIPT: FounderDemoStep[] = [
     minute: "7–9",
     title: "Calendario oficial MiFicha",
     action:
-      "Abre /dashboard/partidos: «MiFicha ya publicó la jornada — ustedes no programan rival ni fecha, solo capturan.»",
-    wow: "Centralización = stats comparables entre colegios",
-    href: "/dashboard/partidos",
+      "Abre /interno/jornadas: publica jornada y, tras el partido, el marcador oficial. En /dashboard/partidos la academia solo captura plantel.",
+    wow: "Marcador = organizador · stats = academia · datos comparables y no manipulables",
+    href: "/interno/jornadas",
   },
   {
     minute: "9–12",
@@ -161,12 +161,13 @@ export const PRODUCTION_SQL_SCRIPTS = [
   { id: 13, file: "match-schedule.sql", label: "Calendario público" },
   { id: 14, file: "platform-seasons-rls.sql", label: "Temporadas solo admin" },
   { id: 15, file: "platform-fixtures-rls.sql", label: "Jornadas solo admin" },
+  { id: 20, file: "official-match-scoring-rls.sql", label: "Marcador solo organizador" },
   { id: 16, file: "public-ficha-match-history.sql", label: "Historial en ficha pública" },
   { id: 17, file: "platform-seasons-shared.sql", label: "Temporada compartida MiFicha" },
   { id: 18, file: "player-profile-views.sql", label: "Aperturas de ficha pública" },
   { id: 19, file: "player-achievements.sql", label: "Insignias y logros verificados" },
 ] as const;
 
-export const PRODUCTION_SQL_ORDER = [11, 13, 14, 15, 16, 17, 18, 19, 12] as const;
+export const PRODUCTION_SQL_ORDER = [11, 13, 14, 15, 20, 16, 17, 18, 19, 12] as const;
 
 export const PRODUCTION_ROLLOUT_FILE = "production-rollout.sql" as const;

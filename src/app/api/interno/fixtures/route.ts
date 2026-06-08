@@ -77,6 +77,10 @@ interface FixtureBody {
   is_official?: boolean;
   fixture_id?: string;
   status?: "scheduled" | "postponed" | "cancelled";
+  result?: "win" | "draw" | "loss";
+  goals_for?: number;
+  goals_against?: number;
+  lock_result?: boolean;
 }
 
 export async function POST(request: Request) {
@@ -176,6 +180,19 @@ export async function PATCH(request: Request) {
   if (body.notes !== undefined) updates.notes = body.notes.trim() || null;
   if (typeof body.is_public === "boolean") updates.is_public = body.is_public;
   if (body.status) updates.status = body.status;
+
+  if (body.result) updates.result = body.result;
+  if (typeof body.goals_for === "number") updates.goals_for = body.goals_for;
+  if (typeof body.goals_against === "number") updates.goals_against = body.goals_against;
+  if (body.lock_result) updates.result_locked_at = new Date().toISOString();
+
+  if (
+    body.result &&
+    typeof body.goals_for === "number" &&
+    typeof body.goals_against === "number"
+  ) {
+    updates.result_locked_at = new Date().toISOString();
+  }
 
   const { data, error } = await auth.admin
     .from("matches")

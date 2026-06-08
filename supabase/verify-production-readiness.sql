@@ -61,7 +61,14 @@ select
     from information_schema.tables
     where table_schema = 'public'
       and table_name = 'player_achievements'
-  ) as player_achievements_sql;
+  ) as player_achievements_sql,
+  exists (
+    select 1
+    from information_schema.columns
+    where table_schema = 'public'
+      and table_name = 'matches'
+      and column_name = 'result_locked_at'
+  ) as official_match_scoring_sql;
 
 -- Si alguna columna es false, ejecuta el script correspondiente:
 -- #11 player-guardian-contact.sql
@@ -73,3 +80,4 @@ select
 -- #17 platform-seasons-shared.sql
 -- #18 player-profile-views.sql
 -- #19 player-achievements.sql
+-- #20 official-match-scoring-rls.sql

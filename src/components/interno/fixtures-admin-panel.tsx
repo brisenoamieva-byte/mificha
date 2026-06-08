@@ -10,6 +10,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { FixtureImportSection } from "@/components/interno/fixture-import-section";
+import { OfficialResultEntry } from "@/components/interno/official-result-entry";
 import { formatKickoffDateTime } from "@/lib/match-utils";
 import { supabase } from "@/lib/supabase";
 import { toast } from "@/components/ui/toast";
@@ -191,8 +192,8 @@ export function FixturesAdminPanel() {
               Jornadas oficiales
             </h1>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-white/65">
-              Publica rival, fecha, sede y categoría. Las academias solo capturan
-              stats sobre estas jornadas.
+              Publica rival, fecha, sede y categoría. Después del partido registras el
+              marcador oficial aquí; las academias solo capturan convocados y stats del plantel.
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
@@ -283,13 +284,22 @@ export function FixturesAdminPanel() {
                           </p>
                         ) : null}
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => void cancelFixture(fixture.id)}
-                        className="rounded-full border border-red-400/30 px-3 py-1.5 text-xs font-semibold text-red-200 hover:bg-red-500/10"
-                      >
-                        Cancelar
-                      </button>
+                      <div className="flex flex-col items-end gap-2">
+                        {fixture.is_official ? (
+                          <OfficialResultEntry
+                            fixture={fixture}
+                            onSaved={() => void loadFixtures(selectedAcademyId)}
+                            authedFetch={authedFetch}
+                          />
+                        ) : null}
+                        <button
+                          type="button"
+                          onClick={() => void cancelFixture(fixture.id)}
+                          className="rounded-full border border-red-400/30 px-3 py-1.5 text-xs font-semibold text-red-200 hover:bg-red-500/10"
+                        >
+                          Cancelar
+                        </button>
+                      </div>
                     </li>
                   ))}
                 </ul>

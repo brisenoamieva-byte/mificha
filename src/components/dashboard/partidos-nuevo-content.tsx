@@ -25,6 +25,11 @@ import {
   type RosterListMode,
 } from "@/lib/match-capture";
 import {
+  buildAcademyCaptureBlockedMessage,
+  formatOfficialScoreLine,
+  getMatchGovernance,
+} from "@/lib/match-data-governance";
+import {
   getCategoryFilterLabel,
   inferCategoryFilterFromMatchCategory,
   matchesCategoryFilter,
@@ -88,6 +93,7 @@ export function PartidosNuevoContent() {
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [season, setSeason] = useState<Season | null>(null);
   const [scheduledMatchId, setScheduledMatchId] = useState<string | null>(null);
+  const [selectedFixture, setSelectedFixture] = useState<Match | null>(null);
   const [scheduledMatchCategory, setScheduledMatchCategory] = useState<string | null>(
     null,
   );
@@ -132,11 +138,24 @@ export function PartidosNuevoContent() {
     [captures],
   );
 
+  const matchGovernance = useMemo(
+    () => getMatchGovernance(selectedFixture ?? { is_official: false, result: null, goals_for: null, goals_against: null, result_locked_at: null }),
+    [selectedFixture],
+  );
+
+  const effectiveGoalsFor = matchGovernance.hasOfficialResult
+    ? selectedFixture?.goals_for ?? 0
+    : goalsFor;
+
   const goalsMismatch =
     captureStyle === "detailed" &&
-    goalsFor > 0 &&
+    effectiveGoalsFor > 0 &&
     playedCount > 0 &&
-    playerGoalsTotal !== goalsFor;
+    playerGoalsTotal !== effectiveGoalsFor;
+
+  const captureBlockedMessage = selectedFixture
+    ? buildAcademyCaptureBlockedMessage(selectedFixture)
+    : null;
 
   const loadData = useCallback(async () => {
     if (!academy) {
@@ -157,9 +176,15 @@ export function PartidosNuevoContent() {
 
       if (scheduledMatch && scheduledMatch.status === "scheduled") {
         setScheduledMatchId(scheduledMatch.id);
+        setSelectedFixture(scheduledMatch);
         setScheduledMatchCategory(scheduledMatch.category);
         setOpponent(scheduledMatch.opponent);
         setMatchDate(scheduledMatch.match_date);
+        if (scheduledMatch.result) {
+          setResult(scheduledMatch.result);
+          setGoalsFor(scheduledMatch.goals_for ?? 0);
+          setGoalsAgainst(scheduledMatch.goals_against ?? 0);
+        }
 
         const [{ data: scheduledSeason }, { data: playerList }] = await Promise.all([
           supabase
@@ -183,6 +208,7 @@ export function PartidosNuevoContent() {
     }
 
     setScheduledMatchId(null);
+    setSelectedFixture(null);
     setScheduledMatchCategory(null);
 
     const [seasonResult, playersResult] = await Promise.all([
@@ -258,14 +284,31 @@ export function PartidosNuevoContent() {
 
   function selectFixture(fixture: Match) {
     setScheduledMatchId(fixture.id);
+    setSelectedFixture(fixture);
     setScheduledMatchCategory(fixture.category);
     setOpponent(fixture.opponent);
     setMatchDate(fixture.match_date);
+    if (fixture.result) {
+      setResult(fixture.result);
+      setGoalsFor(fixture.goals_for ?? 0);
+      setGoalsAgainst(fixture.goals_against ?? 0);
+    } else {
+      setResult("win");
+      setGoalsFor(0);
+      setGoalsAgainst(0);
+    }
   }
 
   async function handleSave() {
-    if (!academy || !season || !scheduledMatchId) {
+    if (!academy || !season || !scheduledMatchId || !selectedFixture) {
       setError("Selecciona una jornada publicada por MiFicha.");
+      return;
+    }
+
+    if (matchGovernance.isOfficial && !matchGovernance.hasOfficialResult) {
+      setError(
+        "El marcador oficial aún no está publicado. El organizador (MiFicha) lo registrará tras el partido.",
+      );
       return;
     }
 
@@ -288,16 +331,26 @@ export function PartidosNuevoContent() {
         }
       }
 
+      const matchUpdate: {
+        status: "completed";
+        opponent?: string;
+        match_date?: string;
+        result?: MatchResult;
+        goals_for?: number;
+        goals_against?: number;
+      } = { status: "completed" };
+
+      if (!matchGovernance.isOfficial) {
+        matchUpdate.opponent = opponent.trim();
+        matchUpdate.match_date = matchDate;
+        matchUpdate.result = result;
+        matchUpdate.goals_for = goalsFor;
+        matchUpdate.goals_against = goalsAgainst;
+      }
+
       const { data: match, error: matchError } = await supabase
         .from("matches")
-        .update({
-          opponent: opponent.trim(),
-          match_date: matchDate,
-          result,
-          goals_for: goalsFor,
-          goals_against: goalsAgainst,
-          status: "completed",
-        })
+        .update(matchUpdate)
         .eq("id", scheduledMatchId)
         .select("*")
         .single();
@@ -542,20 +595,43 @@ export function PartidosNuevoContent() {
             ) : (
               <>
                 <h1 className="text-2xl font-bold text-slate-900">
-                  Capturar resultado
+                  Capturar stats del plantel
                 </h1>
                 <p className="mt-1 text-slate-600">
                   Paso 1 de 2 · Jornada publicada por MiFicha
                 </p>
                 <p className="mt-3 text-sm text-slate-500">
-                  Solo marcador aquí. En el paso 2 eliges convocados y captura
-                  rápida (~1 min) o detallada con goles y tarjetas.
+                  {matchGovernance.isOfficial
+                    ? "El marcador lo publica el organizador. Aquí solo confirmas convocados y stats individuales."
+                    : "Marcador y stats del plantel. En el paso 2 eliges convocados y captura rápida o detallada."}
                 </p>
 
                 <p className="mt-4 rounded-xl bg-[#1B4F8C]/5 px-4 py-3 text-sm text-slate-700">
                   Jornada vs <strong>{opponent}</strong>
                   {scheduledMatchCategory ? ` · ${scheduledMatchCategory}` : ""}
+                  {matchGovernance.isOfficial ? " · Oficial MiFicha" : ""}
                 </p>
+
+                {captureBlockedMessage ? (
+                  <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-950">
+                    <p className="font-semibold">Marcador oficial pendiente</p>
+                    <p className="mt-2 leading-6">{captureBlockedMessage}</p>
+                  </div>
+                ) : null}
+
+                {matchGovernance.hasOfficialResult && selectedFixture ? (
+                  <div className="mt-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-emerald-800">
+                      Marcador oficial · organizador
+                    </p>
+                    <p className="mt-2 text-2xl font-bold text-emerald-950">
+                      {formatOfficialScoreLine(selectedFixture)}
+                    </p>
+                    <p className="mt-2 text-sm text-emerald-900/80">
+                      Verificado por MiFicha. La academia no puede modificar este resultado.
+                    </p>
+                  </div>
+                ) : null}
 
                 <div className="mt-8 space-y-6">
                   <div>
@@ -581,50 +657,55 @@ export function PartidosNuevoContent() {
                     />
                   </div>
 
-                  <div>
-                    <p className="text-sm font-medium text-slate-700">¿Resultado?</p>
-                    <div className="mt-3 grid gap-3 sm:grid-cols-3">
-                      {[
-                        { value: "win" as const, label: "🟢 Ganamos", tone: "border-green-500 bg-green-50" },
-                        { value: "draw" as const, label: "🟡 Empatamos", tone: "border-amber-400 bg-amber-50" },
-                        { value: "loss" as const, label: "🔴 Perdimos", tone: "border-red-500 bg-red-50" },
-                      ].map((option) => (
-                        <button
-                          key={option.value}
-                          type="button"
-                          onClick={() => setResult(option.value)}
-                          className={cn(
-                            "rounded-2xl border-2 px-4 py-5 text-base font-semibold transition-colors",
-                            result === option.value
-                              ? option.tone
-                              : "border-slate-200 bg-white text-slate-700",
-                          )}
-                        >
-                          {option.label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
+                  {!matchGovernance.isOfficial ? (
+                    <>
+                      <div>
+                        <p className="text-sm font-medium text-slate-700">¿Resultado?</p>
+                        <div className="mt-3 grid gap-3 sm:grid-cols-3">
+                          {[
+                            { value: "win" as const, label: "🟢 Ganamos", tone: "border-green-500 bg-green-50" },
+                            { value: "draw" as const, label: "🟡 Empatamos", tone: "border-amber-400 bg-amber-50" },
+                            { value: "loss" as const, label: "🔴 Perdimos", tone: "border-red-500 bg-red-50" },
+                          ].map((option) => (
+                            <button
+                              key={option.value}
+                              type="button"
+                              onClick={() => setResult(option.value)}
+                              className={cn(
+                                "rounded-2xl border-2 px-4 py-5 text-base font-semibold transition-colors",
+                                result === option.value
+                                  ? option.tone
+                                  : "border-slate-200 bg-white text-slate-700",
+                              )}
+                            >
+                              {option.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
 
-                  <div className="grid gap-6 sm:grid-cols-2">
-                    <Counter
-                      label="Goles a favor"
-                      value={goalsFor}
-                      onChange={setGoalsFor}
-                      max={30}
-                    />
-                    <Counter
-                      label="Goles en contra"
-                      value={goalsAgainst}
-                      onChange={setGoalsAgainst}
-                      max={30}
-                    />
-                  </div>
+                      <div className="grid gap-6 sm:grid-cols-2">
+                        <Counter
+                          label="Goles a favor"
+                          value={goalsFor}
+                          onChange={setGoalsFor}
+                          max={30}
+                        />
+                        <Counter
+                          label="Goles en contra"
+                          value={goalsAgainst}
+                          onChange={setGoalsAgainst}
+                          max={30}
+                        />
+                      </div>
+                    </>
+                  ) : null}
 
                   <button
                     type="button"
                     onClick={() => {
                       setScheduledMatchId(null);
+                      setSelectedFixture(null);
                       setScheduledMatchCategory(null);
                     }}
                     className="text-sm font-medium text-slate-500 hover:text-slate-700"
@@ -640,8 +721,9 @@ export function PartidosNuevoContent() {
 
                   <button
                     type="button"
+                    disabled={Boolean(captureBlockedMessage)}
                     onClick={() => setStep(2)}
-                    className="w-full rounded-2xl bg-[#1B4F8C] px-5 py-4 text-base font-semibold text-white"
+                    className="w-full rounded-2xl bg-[#1B4F8C] px-5 py-4 text-base font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     Siguiente · convocados y minutos
                   </button>
@@ -682,7 +764,7 @@ export function PartidosNuevoContent() {
             {goalsMismatch ? (
               <p className="rounded-lg bg-amber-50 px-3 py-2 text-center text-xs text-amber-900">
                 Suma de goles de jugadores ({playerGoalsTotal}) ≠ marcador (
-                {goalsFor}). Puedes guardar igual; revísalo si quieres coherencia.
+                {effectiveGoalsFor}). Puedes guardar igual; revísalo si quieres coherencia.
               </p>
             ) : null}
             <div className="flex flex-col gap-2 sm:flex-row">
