@@ -1,6 +1,6 @@
 export const BRAND_LOGO = "/brand/mificha-logo.png";
 export const BRAND_ICON = "/brand/mificha-icon.png";
-export const BRAND_OG_IMAGE = "/brand/mificha-og.png";
+export const BRAND_OG_IMAGE = "/marketing/og-default.png";
 
 export function getBrandLogoUrl(baseUrl?: string) {
   const appUrl =

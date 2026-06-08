@@ -5,6 +5,7 @@ import { HomeFichaPreview } from "@/components/marketing/home-ficha-preview";
 import { MarketingPageHero } from "@/components/marketing/marketing-page-hero";
 import { ParentLinkForm } from "@/components/marketing/parent-link-form";
 import { SiteFooter, SiteHeader } from "@/components/marketing/site-header";
+import { MARKETING_IMAGES } from "@/lib/marketing-assets";
 
 export const metadata: Metadata = {
   title: "Padres y jugadores | MiFicha",
@@ -21,7 +22,10 @@ export default function PadresPage() {
         <MarketingPageHero
           eyebrow="Padres y jugadores"
           title="La ficha de tu hijo, sin app ni contraseña"
-          description="La academia te comparte un QR o link por WhatsApp. Consulta Passport Score, stats de temporada e historial verificado al instante."
+          description="El colegio te comparte un QR o link por WhatsApp. Consulta Passport Score, stats de temporada e historial verificado al instante."
+          photoSrc={MARKETING_IMAGES.heroPadres}
+          photoAlt="Padre e hijo revisando la ficha después del partido escolar"
+          photoPriority
           actions={
             <Link href="#abrir-ficha" className="mf-btn-primary">
               Abrir ficha

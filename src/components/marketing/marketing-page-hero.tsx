@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { MarketingHeroVisual } from "@/components/marketing/marketing-hero-visual";
 import { cn } from "@/lib/utils";
 
 interface MarketingStat {
@@ -13,6 +14,9 @@ interface MarketingPageHeroProps {
   actions?: ReactNode;
   stats?: MarketingStat[];
   aside?: ReactNode;
+  photoSrc?: string;
+  photoAlt?: string;
+  photoPriority?: boolean;
   className?: string;
 }
 
@@ -23,8 +27,13 @@ export function MarketingPageHero({
   actions,
   stats,
   aside,
+  photoSrc,
+  photoAlt,
+  photoPriority = false,
   className,
 }: MarketingPageHeroProps) {
+  const hasVisual = Boolean(photoSrc && photoAlt);
+
   return (
     <section
       className={cn(
@@ -33,16 +42,17 @@ export function MarketingPageHero({
       )}
     >
       <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-20%,rgba(27,79,140,0.12),transparent)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-20%,rgba(27,79,140,0.1),transparent)]"
         aria-hidden
       />
       <div
         className={cn(
           "relative mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:py-18",
-          aside && "grid gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:py-20",
+          hasVisual &&
+            "grid gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:py-20",
         )}
       >
-        <div className={aside ? "max-w-xl" : "max-w-3xl"}>
+        <div className={hasVisual ? "max-w-xl" : "max-w-3xl"}>
           <p className="mf-marketing-eyebrow">{eyebrow}</p>
           <h1 className="mt-4 text-[2rem] font-semibold leading-[1.08] tracking-[-0.035em] text-mf-text sm:text-[2.5rem] lg:text-[2.75rem]">
             {title}
@@ -72,7 +82,16 @@ export function MarketingPageHero({
             </dl>
           ) : null}
         </div>
-        {aside ? <div className="min-w-0">{aside}</div> : null}
+        {hasVisual ? (
+          <MarketingHeroVisual
+            src={photoSrc!}
+            alt={photoAlt!}
+            aside={aside}
+            priority={photoPriority}
+          />
+        ) : aside ? (
+          <div className="min-w-0">{aside}</div>
+        ) : null}
       </div>
     </section>
   );

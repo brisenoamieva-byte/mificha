@@ -7,6 +7,7 @@ import { PublicScheduleExploreSection } from "@/components/marketing/public-sche
 import { MarketingPageHero } from "@/components/marketing/marketing-page-hero";
 import { SiteFooter, SiteHeader } from "@/components/marketing/site-header";
 import { fetchWeeklyCompetitionData } from "@/lib/ideal-xi";
+import { MARKETING_IMAGES } from "@/lib/marketing-assets";
 import { fetchPublicDirectory } from "@/lib/public-directory";
 import { fetchPublicUpcomingMatches } from "@/lib/public-schedule";
 
@@ -35,6 +36,8 @@ export default async function ExplorarPage() {
           eyebrow="Visorías y scouts"
           title="Explora talento verificado en México"
           description="Marcador semanal, jugadores en tendencia, 11 ideal y rankings por posición. Filtra por categoría, estado o ciudad."
+          photoSrc={MARKETING_IMAGES.heroExplorar}
+          photoAlt="Partido escolar visto desde la banda en torneo intercolegial"
           actions={
             <>
               <Link href="/padres" className="mf-btn-secondary">

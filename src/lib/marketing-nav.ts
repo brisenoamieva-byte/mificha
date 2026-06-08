@@ -11,6 +11,7 @@ import {
   Trophy,
   Users,
 } from "lucide-react";
+import { MARKETING_IMAGES } from "@/lib/marketing-assets";
 
 export interface NavLink {
   href: string;
@@ -103,6 +104,7 @@ export const HOME_FEATURES = [
     mificha:
       "Captura post-partido en 60 s: rival, marcador y stats por jugador. Enlace a tu liga oficial.",
     href: "/signup",
+    image: MARKETING_IMAGES.featureCalendario,
   },
   {
     icon: BarChart3,
@@ -111,6 +113,7 @@ export const HOME_FEATURES = [
     mificha:
       "Marcador semanal del plantel, tendencias ↑↓ y Passport Score individual.",
     href: "/explorar",
+    image: MARKETING_IMAGES.featurePassport,
   },
   {
     icon: Scale,
@@ -127,6 +130,7 @@ export const HOME_FEATURES = [
     mificha:
       "Import Excel, fichas privadas por defecto, QR imprimible para padres.",
     href: "/signup",
+    image: MARKETING_IMAGES.featureCaptura,
   },
   {
     icon: QrCode,
@@ -135,6 +139,7 @@ export const HOME_FEATURES = [
     mificha:
       "La academia comparte QR o link. Padres consultan stats sin registro.",
     href: "/padres",
+    image: MARKETING_IMAGES.featureQr,
   },
   {
     icon: ShieldCheck,

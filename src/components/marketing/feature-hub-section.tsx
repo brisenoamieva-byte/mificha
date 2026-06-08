@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { MarketingCardPhoto } from "@/components/marketing/marketing-hero-visual";
 import { COMPLEMENT_ROWS, HOME_FEATURES } from "@/lib/marketing-nav";
 
 export function FeatureHubSection() {
@@ -22,24 +23,39 @@ export function FeatureHubSection() {
             {HOME_FEATURES.map((feature) => (
               <article
                 key={feature.title}
-                className="group flex flex-col rounded-xl border border-mf-border bg-mf-surface p-6 transition hover:border-mf-brand/25 hover:shadow-[var(--mf-shadow)]"
+                className="group flex flex-col overflow-hidden rounded-xl border border-mf-border bg-mf-surface transition hover:border-mf-brand/25 hover:shadow-[var(--mf-shadow)]"
               >
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-mf-brand-soft text-mf-brand">
-                  <feature.icon className="h-5 w-5" strokeWidth={1.75} />
+                {"image" in feature && feature.image ? (
+                  <MarketingCardPhoto
+                    src={feature.image}
+                    alt={feature.title}
+                    className="h-36 sm:h-40"
+                  />
+                ) : (
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-mf-brand-soft text-mf-brand m-6 mb-0">
+                    <feature.icon className="h-5 w-5" strokeWidth={1.75} />
+                  </div>
+                )}
+                <div className="flex flex-1 flex-col p-6 pt-4">
+                  {"image" in feature && feature.image ? (
+                    <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg bg-mf-brand-soft text-mf-brand">
+                      <feature.icon className="h-4 w-4" strokeWidth={1.75} />
+                    </div>
+                  ) : null}
+                  <h3 className="text-base font-semibold tracking-[-0.01em] text-mf-text">
+                    {feature.title}
+                  </h3>
+                  <p className="mt-2 flex-1 text-sm leading-7 text-mf-text-secondary">
+                    {feature.mificha}
+                  </p>
+                  <Link
+                    href={feature.href}
+                    className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-mf-brand opacity-90 transition group-hover:opacity-100"
+                  >
+                    Conocer más
+                    <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-0.5" />
+                  </Link>
                 </div>
-                <h3 className="mt-4 text-base font-semibold tracking-[-0.01em] text-mf-text">
-                  {feature.title}
-                </h3>
-                <p className="mt-2 flex-1 text-sm leading-7 text-mf-text-secondary">
-                  {feature.mificha}
-                </p>
-                <Link
-                  href={feature.href}
-                  className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-mf-brand opacity-90 transition group-hover:opacity-100"
-                >
-                  Conocer más
-                  <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-0.5" />
-                </Link>
               </article>
             ))}
           </div>
@@ -60,7 +76,7 @@ export function FeatureHubSection() {
                 la liga sigue siendo la fuente del marcador oficial.
               </p>
               <Link href="/signup" className="mf-btn-primary mt-8 inline-flex">
-                Registrar academia
+                Registrar colegio
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
