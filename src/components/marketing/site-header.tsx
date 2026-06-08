@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { BrandLogoLink } from "@/components/ui/brand-logo";
 import { SiteNavDesktop, SiteNavMobile } from "@/components/marketing/site-nav";
+import { LEGAL_ROUTES } from "@/lib/legal";
 
 interface SiteHeaderProps {
   actionHref?: string;
@@ -51,16 +52,28 @@ export function SiteFooter() {
           <Link href="/padres" className="transition hover:text-mf-text">
             Padres
           </Link>
-          <Link href="/aviso-privacidad" className="transition hover:text-mf-text">
+          <Link href={LEGAL_ROUTES.privacy} className="transition hover:text-mf-text">
             Privacidad
+          </Link>
+          <Link href={LEGAL_ROUTES.terms} className="transition hover:text-mf-text">
+            Términos
+          </Link>
+          <Link href={LEGAL_ROUTES.cookies} className="transition hover:text-mf-text">
+            Cookies
           </Link>
         </div>
       </div>
       <div className="mx-auto flex max-w-6xl flex-col gap-3 border-t border-mf-border px-4 py-8 text-sm text-mf-text-muted sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <BrandLogoLink size="sm" />
         <div className="flex flex-wrap items-center gap-4">
-          <Link href="/aviso-privacidad" className="hover:text-mf-text">
+          <Link href={LEGAL_ROUTES.privacy} className="hover:text-mf-text">
             Aviso de privacidad
+          </Link>
+          <Link href={LEGAL_ROUTES.terms} className="hover:text-mf-text">
+            Términos
+          </Link>
+          <Link href={LEGAL_ROUTES.cookies} className="hover:text-mf-text">
+            Cookies
           </Link>
           <p>© 2026 MiFicha · mificha.mx</p>
         </div>

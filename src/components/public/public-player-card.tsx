@@ -273,7 +273,11 @@ export function PublicPlayerCard({ data }: PublicPlayerCardProps) {
             Ficha compartida con autorización parental. Si deseas rectificar o
             eliminar estos datos, contacta a la academia.{" "}
             <Link href="/aviso-privacidad" className="text-[#1B4F8C] hover:underline">
-              Aviso de privacidad
+              Privacidad
+            </Link>
+            {" · "}
+            <Link href="/terminos" className="text-[#1B4F8C] hover:underline">
+              Términos
             </Link>
           </p>
         </footer>

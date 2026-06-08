@@ -1,7 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
-import { AppToaster } from "@/components/ui/toast";
 import { DevServiceWorkerCleanup } from "@/components/dev-service-worker-cleanup";
+import { CookieNotice } from "@/components/marketing/cookie-notice";
+import { AppToaster } from "@/components/ui/toast";
 import { BRAND_ICON, BRAND_OG_IMAGE } from "@/lib/brand";
 import "./globals.css";
 
@@ -62,6 +63,7 @@ export default function RootLayout({
       <body className="min-h-full bg-mf-canvas font-sans text-mf-text antialiased">
         <DevServiceWorkerCleanup />
         {children}
+        <CookieNotice />
         <AppToaster />
       </body>
     </html>

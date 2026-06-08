@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { signUp } from "@/lib/auth";
+import { LEGAL_ROUTES, TERMS_ACCEPTANCE_LABEL } from "@/lib/legal";
 
 function getErrorMessage(error: unknown) {
   if (error instanceof Error) {
@@ -40,6 +41,7 @@ export function SignUpForm() {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -48,6 +50,12 @@ export function SignUpForm() {
     event.preventDefault();
     setError(null);
     setSuccess(null);
+
+    if (!acceptedTerms) {
+      setError("Debes aceptar los Términos y Condiciones y el Aviso de Privacidad.");
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -122,6 +130,26 @@ export function SignUpForm() {
           placeholder="Mínimo 6 caracteres"
         />
       </div>
+
+      <label className="flex items-start gap-3 rounded-lg border border-mf-border bg-mf-surface px-3 py-3">
+        <input
+          type="checkbox"
+          checked={acceptedTerms}
+          onChange={(event) => setAcceptedTerms(event.target.checked)}
+          required
+          className="mt-1 h-4 w-4 rounded border-mf-border text-[#1B4F8C]"
+        />
+        <span className="text-sm leading-6 text-gray-700">
+          {TERMS_ACCEPTANCE_LABEL}{" "}
+          <Link href={LEGAL_ROUTES.terms} className="font-semibold text-[#1B4F8C] hover:underline">
+            Términos
+          </Link>{" "}
+          ·{" "}
+          <Link href={LEGAL_ROUTES.privacy} className="font-semibold text-[#1B4F8C] hover:underline">
+            Privacidad
+          </Link>
+        </span>
+      </label>
 
       {error ? (
         <p className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>

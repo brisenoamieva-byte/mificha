@@ -57,7 +57,11 @@ export function PlayerPrivacyControls({
         <span className="text-sm leading-6 text-slate-700">
           {PRIVACY_COPY.consentLabel}{" "}
           <Link href="/aviso-privacidad" className="font-semibold text-[#1B4F8C] hover:underline">
-            Ver aviso de privacidad
+            Aviso de privacidad
+          </Link>
+          {" · "}
+          <Link href="/terminos" className="font-semibold text-[#1B4F8C] hover:underline">
+            Términos
           </Link>
         </span>
       </label>
