@@ -90,9 +90,11 @@ function PitchSlidePhoto({
 function SlideContent({
   slide,
   className,
+  presenting = false,
 }: {
   slide: PitchSlide;
   className?: string;
+  presenting?: boolean;
 }) {
   const isCover = slide.variant === "cover";
   const isCta = slide.variant === "cta";
@@ -190,6 +192,13 @@ function SlideContent({
           {slide.highlight}
         </p>
       ) : null}
+
+      {slide.speakerNote && !presenting ? (
+        <p className="mt-6 max-w-2xl rounded-xl border border-amber-400/25 bg-amber-400/10 px-4 py-3 text-left text-sm leading-6 text-amber-100/90">
+          <span className="font-semibold text-amber-200">Nota al presentar: </span>
+          {slide.speakerNote}
+        </p>
+      ) : null}
     </div>
   );
 }
@@ -197,9 +206,11 @@ function SlideContent({
 function PitchSlideFrame({
   slide,
   priority = false,
+  presenting = false,
 }: {
   slide: PitchSlide;
   priority?: boolean;
+  presenting?: boolean;
 }) {
   const meta = slide.imageKey ? MARKETING_MEDIA[slide.imageKey] : null;
 
@@ -213,7 +224,7 @@ function PitchSlideFrame({
           className="absolute inset-0"
         />
         <div className="relative flex flex-1 flex-col justify-center">
-          <SlideContent slide={slide} />
+          <SlideContent slide={slide} presenting={presenting} />
           <div className="relative z-10 flex justify-center pb-8">
             <PitchBrandMark size="md" />
           </div>
@@ -232,7 +243,7 @@ function PitchSlideFrame({
           className="absolute inset-0"
         />
         <div className="relative flex flex-1 items-center justify-center overflow-auto">
-          <SlideContent slide={slide} className="w-full max-w-4xl" />
+          <SlideContent slide={slide} className="w-full max-w-4xl" presenting={presenting} />
         </div>
       </div>
     );
@@ -242,7 +253,7 @@ function PitchSlideFrame({
     return (
       <div className="grid min-h-[min(100%,720px)] flex-1 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
         <div className="relative z-10 flex min-h-0 flex-col justify-center overflow-auto bg-[#0a1628] lg:bg-transparent">
-          <SlideContent slide={slide} />
+          <SlideContent slide={slide} presenting={presenting} />
         </div>
 
         <PitchSlidePhoto
@@ -265,7 +276,7 @@ function PitchSlideFrame({
           className="relative h-44 shrink-0 sm:h-52 lg:hidden"
         />
       ) : null}
-      <SlideContent slide={slide} className="flex-1" />
+      <SlideContent slide={slide} className="flex-1" presenting={presenting} />
     </div>
   );
 }
@@ -334,6 +345,12 @@ export function PitchDeckView() {
           </div>
           <div className="flex items-center gap-2">
             <Link
+              href="/interno/lanzamiento"
+              className="inline-flex items-center gap-2 rounded-full border border-emerald-400/30 px-3 py-2 text-sm font-medium text-emerald-200 transition hover:bg-emerald-500/10"
+            >
+              Guión demo
+            </Link>
+            <Link
               href="/dashboard"
               className="inline-flex items-center gap-2 rounded-full px-3 py-2 text-sm font-medium text-white/70 transition hover:bg-white/10 hover:text-white"
             >
@@ -360,7 +377,7 @@ export function PitchDeckView() {
         />
 
         <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
-          <PitchSlideFrame slide={slide} priority={index === 0} />
+          <PitchSlideFrame slide={slide} priority={index === 0} presenting={presenting} />
         </div>
 
         <footer className="shrink-0 border-t border-white/10 bg-[#0a1628]/95 px-4 py-4 sm:px-6">

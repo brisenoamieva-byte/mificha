@@ -9,11 +9,17 @@ import {
   Copy,
   ExternalLink,
   MessageCircle,
+  Sparkles,
+  Zap,
 } from "lucide-react";
 import {
   buildFounderOutreachMessage,
   FOUNDER_CONVERSION_CRITERIA,
+  FOUNDER_DEMO_PRECHECK,
+  FOUNDER_DEMO_WOW_MOMENTS,
+  FOUNDER_LIVE_DEMO_SCRIPT,
   FOUNDER_WEEK_PLAN,
+  PRODUCTION_SQL_ORDER,
   PRODUCTION_SQL_SCRIPTS,
 } from "@/lib/founder-playbook";
 import { supabase } from "@/lib/supabase";
@@ -23,6 +29,7 @@ interface PlatformHealth {
   sql: {
     matchSchedule: boolean | null;
     guardianContact: boolean | null;
+    profileViews: boolean | null;
   };
   resend: {
     ready: boolean;
@@ -32,8 +39,9 @@ interface PlatformHealth {
 }
 
 const defaultOutreach = buildFounderOutreachMessage({
-  contactName: "[nombre]",
+  contactName: "[nombre del director]",
   matchDate: "[fecha del partido]",
+  academyName: "[nombre de la academia]",
 });
 
 export function FounderLaunchPlaybook() {
@@ -66,14 +74,14 @@ export function FounderLaunchPlaybook() {
     void loadHealth();
   }, []);
 
-  const sqlReady =
-    health?.sql.matchSchedule === true && health?.sql.guardianContact === true;
-  const sqlPending =
-    health?.sql.matchSchedule === false || health?.sql.guardianContact === false;
+  const coreSqlReady =
+    health?.sql.matchSchedule === true &&
+    health?.sql.guardianContact === true &&
+    health?.sql.profileViews === true;
 
   async function copyOutreach() {
     await navigator.clipboard.writeText(defaultOutreach);
-    toast.success("Mensaje copiado. Personaliza nombre y fecha.");
+    toast.success("Mensaje copiado. Personaliza nombre, academia y fecha.");
   }
 
   return (
@@ -85,10 +93,20 @@ export function FounderLaunchPlaybook() {
               Interno · MiFicha
             </p>
             <h1 className="mt-2 text-2xl font-semibold tracking-tight">
-              Playbook primera academia
+              Playbook venta + demo en vivo
             </h1>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-white/60">
+              Convence en 15 min: pitch → plantel → captura → WhatsApp con preview.
+            </p>
           </div>
           <div className="flex flex-wrap gap-3">
+            <Link
+              href="/interno/pitch"
+              className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#0a1628] hover:bg-white/95"
+            >
+              <Sparkles className="h-3.5 w-3.5" />
+              Pitch (F = presentar)
+            </Link>
             <Link
               href="/interno/jornadas"
               className="inline-flex items-center gap-2 rounded-full border border-emerald-400/30 bg-emerald-500/10 px-4 py-2 text-sm font-semibold text-emerald-200 hover:bg-emerald-500/15"
@@ -97,20 +115,13 @@ export function FounderLaunchPlaybook() {
             </Link>
             <Link
               href="/interno/temporadas"
-              className="inline-flex items-center gap-2 rounded-full border border-emerald-400/30 bg-emerald-500/10 px-4 py-2 text-sm font-semibold text-emerald-200 hover:bg-emerald-500/15"
+              className="inline-flex items-center gap-2 rounded-full border border-white/20 px-4 py-2 text-sm font-semibold text-white/90 hover:bg-white/10"
             >
               Temporadas
             </Link>
             <Link
-              href="/interno/pitch"
-              className="inline-flex items-center gap-2 rounded-full border border-white/20 px-4 py-2 text-sm font-semibold text-white/90 hover:bg-white/10"
-            >
-              Pitch deck
-              <ExternalLink className="h-3.5 w-3.5" />
-            </Link>
-            <Link
               href="/dashboard"
-              className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#0a1628] hover:bg-white/95"
+              className="inline-flex items-center gap-2 rounded-full border border-white/20 px-4 py-2 text-sm font-semibold text-white/90 hover:bg-white/10"
             >
               Dashboard
               <ArrowRight className="h-3.5 w-3.5" />
@@ -120,11 +131,81 @@ export function FounderLaunchPlaybook() {
       </header>
 
       <main className="mx-auto max-w-4xl space-y-8 px-6 py-10 sm:px-10">
+        <section className="rounded-2xl border border-sky-400/25 bg-sky-500/[0.08] p-6">
+          <div className="flex items-start gap-3">
+            <Zap className="mt-0.5 h-5 w-5 text-sky-300" />
+            <div>
+              <h2 className="text-lg font-semibold">Demo en vivo · 15 minutos</h2>
+              <p className="mt-2 text-sm leading-6 text-white/65">
+                Sigue este guión en la llamada. El wow es captura + WhatsApp con preview OG —
+                ensáyalo una vez antes de la academia real.
+              </p>
+            </div>
+          </div>
+          <ol className="mt-6 space-y-4">
+            {FOUNDER_LIVE_DEMO_SCRIPT.map((step) => (
+              <li
+                key={step.title}
+                className="rounded-xl border border-white/10 bg-black/20 px-4 py-4"
+              >
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-sky-300">
+                      Min {step.minute}
+                    </p>
+                    <p className="mt-1 font-semibold text-white">{step.title}</p>
+                    <p className="mt-2 text-sm leading-6 text-white/70">{step.action}</p>
+                    {step.wow ? (
+                      <p className="mt-2 text-sm font-medium text-emerald-300">
+                        Wow: {step.wow}
+                      </p>
+                    ) : null}
+                  </div>
+                  {step.href ? (
+                    <Link
+                      href={step.href}
+                      target={step.href.startsWith("/dashboard") ? undefined : "_blank"}
+                      className="shrink-0 rounded-full border border-white/15 px-3 py-1.5 text-xs font-semibold text-white/85 hover:bg-white/10"
+                    >
+                      Abrir
+                      <ExternalLink className="ml-1 inline h-3 w-3" />
+                    </Link>
+                  ) : null}
+                </div>
+              </li>
+            ))}
+          </ol>
+        </section>
+
+        <section className="rounded-2xl border border-emerald-400/25 bg-emerald-500/[0.08] p-6">
+          <h2 className="text-lg font-semibold">Efectos wow (memoriza estos 4)</h2>
+          <ul className="mt-4 grid gap-3 sm:grid-cols-2">
+            {FOUNDER_DEMO_WOW_MOMENTS.map((item) => (
+              <li
+                key={item.title}
+                className="rounded-xl border border-emerald-400/20 bg-black/20 px-4 py-3"
+              >
+                <p className="font-semibold text-emerald-200">{item.title}</p>
+                <p className="mt-1 text-sm leading-6 text-white/70">{item.detail}</p>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <section className="rounded-2xl border border-white/10 bg-white/[0.04] p-6">
+          <h2 className="text-lg font-semibold">Antes de la demo (precheck)</h2>
+          <ul className="mt-4 space-y-2">
+            {FOUNDER_DEMO_PRECHECK.map((item) => (
+              <li key={item} className="flex items-start gap-2 text-sm text-white/75">
+                <Circle className="mt-1 h-3.5 w-3.5 shrink-0 text-white/40" />
+                {item}
+              </li>
+            ))}
+          </ul>
+        </section>
+
         <section className="rounded-2xl border border-white/10 bg-white/[0.04] p-6">
           <h2 className="text-lg font-semibold">Estado de plataforma</h2>
-          <p className="mt-2 text-sm leading-6 text-white/60">
-            Revisa esto antes de la demo con una academia real.
-          </p>
           <ul className="mt-5 space-y-3">
             <HealthRow
               done={health?.sql.matchSchedule}
@@ -132,57 +213,43 @@ export function FounderLaunchPlaybook() {
             />
             <HealthRow
               done={health?.sql.guardianContact}
-              label="SQL #11 — email del tutor (guardian_email)"
+              label="SQL #11 — email del tutor"
+            />
+            <HealthRow
+              done={health?.sql.profileViews}
+              label="SQL #18 — contador aperturas de ficha"
             />
             <HealthRow
               done={health?.resend.ready}
-              label="Resend con dominio verificado (mificha.mx)"
+              label="Resend con dominio verificado"
               hint={
                 health?.resend.ready
                   ? undefined
-                  : "Usa WhatsApp desde Plantel hasta verificar dominio."
+                  : "WhatsApp basta para el piloto — email es opcional."
               }
             />
-            <HealthRow
-              done={health?.launchFree ?? true}
-              label="Modo lanzamiento gratis activo"
-            />
+            <HealthRow done={health?.launchFree ?? true} label="Modo lanzamiento gratis" />
           </ul>
-          {sqlReady ? (
+          {coreSqlReady ? (
             <p className="mt-5 rounded-xl border border-emerald-400/30 bg-emerald-400/10 px-4 py-3 text-sm text-emerald-100">
-              Base de datos lista — scripts #11 y #13 aplicados. No necesitas volver a
-              correrlos.
+              Core listo para demo (#11, #13, #18). Temporadas/jornadas (#14–#17) deben estar
+              aplicados para el flujo centralizado.
             </p>
           ) : null}
           {healthError ? (
             <p className="mt-5 rounded-xl border border-amber-400/30 bg-amber-400/10 px-4 py-3 text-sm text-amber-100">
-              No se pudo verificar automáticamente. Corre{" "}
-              <code className="text-amber-200">verify-production-readiness.sql</code> en
-              Supabase; si todo es true, estás listo.
+              Corre{" "}
+              <code className="text-amber-200">verify-production-readiness.sql</code> en Supabase.
             </p>
           ) : null}
-        </section>
-
-        <section className="rounded-2xl border border-white/10 bg-white/[0.04] p-6">
-          <h2 className="text-lg font-semibold">Plan de la semana</h2>
-          <ol className="mt-5 space-y-4">
-            {FOUNDER_WEEK_PLAN.map((item) => (
-              <li key={item.day} className="flex gap-4 text-sm">
-                <span className="w-24 shrink-0 font-semibold text-amber-300">
-                  {item.day}
-                </span>
-                <span className="text-white/75">{item.task}</span>
-              </li>
-            ))}
-          </ol>
         </section>
 
         <section className="rounded-2xl border border-white/10 bg-white/[0.04] p-6">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
-              <h2 className="text-lg font-semibold">Mensaje WhatsApp</h2>
+              <h2 className="text-lg font-semibold">Mensaje WhatsApp (prospección)</h2>
               <p className="mt-2 text-sm text-white/60">
-                Una academia caliente. Personaliza nombre y fecha del partido.
+                Una academia caliente. Enfatiza demo 15 min + gratis fundador.
               </p>
             </div>
             <button
@@ -200,46 +267,19 @@ export function FounderLaunchPlaybook() {
         </section>
 
         <section className="rounded-2xl border border-white/10 bg-white/[0.04] p-6">
-          <h2 className="text-lg font-semibold">Sesión A (30 min)</h2>
-          <ol className="mt-4 space-y-2 text-sm text-white/75">
-            <li>1. Crear cuenta o iniciar sesión juntos.</li>
-            <li>2. Importar Excel del plantel en /dashboard/plantel.</li>
-            <li>3. Confirmar jornada publicada por MiFicha en /dashboard/partidos.</li>
-            <li>4. Activar 1 ficha con consentimiento y mandar QR de prueba.</li>
+          <h2 className="text-lg font-semibold">Plan de la semana</h2>
+          <ol className="mt-5 space-y-4">
+            {FOUNDER_WEEK_PLAN.map((item) => (
+              <li key={item.day} className="flex gap-4 text-sm">
+                <span className="w-28 shrink-0 font-semibold text-amber-300">{item.day}</span>
+                <span className="text-white/75">{item.task}</span>
+              </li>
+            ))}
           </ol>
-          <div className="mt-5 flex flex-wrap gap-3">
-            <Link
-              href="/dashboard/plantel"
-              className="inline-flex items-center gap-2 rounded-lg border border-white/15 px-4 py-2 text-sm font-semibold hover:bg-white/10"
-            >
-              Plantel
-            </Link>
-            <Link
-              href="/dashboard/partidos"
-              className="inline-flex items-center gap-2 rounded-lg border border-white/15 px-4 py-2 text-sm font-semibold hover:bg-white/10"
-            >
-              Partidos
-            </Link>
-            <Link
-              href="/interno/jornadas"
-              className="inline-flex items-center gap-2 rounded-lg border border-white/15 px-4 py-2 text-sm font-semibold hover:bg-white/10"
-            >
-              Jornadas (interno)
-            </Link>
-            <Link
-              href="/dashboard/plantel/imprimir"
-              className="inline-flex items-center gap-2 rounded-lg border border-white/15 px-4 py-2 text-sm font-semibold hover:bg-white/10"
-            >
-              <MessageCircle className="h-4 w-4" />
-              QR imprimibles
-            </Link>
-          </div>
         </section>
 
         <section className="rounded-2xl border border-amber-400/30 bg-amber-400/10 p-6">
-          <h2 className="text-lg font-semibold text-amber-100">
-            Academia convertida cuando…
-          </h2>
+          <h2 className="text-lg font-semibold text-amber-100">Academia convertida cuando…</h2>
           <ul className="mt-4 space-y-2">
             {FOUNDER_CONVERSION_CRITERIA.map((item) => (
               <li key={item} className="flex items-center gap-2 text-sm text-amber-50/90">
@@ -250,29 +290,45 @@ export function FounderLaunchPlaybook() {
           </ul>
         </section>
 
-        {sqlPending ? (
-          <section className="rounded-2xl border border-amber-400/30 bg-amber-400/10 p-6">
-            <h2 className="text-lg font-semibold text-amber-100">
-              SQL pendiente en Supabase
-            </h2>
-            <p className="mt-2 text-sm text-amber-50/80">
-              El estado de plataforma arriba marca scripts faltantes. Ejecuta solo los
-              que correspondan en SQL Editor.
-            </p>
-            <ul className="mt-4 space-y-2 text-sm text-amber-50/90">
-              {PRODUCTION_SQL_SCRIPTS.filter((script) => {
-                if (script.id === 11) return health?.sql.guardianContact === false;
-                if (script.id === 13) return health?.sql.matchSchedule === false;
-                return false;
-              }).map((script) => (
-                <li key={script.id}>
-                  #{script.id} · <code className="text-amber-200">{script.file}</code> —{" "}
-                  {script.label}
-                </li>
-              ))}
-            </ul>
-          </section>
-        ) : null}
+        <section className="rounded-2xl border border-white/10 bg-white/[0.04] p-6">
+          <h2 className="text-lg font-semibold">SQL en Supabase (orden recomendado)</h2>
+          <p className="mt-2 text-sm text-white/60">
+            Ejecuta en SQL Editor. Orden: {PRODUCTION_SQL_ORDER.join(" → ")}.
+          </p>
+          <ul className="mt-4 space-y-2 text-sm text-white/75">
+            {PRODUCTION_SQL_SCRIPTS.map((script) => (
+              <li key={script.id}>
+                <span className="font-mono text-emerald-300">#{script.id}</span> ·{" "}
+                <code className="text-sky-200">{script.file}</code> — {script.label}
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <section className="rounded-2xl border border-white/10 bg-white/[0.04] p-6">
+          <h2 className="text-lg font-semibold">Sesión B · post-partido real</h2>
+          <ol className="mt-4 space-y-2 text-sm text-white/75">
+            <li>1. Captura en cancha juntos (modo convocados, 2 min).</li>
+            <li>2. WhatsApp a 3 padres reales — pide que abran el link.</li>
+            <li>3. Dashboard → confirma contador «3 visitas únicas».</li>
+            <li>4. Pide testimonio al director (audio 30 s o WhatsApp escrito).</li>
+          </ol>
+          <div className="mt-5 flex flex-wrap gap-3">
+            <Link
+              href="/dashboard/partidos/nuevo"
+              className="inline-flex items-center gap-2 rounded-lg border border-white/15 px-4 py-2 text-sm font-semibold hover:bg-white/10"
+            >
+              Captura
+            </Link>
+            <Link
+              href="/dashboard/plantel/imprimir"
+              className="inline-flex items-center gap-2 rounded-lg border border-white/15 px-4 py-2 text-sm font-semibold hover:bg-white/10"
+            >
+              <MessageCircle className="h-4 w-4" />
+              QR
+            </Link>
+          </div>
+        </section>
       </main>
     </div>
   );
