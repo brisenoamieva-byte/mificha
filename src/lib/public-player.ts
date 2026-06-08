@@ -45,6 +45,7 @@ function getSupabaseHeaders() {
 
 export async function fetchPublicPlayerBySlug(
   slug: string,
+  options?: { skipMediaSigning?: boolean },
 ): Promise<PublicPlayerData | null> {
   const { url, key } = getSupabaseHeaders();
 
@@ -173,8 +174,12 @@ export async function fetchPublicPlayerBySlug(
   return {
     player: {
       ...player,
-      photo_url: await signPlayerPhotoUrl(player.photo_url),
-      video_url: await signPlayerVideoUrl(player.video_url),
+      photo_url: options?.skipMediaSigning
+        ? player.photo_url
+        : await signPlayerPhotoUrl(player.photo_url),
+      video_url: options?.skipMediaSigning
+        ? player.video_url
+        : await signPlayerVideoUrl(player.video_url),
     },
     currentSeasonStats,
     currentSeasonName,

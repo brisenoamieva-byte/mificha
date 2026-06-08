@@ -204,7 +204,7 @@ export function FounderLaunchPlaybook() {
           <ol className="mt-4 space-y-2 text-sm text-white/75">
             <li>1. Crear cuenta o iniciar sesión juntos.</li>
             <li>2. Importar Excel del plantel en /dashboard/plantel.</li>
-            <li>3. Programar próximo partido en /dashboard/partidos/programar.</li>
+            <li>3. Confirmar jornada publicada por MiFicha en /dashboard/partidos.</li>
             <li>4. Activar 1 ficha con consentimiento y mandar QR de prueba.</li>
           </ol>
           <div className="mt-5 flex flex-wrap gap-3">
@@ -215,10 +215,16 @@ export function FounderLaunchPlaybook() {
               Plantel
             </Link>
             <Link
-              href="/dashboard/partidos/programar"
+              href="/dashboard/partidos"
               className="inline-flex items-center gap-2 rounded-lg border border-white/15 px-4 py-2 text-sm font-semibold hover:bg-white/10"
             >
-              Programar partido
+              Partidos
+            </Link>
+            <Link
+              href="/interno/jornadas"
+              className="inline-flex items-center gap-2 rounded-lg border border-white/15 px-4 py-2 text-sm font-semibold hover:bg-white/10"
+            >
+              Jornadas (interno)
             </Link>
             <Link
               href="/dashboard/plantel/imprimir"
