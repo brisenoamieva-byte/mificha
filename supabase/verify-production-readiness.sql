@@ -36,7 +36,20 @@ select
     where schemaname = 'public'
       and tablename = 'matches'
       and policyname = 'matches_select_public_ficha'
-  ) as public_ficha_match_history_sql;
+  ) as public_ficha_match_history_sql,
+  exists (
+    select 1
+    from information_schema.tables
+    where table_schema = 'public'
+      and table_name = 'platform_seasons'
+  ) as platform_seasons_shared_sql,
+  exists (
+    select 1
+    from information_schema.columns
+    where table_schema = 'public'
+      and table_name = 'seasons'
+      and column_name = 'platform_season_id'
+  ) as seasons_platform_link_sql;
 
 -- Si alguna columna es false, ejecuta el script correspondiente:
 -- #11 player-guardian-contact.sql
@@ -45,3 +58,4 @@ select
 -- #14 platform-seasons-rls.sql
 -- #15 platform-fixtures-rls.sql
 -- #16 public-ficha-match-history.sql
+-- #17 platform-seasons-shared.sql

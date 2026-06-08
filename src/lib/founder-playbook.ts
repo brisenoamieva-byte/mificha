@@ -49,4 +49,5 @@ export const PRODUCTION_SQL_SCRIPTS = [
   { id: 14, file: "platform-seasons-rls.sql", label: "Temporadas solo admin" },
   { id: 15, file: "platform-fixtures-rls.sql", label: "Jornadas solo admin" },
   { id: 16, file: "public-ficha-match-history.sql", label: "Historial en ficha pública" },
+  { id: 17, file: "platform-seasons-shared.sql", label: "Temporada compartida MiFicha" },
 ] as const;

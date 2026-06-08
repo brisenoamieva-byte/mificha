@@ -202,6 +202,39 @@ export type Database = {
           },
         ];
       };
+      platform_seasons: {
+        Row: {
+          id: string;
+          name: string;
+          slug: string;
+          region: string | null;
+          start_date: string;
+          end_date: string;
+          is_active: boolean;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          slug: string;
+          region?: string | null;
+          start_date: string;
+          end_date: string;
+          is_active?: boolean;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          slug?: string;
+          region?: string | null;
+          start_date?: string;
+          end_date?: string;
+          is_active?: boolean;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
       seasons: {
         Row: {
           id: string;
@@ -210,6 +243,7 @@ export type Database = {
           start_date: string;
           end_date: string;
           is_active: boolean;
+          platform_season_id: string | null;
         };
         Insert: {
           id?: string;
@@ -218,6 +252,7 @@ export type Database = {
           start_date: string;
           end_date: string;
           is_active?: boolean;
+          platform_season_id?: string | null;
         };
         Update: {
           id?: string;
@@ -226,6 +261,7 @@ export type Database = {
           start_date?: string;
           end_date?: string;
           is_active?: boolean;
+          platform_season_id?: string | null;
         };
         Relationships: [
           {
@@ -233,6 +269,13 @@ export type Database = {
             columns: ["academy_id"];
             isOneToOne: false;
             referencedRelation: "academies";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "seasons_platform_season_id_fkey";
+            columns: ["platform_season_id"];
+            isOneToOne: false;
+            referencedRelation: "platform_seasons";
             referencedColumns: ["id"];
           },
         ];

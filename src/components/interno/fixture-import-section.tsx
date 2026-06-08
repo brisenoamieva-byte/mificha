@@ -33,7 +33,11 @@ async function authedFetch(input: string, init?: RequestInit) {
     },
   });
 
-  const payload = (await response.json()) as { error?: string; inserted?: number };
+  const payload = (await response.json()) as {
+    error?: string;
+    inserted?: number;
+    academies?: number;
+  };
 
   if (!response.ok) {
     throw new Error(payload.error ?? "Error de red.");
@@ -78,18 +82,21 @@ export function FixtureImportSection({
   }
 
   async function handleImport() {
-    if (!preview || preview.valid.length === 0 || !academyId) return;
+    const isMultiAcademy = preview?.valid.some((row) => row.academySlug) ?? false;
+    if (!preview || preview.valid.length === 0) return;
+    if (!isMultiAcademy && !academyId) return;
 
     setImporting(true);
     try {
       const result = await authedFetch("/api/interno/fixtures/bulk", {
         method: "POST",
         body: JSON.stringify({
-          academy_id: academyId,
+          ...(isMultiAcademy ? {} : { academy_id: academyId }),
           season_id: seasonId,
           is_public: isPublic,
           is_official: isOfficial,
           fixtures: preview.valid.map((row) => ({
+            ...(row.academySlug ? { academy_slug: row.academySlug } : {}),
             opponent: row.opponent,
             match_date: row.matchDate,
             kickoff_time: row.kickoffTime,
@@ -101,7 +108,11 @@ export function FixtureImportSection({
         }),
       });
 
-      toast.success(`${result.inserted ?? preview.valid.length} jornadas publicadas.`);
+      const academiesNote =
+        result.academies && result.academies > 1
+          ? ` en ${result.academies} academias`
+          : "";
+      toast.success(`${result.inserted ?? preview.valid.length} jornadas publicadas${academiesNote}.`);
       setPreview(null);
       onImported();
     } catch (error) {
@@ -120,8 +131,9 @@ export function FixtureImportSection({
             <h2 className="text-lg font-semibold">Importar calendario</h2>
           </div>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-white/60">
-            Sube CSV o Excel con columnas: rival, fecha, hora, categoría, sede,
-            notas. Ideal para cargar toda la jornada del torneo de una vez.
+            Sube CSV o Excel con columnas: academia (slug), rival, fecha, hora,
+            categoría, sede, notas. Omite academia para cargar solo la academia
+            seleccionada; inclúyela para importar varias academias a la vez.
           </p>
         </div>
         <button
@@ -173,6 +185,19 @@ export function FixtureImportSection({
 
       {preview ? (
         <div className="mt-6 space-y-4">
+          {preview.valid.some((row) => row.academySlug) ? (
+            <p className="text-sm text-sky-200">
+              Modo multi-academia:{" "}
+              {
+                new Set(
+                  preview.valid
+                    .map((row) => row.academySlug)
+                    .filter((slug): slug is string => Boolean(slug)),
+                ).size
+              }{" "}
+              colegios detectados en el archivo.
+            </p>
+          ) : null}
           <div className="flex flex-wrap gap-4 text-sm">
             <span className="rounded-full bg-emerald-500/15 px-3 py-1 font-semibold text-emerald-200">
               {preview.valid.length} válidas
@@ -189,6 +214,9 @@ export function FixtureImportSection({
               <table className="min-w-full text-left text-sm">
                 <thead className="bg-black/20 text-xs uppercase tracking-wide text-white/45">
                   <tr>
+                    {preview.valid.some((row) => row.academySlug) ? (
+                      <th className="px-4 py-3">Academia</th>
+                    ) : null}
                     <th className="px-4 py-3">Rival</th>
                     <th className="px-4 py-3">Fecha</th>
                     <th className="px-4 py-3">Hora</th>
@@ -199,6 +227,9 @@ export function FixtureImportSection({
                 <tbody>
                   {preview.valid.slice(0, 8).map((row) => (
                     <tr key={row.rowNumber} className="border-t border-white/10">
+                      {preview.valid.some((item) => item.academySlug) ? (
+                        <td className="px-4 py-3 text-white/70">{row.academySlug ?? "—"}</td>
+                      ) : null}
                       <td className="px-4 py-3 font-medium">{row.opponent}</td>
                       <td className="px-4 py-3 text-white/70">{row.matchDate}</td>
                       <td className="px-4 py-3 text-white/70">{row.kickoffTime}</td>
@@ -223,7 +254,11 @@ export function FixtureImportSection({
 
           <button
             type="button"
-            disabled={importing || disabled || preview.valid.length === 0}
+            disabled={
+              importing ||
+              (disabled && !preview.valid.some((row) => row.academySlug)) ||
+              preview.valid.length === 0
+            }
             onClick={() => void handleImport()}
             className="inline-flex items-center gap-2 rounded-full bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-[#0a1628] disabled:opacity-60"
           >

@@ -2,6 +2,7 @@ import * as XLSX from "xlsx";
 
 export interface ParsedFixtureRow {
   rowNumber: number;
+  academySlug: string | null;
   opponent: string;
   matchDate: string;
   kickoffTime: string;
@@ -23,9 +24,9 @@ export interface FixtureImportPreview {
   totalRows: number;
 }
 
-export const FIXTURE_IMPORT_TEMPLATE = `rival,fecha,hora,categoria,sede,notas
-Halcones FC,2026-03-15,10:00,Sub-15 Varonil,Cancha 2 U.D. Querétaro,Jornada 3
-Águilas SC,2026-03-22,09:00,Sub-15 Varonil,Cancha 1 U.D. Querétaro,Jornada 4
+export const FIXTURE_IMPORT_TEMPLATE = `academia,rival,fecha,hora,categoria,sede,notas
+colegio-ejemplo,Halcones FC,2026-03-15,10:00,Sub-15 Varonil,Cancha 2 U.D. Querétaro,Jornada 3
+colegio-ejemplo,Águilas SC,2026-03-22,09:00,Sub-15 Varonil,Cancha 1 U.D. Querétaro,Jornada 4
 `;
 
 function normalizeKey(key: string) {
@@ -121,6 +122,8 @@ export function parseFixtureImportFile(buffer: ArrayBuffer): FixtureImportPrevie
 
   rows.forEach((row, index) => {
     const rowNumber = index + 2;
+    const academySlug =
+      getCell(row, ["academia", "academy", "slug", "colegio"]) || null;
     const opponent = getCell(row, ["rival", "oponente", "opponent", "vs"]);
     const dateRaw = getCell(row, ["fecha", "date", "match"]);
     const timeRaw = getCell(row, ["hora", "time", "kickoff"]);
@@ -162,6 +165,7 @@ export function parseFixtureImportFile(buffer: ArrayBuffer): FixtureImportPrevie
 
     valid.push({
       rowNumber,
+      academySlug,
       opponent,
       matchDate,
       kickoffTime,

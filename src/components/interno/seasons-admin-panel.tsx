@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ArrowLeft, CalendarPlus, CheckCircle2, Loader2 } from "lucide-react";
+import { PlatformSeasonSection } from "@/components/interno/platform-season-section";
 import { defaultSeasonName } from "@/lib/match-utils";
 import { supabase } from "@/lib/supabase";
 import { toast } from "@/components/ui/toast";
@@ -185,8 +186,11 @@ export function SeasonsAdminPanel() {
           </div>
         ) : (
           <div className="space-y-8">
+            <PlatformSeasonSection />
+
             <section className="rounded-2xl border border-white/10 bg-white/[0.04] p-6">
-              <label className="block text-sm font-medium text-white/80">
+              <h2 className="text-lg font-semibold">Temporada por academia</h2>
+              <label className="mt-4 block text-sm font-medium text-white/80">
                 Academia
               </label>
               <select
@@ -316,7 +320,11 @@ export function SeasonsAdminPanel() {
               <code className="rounded bg-white/10 px-1.5 py-0.5 text-emerald-200">
                 platform-seasons-rls.sql
               </code>{" "}
-              en Supabase para bloquear creación por academias.
+              y{" "}
+              <code className="rounded bg-white/10 px-1.5 py-0.5 text-sky-200">
+                platform-seasons-shared.sql
+              </code>{" "}
+              en Supabase.
             </p>
           </div>
         )}
