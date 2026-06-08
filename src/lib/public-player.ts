@@ -10,6 +10,11 @@ import {
   normalizeMatchPerformanceRows,
 } from "@/lib/performance-analytics";
 
+export interface PublicPlayerAchievement {
+  achievement_key: string;
+  unlocked_at: string;
+}
+
 export interface PublicPlayerAcademy {
   name: string;
   city: string | null;
@@ -30,6 +35,7 @@ export interface PublicPlayerData {
   history: PublicPlayerHistoryItem[];
   seasonProgress: MatchPerformanceRow[];
   seasonHighlights: ReturnType<typeof getPerformanceHighlights>;
+  achievements: PublicPlayerAchievement[];
 }
 
 function getSupabaseHeaders() {
@@ -171,6 +177,23 @@ export async function fetchPublicPlayerBySlug(
 
   const seasonHighlights = getPerformanceHighlights(seasonProgress, []);
 
+  let achievements: PublicPlayerAchievement[] = [];
+
+  const achievementsResponse = await fetch(
+    `${url}/rest/v1/player_achievements?player_id=eq.${player.id}&select=achievement_key,unlocked_at&order=unlocked_at.desc`,
+    {
+      headers: {
+        apikey: key,
+        Authorization: `Bearer ${key}`,
+      },
+      next: { revalidate: 60 },
+    },
+  );
+
+  if (achievementsResponse.ok) {
+    achievements = (await achievementsResponse.json()) as PublicPlayerAchievement[];
+  }
+
   return {
     player: {
       ...player,
@@ -186,6 +209,7 @@ export async function fetchPublicPlayerBySlug(
     history,
     seasonProgress,
     seasonHighlights,
+    achievements,
   };
 }
 

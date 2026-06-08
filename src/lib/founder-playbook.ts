@@ -160,6 +160,7 @@ export const PRODUCTION_SQL_SCRIPTS = [
   { id: 16, file: "public-ficha-match-history.sql", label: "Historial en ficha pública" },
   { id: 17, file: "platform-seasons-shared.sql", label: "Temporada compartida MiFicha" },
   { id: 18, file: "player-profile-views.sql", label: "Aperturas de ficha pública" },
+  { id: 19, file: "player-achievements.sql", label: "Insignias y logros verificados" },
 ] as const;
 
-export const PRODUCTION_SQL_ORDER = [11, 13, 14, 15, 16, 17, 18, 12] as const;
+export const PRODUCTION_SQL_ORDER = [11, 13, 14, 15, 16, 17, 18, 19, 12] as const;

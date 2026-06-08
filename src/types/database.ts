@@ -463,6 +463,55 @@ export type Database = {
           },
         ];
       };
+      player_achievements: {
+        Row: {
+          id: string;
+          player_id: string;
+          academy_id: string;
+          achievement_key: string;
+          match_id: string | null;
+          unlocked_at: string;
+        };
+        Insert: {
+          id?: string;
+          player_id: string;
+          academy_id: string;
+          achievement_key: string;
+          match_id?: string | null;
+          unlocked_at?: string;
+        };
+        Update: {
+          id?: string;
+          player_id?: string;
+          academy_id?: string;
+          achievement_key?: string;
+          match_id?: string | null;
+          unlocked_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "player_achievements_player_id_fkey";
+            columns: ["player_id"];
+            isOneToOne: false;
+            referencedRelation: "players";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "player_achievements_academy_id_fkey";
+            columns: ["academy_id"];
+            isOneToOne: false;
+            referencedRelation: "academies";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "player_achievements_match_id_fkey";
+            columns: ["match_id"];
+            isOneToOne: false;
+            referencedRelation: "matches";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       player_profile_views: {
         Row: {
           id: string;

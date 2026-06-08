@@ -55,7 +55,13 @@ select
     from information_schema.tables
     where table_schema = 'public'
       and table_name = 'player_profile_views'
-  ) as player_profile_views_sql;
+  ) as player_profile_views_sql,
+  exists (
+    select 1
+    from information_schema.tables
+    where table_schema = 'public'
+      and table_name = 'player_achievements'
+  ) as player_achievements_sql;
 
 -- Si alguna columna es false, ejecuta el script correspondiente:
 -- #11 player-guardian-contact.sql
@@ -66,3 +72,4 @@ select
 -- #16 public-ficha-match-history.sql
 -- #17 platform-seasons-shared.sql
 -- #18 player-profile-views.sql
+-- #19 player-achievements.sql

@@ -347,6 +347,72 @@ export function PartidosNuevoContent() {
           .select("id, slug, first_name, last_name, passport_score, is_public, public_consent_at")
           .in("id", playedIds);
 
+        const achievementMap = new Map<
+          string,
+          Array<{
+            key: string;
+            title: string;
+            description: string;
+            rarity: string;
+            emoji: string;
+          }>
+        >();
+
+        try {
+          const {
+            data: { session },
+          } = await supabase.auth.getSession();
+
+          if (session) {
+            const achievementResponse = await fetch("/api/achievements/evaluate-match", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${session.access_token}`,
+              },
+              body: JSON.stringify({
+                match_id: match.id,
+                season_id: season.id,
+                captures: playedStats.map((capture) => ({
+                  player_id: capture.player_id,
+                  goals: capture.goals,
+                  assists: capture.assists,
+                  minutes: capture.minutes,
+                  passport_score:
+                    afterPlayers?.find((player) => player.id === capture.player_id)
+                      ?.passport_score ?? 0,
+                  previous_passport_score:
+                    previousScores.get(capture.player_id) ??
+                    afterPlayers?.find((player) => player.id === capture.player_id)
+                      ?.passport_score ??
+                    0,
+                })),
+              }),
+            });
+
+            if (achievementResponse.ok) {
+              const payload = (await achievementResponse.json()) as {
+                players?: Array<{
+                  player_id: string;
+                  unlocked: Array<{
+                    key: string;
+                    title: string;
+                    description: string;
+                    rarity: string;
+                    emoji: string;
+                  }>;
+                }>;
+              };
+
+              for (const row of payload.players ?? []) {
+                achievementMap.set(row.player_id, row.unlocked);
+              }
+            }
+          }
+        } catch {
+          // Achievements are optional until SQL #19 is applied.
+        }
+
         summaries = playedStats.map((capture) => {
           const updated = afterPlayers?.find(
             (player) => player.id === capture.player_id,
@@ -365,13 +431,22 @@ export function PartidosNuevoContent() {
               previousScores.get(capture.player_id) ?? updated?.passport_score ?? 0,
             is_public: updated?.is_public ?? false,
             public_consent_at: updated?.public_consent_at ?? null,
+            unlocked_achievements: achievementMap.get(capture.player_id) ?? [],
           };
         });
       }
 
       setSavedSummaries(summaries);
       setStep(3);
-      toast.success("Partido guardado. Passport Score actualizado.");
+      const unlockedCount = summaries.reduce(
+        (count, player) => count + player.unlocked_achievements.length,
+        0,
+      );
+      toast.success(
+        unlockedCount > 0
+          ? `Partido guardado · ${unlockedCount} insignia${unlockedCount === 1 ? "" : "s"} desbloqueada${unlockedCount === 1 ? "" : "s"}.`
+          : "Partido guardado. Passport Score actualizado.",
+      );
     } catch (saveError) {
       setError(
         saveError instanceof Error

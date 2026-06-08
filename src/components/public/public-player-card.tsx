@@ -19,6 +19,7 @@ import { calculateAge, getPositionLabel } from "@/lib/dashboard-utils";
 import { PlayerCategoryBadge } from "@/components/ui/player-category-badge";
 import type { PublicPlayerData } from "@/lib/public-player";
 import { PublicPlayerProgressSection } from "@/components/public/public-player-progress-section";
+import { PlayerAchievementsShelf } from "@/components/public/player-achievements-shelf";
 import { ProfileViewTracker } from "@/components/public/profile-view-tracker";
 import { PassportScoreDisplay } from "@/components/ui/passport-score-display";
 import {
@@ -54,7 +55,7 @@ function StatTile({
 }
 
 export function PublicPlayerCard({ data }: PublicPlayerCardProps) {
-  const { player, currentSeasonStats, currentSeasonName, history, seasonProgress, seasonHighlights } = data;
+  const { player, currentSeasonStats, currentSeasonName, history, seasonProgress, seasonHighlights, achievements } = data;
   const [copied, setCopied] = useState(false);
 
   const fullName = `${player.first_name} ${player.last_name}`;
@@ -210,6 +211,8 @@ export function PublicPlayerCard({ data }: PublicPlayerCardProps) {
           progress={seasonProgress}
           highlights={seasonHighlights}
         />
+
+        <PlayerAchievementsShelf achievements={achievements} />
 
         {history.length > 0 ? (
           <section className="border-t border-slate-100 px-6 py-8 sm:px-10">
