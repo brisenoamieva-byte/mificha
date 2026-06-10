@@ -31,7 +31,7 @@ export function buildFounderOutreachMessage(options: {
   return [
     `Hola ${options.contactName}, lanzamos MiFicha en Querétaro — ficha digital verificada para escuelas.`,
     "",
-    `En 15 min te enseño en vivo: cargas plantel, capturas convocados y minutos en ~1 min, y el padre recibe el link con Passport Score automáticamente (sin app).`,
+    `En 15 min te enseño en vivo: cargamos plantel, capturamos convocados y minutos, y el padre recibe el link con Passport Score automáticamente.`,
     "",
     `Además, tu academia y tus mejores jugadores aparecen en el directorio verificado de Querétaro — ficha compartible para visorías, destacados semanales y badge de academia certificada. No prometemos becas; sí evidencia verificada que refleja en el renombre de tu escuela.`,
     "",
@@ -89,7 +89,7 @@ export const FOUNDER_LIVE_DEMO_SCRIPT: FounderDemoStep[] = [
     minute: "0–2",
     title: "Gancho emocional",
     action:
-      "Abre pitch slide «Tu talento existe, pero no se ve». Pregunta: «¿Cuántos padres te escriben el domingo pidiendo stats?»",
+      "Abre pitch slide «El talento existe, pero no se ve». Pregunta: «¿Cuántos padres te escriben el domingo pidiendo stats?»",
     href: "/interno/pitch",
   },
   {
@@ -119,7 +119,7 @@ export const FOUNDER_LIVE_DEMO_SCRIPT: FounderDemoStep[] = [
     minute: "9–11",
     title: "Captura post-partido",
     action:
-      "/dashboard/partidos/nuevo → convocados + minutos (~1 min) → Guardar. Señala Passport, insignias y ranking semanal.",
+      "/dashboard/partidos/nuevo → capturamos convocados + minutos (~1 min) → Guardar. Señala Passport, insignias y ranking semanal.",
     wow: "Recompensas desbloqueadas + «Subió X puestos»",
     href: "/dashboard/partidos/nuevo",
   },
@@ -135,8 +135,8 @@ export const FOUNDER_LIVE_DEMO_SCRIPT: FounderDemoStep[] = [
     minute: "13–14",
     title: "Visibilidad de la academia",
     action:
-      "Slide «Tu plantel en la vitrina verificada» o abre /explorar. «Tus mejores jugadores salen en destacados semanales; la academia aparece certificada. Entra primero como fundadora.»",
-    wow: "Evidencia verificada > promesas de becas",
+      "Slide «Tu plantel en el directorio de Querétaro» o abre /explorar. «Tus mejores salen en destacados; entra primero como fundadora.»",
+    wow: "Ficha compartible > promesas vacías",
     href: "/explorar",
   },
   {
@@ -172,9 +172,9 @@ export const FOUNDER_DEMO_WOW_MOMENTS = [
       "Organizador = marcador/acta · academia = minutos · padres = solo consultan. Stats creíbles en toda la red.",
   },
   {
-    title: "Vitrina verificada",
+    title: "Directorio Querétaro",
     detail:
-      "/explorar muestra academia certificada, destacados semanales y fichas compartibles — renombre sin prometer becas.",
+      "/explorar muestra academia fundadora, destacados semanales y fichas compartibles.",
   },
 ] as const;
 
