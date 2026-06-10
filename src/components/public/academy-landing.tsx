@@ -198,7 +198,11 @@ export function AcademyLanding({ data }: AcademyLandingProps) {
                     <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-500">
                       Passport Score
                     </p>
-                    <PassportSegments score={player.passport_score} className="mt-3" />
+                    <PassportSegments
+                      score={player.passport_score}
+                      surface="dark"
+                      className="mt-3"
+                    />
                   </div>
                 </Link>
               );

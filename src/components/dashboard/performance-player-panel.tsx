@@ -270,6 +270,7 @@ export function PerformancePlayerPanel({
               <PassportScoreDisplay
                 score={selectedPlayer.passport_score}
                 variant="compact"
+                surface="dark"
                 scoreLabel="Progreso verificado"
                 className="w-[160px]"
               />

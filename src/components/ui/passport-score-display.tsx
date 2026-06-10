@@ -1,6 +1,5 @@
 import {
   clampPassportScore,
-  getPassportFilledSegments,
   getPassportTier,
 } from "@/lib/passport-score";
 import { cn } from "@/lib/utils";
@@ -8,6 +7,7 @@ import { cn } from "@/lib/utils";
 interface PassportScoreDisplayProps {
   score: number;
   variant?: "hero" | "card" | "compact" | "inline";
+  surface?: "light" | "dark";
   showLabel?: boolean;
   showTier?: boolean;
   /** Player-facing copy; default keeps product name for coaches */
@@ -15,37 +15,68 @@ interface PassportScoreDisplayProps {
   className?: string;
 }
 
-export function PassportSegments({
+function PassportProgressBar({
   score,
   className,
-  segmentClassName,
+  surface = "light",
+  barClassName,
 }: {
   score: number;
   className?: string;
-  segmentClassName?: string;
+  surface?: "light" | "dark";
+  barClassName?: string;
 }) {
-  const tier = getPassportTier(score);
-  const filled = getPassportFilledSegments(score);
+  const value = clampPassportScore(score);
+  const tier = getPassportTier(value);
 
   return (
-    <div className={cn("flex gap-1", className)}>
-      {Array.from({ length: 10 }).map((_, index) => (
-        <span
-          key={index}
-          className={cn(
-            "h-2 flex-1 skew-x-[-12deg] rounded-[2px]",
-            index < filled ? tier.segmentFilled : tier.segmentEmpty,
-            segmentClassName,
-          )}
-        />
-      ))}
+    <div
+      className={cn(
+        "h-1 w-full overflow-hidden rounded-full",
+        surface === "dark" ? "bg-white/15" : "bg-slate-100",
+        className,
+      )}
+      role="progressbar"
+      aria-valuenow={value}
+      aria-valuemin={0}
+      aria-valuemax={100}
+    >
+      <div
+        className={cn(
+          "h-full rounded-full transition-[width]",
+          surface === "dark" ? tier.progressFillOnDark : tier.progressFill,
+          barClassName,
+        )}
+        style={{ width: `${value}%` }}
+      />
     </div>
+  );
+}
+
+export function PassportSegments({
+  score,
+  className,
+  surface = "light",
+}: {
+  score: number;
+  className?: string;
+  surface?: "light" | "dark";
+  /** @deprecated No longer used — kept for call-site compatibility */
+  segmentClassName?: string;
+}) {
+  return (
+    <PassportProgressBar
+      score={score}
+      surface={surface}
+      className={cn("h-1.5", className)}
+    />
   );
 }
 
 export function PassportScoreDisplay({
   score,
   variant = "hero",
+  surface = "light",
   showLabel = true,
   showTier = true,
   scoreLabel = "Passport Score",
@@ -53,23 +84,22 @@ export function PassportScoreDisplay({
 }: PassportScoreDisplayProps) {
   const value = clampPassportScore(score);
   const tier = getPassportTier(value);
+  const scoreColor = surface === "dark" ? tier.scoreTextOnDark : tier.scoreText;
+  const labelColor =
+    surface === "dark" ? "text-white/55" : "text-slate-400";
+  const tierColor =
+    surface === "dark" ? "text-white/50" : "text-slate-500";
 
   if (variant === "inline") {
-    const filled = getPassportFilledSegments(value);
     return (
-      <div className={cn("flex min-w-[88px] items-center gap-2", className)}>
-        <div className="flex flex-1 gap-0.5">
-          {Array.from({ length: 10 }).map((_, index) => (
-            <span
-              key={index}
-              className={cn(
-                "h-1.5 flex-1 skew-x-[-12deg] rounded-[1px]",
-                index < filled ? tier.segmentFilled : "bg-slate-200",
-              )}
-            />
-          ))}
-        </div>
-        <span className="w-7 text-right text-xs font-bold tabular-nums text-slate-700">
+      <div className={cn("flex min-w-[88px] items-center gap-2.5", className)}>
+        <PassportProgressBar score={value} surface={surface} className="flex-1" />
+        <span
+          className={cn(
+            "w-7 shrink-0 text-right text-xs font-semibold tabular-nums",
+            surface === "dark" ? "text-white/90" : "text-slate-700",
+          )}
+        >
           {value}
         </span>
       </div>
@@ -80,36 +110,38 @@ export function PassportScoreDisplay({
     return (
       <div
         className={cn(
-          "relative overflow-hidden rounded-xl border px-3 py-2 text-center shadow-sm",
-          tier.panelBg,
-          tier.panelBorder,
+          "rounded-xl border px-3 py-2.5 text-center",
+          surface === "dark"
+            ? "border-white/10 bg-white/5"
+            : "border-slate-200/80 bg-white shadow-sm",
           className,
         )}
       >
-        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.08)_0%,transparent_45%)]" />
         {showTier ? (
-          <span
-            className={cn(
-              "relative inline-flex rounded px-1.5 py-0.5 text-[10px] font-semibold tracking-normal",
-              tier.badgeBg,
-              tier.badgeText,
-            )}
-          >
+          <p className={cn("text-[10px] font-medium tracking-wide", tierColor)}>
             {tier.label}
-          </span>
+          </p>
         ) : null}
         <p
           className={cn(
-            "relative mt-1 text-2xl font-bold tabular-nums leading-none tracking-tight",
-            tier.scoreText,
+            "font-semibold tabular-nums leading-none tracking-tight",
+            showTier ? "mt-1 text-2xl" : "text-xl",
+            scoreColor,
           )}
         >
           {value}
         </p>
         {showLabel ? (
-          <p className="relative mt-1 text-[9px] font-medium text-white/55">
+          <p className={cn("mt-1 text-[9px] font-medium", labelColor)}>
             {scoreLabel}
           </p>
+        ) : null}
+        {showLabel || showTier ? (
+          <PassportProgressBar
+            score={value}
+            surface={surface}
+            className="mt-2"
+          />
         ) : null}
       </div>
     );
@@ -119,51 +151,36 @@ export function PassportScoreDisplay({
     return (
       <div
         className={cn(
-          "relative overflow-hidden rounded-2xl border-2 p-4 shadow-lg",
-          tier.panelBg,
-          tier.panelBorder,
+          "rounded-2xl border p-4",
+          surface === "dark"
+            ? "border-white/10 bg-white/5"
+            : "border-slate-200/80 bg-white shadow-sm",
           className,
         )}
       >
-        <div className="pointer-events-none absolute -right-6 -top-6 h-24 w-24 rotate-12 rounded-full bg-white/5 blur-2xl" />
-        <div className="pointer-events-none absolute inset-0 bg-[repeating-linear-gradient(-45deg,rgba(255,255,255,0.03)_0px,rgba(255,255,255,0.03)_2px,transparent_2px,transparent_8px)]" />
-        <div className="relative flex items-end justify-between gap-3">
-          <div>
+        <div className="flex items-end justify-between gap-4">
+          <div className="min-w-0">
             {showTier ? (
-              <span
-                className={cn(
-                  "inline-flex rounded-md px-2 py-0.5 text-[10px] font-semibold tracking-normal",
-                  tier.badgeBg,
-                  tier.badgeText,
-                )}
-              >
+              <p className={cn("text-[11px] font-medium", tierColor)}>
                 {tier.label}
-              </span>
+              </p>
             ) : null}
             <p
               className={cn(
-                "mt-2 text-5xl font-bold tabular-nums leading-none tracking-tight drop-shadow-sm",
-                tier.scoreText,
+                "mt-1 text-5xl font-semibold tabular-nums leading-none tracking-tight",
+                scoreColor,
               )}
             >
               {value}
             </p>
             {showLabel ? (
-              <p className="mt-2 text-[11px] font-medium text-white/50">
+              <p className={cn("mt-2 text-xs font-medium", labelColor)}>
                 {scoreLabel}
               </p>
             ) : null}
           </div>
-          <div
-            className="flex h-16 w-14 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-black/20"
-            style={{ clipPath: "polygon(50% 0%, 100% 22%, 100% 78%, 50% 100%, 0% 78%, 0% 22%)" }}
-          >
-            <span className={cn("text-xl font-bold tabular-nums", tier.scoreText)}>
-              {value}
-            </span>
-          </div>
         </div>
-        <PassportSegments score={value} className="relative mt-4" />
+        <PassportProgressBar score={value} surface={surface} className="mt-4" />
       </div>
     );
   }
@@ -171,51 +188,36 @@ export function PassportScoreDisplay({
   return (
     <div
       className={cn(
-        "relative mx-auto w-full max-w-[220px] overflow-hidden rounded-2xl border-2 p-5 shadow-xl",
-        tier.panelBg,
-        tier.panelBorder,
+        "mx-auto w-full max-w-[200px] rounded-2xl border px-5 py-6 text-center",
+        surface === "dark"
+          ? "border-white/10 bg-white/5"
+          : "border-slate-200/80 bg-white shadow-sm",
         className,
       )}
     >
-      <div className="pointer-events-none absolute -left-8 top-0 h-full w-16 skew-x-[-18deg] bg-white/5" />
-      <div className="pointer-events-none absolute inset-0 bg-[repeating-linear-gradient(-45deg,rgba(255,255,255,0.04)_0px,rgba(255,255,255,0.04)_2px,transparent_2px,transparent_10px)]" />
+      {showTier ? (
+        <p className={cn("text-[11px] font-medium tracking-wide", tierColor)}>
+          {tier.label}
+        </p>
+      ) : null}
 
-      <div className="relative text-center">
-        {showTier ? (
-          <span
-            className={cn(
-              "inline-flex rounded-md px-2.5 py-1 text-[10px] font-semibold tracking-normal",
-              tier.badgeBg,
-              tier.badgeText,
-            )}
-          >
-            {tier.label}
-          </span>
-        ) : null}
+      <p
+        className={cn(
+          "font-semibold tabular-nums leading-none tracking-tight",
+          showTier ? "mt-2 text-5xl" : "text-5xl",
+          scoreColor,
+        )}
+      >
+        {value}
+      </p>
 
-        <div className="relative mx-auto mt-3 flex h-24 w-20 items-center justify-center">
-          <div
-            className="absolute inset-0 border-2 border-white/15 bg-black/25 shadow-inner"
-            style={{ clipPath: "polygon(50% 0%, 100% 24%, 100% 76%, 50% 100%, 0% 76%, 0% 24%)" }}
-          />
-          <span
-            className={cn(
-              "relative text-4xl font-bold tabular-nums leading-none tracking-tight drop-shadow-md",
-              tier.scoreText,
-            )}
-          >
-            {value}
-          </span>
-        </div>
+      {showLabel ? (
+        <p className={cn("mt-2 text-xs font-medium", labelColor)}>
+          {scoreLabel}
+        </p>
+      ) : null}
 
-        {showLabel ? (
-          <p className="mt-3 text-[11px] font-medium text-white/55">
-            {scoreLabel}
-          </p>
-        ) : null}
-
-        <PassportSegments score={value} className="relative mt-4 px-1" />
-      </div>
+      <PassportProgressBar score={value} surface={surface} className="mt-4" />
     </div>
   );
 }

@@ -6,12 +6,19 @@ export interface PassportTierStyle {
   tier: PassportTier;
   label: string;
   scoreText: string;
+  scoreTextOnDark: string;
   badgeBg: string;
   badgeText: string;
-  panelBg: string;
-  panelBorder: string;
   accent: string;
+  progressFill: string;
+  progressFillOnDark: string;
+  /** @deprecated Use surface styling in PassportScoreDisplay */
+  panelBg: string;
+  /** @deprecated Use surface styling in PassportScoreDisplay */
+  panelBorder: string;
+  /** @deprecated Use progressFill */
   segmentFilled: string;
+  /** @deprecated Use progress track in component */
   segmentEmpty: string;
 }
 
@@ -125,14 +132,17 @@ export function getPassportTier(score: number): PassportTierStyle {
     return {
       tier: "elite",
       label: "Consolidado",
-      scoreText: "text-amber-300",
-      badgeBg: "bg-gradient-to-r from-amber-500 to-yellow-400",
-      badgeText: "text-slate-950",
-      panelBg: "bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800",
-      panelBorder: "border-amber-400/40",
-      accent: "#fbbf24",
-      segmentFilled: "bg-amber-400",
-      segmentEmpty: "bg-white/10",
+      scoreText: "text-amber-600",
+      scoreTextOnDark: "text-amber-300",
+      badgeBg: "bg-amber-50",
+      badgeText: "text-amber-700",
+      accent: "#d97706",
+      progressFill: "bg-amber-500",
+      progressFillOnDark: "bg-amber-400",
+      panelBg: "bg-white",
+      panelBorder: "border-slate-200",
+      segmentFilled: "bg-amber-500",
+      segmentEmpty: "bg-slate-100",
     };
   }
 
@@ -140,14 +150,17 @@ export function getPassportTier(score: number): PassportTierStyle {
     return {
       tier: "pro",
       label: "En ascenso",
-      scoreText: "text-mf-accent-bright",
-      badgeBg: "bg-gradient-to-r from-mf-accent-dark to-mf-accent",
-      badgeText: "text-slate-950",
-      panelBg: "bg-gradient-to-br from-[#0a1f3d] via-[#0f2d52] to-[#163a66]",
-      panelBorder: "border-mf-accent/30",
-      accent: "#34d399",
-      segmentFilled: "bg-mf-accent",
-      segmentEmpty: "bg-white/10",
+      scoreText: "text-emerald-600",
+      scoreTextOnDark: "text-emerald-300",
+      badgeBg: "bg-emerald-50",
+      badgeText: "text-emerald-700",
+      accent: "#059669",
+      progressFill: "bg-emerald-500",
+      progressFillOnDark: "bg-emerald-400",
+      panelBg: "bg-white",
+      panelBorder: "border-slate-200",
+      segmentFilled: "bg-emerald-500",
+      segmentEmpty: "bg-slate-100",
     };
   }
 
@@ -155,28 +168,34 @@ export function getPassportTier(score: number): PassportTierStyle {
     return {
       tier: "desarrollo",
       label: "En progreso",
-      scoreText: "text-amber-200",
-      badgeBg: "bg-gradient-to-r from-amber-600 to-orange-500",
-      badgeText: "text-white",
-      panelBg: "bg-gradient-to-br from-slate-800 via-slate-700 to-slate-800",
-      panelBorder: "border-amber-500/30",
-      accent: "#f59e0b",
-      segmentFilled: "bg-amber-400",
-      segmentEmpty: "bg-white/10",
+      scoreText: "text-[#1B4F8C]",
+      scoreTextOnDark: "text-sky-200",
+      badgeBg: "bg-sky-50",
+      badgeText: "text-[#1B4F8C]",
+      accent: "#1B4F8C",
+      progressFill: "bg-[#1B4F8C]",
+      progressFillOnDark: "bg-sky-400",
+      panelBg: "bg-white",
+      panelBorder: "border-slate-200",
+      segmentFilled: "bg-[#1B4F8C]",
+      segmentEmpty: "bg-slate-100",
     };
   }
 
   return {
     tier: "base",
     label: "Comenzando",
-    scoreText: "text-slate-200",
-    badgeBg: "bg-gradient-to-r from-slate-600 to-slate-500",
-    badgeText: "text-white",
-    panelBg: "bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900",
-    panelBorder: "border-slate-500/30",
-    accent: "#94a3b8",
+    scoreText: "text-slate-500",
+    scoreTextOnDark: "text-slate-300",
+    badgeBg: "bg-slate-100",
+    badgeText: "text-slate-600",
+    accent: "#64748b",
+    progressFill: "bg-slate-400",
+    progressFillOnDark: "bg-slate-400",
+    panelBg: "bg-white",
+    panelBorder: "border-slate-200",
     segmentFilled: "bg-slate-400",
-    segmentEmpty: "bg-white/10",
+    segmentEmpty: "bg-slate-100",
   };
 }
 
@@ -185,9 +204,5 @@ export function getPassportFilledSegments(score: number, total = 10) {
 }
 
 export function getPassportBarClass(score: number) {
-  const tier = getPassportTier(score);
-  if (tier.tier === "elite") return "bg-amber-400";
-  if (tier.tier === "pro") return "bg-mf-accent";
-  if (tier.tier === "desarrollo") return "bg-amber-400";
-  return "bg-slate-400";
+  return getPassportTier(score).progressFill;
 }
