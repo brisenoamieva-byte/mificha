@@ -2,13 +2,14 @@ export const DIRECTOR_ONE_PAGER = {
   eyebrow: "Escolar Querétaro · Academias fundadoras",
   title: "MiFicha",
   tagline:
-    "Ficha técnica digital verificada — stats comparables, avisos automáticos a padres, cero Excel.",
+    "Ficha técnica digital verificada — padres informados, jugadores visibles, academia con renombre.",
   problemTitle: "El reto de cada director",
   problems: [
     "Padres preguntan «¿cómo va mi hijo?» y no hay una respuesta clara el mismo día.",
     "Stats en WhatsApp o Excel se pierden y no se comparan con otras escuelas.",
     "Capturar después del partido da flojera — nadie lo hace con consistencia.",
     "Nadie confía en stats si cualquier escuela puede inflar goles o marcadores.",
+    "Cuando un jugador destaca, no tiene nada verificable que mostrar a visorías o universidades.",
   ],
   solutionTitle: "Qué es MiFicha",
   solution:
@@ -19,6 +20,15 @@ export const DIRECTOR_ONE_PAGER = {
     "Academia: plantel, consentimiento, convocados y minutos jugados.",
     "MiFicha: Passport, insignias, rankings y aviso automático al tutor.",
     "Padres: consultan y comparten — no capturan ni registran stats.",
+  ],
+  visibilityTitle: "Tu academia y tus jugadores ganan visibilidad",
+  visibilityIntro:
+    "MiFicha no garantiza becas ni fichajes — pero crea la evidencia verificada que hace posible que un jugador sea considerado, y eso refleja en el renombre de tu escuela.",
+  visibilityPoints: [
+    "Directorio público /explorar — academia certificada visible ante padres nuevos y visorías.",
+    "Once destacado semanal y ranking por posición — tus mejores salen sin depender del WhatsApp.",
+    "Ficha compartible con stats de temporada — el padre o coach la reenvía a quien importe.",
+    "Entra primero como fundadora — más visibilidad relativa cuando crece la red escolar.",
   ],
   demoTitle: "Demo en vivo · 15 minutos",
   demoIntro:
@@ -61,6 +71,7 @@ export const DIRECTOR_ONE_PAGER = {
     "Acceso completo gratis en fase piloto — sin permanencia.",
     "Temporada y calendario escolar publicados por MiFicha.",
     "Stats comparables con otras escuelas de la red en Querétaro.",
+    "Badge fundadora en /explorar mientras armamos la red verificada.",
     "Acompañamiento en plantel, captura y avisos automáticos a tutores.",
   ],
   pilotTitle: "Meta del piloto (1 semana)",
@@ -97,8 +108,10 @@ export function buildDirectorOnePagerPlainText(options?: {
     "· Cargamos plantel + contacto del tutor",
     "· Marcador/acta oficial + captura de convocados y minutos (~1 min)",
     "· MiFicha avisa al padre automáticamente con link y Passport Score",
+    "· Cómo se ve tu academia y tus destacados en el directorio verificado",
     "",
-    "Datos creíbles: el organizador registra marcador y acta; tu escuela solo opera el plantel.",
+    "Datos creíbles: el organizador registra marcador y acta; tu escuela opera el plantel.",
+    "Visibilidad real: ficha compartible para visorías — sin prometer becas, con evidencia verificada.",
     "",
     "Como academia fundadora: acceso completo gratis en el piloto.",
     "",

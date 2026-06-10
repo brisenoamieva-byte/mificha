@@ -9,7 +9,7 @@ export function HomeHero() {
     <MarketingPageHero
       eyebrow="Ficha digital del jugador"
       title="Participa, compite y comparte tu juego"
-      description="Ficha verificada por tu academia. Padres reciben el link automáticamente; scouts descubren talento por categoría — sin presión, con progreso claro."
+      description="Ficha verificada por tu academia. Padres reciben el link automáticamente; tu plantel gana visibilidad en la red escolar — sin presión, con progreso claro."
       photo={MARKETING_MEDIA.heroHome}
       photoPriority
       actions={

@@ -64,7 +64,7 @@ export function ParticipatingAcademiesStrip({
             {academies.length} academias verificadas ya compiten contigo
           </h3>
           <p className="mt-1 text-sm text-white/65">
-            Tus rivales ya tienen ficha digital — tu plantel también puede destacar.
+            Tus rivales ya tienen ficha digital — sube tu plantel y destaca en el directorio verificado.
           </p>
         </div>
         <Link

@@ -33,6 +33,8 @@ export function buildFounderOutreachMessage(options: {
     "",
     `En 15 min te enseño en vivo: cargas plantel, capturas convocados y minutos en ~1 min, y el padre recibe el link con Passport Score automáticamente (sin app).`,
     "",
+    `Además, tu academia y tus mejores jugadores aparecen en el directorio verificado de Querétaro — ficha compartible para visorías, destacados semanales y badge de academia certificada. No prometemos becas; sí evidencia verificada que refleja en el renombre de tu escuela.`,
+    "",
     `Marcador y acta los registra MiFicha como organizador — stats comparables y creíbles entre colegios.`,
     "",
     `Después del partido del ${options.matchDate} lo probamos con ${academy} — gratis como academia fundadora.`,
@@ -122,7 +124,7 @@ export const FOUNDER_LIVE_DEMO_SCRIPT: FounderDemoStep[] = [
     href: "/dashboard/partidos/nuevo",
   },
   {
-    minute: "11–14",
+    minute: "11–13",
     title: "Aviso automático al tutor",
     action:
       "Tras guardar: contador «X tutores avisados». Opcional: envío de bienvenida bulk en /plantel/tutores. Muestra preview OG en celular.",
@@ -130,10 +132,18 @@ export const FOUNDER_LIVE_DEMO_SCRIPT: FounderDemoStep[] = [
     href: "/dashboard/plantel/tutores",
   },
   {
+    minute: "13–14",
+    title: "Visibilidad de la academia",
+    action:
+      "Slide «Tu plantel en la vitrina verificada» o abre /explorar. «Tus mejores jugadores salen en destacados semanales; la academia aparece certificada. Entra primero como fundadora.»",
+    wow: "Evidencia verificada > promesas de becas",
+    href: "/explorar",
+  },
+  {
     minute: "14–15",
     title: "Cierre",
     action:
-      "«Esta semana: 3 padres abren la ficha y quedan activos gratis. ¿Empezamos el lunes?» Agenda Sesión B post-partido real.",
+      "«Esta semana: 3 padres abren la ficha y tu plantel queda visible en la red. ¿Empezamos el lunes?» Agenda Sesión B post-partido real.",
   },
 ];
 
@@ -160,6 +170,11 @@ export const FOUNDER_DEMO_WOW_MOMENTS = [
     title: "Gobernanza clara",
     detail:
       "Organizador = marcador/acta · academia = minutos · padres = solo consultan. Stats creíbles en toda la red.",
+  },
+  {
+    title: "Vitrina verificada",
+    detail:
+      "/explorar muestra academia certificada, destacados semanales y fichas compartibles — renombre sin prometer becas.",
   },
 ] as const;
 

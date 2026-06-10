@@ -24,7 +24,7 @@ const audiences: AudienceItem[] = [
     icon: Building2,
     title: "Colegios y academias",
     description:
-      "Plantel, captura de minutos, acta oficial y avisos automáticos a tutores. Todo el plantel en un panel.",
+      "Plantel, captura de minutos, avisos a tutores y visibilidad en el directorio verificado. Tu academia y tus jugadores destacan en la red.",
     href: "/signup",
     secondaryHref: "/login",
     secondaryLabel: "Iniciar sesión",

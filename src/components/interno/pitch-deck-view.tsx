@@ -351,6 +351,12 @@ export function PitchDeckView() {
               One-pager
             </Link>
             <Link
+              href="/interno/patrocinio-mars"
+              className="inline-flex items-center gap-2 rounded-full border border-[#0000B2]/40 px-3 py-2 text-sm font-medium text-[#B8B8FF] transition hover:bg-[#0000B2]/10"
+            >
+              Mars
+            </Link>
+            <Link
               href="/interno/lanzamiento"
               className="inline-flex items-center gap-2 rounded-full border border-emerald-400/30 px-3 py-2 text-sm font-medium text-emerald-200 transition hover:bg-emerald-500/10"
             >

@@ -96,7 +96,7 @@ export function FounderLaunchPlaybook() {
               Playbook venta + demo en vivo
             </h1>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-white/60">
-              Convence en 15 min: pitch → gobernanza → plantel → captura → aviso automático al tutor.
+              Convence en 15 min: dolor operativo → gobernanza → plantel → captura → aviso al tutor → visibilidad en la red.
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
@@ -105,6 +105,12 @@ export function FounderLaunchPlaybook() {
               className="inline-flex items-center gap-2 rounded-full border border-sky-400/30 bg-sky-500/10 px-4 py-2 text-sm font-semibold text-sky-200 hover:bg-sky-500/15"
             >
               One-pager PDF
+            </Link>
+            <Link
+              href="/interno/patrocinio-mars"
+              className="inline-flex items-center gap-2 rounded-full border border-[#0000B2]/40 bg-[#0000B2]/15 px-4 py-2 text-sm font-semibold text-[#B8B8FF] hover:bg-[#0000B2]/25"
+            >
+              Patrocinio Mars
             </Link>
             <Link
               href="/interno/pitch"

@@ -131,6 +131,23 @@ export function DemoOnePagerView() {
           </ul>
         </section>
 
+        <section className="mt-8 rounded-2xl border border-[#1B4F8C]/15 bg-[#1B4F8C]/5 px-5 py-5 print:break-inside-avoid">
+          <h2 className="text-sm font-bold uppercase tracking-wide text-[#1B4F8C]">
+            {DIRECTOR_ONE_PAGER.visibilityTitle}
+          </h2>
+          <p className="mt-3 text-sm leading-7 text-slate-700">
+            {DIRECTOR_ONE_PAGER.visibilityIntro}
+          </p>
+          <ul className="mt-3 space-y-2">
+            {DIRECTOR_ONE_PAGER.visibilityPoints.map((item) => (
+              <li key={item} className="flex gap-2 text-sm leading-6 text-slate-700">
+                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#1B4F8C]" />
+                {item}
+              </li>
+            ))}
+          </ul>
+        </section>
+
         <section className="mt-8">
           <h2 className="text-sm font-bold uppercase tracking-wide text-[#1B4F8C]">
             {DIRECTOR_ONE_PAGER.demoTitle}
