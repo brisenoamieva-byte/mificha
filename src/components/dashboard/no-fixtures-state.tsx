@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { CalendarDays, Mail } from "lucide-react";
+import { CalendarDays } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface NoFixturesStateProps {
@@ -29,21 +29,24 @@ export function NoFixturesState({
           Aún no hay jornadas publicadas
         </h1>
         <p className="mt-3 text-sm leading-7 text-mf-text-secondary">
-          MiFicha publicará el calendario oficial de tu competición (rival, fecha,
-          sede y categoría). Cuando aparezca aquí, capturas convocados y minutos en ~1
-          minuto post-partido (tras marcador y acta oficial).
+          MiFicha publicará el calendario oficial (rival, fecha, sede y categoría).
+          Cuando aparezca en Partidos, capturas convocados y minutos tras marcador y acta
+          oficial.
         </p>
-        <p className="mt-3 text-sm leading-7 text-mf-text-secondary">
-          Los amistosos fuera de torneo también los agenda el equipo MiFicha para
-          evitar duplicados en el calendario.
-        </p>
-        <a
-          href="mailto:hola@mificha.mx?subject=Jornada%20oficial%20MiFicha"
-          className="mt-6 inline-flex items-center gap-2 rounded-full border border-mf-brand/20 bg-white px-4 py-2.5 text-sm font-semibold text-mf-brand transition hover:bg-mf-brand-soft"
-        >
-          <Mail className="h-4 w-4" />
-          Consultar calendario
-        </a>
+        <div className="mt-6 flex flex-wrap gap-3">
+          <Link
+            href="/interno/jornadas"
+            className="inline-flex items-center gap-2 rounded-full bg-mf-brand px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-mf-brand-dark"
+          >
+            Publicar jornada (interno)
+          </Link>
+          <Link
+            href="/dashboard/partidos"
+            className="inline-flex items-center gap-2 rounded-full border border-mf-brand/20 bg-white px-4 py-2.5 text-sm font-semibold text-mf-brand transition hover:bg-mf-brand-soft"
+          >
+            Volver a partidos
+          </Link>
+        </div>
       </div>
     </div>
   );

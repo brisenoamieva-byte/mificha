@@ -10,7 +10,7 @@ interface NoSeasonStateProps {
 }
 
 export function NoSeasonState({
-  title = "Temporada pendiente de MiFicha",
+  title = "Temporada MiFicha pendiente",
   backHref,
   backLabel = "← Volver",
   className,
@@ -31,22 +31,31 @@ export function NoSeasonState({
           {title}
         </h1>
         <p className="mt-3 text-sm leading-7 text-mf-text-secondary">
-          Las temporadas y calendarios oficiales los publica el equipo MiFicha para
-          que todas las academias compitan en el mismo ciclo y las stats sean
-          comparables.
+          Para capturar partidos tu academia necesita la{" "}
+          <strong className="font-semibold text-mf-text">temporada escolar MiFicha</strong>{" "}
+          activa. Esto no tiene que ver con el email de avisos a padres — es el calendario
+          oficial de la red.
         </p>
         <p className="mt-3 text-sm leading-7 text-mf-text-secondary">
-          Cuando tu colegio esté verificado, verás aquí la temporada activa (por
-          ejemplo <strong className="font-semibold text-mf-text">Escolar 2025–2026</strong>
-          ). Mientras tanto no podrás capturar partidos.
+          Si acabas de registrarte, la temporada se asigna en cuanto MiFicha publica el ciclo
+          escolar (por ejemplo <strong className="font-semibold text-mf-text">Escolar 2025–2026</strong>
+          ). Luego publicamos jornadas en Partidos.
         </p>
-        <a
-          href="mailto:hola@mificha.mx?subject=Temporada%20MiFicha"
-          className="mt-6 inline-flex items-center gap-2 rounded-full border border-mf-brand/20 bg-mf-brand-soft px-4 py-2.5 text-sm font-semibold text-mf-brand transition hover:bg-mf-brand/10"
-        >
-          <Mail className="h-4 w-4" />
-          Solicitar activación
-        </a>
+        <div className="mt-6 flex flex-wrap gap-3">
+          <Link
+            href="/interno/temporadas"
+            className="inline-flex items-center gap-2 rounded-full bg-mf-brand px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-mf-brand-dark"
+          >
+            Activar temporada (interno)
+          </Link>
+          <a
+            href="mailto:hola@mificha.mx?subject=Temporada%20MiFicha"
+            className="inline-flex items-center gap-2 rounded-full border border-mf-brand/20 bg-mf-brand-soft px-4 py-2.5 text-sm font-semibold text-mf-brand transition hover:bg-mf-brand/10"
+          >
+            <Mail className="h-4 w-4" />
+            Contactar soporte
+          </a>
+        </div>
       </div>
     </div>
   );

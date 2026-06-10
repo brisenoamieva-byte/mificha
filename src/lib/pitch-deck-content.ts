@@ -22,7 +22,7 @@ export const PITCH_SLIDES: PitchSlide[] = [
     kicker: "Escolar Querétaro · mificha.mx",
     title: "MiFicha",
     subtitle: "Una ficha por jugador. Padres informados. Academia visible.",
-    highlight: "Academias fundadoras · gratis en piloto",
+    highlight: "Academias fundadoras · Querétaro",
     speakerNote: "«¿Cuántos padres te piden stats el domingo?»",
     imageKey: "heroHome",
   },
@@ -106,7 +106,7 @@ export const PITCH_SLIDES: PitchSlide[] = [
     title: "¿Empezamos esta semana?",
     bullets: [
       "Demo en vivo · 15 min",
-      "Gratis como fundadora",
+      "Academia fundadora",
       "3 padres abren ficha",
     ],
     highlight: "Ricardo Briseño · mificha.mx · hola@mificha.mx",

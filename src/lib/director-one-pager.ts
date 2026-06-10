@@ -32,7 +32,7 @@ export const DIRECTOR_ONE_PAGER = {
   ],
   demoTitle: "Demo en vivo · 15 minutos",
   demoIntro:
-    "Te enseñamos con tu plantel real. Sin compromiso. Acceso completo gratis como academia fundadora.",
+    "Te enseñamos con tu plantel real. Sin compromiso.",
   demoSteps: [
     {
       step: "1",
@@ -68,7 +68,7 @@ export const DIRECTOR_ONE_PAGER = {
   ],
   founderTitle: "Academia fundadora",
   founderBenefits: [
-    "Acceso completo gratis en fase piloto — sin permanencia.",
+    "Academia fundadora en la red Querétaro.",
     "Temporada y calendario escolar publicados por MiFicha.",
     "Stats comparables con otras escuelas de la red en Querétaro.",
     "Badge fundadora en /explorar mientras armamos la red verificada.",
@@ -113,7 +113,7 @@ export function buildDirectorOnePagerPlainText(options?: {
     "Datos creíbles: el organizador registra marcador y acta; tu escuela opera el plantel.",
     "Visibilidad real: ficha compartible para visorías — sin prometer becas, con evidencia verificada.",
     "",
-    "Como academia fundadora: acceso completo gratis en el piloto.",
+    "Como academia fundadora en la red Querétaro.",
     "",
     ...(match
       ? [`Ideal probarlo antes del partido del ${match}.`, ""]

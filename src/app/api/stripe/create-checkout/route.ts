@@ -20,7 +20,7 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           error:
-            "MiFicha está en lanzamiento gratuito. Los planes de pago se activarán más adelante.",
+            "La suscripción no está disponible por ahora.",
         },
         { status: 403 },
       );

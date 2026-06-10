@@ -246,7 +246,7 @@ export function FounderLaunchPlaybook() {
                   : "WhatsApp basta para el piloto — email es opcional."
               }
             />
-            <HealthRow done={health?.launchFree ?? true} label="Modo lanzamiento gratis" />
+            <HealthRow done={health?.launchFree ?? true} label="Modo lanzamiento activo" />
           </ul>
           {coreSqlReady ? (
             <p className="mt-5 rounded-xl border border-emerald-400/30 bg-emerald-400/10 px-4 py-3 text-sm text-emerald-100">
@@ -267,7 +267,7 @@ export function FounderLaunchPlaybook() {
             <div>
               <h2 className="text-lg font-semibold">Mensaje WhatsApp (prospección)</h2>
               <p className="mt-2 text-sm text-white/60">
-                Una academia caliente. Enfatiza demo 15 min + gratis fundador.
+                Una academia caliente. Enfatiza demo 15 min + academia fundadora.
               </p>
             </div>
             <button

@@ -37,7 +37,7 @@ export function buildFounderOutreachMessage(options: {
     "",
     `Marcador y acta los registra MiFicha como organizador — stats comparables y creíbles entre colegios.`,
     "",
-    `Después del partido del ${options.matchDate} lo probamos con ${academy} — gratis como academia fundadora.`,
+    `Después del partido del ${options.matchDate} lo probamos con ${academy} como academia fundadora.`,
     "",
     `¿Martes o jueves 15 min por videollamada?`,
   ].join("\n");

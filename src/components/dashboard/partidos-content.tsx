@@ -18,6 +18,7 @@ import {
   isCompletedMatch,
   isUpcomingMatch,
 } from "@/lib/match-utils";
+import { loadActiveAcademySeason } from "@/lib/academy-season-client";
 import { supabase } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
 import type { Match, MatchResult, Season } from "@/types/database";
@@ -40,15 +41,7 @@ export function PartidosContent() {
 
     setLoading(true);
 
-    const { data: seasons } = await supabase
-      .from("seasons")
-      .select("*")
-      .eq("academy_id", academy.id)
-      .eq("is_active", true)
-      .order("start_date", { ascending: false })
-      .limit(1);
-
-    const activeSeason = seasons?.[0] ?? null;
+    const activeSeason = await loadActiveAcademySeason(academy.id);
 
     setSeason(activeSeason);
 

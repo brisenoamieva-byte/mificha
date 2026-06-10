@@ -1,4 +1,4 @@
-/** Fase de lanzamiento: acceso gratuito para academias, padres y scouts. */
+/** Fase de lanzamiento: academias activas sin flujo de suscripción. */
 export function isLaunchFreeMode() {
   const flag = process.env.NEXT_PUBLIC_LAUNCH_FREE;
 
