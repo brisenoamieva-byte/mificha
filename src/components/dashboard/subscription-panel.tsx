@@ -2,7 +2,6 @@
 
 import { CreditCard, ExternalLink } from "lucide-react";
 import { useState } from "react";
-import { LaunchAccessPanel } from "@/components/dashboard/launch-access-panel";
 import { useDashboard } from "@/components/dashboard/dashboard-context";
 import { toast } from "@/components/ui/toast";
 import { isSubscriptionActive } from "@/lib/dashboard-utils";
@@ -23,7 +22,7 @@ export function SubscriptionPanel() {
   if (!academy) return null;
 
   if (isLaunchFreeMode()) {
-    return <LaunchAccessPanel />;
+    return null;
   }
 
   const academyId = academy.id;

@@ -96,7 +96,7 @@ export function FounderLaunchPlaybook() {
               Playbook venta + demo en vivo
             </h1>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-white/60">
-              Convence en 15 min: dolor operativo → gobernanza → plantel → captura → aviso al tutor → visibilidad en la red.
+              Pitch 7 slides (~5 min) + demo en vivo (~10 min): problema → solución → cuatro pasos → red → cierre.
             </p>
           </div>
           <div className="flex flex-wrap gap-3">

@@ -87,63 +87,62 @@ export interface FounderDemoStep {
 export const FOUNDER_LIVE_DEMO_SCRIPT: FounderDemoStep[] = [
   {
     minute: "0–2",
-    title: "Gancho emocional",
+    title: "Pitch · problema",
     action:
-      "Abre pitch slide «El talento existe, pero no se ve». Pregunta: «¿Cuántos padres te escriben el domingo pidiendo stats?»",
+      "Slides 1–2: gancho + «El talento existe, pero no se ve». Pregunta: «¿Cuántos padres te piden stats el domingo?»",
     href: "/interno/pitch",
   },
   {
-    minute: "2–4",
-    title: "Datos creíbles",
+    minute: "2–3",
+    title: "Pitch · solución y cómo",
     action:
-      "Slide «Cada quien registra lo suyo» o /interno/gobernanza. «Nadie infla goles — el organizador pone marcador y acta.»",
-    wow: "Credibilidad > promesas de software",
-    href: "/interno/gobernanza",
+      "Slides 3–4: «Una ficha por jugador» + «Cuatro pasos». No leas todo — señala stats y pasa a demo.",
+    href: "/interno/pitch",
+  },
+  {
+    minute: "3–4",
+    title: "Pitch · red y cierre",
+    action:
+      "Slides 5–7: «Tu plantel en la red» + gobernanza + «¿Empezamos esta semana?». Luego abre dashboard.",
+    href: "/interno/pitch",
   },
   {
     minute: "4–7",
     title: "Plantel + tutores",
     action:
-      "Inicia sesión → /dashboard/plantel → importa 3–5 jugadores. Activa consentimiento y contacto del tutor. Abre /dashboard/plantel/tutores.",
+      "/dashboard/plantel → importa 3–5 jugadores. Consentimiento y contacto del tutor. Abre /dashboard/plantel/tutores.",
     href: "/dashboard/plantel/tutores",
   },
   {
     minute: "7–9",
-    title: "Calendario y acta oficial",
+    title: "Calendario y acta",
     action:
-      "/interno/jornadas: publica jornada, marcador y acta. En /dashboard/partidos la academia solo ve convocados + minutos bloqueados hasta acta.",
-    wow: "Marcador = organizador · minutos = academia · comparable entre escuelas",
+      "/interno/jornadas: jornada, marcador y acta. En /dashboard/partidos solo convocados + minutos.",
+    wow: "Marcador = MiFicha · minutos = captura · comparable entre escuelas",
     href: "/interno/jornadas",
   },
   {
     minute: "9–11",
     title: "Captura post-partido",
     action:
-      "/dashboard/partidos/nuevo → capturamos convocados + minutos (~1 min) → Guardar. Señala Passport, insignias y ranking semanal.",
-    wow: "Recompensas desbloqueadas + «Subió X puestos»",
+      "/dashboard/partidos/nuevo → capturamos convocados + minutos (~1 min) → Guardar. Passport e insignias.",
+    wow: "«Subió X puestos» en ranking",
     href: "/dashboard/partidos/nuevo",
   },
   {
     minute: "11–13",
-    title: "Aviso automático al tutor",
+    title: "Aviso al tutor",
     action:
-      "Tras guardar: contador «X tutores avisados». Opcional: envío de bienvenida bulk en /plantel/tutores. Muestra preview OG en celular.",
-    wow: "El director no pega WhatsApp — MiFicha envía solo",
+      "Contador «X tutores avisados». Preview OG en celular. Opcional: bulk en /plantel/tutores.",
+    wow: "El director no pega WhatsApp",
     href: "/dashboard/plantel/tutores",
   },
   {
-    minute: "13–14",
-    title: "Visibilidad de la academia",
-    action:
-      "Slide «Tu plantel en el directorio de Querétaro» o abre /explorar. «Tus mejores salen en destacados; entra primero como fundadora.»",
-    wow: "Ficha compartible > promesas vacías",
-    href: "/explorar",
-  },
-  {
-    minute: "14–15",
+    minute: "13–15",
     title: "Cierre",
     action:
-      "«Esta semana: 3 padres abren la ficha y tu plantel queda visible en la red. ¿Empezamos el lunes?» Agenda Sesión B post-partido real.",
+      "Abre /explorar. «Esta semana: 3 padres abren ficha. ¿Empezamos el lunes?» Agenda primer partido real.",
+    href: "/explorar",
   },
 ];
 
