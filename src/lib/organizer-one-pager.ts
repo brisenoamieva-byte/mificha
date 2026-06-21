@@ -40,7 +40,7 @@ export const ORGANIZER_ONE_PAGER = {
     "Promoción a academias inscritas: «Activa plantel en MiFicha» — nosotros damos el guión y el link.",
     "Logo y nombre del torneo en la temporada MiFicha (co-branding en la red escolar).",
   ],
-  governanceTitle: "Quién hace qué (sin confusiones)",
+  governanceTitle: "Quién hace qué",
   governancePoints: [
     "Organizador: calendario, marcador final y acta (goles, asistencias, tarjetas, minutos).",
     "Academia: plantel, consentimiento y contacto del tutor.",
