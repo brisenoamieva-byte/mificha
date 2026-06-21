@@ -35,9 +35,14 @@ export default function OrganizadoresPage() {
           </div>
           <ul className="mt-8 grid gap-4 sm:grid-cols-2">
             {ORGANIZER_ONE_PAGER.winPoints.map((point) => (
-              <li key={point} className="mf-card flex gap-3 p-5 text-sm leading-7 text-mf-text-secondary">
-                <Trophy className="mt-0.5 h-5 w-5 shrink-0 text-mf-brand" />
-                <WithBrandName>{point}</WithBrandName>
+              <li
+                key={point.title}
+                className="mf-card flex flex-col gap-2 p-5 sm:p-6"
+              >
+                <p className="text-sm font-semibold text-mf-text">{point.title}</p>
+                <p className="text-sm leading-7 text-mf-text-secondary">
+                  <WithBrandName>{point.description}</WithBrandName>
+                </p>
               </li>
             ))}
           </ul>

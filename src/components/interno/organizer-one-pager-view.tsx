@@ -136,8 +136,9 @@ export function OrganizerOnePagerView() {
           </h2>
           <ul className="mt-3 space-y-2">
             {ORGANIZER_ONE_PAGER.winPoints.map((item) => (
-              <li key={item} className="text-sm leading-6 text-slate-700">
-                {item}
+              <li key={item.title} className="text-sm leading-6 text-slate-700">
+                <span className="font-semibold text-slate-900">{item.title}.</span>{" "}
+                {item.description}
               </li>
             ))}
           </ul>

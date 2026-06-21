@@ -16,12 +16,22 @@ export const ORGANIZER_ONE_PAGER = {
     "MiFicha publica jornadas, marcador y acta como fuente oficial. Cruza esos datos con cada plantel y avisa al padre. No sustituye tu inscripción ni tu reglamento.",
   winTitle: "Qué gana tu torneo",
   winPoints: [
-    "Diferenciador: torneo con ficha MiFicha y stats verificadas por categoría.",
-    "Menos ruido post-jornada: el padre consulta su link, no tu celular.",
-    "Calendario y resultados en mificha.mx/explorar — visibilidad para la marca de tu torneo.",
-    "Credibilidad: nadie infla goles; el acta la registra el organizador, no la escuela rival.",
-    "Menos disputas de goleadores y tarjetas entre directores.",
-    "Retención: academias contentas vuelven a inscribirse la próxima edición.",
+    {
+      title: "Diferenciador real",
+      description: "Torneo con ficha MiFicha y stats verificadas por categoría.",
+    },
+    {
+      title: "Menos ruido post-jornada",
+      description: "El padre consulta su link; no te escribe a ti el domingo.",
+    },
+    {
+      title: "Visibilidad del torneo",
+      description: "Calendario y resultados en mificha.mx/explorar — refuerza la marca de tu torneo.",
+    },
+    {
+      title: "Credibilidad",
+      description: "El acta la registra el organizador, no la escuela rival.",
+    },
   ],
   askTitle: "Qué necesitamos de ti (operación mínima)",
   askPoints: [
