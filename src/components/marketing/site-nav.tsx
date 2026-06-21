@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { ChevronDown, Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { MARKETING_NAV } from "@/lib/marketing-nav";
 import { cn } from "@/lib/utils";
 
@@ -67,6 +68,11 @@ export function SiteNavMobile({
   actionLabel?: string;
 }) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (!mobileOpen) return;
@@ -77,67 +83,84 @@ export function SiteNavMobile({
     };
   }, [mobileOpen]);
 
+  const mobilePanel =
+    mobileOpen && mounted
+      ? createPortal(
+          <>
+            <button
+              type="button"
+              className="fixed inset-0 z-[100] bg-black/25 lg:hidden"
+              aria-label="Cerrar menú"
+              onClick={() => setMobileOpen(false)}
+            />
+            <div
+              id="mobile-nav-panel"
+              className="mf-mobile-nav-panel mf-safe-bottom fixed inset-x-0 bottom-0 z-[101] overflow-y-auto overscroll-contain border-t border-mf-border bg-mf-surface px-4 py-4 shadow-xl lg:hidden"
+            >
+              {MARKETING_NAV.map((section) => (
+                <div key={section.id} className="border-b border-mf-border-subtle py-3 last:border-0">
+                  <p className="text-xs font-bold uppercase tracking-[0.15em] text-mf-brand">
+                    {section.label}
+                  </p>
+                  <div className="mt-2 space-y-1">
+                    {section.links.map((link) => (
+                      <Link
+                        key={link.href + link.label}
+                        href={link.href}
+                        className="block rounded-lg px-2 py-2.5 text-sm font-medium text-mf-text hover:bg-mf-brand-soft"
+                        onClick={() => setMobileOpen(false)}
+                      >
+                        {link.label}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              ))}
+              <div className="mt-4 space-y-2 border-t border-mf-border-subtle pt-4 sm:hidden">
+                <Link
+                  href={actionHref}
+                  className="block rounded-lg px-2 py-2.5 text-center text-sm font-semibold text-mf-text hover:bg-mf-brand-soft"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  {actionLabel}
+                </Link>
+                <Link
+                  href="/signup"
+                  className="mf-btn-primary w-full justify-center"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  Registrar academia
+                </Link>
+              </div>
+              <Link
+                href="/aviso-privacidad"
+                className={cn(
+                  "mt-2 block rounded-lg px-2 py-2.5 text-sm font-medium text-mf-text-secondary",
+                  "hover:bg-mf-brand-soft",
+                )}
+                onClick={() => setMobileOpen(false)}
+              >
+                Aviso de privacidad
+              </Link>
+            </div>
+          </>,
+          document.body,
+        )
+      : null;
+
   return (
     <>
       <button
         type="button"
         className="inline-flex h-10 w-10 items-center justify-center rounded-full text-mf-text-secondary transition hover:bg-black/[0.04] lg:hidden"
         aria-expanded={mobileOpen}
+        aria-controls="mobile-nav-panel"
         aria-label={mobileOpen ? "Cerrar menú" : "Abrir menú"}
         onClick={() => setMobileOpen((value) => !value)}
       >
         {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
       </button>
-
-      {mobileOpen ? (
-        <div className="mf-mobile-nav-panel mf-safe-bottom fixed inset-x-0 bottom-0 z-50 overflow-y-auto overscroll-contain border-b border-mf-border bg-mf-surface px-4 py-4 shadow-lg lg:hidden">
-          {MARKETING_NAV.map((section) => (
-            <div key={section.id} className="border-b border-mf-border-subtle py-3 last:border-0">
-              <p className="text-xs font-bold uppercase tracking-[0.15em] text-mf-brand">
-                {section.label}
-              </p>
-              <div className="mt-2 space-y-1">
-                {section.links.map((link) => (
-                  <Link
-                    key={link.href + link.label}
-                    href={link.href}
-                    className="block rounded-lg px-2 py-2 text-sm font-medium text-mf-text hover:bg-mf-brand-soft"
-                    onClick={() => setMobileOpen(false)}
-                  >
-                    {link.label}
-                  </Link>
-                ))}
-              </div>
-            </div>
-          ))}
-          <div className="mt-4 space-y-2 border-t border-mf-border-subtle pt-4 sm:hidden">
-            <Link
-              href={actionHref}
-              className="block rounded-lg px-2 py-2.5 text-center text-sm font-semibold text-mf-text hover:bg-mf-brand-soft"
-              onClick={() => setMobileOpen(false)}
-            >
-              {actionLabel}
-            </Link>
-            <Link
-              href="/signup"
-              className="mf-btn-primary w-full justify-center"
-              onClick={() => setMobileOpen(false)}
-            >
-              Registrar academia
-            </Link>
-          </div>
-          <Link
-            href="/aviso-privacidad"
-            className={cn(
-              "mt-2 block rounded-lg px-2 py-2 text-sm font-medium text-mf-text-secondary",
-              "hover:bg-mf-brand-soft",
-            )}
-            onClick={() => setMobileOpen(false)}
-          >
-            Aviso de privacidad
-          </Link>
-        </div>
-      ) : null}
+      {mobilePanel}
     </>
   );
 }

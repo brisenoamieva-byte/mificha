@@ -138,7 +138,7 @@ export function VerifiedAcademiesShowcase({
     return (
       <section
         className={cn(
-          "relative overflow-hidden border-y border-mf-brand/20 bg-gradient-to-r from-[#0a1f3d] via-mf-brand-dark to-[#123d68] py-8",
+          "relative overflow-hidden border-y border-mf-brand/20 bg-gradient-to-r from-[#0a1f3d] via-mf-brand-dark to-[#123d68] py-6 sm:py-8",
           className,
         )}
       >

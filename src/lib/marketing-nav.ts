@@ -31,9 +31,9 @@ export const MARKETING_NAV: NavSection[] = [
         description: "Plantel, acta oficial y aviso al tutor",
       },
       {
-        href: "/#complemento",
-        label: "MiFicha + liga oficial",
-        description: "Stats individuales junto a tu torneo",
+        href: "/j/santiago-hernandez-demo",
+        label: "Ficha de ejemplo",
+        description: "Stats del torneo en una ficha real",
       },
       {
         href: "/padres",
@@ -66,6 +66,7 @@ export const MARKETING_NAV: NavSection[] = [
   },
 ];
 
+/** @deprecated Tabla torneo vs MiFicha — ya no en home; conservada por si se reutiliza. */
 export const COMPLEMENT_ROWS = [
   {
     official: "Resultados y tabla",

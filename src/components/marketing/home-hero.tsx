@@ -4,6 +4,8 @@ import { HomeFichaPreview } from "@/components/marketing/home-ficha-preview";
 import { MarketingPageHero } from "@/components/marketing/marketing-page-hero";
 import { WithBrandName } from "@/components/ui/brand-wordmark";
 
+const DEMO_FICHA_HREF = "/j/santiago-hernandez-demo";
+
 export function HomeHero() {
   return (
     <MarketingPageHero
@@ -12,9 +14,8 @@ export function HomeHero() {
       description={
         <>
           <WithBrandName>
-            MiFicha lleva las stats del torneo a la ficha de cada jugador. Gratis para
-            academias — carga plantel y contacto del tutor; el link llega solo después de
-            cada jornada.
+            Stats oficiales del torneo en la ficha de cada jugador. Gratis para academias;
+            el tutor recibe su link tras cada jornada.
           </WithBrandName>
         </>
       }
@@ -27,10 +28,18 @@ export function HomeHero() {
           <Link href="#como-funciona" className="mf-btn-accent">
             Ver cómo funciona
           </Link>
+          <Link
+            href={DEMO_FICHA_HREF}
+            className="inline-flex w-full items-center gap-1 text-sm font-semibold text-mf-brand hover:underline sm:hidden"
+          >
+            Ver ficha de ejemplo
+            <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
         </>
       }
       aside={<HomeFichaPreview />}
       asideAlign="start"
+      asideClassName="hidden lg:block"
       className="demo-ficha-hero"
     />
   );

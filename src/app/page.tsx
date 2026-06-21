@@ -1,10 +1,8 @@
 import { SiteFooter, SiteHeader } from "@/components/marketing/site-header";
 import { HomeAudienceSection } from "@/components/marketing/home-audience-section";
-import { HomeComplementSection } from "@/components/marketing/home-complement-section";
 import { HomeCtaBand } from "@/components/marketing/home-cta-band";
 import { HomeHero } from "@/components/marketing/home-hero";
 import { HomeHowItWorks } from "@/components/marketing/home-how-it-works";
-import { HomeTrustSection } from "@/components/marketing/home-trust-section";
 import { VerifiedAcademiesShowcase } from "@/components/marketing/verified-academies-showcase";
 import {
   buildHomeShowcaseAcademies,
@@ -24,14 +22,12 @@ export default async function Home() {
       <main className="flex-1">
         <HomeHero />
         <HomeHowItWorks />
-        <HomeTrustSection />
         <HomeAudienceSection />
         <VerifiedAcademiesShowcase
           academies={showcaseAcademies}
           playerCount={playerCount}
           variant="marquee"
         />
-        <HomeComplementSection />
         <HomeCtaBand />
       </main>
 

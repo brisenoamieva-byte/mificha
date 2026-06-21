@@ -5,7 +5,7 @@ import { MARKETING_MEDIA } from "@/lib/marketing-assets";
 
 export function HomeCtaBand() {
   return (
-    <section className="relative min-h-[280px] overflow-hidden border-t border-mf-brand-dark">
+    <section className="relative min-h-0 overflow-hidden border-t border-mf-brand-dark sm:min-h-[240px]">
       <MarketingBackgroundPhoto meta={MARKETING_MEDIA.ctaBand} />
       <div className="absolute inset-0 bg-gradient-to-r from-mf-brand-dark/95 via-mf-brand/88 to-mf-brand-dark/55 lg:to-transparent" />
       <div
@@ -13,15 +13,15 @@ export function HomeCtaBand() {
         aria-hidden
       />
       <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-mf-accent via-mf-accent-bright to-mf-accent-dark" />
-      <div className="relative mx-auto flex max-w-6xl flex-col items-start gap-6 px-4 py-14 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:py-16">
+      <div className="relative mx-auto flex max-w-6xl flex-col items-start gap-5 px-4 py-10 sm:px-6 sm:py-14 lg:flex-row lg:items-center lg:justify-between">
         <div className="max-w-xl">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-white/60">
             Piloto · Querétaro
           </p>
-          <h2 className="mt-3 text-2xl font-semibold tracking-[-0.02em] text-white sm:text-3xl">
+          <h2 className="mt-2 text-xl font-semibold tracking-[-0.02em] text-white sm:text-2xl">
             ¿Tu colegio ya está en la red?
           </h2>
-          <p className="mt-3 text-sm leading-7 text-white/80">
+          <p className="mt-2 text-sm leading-6 text-white/80">
             Registra plantel y tutores, o entra como padre si tu escuela ya participa.
           </p>
         </div>
