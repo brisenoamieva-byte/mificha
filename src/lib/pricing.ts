@@ -54,7 +54,7 @@ export const ORGANIZER_PRICING = {
       priceLabel: "$10",
       period: "MXN / jugador / temporada",
       description:
-        "Alternativa flexible: ~$500 por plantel de 50. Ideal si lo sumas a la cuota de inscripción.",
+        "Ideal si prefieres sumarlo a la cuota de inscripción del torneo.",
     },
   ] satisfies OrganizerPricingPlan[],
 } as const;
