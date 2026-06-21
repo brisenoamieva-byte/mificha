@@ -137,7 +137,7 @@ function SlideContent({
         )}
       >
         {slide.title === "MiFicha" ? (
-          <BrandWordmark />
+          <BrandWordmark className="text-white" />
         ) : containsBrandName(slide.title) ? (
           <WithBrandName>{slide.title}</WithBrandName>
         ) : (

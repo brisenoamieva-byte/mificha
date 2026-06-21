@@ -23,9 +23,17 @@ interface FichaDocumentProps {
   model: FichaDocumentModel;
   className?: string;
   priorityPhoto?: boolean;
+  /** Versión recortada para hero de marketing — menos altura, sin evaluación ni footer. */
+  variant?: "full" | "hero";
 }
 
-export function FichaDocument({ model, className, priorityPhoto = false }: FichaDocumentProps) {
+export function FichaDocument({
+  model,
+  className,
+  priorityPhoto = false,
+  variant = "full",
+}: FichaDocumentProps) {
+  const isHero = variant === "hero";
   const summary = computeSeasonSummary(model.seasonStats);
   const showCoach = hasFichaCoachContent({
     position: model.coach.primary,
@@ -181,10 +189,20 @@ export function FichaDocument({ model, className, priorityPhoto = false }: Ficha
 
       {showSeason ? <FichaSeasonBlock stats={model.seasonStats} summary={summary} compact /> : null}
 
-      {model.lastMatch || model.participation ? (
-        <section className="demo-ficha-context grid border-b border-mf-border-subtle sm:grid-cols-2">
+      {model.lastMatch || (!isHero && model.participation) ? (
+        <section
+          className={cn(
+            "demo-ficha-context grid border-mf-border-subtle sm:grid-cols-2",
+            !isHero && "border-b",
+          )}
+        >
           {model.lastMatch ? (
-            <div className="border-b border-mf-border-subtle px-4 py-3 sm:border-b-0 sm:border-r sm:px-5">
+            <div
+              className={cn(
+                "px-4 py-3 sm:px-5",
+                !isHero && "border-b border-mf-border-subtle sm:border-b-0 sm:border-r",
+              )}
+            >
               <SectionLabel>{FICHA_COPY.lastMatch}</SectionLabel>
               <p className="mt-1.5 text-sm font-semibold text-mf-text">
                 {model.lastMatch.headline}
@@ -197,7 +215,7 @@ export function FichaDocument({ model, className, priorityPhoto = false }: Ficha
             <div className="hidden sm:block" />
           )}
 
-          {model.participation ? (
+          {!isHero && model.participation ? (
             <div className="px-4 py-3 sm:px-5">
               <SectionLabel>{FICHA_COPY.role}</SectionLabel>
               <dl className="mt-1.5 space-y-1 text-xs">
@@ -217,7 +235,7 @@ export function FichaDocument({ model, className, priorityPhoto = false }: Ficha
         </section>
       ) : null}
 
-      {showCoach ? (
+      {showCoach && !isHero ? (
         <FichaCoachBlock
           primary={model.coach.primary}
           secondary={model.coach.secondary}
@@ -226,7 +244,7 @@ export function FichaDocument({ model, className, priorityPhoto = false }: Ficha
         />
       ) : null}
 
-      {model.achievements.length > 0 ? (
+      {!isHero && model.achievements.length > 0 ? (
         <section className="px-4 py-3 sm:px-5">
           <SectionLabel>{FICHA_COPY.insignias}</SectionLabel>
           <div className="mt-2 flex flex-wrap gap-1.5">
@@ -243,21 +261,23 @@ export function FichaDocument({ model, className, priorityPhoto = false }: Ficha
         </section>
       ) : null}
 
-      <footer className="demo-ficha-footer border-t border-mf-border-subtle bg-mf-canvas px-4 py-3 sm:px-5">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="text-[10px] leading-4 text-mf-text-muted">
-            Ficha compartida con autorización parental.
-            <br className="sm:hidden" />
-            <span className="break-all font-medium text-mf-brand">{model.publicUrlDisplay}</span>
-          </p>
-          <div className="demo-ficha-qr hidden items-center gap-3 sm:flex">
-            <div className="rounded-md bg-white p-1.5 ring-1 ring-mf-border-subtle">
-              <QRCode value={model.publicUrlQr} size={52} />
+      {!isHero ? (
+        <footer className="demo-ficha-footer border-t border-mf-border-subtle bg-mf-canvas px-4 py-3 sm:px-5">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <p className="text-[10px] leading-4 text-mf-text-muted">
+              Ficha compartida con autorización parental.
+              <br className="sm:hidden" />
+              <span className="break-all font-medium text-mf-brand">{model.publicUrlDisplay}</span>
+            </p>
+            <div className="demo-ficha-qr hidden items-center gap-3 sm:flex">
+              <div className="rounded-md bg-white p-1.5 ring-1 ring-mf-border-subtle">
+                <QRCode value={model.publicUrlQr} size={52} />
+              </div>
+              <p className="text-[10px] leading-4 text-mf-text-muted">Escanea para abrir la ficha</p>
             </div>
-            <p className="text-[10px] leading-4 text-mf-text-muted">Escanea para abrir la ficha</p>
           </div>
-        </div>
-      </footer>
+        </footer>
+      ) : null}
     </article>
   );
 }

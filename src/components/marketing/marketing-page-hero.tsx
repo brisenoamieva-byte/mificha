@@ -59,7 +59,7 @@ export function MarketingPageHero({
             (asideAlign === "start" ? "lg:items-start" : "lg:items-center"),
         )}
       >
-        <div className={twoColumn ? "max-w-xl" : "max-w-3xl"}>
+        <div className={cn(twoColumn && "self-start", twoColumn ? "max-w-xl" : "max-w-3xl")}>
           <p className="mf-marketing-eyebrow">{eyebrow}</p>
           <h1 className="mt-4 text-[2rem] font-semibold leading-[1.08] tracking-[-0.035em] text-mf-text sm:text-[2.5rem] lg:text-[2.75rem]">
             {title}

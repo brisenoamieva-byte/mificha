@@ -152,7 +152,7 @@ export function AcademyLanding({ data }: AcademyLandingProps) {
               Plantel destacado
             </p>
             <h2 className="mt-2 text-3xl font-black uppercase tracking-tight sm:text-4xl">
-              Jugadores <BrandWordmark />
+              Jugadores <BrandWordmark className="text-white" />
             </h2>
           </div>
           <Trophy className="hidden h-10 w-10 text-slate-600 sm:block" />

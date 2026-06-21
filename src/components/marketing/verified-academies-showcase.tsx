@@ -150,7 +150,8 @@ export function VerifiedAcademiesShowcase({
                 Red certificada
               </p>
               <p className="mt-1 text-lg font-semibold text-white">
-                {stats.academyCount} academias en la red <BrandWordmark />
+                {stats.academyCount} academias en la red{" "}
+                <BrandWordmark className="text-white" />
               </p>
             </div>
             <Link
@@ -185,7 +186,7 @@ export function VerifiedAcademiesShowcase({
         <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-end">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-mf-accent-bright">
-              Red certificada <BrandWordmark />
+              Red certificada <BrandWordmark className="text-white" />
             </p>
             <h2 className="mt-3 text-3xl font-semibold tracking-[-0.03em] text-white sm:text-4xl">
               Academias que cumplen el estándar de la red

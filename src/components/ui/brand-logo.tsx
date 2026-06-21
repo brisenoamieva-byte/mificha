@@ -2,47 +2,70 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { BRAND_ICON, BRAND_LOGO } from "@/lib/brand";
+import { BRAND_ICON } from "@/lib/brand";
+import { BrandWordmark } from "@/components/ui/brand-wordmark";
 import { cn } from "@/lib/utils";
 
 interface BrandLogoProps {
   className?: string;
-  /** Full lockup includes wordmark in the asset. Icon-only shows the shield. */
+  /** Muestra escudo + marca tipográfica MiFicha. */
   showWordmark?: boolean;
   wordmarkClassName?: string;
   size?: "sm" | "md" | "lg";
-  /** Invert colors for dark backgrounds (e.g. academy landing footer). */
+  /** Escudo claro para fondos oscuros (p. ej. landing de academia). */
   variant?: "default" | "onDark";
 }
 
-const sizeClasses = {
-  sm: { full: "h-7", icon: "h-7 w-7" },
-  md: { full: "h-8", icon: "h-8 w-8" },
-  lg: { full: "h-10", icon: "h-10 w-10" },
+const iconClasses = {
+  sm: "h-6 w-6",
+  md: "h-7 w-7",
+  lg: "h-9 w-9",
+} as const;
+
+const iconPixels = {
+  sm: 24,
+  md: 28,
+  lg: 36,
+} as const;
+
+const wordmarkClasses = {
+  sm: "text-base",
+  md: "text-lg",
+  lg: "text-xl",
 } as const;
 
 export function BrandLogo({
   className,
   showWordmark = true,
+  wordmarkClassName,
   size = "md",
   variant = "default",
 }: BrandLogoProps) {
-  const sizes = sizeClasses[size];
-  const imageClassName = cn(
-    showWordmark ? cn(sizes.full, "w-auto") : sizes.icon,
-    variant === "onDark" && "brightness-0 invert opacity-95",
-  );
-
   return (
-    <div className={cn("flex items-center", className)}>
+    <div className={cn("inline-flex items-center gap-2", className)} aria-label="MiFicha">
       <Image
-        src={showWordmark ? BRAND_LOGO : BRAND_ICON}
-        alt="MiFicha"
-        width={showWordmark ? 665 : 173}
-        height={173}
-        className={imageClassName}
+        src={BRAND_ICON}
+        alt=""
+        aria-hidden
+        width={iconPixels[size]}
+        height={iconPixels[size]}
+        className={cn(
+          iconClasses[size],
+          "shrink-0 object-contain",
+          variant === "onDark" && "brightness-0 invert opacity-95",
+        )}
         priority
       />
+      {showWordmark ? (
+        <BrandWordmark
+          className={cn(
+            wordmarkClasses[size],
+            "leading-none",
+            variant === "onDark" ? "text-white" : "text-mf-brand",
+            wordmarkClassName,
+          )}
+        />
+      ) : null}
     </div>
   );
 }

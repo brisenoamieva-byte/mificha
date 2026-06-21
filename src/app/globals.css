@@ -363,32 +363,25 @@ body {
   max-width: 100%;
 }
 
+.demo-ficha-hero > div > div:first-child,
 .demo-ficha-hero > div > div:last-child {
   min-width: 0;
+}
+
+.demo-ficha-hero > div {
+  row-gap: 2rem;
 }
 
 @media (min-width: 1024px) {
   .demo-ficha-hero > div {
     align-items: start;
+    gap: 2.5rem;
+    padding-top: 2.75rem;
+    padding-bottom: 2.75rem;
   }
 
   .demo-ficha-hero > div > div:last-child {
     justify-self: end;
-    width: min(100%, 720px);
-  }
-
-  .demo-ficha-hero .demo-ficha-shell {
-    transform: scale(0.92);
-    transform-origin: top right;
-  }
-}
-
-@media (min-width: 1280px) {
-  .demo-ficha-hero > div > div:last-child {
-    width: min(100%, 780px);
-  }
-
-  .demo-ficha-hero .demo-ficha-shell {
-    transform: scale(0.96);
+    width: min(100%, 680px);
   }
 }

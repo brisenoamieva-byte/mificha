@@ -7,10 +7,10 @@ interface BrandWordmarkProps {
   className?: string;
 }
 
-/** Marca tipográfica: Mi (normal) + Ficha (negrita). */
+/** Marca tipográfica: Mi (normal) + Ficha (negrita) · color de marca por defecto. */
 export function BrandWordmark({ className }: BrandWordmarkProps) {
   return (
-    <span className={cn("inline", className)} aria-label="MiFicha">
+    <span className={cn("inline text-mf-brand", className)} aria-label="MiFicha">
       <span className="font-normal">Mi</span>
       <span className="font-bold">Ficha</span>
     </span>
@@ -46,11 +46,20 @@ export function WithBrandName({ children, className }: WithBrandNameProps) {
 /** Marca tipográfica para imágenes OG (ImageResponse). */
 export function OgBrandWordmark({
   style,
+  tone = "inherit",
 }: {
   style?: CSSProperties;
+  /** brand = #1B4F8C · inherit = color del contenedor (p. ej. blanco en OG oscuro) */
+  tone?: "brand" | "inherit";
 }) {
   return (
-    <span style={{ display: "inline", ...style }}>
+    <span
+      style={{
+        display: "inline",
+        ...(tone === "brand" ? { color: "#1B4F8C" } : null),
+        ...style,
+      }}
+    >
       <span style={{ fontWeight: 400 }}>Mi</span>
       <span style={{ fontWeight: 700 }}>Ficha</span>
     </span>
