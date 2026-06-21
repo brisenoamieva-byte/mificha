@@ -46,13 +46,6 @@ export const ORGANIZER_ONE_PAGER = {
     "Academia: plantel, consentimiento y contacto del tutor.",
     "MiFicha: cruza acta con plantel, progreso de ficha, insignias y avisos al tutor.",
   ],
-  pilotTitle: "Piloto en Querétaro",
-  pilotSteps: [
-    "1 temporada · 1 categoría · 4–8 academias inscritas en MiFicha.",
-    "Publicamos jornadas oficiales antes del arranque.",
-    "Tras 2 jornadas: padres con link + academias certificadas en directorio.",
-    "Caso de éxito para tu próxima convocatoria de inscripciones.",
-  ],
   cta: "¿Agendamos 20 min para ver tu calendario en MiFicha?",
   contact: {
     name: "Ricardo Briseño",

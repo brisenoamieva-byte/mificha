@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { ArrowRight, Trophy } from "lucide-react";
 import { OrganizadoresPageHero } from "@/components/marketing/organizadores-page-hero";
 import { SiteFooter, SiteHeader } from "@/components/marketing/site-header";
@@ -85,31 +84,6 @@ export default function OrganizadoresPage() {
                   ))}
                 </ul>
               </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:py-16">
-          <div className="mf-card overflow-hidden p-8 sm:p-10">
-            <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-              <div className="max-w-xl">
-                <p className="mf-marketing-eyebrow">Piloto Querétaro</p>
-                <h2 className="mt-3 text-2xl font-semibold text-mf-text">
-                  Empecemos con una categoría y crecemos contigo
-                </h2>
-                <ul className="mt-4 space-y-2 text-sm leading-7 text-mf-text-secondary">
-                  {ORGANIZER_ONE_PAGER.pilotSteps.map((step) => (
-                    <li key={step} className="flex gap-2">
-                      <ArrowRight className="mt-1 h-4 w-4 shrink-0 text-mf-accent-dark" />
-                      {step}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <a href={mailto} className="mf-btn-primary shrink-0">
-                {ORGANIZER_ONE_PAGER.cta}
-                <ArrowRight className="h-4 w-4" />
-              </a>
             </div>
           </div>
         </section>
