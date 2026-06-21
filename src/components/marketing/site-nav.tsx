@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { ChevronDown, Menu, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { MARKETING_NAV } from "@/lib/marketing-nav";
 import { cn } from "@/lib/utils";
 
@@ -68,11 +68,20 @@ export function SiteNavMobile({
 }) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [mobileOpen]);
+
   return (
     <>
       <button
         type="button"
-        className="inline-flex h-9 w-9 items-center justify-center rounded-full text-mf-text-secondary transition hover:bg-black/[0.04] lg:hidden"
+        className="inline-flex h-10 w-10 items-center justify-center rounded-full text-mf-text-secondary transition hover:bg-black/[0.04] lg:hidden"
         aria-expanded={mobileOpen}
         aria-label={mobileOpen ? "Cerrar menú" : "Abrir menú"}
         onClick={() => setMobileOpen((value) => !value)}
@@ -81,7 +90,7 @@ export function SiteNavMobile({
       </button>
 
       {mobileOpen ? (
-        <div className="absolute inset-x-0 top-14 z-50 border-b border-mf-border bg-mf-surface px-4 py-4 shadow-lg lg:hidden">
+        <div className="mf-mobile-nav-panel mf-safe-bottom fixed inset-x-0 bottom-0 z-50 overflow-y-auto overscroll-contain border-b border-mf-border bg-mf-surface px-4 py-4 shadow-lg lg:hidden">
           {MARKETING_NAV.map((section) => (
             <div key={section.id} className="border-b border-mf-border-subtle py-3 last:border-0">
               <p className="text-xs font-bold uppercase tracking-[0.15em] text-mf-brand">

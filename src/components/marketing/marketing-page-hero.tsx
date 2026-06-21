@@ -17,6 +17,7 @@ interface MarketingPageHeroProps {
   actions?: ReactNode;
   stats?: MarketingStat[];
   aside?: ReactNode;
+  asideAlign?: "center" | "start";
   photo?: MarketingImageMeta;
   photoPriority?: boolean;
   className?: string;
@@ -29,6 +30,7 @@ export function MarketingPageHero({
   actions,
   stats,
   aside,
+  asideAlign = "center",
   photo,
   photoPriority = false,
   className,
@@ -50,9 +52,11 @@ export function MarketingPageHero({
       />
       <div
         className={cn(
-          "relative mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:py-18",
+          "relative mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:py-20",
           twoColumn &&
-            "grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-12 lg:py-20",
+            "grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12",
+          twoColumn &&
+            (asideAlign === "start" ? "lg:items-start" : "lg:items-center"),
         )}
       >
         <div className={twoColumn ? "max-w-xl" : "max-w-3xl"}>

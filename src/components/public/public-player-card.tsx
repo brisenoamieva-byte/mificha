@@ -37,7 +37,7 @@ export function PublicPlayerCard({ data }: PublicPlayerCardProps) {
   }
 
   return (
-    <div className="min-h-screen bg-mf-canvas px-4 py-8 sm:px-6">
+    <div className="min-h-dvh bg-mf-canvas px-4 py-8 mf-page-bottom sm:px-6">
       <ProfileViewTracker slug={player.slug} />
       <div className="mx-auto w-full max-w-[780px]">
         <div className="mb-5 flex justify-center">

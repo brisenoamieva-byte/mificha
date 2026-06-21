@@ -11,12 +11,12 @@ interface AuthShellProps {
 
 export function AuthShell({ title, subtitle, children, footer }: AuthShellProps) {
   return (
-    <div className="flex min-h-full flex-col bg-mf-canvas">
+    <div className="flex min-h-dvh flex-col bg-mf-canvas">
       <header className="border-b border-mf-border bg-mf-surface px-4 py-3 sm:px-6">
         <BrandLogoLink />
       </header>
 
-      <main className="flex flex-1 items-center justify-center px-4 py-12 sm:px-6">
+      <main className="flex flex-1 items-center justify-center px-4 py-12 mf-page-bottom sm:px-6">
         <div className="w-full max-w-[420px]">
           <div className="mb-8">
             <h1 className="text-[1.75rem] font-semibold tracking-[-0.02em] text-mf-text">

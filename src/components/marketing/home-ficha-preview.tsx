@@ -12,7 +12,7 @@ export function HomeFichaPreview() {
   }
 
   return (
-    <div className="demo-ficha-shell relative mx-auto w-full max-w-[780px] lg:mx-0">
+    <div className="demo-ficha-shell relative mx-auto w-full min-w-0 max-w-[780px] lg:mx-0">
       <FichaDocument model={model} priorityPhoto />
 
       <div className="demo-ficha-actions mt-3 flex flex-wrap items-center justify-between gap-2">

@@ -39,10 +39,10 @@ export function HomeComplementSection() {
                 key={row.official}
                 className="grid grid-cols-2 border-b border-mf-border-subtle last:border-0"
               >
-                <div className="px-4 py-3.5 text-sm leading-6 text-mf-text-secondary">
+                <div className="px-3 py-3.5 text-xs leading-5 text-mf-text-secondary sm:px-4 sm:py-3.5 sm:text-sm sm:leading-6">
                   {row.official}
                 </div>
-                <div className="border-l border-mf-border-subtle bg-mf-accent-soft/20 px-4 py-3.5 text-sm font-medium leading-6 text-mf-text">
+                <div className="border-l border-mf-border-subtle bg-mf-accent-soft/20 px-3 py-3.5 text-xs font-medium leading-5 text-mf-text sm:px-4 sm:py-3.5 sm:text-sm sm:leading-6">
                   {row.mificha}
                 </div>
               </div>

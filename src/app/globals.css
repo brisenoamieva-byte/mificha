@@ -57,11 +57,44 @@
   border-color: var(--mf-border-subtle);
 }
 
+html {
+  overflow-x: clip;
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
   background: var(--mf-canvas);
   color: var(--mf-text);
   font-feature-settings: "cv11", "ss01";
   -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+
+@layer components {
+  .mf-safe-top {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+
+  .mf-safe-bottom {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+  }
+
+  .mf-page-bottom {
+    padding-bottom: max(1.5rem, env(safe-area-inset-bottom, 0px));
+  }
+
+  .mf-mobile-nav-panel {
+    top: calc(3.5rem + env(safe-area-inset-top, 0px));
+  }
+}
+
+@media (max-width: 767px) {
+  .mf-input,
+  .mf-input:focus,
+  select.mf-input,
+  textarea.mf-input {
+    font-size: 16px;
+  }
 }
 
 ::selection {
@@ -327,11 +360,35 @@ body {
 
 .demo-ficha-hero .demo-ficha-shell {
   width: 100%;
+  max-width: 100%;
+}
+
+.demo-ficha-hero > div > div:last-child {
+  min-width: 0;
 }
 
 @media (min-width: 1024px) {
+  .demo-ficha-hero > div {
+    align-items: start;
+  }
+
   .demo-ficha-hero > div > div:last-child {
     justify-self: end;
+    width: min(100%, 720px);
+  }
+
+  .demo-ficha-hero .demo-ficha-shell {
+    transform: scale(0.92);
+    transform-origin: top right;
+  }
+}
+
+@media (min-width: 1280px) {
+  .demo-ficha-hero > div > div:last-child {
     width: min(100%, 780px);
+  }
+
+  .demo-ficha-hero .demo-ficha-shell {
+    transform: scale(0.96);
   }
 }

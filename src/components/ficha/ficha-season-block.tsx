@@ -58,7 +58,7 @@ export function FichaSeasonBlock({
         <StatCell label="Rojas" value={summary.redCards} />
       </div>
 
-      <p className="mt-2 text-[10px] tabular-nums text-mf-text-secondary">
+      <p className="mt-2 break-words text-[9px] tabular-nums text-mf-text-secondary sm:text-[10px]">
         Promedio {summary.avgMinutesPerMatch} min/partido
         {summary.goalsPer90 > 0 || summary.assistsPer90 > 0 ? (
           <>

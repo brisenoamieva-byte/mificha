@@ -30,6 +30,7 @@ export function HomeHero() {
         </>
       }
       aside={<HomeFichaPreview />}
+      asideAlign="start"
       className="demo-ficha-hero"
     />
   );

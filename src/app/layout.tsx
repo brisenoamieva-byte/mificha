@@ -51,6 +51,9 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: "#1B4F8C",
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({
@@ -60,7 +63,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es" className={`${inter.variable} h-full antialiased`}>
-      <body className="min-h-full bg-mf-canvas font-sans text-mf-text antialiased">
+      <body className="min-h-dvh bg-mf-canvas font-sans text-mf-text antialiased">
         <DevServiceWorkerCleanup />
         {children}
         <CookieNotice />

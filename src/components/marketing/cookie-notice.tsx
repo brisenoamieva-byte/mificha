@@ -35,7 +35,7 @@ export function CookieNotice() {
       role="dialog"
       aria-live="polite"
       aria-label="Aviso de cookies"
-      className="fixed inset-x-0 bottom-0 z-[100] border-t border-mf-border bg-mf-surface p-4 shadow-[0_-4px_24px_rgba(0,0,0,0.08)] sm:p-5"
+      className="mf-safe-bottom fixed inset-x-0 bottom-0 z-[100] border-t border-mf-border bg-mf-surface p-4 shadow-[0_-4px_24px_rgba(0,0,0,0.08)] sm:p-5"
     >
       <div className="mx-auto flex max-w-6xl flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm leading-6 text-mf-text-secondary">

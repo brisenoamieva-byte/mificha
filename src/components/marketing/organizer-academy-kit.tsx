@@ -37,7 +37,7 @@ export function OrganizerAcademyKit() {
         </div>
 
         <div className="mt-6 rounded-xl border border-mf-border bg-mf-canvas p-5 sm:p-6">
-          <pre className="whitespace-pre-wrap font-sans text-sm leading-7 text-mf-text-secondary">
+          <pre className="overflow-x-auto whitespace-pre-wrap break-words font-sans text-sm leading-7 text-mf-text-secondary">
             {blastText}
           </pre>
           <button

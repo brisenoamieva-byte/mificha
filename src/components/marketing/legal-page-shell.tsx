@@ -17,7 +17,7 @@ export function LegalPageShell({
   children,
 }: LegalPageShellProps) {
   return (
-    <div className="flex min-h-full flex-col bg-mf-canvas">
+    <div className="flex min-h-dvh flex-col bg-mf-canvas">
       <SiteHeader actionHref="/login" actionLabel="Iniciar sesión" />
 
       <main className="flex-1">

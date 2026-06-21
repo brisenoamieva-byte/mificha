@@ -23,7 +23,7 @@ export default function OrganizadoresPage() {
   )}`;
 
   return (
-    <div className="flex min-h-full flex-col bg-mf-canvas">
+    <div className="flex min-h-dvh flex-col bg-mf-canvas">
       <SiteHeader />
 
       <main className="flex-1">

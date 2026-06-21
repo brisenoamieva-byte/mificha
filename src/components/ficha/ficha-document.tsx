@@ -44,7 +44,7 @@ export function FichaDocument({ model, className, priorityPhoto = false }: Ficha
     <article
       id={model.documentId}
       className={cn(
-        "demo-ficha-document overflow-hidden rounded-xl border border-mf-border bg-white shadow-[0_20px_50px_-24px_rgba(15,45,82,0.35)]",
+        "demo-ficha-document min-w-0 overflow-hidden rounded-xl border border-mf-border bg-white shadow-[0_20px_50px_-24px_rgba(15,45,82,0.35)]",
         className,
       )}
     >
@@ -248,7 +248,7 @@ export function FichaDocument({ model, className, priorityPhoto = false }: Ficha
           <p className="text-[10px] leading-4 text-mf-text-muted">
             Ficha compartida con autorización parental.
             <br className="sm:hidden" />
-            <span className="font-medium text-mf-brand">{model.publicUrlDisplay}</span>
+            <span className="break-all font-medium text-mf-brand">{model.publicUrlDisplay}</span>
           </p>
           <div className="demo-ficha-qr hidden items-center gap-3 sm:flex">
             <div className="rounded-md bg-white p-1.5 ring-1 ring-mf-border-subtle">

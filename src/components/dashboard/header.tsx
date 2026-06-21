@@ -34,13 +34,13 @@ export function DashboardHeader({ onMenuClick }: DashboardHeaderProps) {
   }
 
   return (
-    <header className="sticky top-0 z-40 border-b border-mf-border bg-mf-surface">
+    <header className="mf-safe-top sticky top-0 z-40 border-b border-mf-border bg-mf-surface">
       <div className="flex items-center justify-between gap-4 px-4 py-3 sm:px-6">
         <div className="flex min-w-0 items-center gap-3">
           <button
             type="button"
             onClick={onMenuClick}
-            className="rounded-md p-2 text-mf-text-secondary hover:bg-black/[0.04] lg:hidden"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-md text-mf-text-secondary hover:bg-black/[0.04] lg:hidden"
             aria-label="Abrir menú"
           >
             <Menu className="h-5 w-5" />

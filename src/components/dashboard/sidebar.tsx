@@ -90,7 +90,7 @@ export function DashboardSidebar({ open, onClose }: DashboardSidebarProps) {
             onClick={onClose}
             aria-label="Cerrar menú"
           />
-          <aside className="relative h-full w-[280px] max-w-[85vw] border-r border-mf-border bg-mf-surface">
+          <aside className="relative flex h-full max-h-dvh w-[280px] max-w-[85vw] flex-col border-r border-mf-border bg-mf-surface mf-safe-top mf-safe-bottom">
             {content}
           </aside>
         </div>

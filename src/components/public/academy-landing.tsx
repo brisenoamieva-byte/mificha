@@ -48,7 +48,7 @@ export function AcademyLanding({ data }: AcademyLandingProps) {
   const whatsappUrl = formatWhatsAppUrl(academy.phone);
 
   return (
-    <div className="min-h-screen bg-[#0a0f1a] text-white">
+    <div className="min-h-dvh bg-[#0a0f1a] text-white">
       <section
         className="relative overflow-hidden"
         style={{
@@ -56,7 +56,7 @@ export function AcademyLanding({ data }: AcademyLandingProps) {
         }}
       >
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.12),transparent_40%)]" />
-        <div className="relative mx-auto max-w-6xl px-6 pb-20 pt-10 sm:px-10 sm:pt-14">
+        <div className="relative mx-auto max-w-6xl px-4 pb-20 pt-10 mf-page-bottom sm:px-6 sm:pt-14">
           <BrandLogoLink variant="onDark" size="sm" className="mb-10" />
           <div className="flex flex-col gap-10 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-3xl">
