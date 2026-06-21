@@ -1,11 +1,9 @@
 import type { LucideIcon } from "lucide-react";
 import {
-  Building2,
   Search,
   Trophy,
   Users,
 } from "lucide-react";
-import { MARKETING_MEDIA } from "@/lib/marketing-assets";
 
 export interface NavLink {
   href: string;
@@ -20,11 +18,11 @@ export interface NavSection {
   links: NavLink[];
 }
 
-/** Inspirado en portales federativos (calendario, clasificación, comparativa) — adaptado a MiFicha. */
+/** Navegación marketing — un enlace por destino, sin duplicados. */
 export const MARKETING_NAV: NavSection[] = [
   {
-    id: "plataforma",
-    label: "Plataforma",
+    id: "producto",
+    label: "Producto",
     icon: Trophy,
     links: [
       {
@@ -35,61 +33,34 @@ export const MARKETING_NAV: NavSection[] = [
       {
         href: "/#complemento",
         label: "MiFicha + liga oficial",
-        description: "Stats individuales junto a tu liga",
+        description: "Stats individuales junto a tu torneo",
       },
       {
         href: "/padres",
-        label: "Ficha del jugador",
-        description: "Progreso verificado al instante",
+        label: "Padres",
+        description: "Ficha post-partido por WhatsApp o email",
       },
     ],
   },
   {
-    id: "accesos",
-    label: "Accesos",
+    id: "acceso",
+    label: "Acceso",
     icon: Users,
     links: [
       {
         href: "/signup",
-        label: "Soy academia",
+        label: "Registrar academia",
         description: "Plantel, partidos y reportes",
       },
       {
-        href: "/padres",
-        label: "Soy padre",
-        description: "Link automático tras cada partido",
-      },
-      {
         href: "/organizadores",
-        label: "Organizo torneos",
-        description: "Calendario y acta oficial en MiFicha",
+        label: "Organizadores",
+        description: "Calendario y acta oficial",
       },
       {
         href: "/explorar",
-        label: "Scouts / visorías",
-        description: "Directorio y marcador semanal",
-      },
-    ],
-  },
-  {
-    id: "directorio",
-    label: "Directorio",
-    icon: Search,
-    links: [
-      {
-        href: "/explorar",
-        label: "Explorar talento",
-        description: "Jugadores y academias públicas",
-      },
-      {
-        href: "/explorar#rankings",
-        label: "Referencia por posición",
-        description: "Top por categoría y zona",
-      },
-      {
-        href: "/explorar#ideal-11",
-        label: "11 ideal semanal",
-        description: "Mejores rendimientos verificados",
+        label: "Explorar",
+        description: "Directorio, rankings e 11 ideal semanal",
       },
     ],
   },

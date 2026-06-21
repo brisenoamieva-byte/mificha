@@ -62,8 +62,8 @@ export function FichaDocument({ model, className, priorityPhoto = false }: Ficha
         <BrandWordmark className="shrink-0 text-xs text-white" />
       </header>
 
-      <div className="demo-ficha-identity grid border-b border-mf-border-subtle sm:grid-cols-[148px_1fr]">
-        <div className="relative aspect-[3/4] w-full max-h-[196px] border-b border-mf-border-subtle bg-slate-100 sm:max-h-none sm:border-b-0 sm:border-r">
+      <div className="demo-ficha-identity grid grid-cols-[96px_minmax(0,1fr)] border-b border-mf-border-subtle sm:grid-cols-[148px_minmax(0,1fr)_auto]">
+        <div className="relative row-span-2 aspect-[3/4] w-full max-h-[128px] overflow-hidden border-r border-mf-border-subtle bg-slate-100 sm:row-span-2 sm:max-h-none">
           {model.photoSrc ? (
             model.photoIsLocal ? (
               <Image
@@ -73,7 +73,7 @@ export function FichaDocument({ model, className, priorityPhoto = false }: Ficha
                 priority={priorityPhoto}
                 className="object-cover"
                 style={{ objectPosition: "50% 18%" }}
-                sizes="(max-width: 640px) 100vw, 148px"
+                sizes="(max-width: 640px) 96px, 148px"
               />
             ) : (
               <PlayerPortraitImage
@@ -81,12 +81,12 @@ export function FichaDocument({ model, className, priorityPhoto = false }: Ficha
                 alt={`Retrato de ${model.fullName}`}
                 className="object-cover"
                 objectPosition="50% 18%"
-                sizes="148px"
+                sizes="(max-width: 640px) 96px, 148px"
                 priority={priorityPhoto}
               />
             )
           ) : (
-            <div className="flex h-full items-center justify-center text-lg font-semibold text-mf-text-muted">
+            <div className="flex h-full items-center justify-center text-base font-semibold text-mf-text-muted">
               {model.fullName
                 .split(" ")
                 .map((part) => part[0])
@@ -96,68 +96,87 @@ export function FichaDocument({ model, className, priorityPhoto = false }: Ficha
           )}
         </div>
 
-        <div className="flex min-w-0 border-b border-mf-border-subtle sm:border-b-0">
-          <div className="flex min-w-0 flex-1 flex-col justify-between gap-3 px-4 py-4 sm:px-5">
-            <div>
-              <h1 className="text-xl font-semibold leading-tight tracking-tight text-mf-text sm:text-[1.35rem]">
-                {model.fullName}
-              </h1>
-              <p className="mt-1.5 text-sm text-mf-text-secondary">
-                {model.age} años · {model.categoryLabel}
-              </p>
-              <p className="mt-0.5 text-sm text-mf-text-secondary">
-                {model.positionLabel}
-                {model.secondaryPositionLabel
-                  ? ` · también ${model.secondaryPositionLabel.toLowerCase()}`
-                  : null}
-              </p>
-              <p className="mt-0.5 text-sm text-mf-text-secondary">{model.academyName}</p>
-              {model.metaLine ? (
-                <p className="mt-1 text-xs text-mf-text-muted">{model.metaLine}</p>
-              ) : null}
-            </div>
-
-            <div className="flex flex-wrap gap-1.5">
-              {model.showVerified ? (
-                <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-800 ring-1 ring-emerald-200/80">
-                  <BadgeCheck className="h-3 w-3" aria-hidden />
-                  {FICHA_COPY.verified}
-                </span>
-              ) : null}
-              {model.showConsent ? (
-                <span className="rounded-md bg-mf-canvas px-2 py-0.5 text-[10px] font-medium text-mf-text-secondary ring-1 ring-mf-border-subtle">
-                  {FICHA_COPY.parentalConsent}
-                </span>
-              ) : null}
-              {model.isDemo ? (
-                <span className="rounded-md bg-mf-brand-soft px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-mf-brand">
-                  Ejemplo
-                </span>
-              ) : null}
-            </div>
-          </div>
-
+        <div className="relative col-start-2 row-start-1 min-w-0 px-3 pt-3 sm:px-5 sm:py-4">
           {model.academyLogoUrl ? (
-            <div className="demo-ficha-academy-logo flex w-[88px] shrink-0 items-center justify-center border-l border-mf-border-subtle bg-white px-2 py-4 sm:w-[104px] sm:px-3">
+            <div className="absolute right-3 top-3 flex h-11 w-11 items-center justify-center rounded-md bg-white p-1 ring-1 ring-mf-border-subtle sm:hidden">
               {model.academyLogoUrl.startsWith("/") ? (
                 <Image
                   src={model.academyLogoUrl}
-                  alt={`Logo ${model.academyName}`}
-                  width={80}
-                  height={80}
-                  className="h-auto w-full max-w-[76px] object-contain sm:max-w-[84px]"
+                  alt=""
+                  width={40}
+                  height={40}
+                  className="h-full w-full object-contain"
                 />
               ) : (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={model.academyLogoUrl}
-                  alt={`Logo ${model.academyName}`}
-                  className="h-auto w-full max-w-[76px] object-contain sm:max-w-[84px]"
+                  alt=""
+                  className="h-full w-full object-contain"
                 />
               )}
             </div>
           ) : null}
+
+          <div className={cn(model.academyLogoUrl && "pr-12 sm:pr-0")}>
+            <h1 className="text-lg font-semibold leading-tight tracking-tight text-mf-text sm:text-[1.35rem]">
+              {model.fullName}
+            </h1>
+            <p className="mt-1 text-sm text-mf-text-secondary">
+              {model.age} años · {model.categoryLabel}
+            </p>
+            <p className="mt-0.5 text-sm text-mf-text-secondary">
+              {model.positionLabel}
+              {model.secondaryPositionLabel
+                ? ` · también ${model.secondaryPositionLabel.toLowerCase()}`
+                : null}
+            </p>
+            <p className="mt-0.5 text-sm text-mf-text-secondary">{model.academyName}</p>
+            {model.metaLine ? (
+              <p className="mt-1 text-xs text-mf-text-muted">{model.metaLine}</p>
+            ) : null}
+          </div>
         </div>
+
+        <div className="col-start-2 row-start-2 flex flex-wrap gap-1.5 self-end px-3 pb-3 sm:px-5 sm:pb-4">
+          {model.showVerified ? (
+            <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-800 ring-1 ring-emerald-200/80">
+              <BadgeCheck className="h-3 w-3" aria-hidden />
+              {FICHA_COPY.verified}
+            </span>
+          ) : null}
+          {model.showConsent ? (
+            <span className="rounded-md bg-mf-canvas px-2 py-0.5 text-[10px] font-medium text-mf-text-secondary ring-1 ring-mf-border-subtle">
+              {FICHA_COPY.parentalConsent}
+            </span>
+          ) : null}
+          {model.isDemo ? (
+            <span className="rounded-md bg-mf-brand-soft px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-mf-brand">
+              Ejemplo
+            </span>
+          ) : null}
+        </div>
+
+        {model.academyLogoUrl ? (
+          <div className="demo-ficha-academy-logo col-start-3 row-span-2 row-start-1 hidden w-[88px] shrink-0 items-center justify-center border-l border-mf-border-subtle bg-white px-2 py-4 sm:flex sm:w-[104px] sm:px-3">
+            {model.academyLogoUrl.startsWith("/") ? (
+              <Image
+                src={model.academyLogoUrl}
+                alt={`Logo ${model.academyName}`}
+                width={80}
+                height={80}
+                className="h-auto w-full max-w-[76px] object-contain sm:max-w-[84px]"
+              />
+            ) : (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={model.academyLogoUrl}
+                alt={`Logo ${model.academyName}`}
+                className="h-auto w-full max-w-[76px] object-contain sm:max-w-[84px]"
+              />
+            )}
+          </div>
+        ) : null}
       </div>
 
       {showSeason ? <FichaSeasonBlock stats={model.seasonStats} summary={summary} compact /> : null}
