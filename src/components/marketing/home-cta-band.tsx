@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { MarketingBackgroundPhoto } from "@/components/marketing/marketing-hero-visual";
+import { WithBrandName } from "@/components/ui/brand-wordmark";
 import { MARKETING_MEDIA } from "@/lib/marketing-assets";
 
 export function HomeCtaBand() {
@@ -16,14 +17,16 @@ export function HomeCtaBand() {
       <div className="relative mx-auto flex max-w-6xl flex-col items-start gap-6 px-4 py-14 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:py-16">
         <div className="max-w-xl">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-white/60">
-            Empieza hoy
+            Piloto en Querétaro
           </p>
           <h2 className="mt-3 text-2xl font-semibold tracking-[-0.02em] text-white sm:text-3xl">
-            Tu plantel merece más que una hoja de Excel
+            Stats del torneo que llegan a cada familia
           </h2>
           <p className="mt-3 text-sm leading-7 text-white/80">
-            Carga el roster, captura convocados y minutos post-partido, y MiFicha
-            avisa a los tutores el mismo sábado.
+            <WithBrandName>
+              Carga plantel y contacto del tutor. MiFicha sincroniza el acta oficial,
+              actualiza cada ficha y avisa a las familias tras cada jornada.
+            </WithBrandName>
           </p>
         </div>
         <div className="flex flex-wrap gap-3">

@@ -1,125 +1,81 @@
 import Link from "next/link";
-import type { LucideIcon } from "lucide-react";
-import { ArrowRight, Building2, MessageCircle, Search } from "lucide-react";
-import { MarketingCardPhoto } from "@/components/marketing/marketing-hero-visual";
-import type { MarketingImageKey } from "@/lib/marketing-assets";
-import { MARKETING_MEDIA } from "@/lib/marketing-assets";
+import { ArrowRight } from "lucide-react";
+import { AUDIENCE_VALUE_PROPS } from "@/lib/audience-value-props";
+import { BrandWordmark } from "@/components/ui/brand-wordmark";
 import { cn } from "@/lib/utils";
-
-interface AudienceItem {
-  icon: LucideIcon;
-  title: string;
-  description: string;
-  href: string;
-  cta: string;
-  imageKey: MarketingImageKey;
-  iconTone?: "brand" | "accent";
-  secondaryHref?: string;
-  secondaryLabel?: string;
-  featured?: boolean;
-}
-
-const audiences: AudienceItem[] = [
-  {
-    icon: Building2,
-    title: "Colegios y academias",
-    description:
-      "Plantel, captura de minutos, avisos a tutores y visibilidad en el directorio verificado. Tu academia y tus jugadores destacan en la red.",
-    href: "/signup",
-    secondaryHref: "/login",
-    secondaryLabel: "Iniciar sesión",
-    cta: "Crear cuenta",
-    imageKey: "audienceAcademias",
-    iconTone: "brand",
-    featured: true,
-  },
-  {
-    icon: MessageCircle,
-    title: "Padres",
-    description:
-      "Recibe el link por email o WhatsApp tras cada partido. Stats y Passport Score sin registro.",
-    href: "/padres",
-    cta: "Abrir ficha",
-    imageKey: "audiencePadres",
-    iconTone: "accent",
-  },
-  {
-    icon: Search,
-    title: "Torneos y visorías",
-    description:
-      "Directorio, destacados semanales y referencia por posición — siempre por categoría.",
-    href: "/explorar",
-    cta: "Explorar directorio",
-    imageKey: "audienceScouts",
-    iconTone: "accent",
-  },
-];
 
 export function HomeAudienceSection() {
   return (
-    <section id="accesos" className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-20">
+    <section id="accesos" className="mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:py-16">
       <div className="max-w-2xl">
-        <p className="mf-marketing-eyebrow">Tres accesos, una plataforma</p>
+        <p className="mf-marketing-eyebrow">¿Eres…?</p>
         <h2 className="mt-3 text-2xl font-semibold tracking-[-0.02em] text-mf-text sm:text-3xl">
-          Para colegios, padres y torneos
+          ¿Por qué te interesa <BrandWordmark />?
         </h2>
+        <p className="mt-3 text-sm leading-7 text-mf-text-secondary">
+          Cada quien gana algo distinto. El acta oficial del torneo es el punto de
+          partida para todos.
+        </p>
       </div>
 
-      <div className="mt-10 grid gap-5 lg:grid-cols-3">
-        {audiences.map((item) => (
+      <div className="mt-8 grid gap-4 lg:grid-cols-2">
+        {AUDIENCE_VALUE_PROPS.map((item) => (
           <article
-            key={item.title}
-            className={cn(
-              "group flex flex-col overflow-hidden rounded-xl border bg-mf-surface transition",
-              item.featured
-                ? "border-mf-brand/25 shadow-[0_0_0_1px_rgba(27,79,140,0.08)]"
-                : item.iconTone === "accent"
-                  ? "border-mf-border hover:border-mf-accent/35 hover:shadow-[0_0_0_1px_rgba(52,211,153,0.12)]"
-                  : "border-mf-border hover:border-mf-brand/20",
-            )}
+            key={item.id}
+            className="mf-card flex flex-col p-6 transition hover:border-mf-brand/25"
           >
-            <MarketingCardPhoto meta={MARKETING_MEDIA[item.imageKey]} />
-            <div className="flex flex-1 flex-col px-6 pb-6 pt-6">
+            <div className="flex gap-4">
               <div
                 className={cn(
-                  item.featured || item.iconTone === "brand"
-                    ? "mf-icon-brand"
-                    : "mf-icon-accent",
-                  item.featured && "bg-mf-brand text-white",
+                  "flex h-11 w-11 shrink-0 items-center justify-center rounded-xl",
+                  item.tone === "brand"
+                    ? "bg-mf-brand-soft text-mf-brand"
+                    : "bg-mf-accent-soft text-mf-accent-dark",
                 )}
               >
                 <item.icon className="h-5 w-5" strokeWidth={1.75} />
               </div>
-              <h3 className="mt-4 text-lg font-semibold tracking-[-0.01em] text-mf-text">
-                {item.title}
-              </h3>
-              <p className="mt-2 flex-1 text-sm leading-7 text-mf-text-secondary">
-                {item.description}
-              </p>
-              <div className="mt-6 flex flex-wrap items-center gap-3">
-                <Link
-                  href={item.href}
-                  className={cn(
-                    "inline-flex items-center gap-1.5 text-sm font-semibold transition",
-                    item.featured
-                      ? "text-mf-brand hover:text-mf-brand-dark"
-                      : item.iconTone === "accent"
-                        ? "text-mf-accent-dark hover:text-[#047857]"
-                        : "text-mf-text hover:text-mf-brand",
-                  )}
-                >
-                  {item.cta}
-                  <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
-                </Link>
-                {item.secondaryHref ? (
-                  <Link
-                    href={item.secondaryHref}
-                    className="text-sm font-medium text-mf-text-muted hover:text-mf-text"
-                  >
-                    {item.secondaryLabel}
-                  </Link>
-                ) : null}
+              <div className="min-w-0">
+                <h3 className="font-semibold text-mf-text">{item.title}</h3>
+                <p className="mt-1 text-sm font-medium text-mf-text">
+                  {item.headline}
+                </p>
               </div>
+            </div>
+
+            <ul className="mt-4 space-y-2 border-t border-mf-border-subtle pt-4">
+              {item.reasons.map((reason) => (
+                <li
+                  key={reason}
+                  className="flex gap-2 text-sm leading-6 text-mf-text-secondary"
+                >
+                  <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-mf-brand/60" />
+                  {reason}
+                </li>
+              ))}
+            </ul>
+
+            <div className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-1">
+              <Link
+                href={item.href}
+                className={cn(
+                  "inline-flex items-center gap-1 text-sm font-semibold",
+                  item.tone === "brand"
+                    ? "text-mf-brand hover:text-mf-brand-dark"
+                    : "text-mf-accent-dark hover:text-[#047857]",
+                )}
+              >
+                {item.cta}
+                <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+              {item.secondaryHref ? (
+                <Link
+                  href={item.secondaryHref}
+                  className="text-sm font-medium text-mf-text-muted hover:text-mf-text"
+                >
+                  {item.secondaryLabel}
+                </Link>
+              ) : null}
             </div>
           </article>
         ))}

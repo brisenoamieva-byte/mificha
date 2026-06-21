@@ -34,8 +34,8 @@ export function PartidosProgramarContent() {
         </p>
         <p className="mt-3 text-sm leading-7 text-slate-600">
           Cuando publiquemos tu próximo partido, aparecerá en{" "}
-          <strong className="font-semibold text-slate-800">Partidos → Capturar stats</strong>
-          . El marcador y acta los publica el organizador; tú registras convocados y minutos (~1 min).
+          <strong className="font-semibold text-slate-800">Partidos</strong>. El marcador
+          y acta los publica el organizador; MiFicha sincroniza stats y avisa a los tutores.
         </p>
 
         <div className="mt-6 flex flex-wrap gap-3">

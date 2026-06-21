@@ -30,8 +30,8 @@ export function NoFixturesState({
         </h1>
         <p className="mt-3 text-sm leading-7 text-mf-text-secondary">
           MiFicha publicará el calendario oficial (rival, fecha, sede y categoría).
-          Cuando aparezca en Partidos, capturas convocados y minutos tras marcador y acta
-          oficial.
+          Cuando aparezca en Partidos, MiFicha sincronizará stats al publicarse marcador
+          y acta oficial del torneo.
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
           <Link

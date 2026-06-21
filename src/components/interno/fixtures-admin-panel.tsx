@@ -12,6 +12,7 @@ import {
 import { FixtureImportSection } from "@/components/interno/fixture-import-section";
 import { OfficialActaEntry } from "@/components/interno/official-acta-entry";
 import { OfficialResultEntry } from "@/components/interno/official-result-entry";
+import { BrandWordmark } from "@/components/ui/brand-wordmark";
 import { formatKickoffDateTime } from "@/lib/match-utils";
 import { supabase } from "@/lib/supabase";
 import { toast } from "@/components/ui/toast";
@@ -187,7 +188,7 @@ export function FixturesAdminPanel() {
         <div className="mx-auto flex max-w-4xl flex-wrap items-center justify-between gap-4">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/50">
-              Interno · MiFicha
+              Interno · <BrandWordmark />
             </p>
             <h1 className="mt-2 text-2xl font-semibold tracking-tight">
               Jornadas oficiales

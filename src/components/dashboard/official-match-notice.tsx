@@ -1,5 +1,6 @@
 import { ShieldCheck } from "lucide-react";
-import { buildAcademyRosterMinutesNotice } from "@/lib/match-data-governance";
+import { BrandWordmark, containsBrandName, WithBrandName } from "@/components/ui/brand-wordmark";
+import { buildOfficialStatsSyncNotice } from "@/lib/match-data-governance";
 import { cn } from "@/lib/utils";
 
 interface OfficialMatchNoticeProps {
@@ -12,7 +13,7 @@ interface OfficialMatchNoticeProps {
 export function OfficialMatchNotice({
   variant = "info",
   title,
-  message = buildAcademyRosterMinutesNotice(),
+  message = buildOfficialStatsSyncNotice(),
   className,
 }: OfficialMatchNoticeProps) {
   return (
@@ -34,7 +35,17 @@ export function OfficialMatchNotice({
         )}
       >
         <ShieldCheck className="h-3.5 w-3.5" />
-        {title ?? "Jornada oficial MiFicha"}
+        {title ? (
+          containsBrandName(title) ? (
+            <WithBrandName>{title}</WithBrandName>
+          ) : (
+            title
+          )
+        ) : (
+          <>
+            Jornada oficial <BrandWordmark />
+          </>
+        )}
       </p>
       <p
         className={cn(
@@ -44,7 +55,7 @@ export function OfficialMatchNotice({
           variant === "success" && "text-emerald-950",
         )}
       >
-        {message}
+        <WithBrandName>{message}</WithBrandName>
       </p>
     </div>
   );

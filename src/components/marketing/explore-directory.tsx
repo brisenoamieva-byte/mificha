@@ -8,6 +8,7 @@ import { CategoryFilterSelect } from "@/components/ui/category-filter-select";
 import { PlayerCategoryBadge } from "@/components/ui/player-category-badge";
 import { MexicoLocationSelect } from "@/components/ui/mexico-location-select";
 import { IdealXIPanel } from "@/components/marketing/ideal-xi-panel";
+import { BrandWordmark } from "@/components/ui/brand-wordmark";
 import { WeeklyCompetitionPanels } from "@/components/marketing/weekly-competition-panels";
 import { PositionRankingsPanel } from "@/components/marketing/position-rankings-panel";
 import { getPositionLabel } from "@/lib/dashboard-utils";
@@ -146,8 +147,7 @@ export function ExploreDirectory({
       </div>
 
       <div className="rounded-xl border border-mf-border-subtle border-l-4 border-l-mf-accent bg-mf-accent-soft/40 px-4 py-3 text-sm leading-6 text-mf-text-secondary">
-        MiFicha ordena tu participación y te da visibilidad ante visorías — siempre
-        por categoría y con consentimiento. No es una calificación ni un examen.
+        Directorio con consentimiento parental. Stats verificados del acta oficial.
       </div>
 
       <WeeklyCompetitionPanels
@@ -182,7 +182,7 @@ export function ExploreDirectory({
 
       <section className="space-y-4">
         <div className="flex items-center justify-between gap-3">
-          <h2 className="mf-section-title">Academias públicas</h2>
+          <h2 className="mf-section-title">Academias certificadas</h2>
           <span className="text-sm text-mf-text-muted">
             {filtered.academies.length} resultados
           </span>
@@ -190,7 +190,7 @@ export function ExploreDirectory({
 
         {filtered.academies.length === 0 ? (
           <div className="mf-card border-dashed p-8 text-center text-sm text-mf-text-secondary">
-            No hay academias públicas que coincidan con tu búsqueda.
+            No hay academias certificadas que coincidan con tu búsqueda.
           </div>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -228,7 +228,7 @@ export function ExploreDirectory({
                 {academy.is_certified ? (
                   <span className="mf-badge-accent mt-4">
                     <Award className="h-3.5 w-3.5" />
-                    Certificada
+                    Certificada <BrandWordmark />
                   </span>
                 ) : null}
               </Link>
@@ -251,7 +251,51 @@ export function ExploreDirectory({
           </div>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            {filtered.players.map((player) => (
+            {filtered.players.map((player) => {
+              const fullName = `${player.first_name} ${player.last_name}`;
+
+              if (player.photo_url) {
+                return (
+                  <Link
+                    key={player.slug}
+                    href={`/j/${player.slug}`}
+                    className="group mf-card block overflow-hidden p-0 transition hover:border-mf-brand/30"
+                  >
+                    <div className="relative aspect-[4/3] overflow-hidden bg-mf-canvas">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={player.photo_url}
+                        alt={fullName}
+                        className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#0a1628] via-[#0a1628]/20 to-transparent" />
+                      <div className="absolute bottom-0 left-0 right-0 p-4">
+                        <p className="truncate text-lg font-semibold text-white">{fullName}</p>
+                        <p className="text-sm text-white/75">{getPositionLabel(player.position)}</p>
+                      </div>
+                      <div className="absolute right-3 top-3 rounded-full bg-white/95 px-2 py-1 shadow-sm">
+                        <PassportScoreDisplay
+                          score={player.passport_score}
+                          variant="compact"
+                          showLabel={false}
+                        />
+                      </div>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2 px-4 py-3">
+                      <PlayerCategoryBadge birthDate={player.birth_date} compact />
+                      <span className="inline-flex items-center gap-1 text-xs font-medium text-mf-success">
+                        <Shield className="h-3.5 w-3.5" />
+                        Ficha verificada
+                      </span>
+                      <span className="truncate text-xs text-mf-text-muted">
+                        {player.academies?.name ?? "Academia"}
+                      </span>
+                    </div>
+                  </Link>
+                );
+              }
+
+              return (
               <Link
                 key={player.slug}
                 href={`/j/${player.slug}`}
@@ -295,7 +339,8 @@ export function ExploreDirectory({
                   </span>
                 </div>
               </Link>
-            ))}
+              );
+            })}
           </div>
         )}
       </section>

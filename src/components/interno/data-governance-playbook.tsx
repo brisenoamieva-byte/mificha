@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { ArrowLeft, ShieldCheck } from "lucide-react";
+import { BrandWordmark, WithBrandName } from "@/components/ui/brand-wordmark";
 import {
   MIFICHA_DATA_GOVERNANCE,
   getGovernanceResponsibilitiesFor,
@@ -10,9 +11,16 @@ import {
 const ACTOR_LABELS = {
   organizer: "Organizador",
   academy: "Academia",
-  mificha: "MiFicha",
   parent: "Padres",
 } as const;
+
+function ActorLabel({ actor }: { actor: keyof typeof ACTOR_LABELS | "mificha" }) {
+  if (actor === "mificha") {
+    return <BrandWordmark />;
+  }
+
+  return <>{ACTOR_LABELS[actor]}</>;
+}
 
 export function DataGovernancePlaybook() {
   return (
@@ -30,10 +38,10 @@ export function DataGovernancePlaybook() {
             Interno · Modelo de datos
           </p>
           <h1 className="mt-2 text-2xl font-semibold tracking-tight">
-            Quién hace qué en MiFicha
+            Quién hace qué en <BrandWordmark />
           </h1>
           <p className="mt-3 max-w-3xl text-sm leading-7 text-white/65">
-            {MIFICHA_DATA_GOVERNANCE.principle}
+            <WithBrandName>{MIFICHA_DATA_GOVERNANCE.principle}</WithBrandName>
           </p>
         </div>
       </header>
@@ -46,7 +54,7 @@ export function DataGovernancePlaybook() {
               className="rounded-2xl border border-white/10 bg-white/[0.04] p-5"
             >
               <p className="text-xs font-semibold uppercase tracking-wide text-emerald-300/90">
-                {ACTOR_LABELS[key as keyof typeof ACTOR_LABELS]}
+                <ActorLabel actor={key as keyof typeof ACTOR_LABELS | "mificha"} />
               </p>
               <h2 className="mt-2 font-semibold">{role.title}</h2>
               <p className="mt-2 text-sm text-white/60">{role.motto}</p>
@@ -80,9 +88,11 @@ export function DataGovernancePlaybook() {
                   <tr key={row.id} className="border-b border-white/5 align-top">
                     <td className="py-3 pr-4 font-medium text-white/90">{row.label}</td>
                     <td className="py-3 pr-4 text-emerald-200/90">
-                      {ACTOR_LABELS[row.owner]}
+                      <ActorLabel actor={row.owner} />
                     </td>
-                    <td className="py-3 text-white/60">{row.why}</td>
+                    <td className="py-3 text-white/60">
+                      <WithBrandName>{row.why}</WithBrandName>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -115,10 +125,14 @@ export function DataGovernancePlaybook() {
                   </ul>
                 </div>
                 <div>
-                  <p className="text-xs font-semibold text-white/45">MiFicha</p>
+                  <p className="text-xs font-semibold text-white/45">
+                    <BrandWordmark />
+                  </p>
                   <ul className="mt-2 space-y-1 text-sm text-white/75">
                     {step.mificha.map((line) => (
-                      <li key={line}>{line}</li>
+                      <li key={line}>
+                        <WithBrandName>{line}</WithBrandName>
+                      </li>
                     ))}
                   </ul>
                 </div>

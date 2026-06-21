@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { Globe2, Loader2, Users } from "lucide-react";
+import { BrandWordmark } from "@/components/ui/brand-wordmark";
 import { supabase } from "@/lib/supabase";
 import { toast } from "@/components/ui/toast";
 
@@ -123,7 +124,9 @@ export function PlatformSeasonSection() {
       <div className="flex items-start gap-3">
         <Globe2 className="mt-0.5 h-5 w-5 text-sky-300" />
         <div>
-          <h2 className="text-lg font-semibold">Temporada MiFicha (compartida)</h2>
+          <h2 className="text-lg font-semibold">
+            Temporada <BrandWordmark /> (compartida)
+          </h2>
           <p className="mt-2 text-sm leading-6 text-white/65">
             Un solo ciclo para todas las academias — stats comparables. Créala aquí y
             asígnala en lote; cada colegio recibe su temporada activa vinculada.

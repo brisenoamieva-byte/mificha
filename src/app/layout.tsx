@@ -15,18 +15,18 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "MiFicha - Perfiles futbolísticos digitales",
+  title: "MiFicha · Ficha técnica para torneos escolares",
   description:
-    "Fichas técnicas verificadas para academias, padres y visorías, con protección de datos de menores.",
+    "Acta oficial del torneo, plantel verificado y aviso al tutor. Plataforma para academias interescolares en Querétaro.",
   metadataBase: new URL(appUrl),
   icons: {
     icon: BRAND_ICON,
     apple: BRAND_ICON,
   },
   openGraph: {
-    title: "MiFicha — La ficha técnica digital",
+    title: "MiFicha · Ficha técnica para torneos escolares",
     description:
-      "Fichas técnicas verificadas para academias, padres y visorías.",
+      "Acta oficial, plantel verificado y aviso al tutor. Torneos interescolares en Querétaro.",
     url: appUrl,
     siteName: "MiFicha",
     locale: "es_MX",
@@ -42,9 +42,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "MiFicha — La ficha técnica digital",
+    title: "MiFicha · Ficha técnica para torneos escolares",
     description:
-      "Fichas técnicas verificadas para academias, padres y visorías.",
+      "Acta oficial, plantel verificado y aviso al tutor. Torneos interescolares en Querétaro.",
     images: [BRAND_OG_IMAGE],
   },
 };

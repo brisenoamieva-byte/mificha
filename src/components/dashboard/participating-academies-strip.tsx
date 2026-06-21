@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { ArrowRight, Award, ShieldCheck } from "lucide-react";
+import { ArrowRight, Award } from "lucide-react";
 import {
   prepareShowcaseAcademies,
   type ShowcaseAcademy,
 } from "@/lib/participating-academies";
 import { supabase } from "@/lib/supabase";
+import { BrandWordmark } from "@/components/ui/brand-wordmark";
 import { cn } from "@/lib/utils";
 
 interface ParticipatingAcademiesStripProps {
@@ -29,6 +30,7 @@ export function ParticipatingAcademiesStrip({
         .from("academies")
         .select("id,name,slug,city,state,logo_url,is_certified")
         .eq("is_public", true)
+        .eq("is_certified", true)
         .neq("id", currentAcademyId)
         .order("name", { ascending: true });
 
@@ -58,13 +60,13 @@ export function ParticipatingAcademiesStrip({
       <div className="relative flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-mf-accent-bright">
-            Red MiFicha
+            Red <BrandWordmark />
           </p>
           <h3 className="mt-1 text-lg font-semibold tracking-[-0.02em]">
-            {academies.length} academias verificadas ya compiten contigo
+            {academies.length} academias certificadas en la red
           </h3>
           <p className="mt-1 text-sm text-white/65">
-            Tus rivales ya tienen ficha digital — sube tu plantel y destaca en el directorio verificado.
+            Solo aparecen academias certificadas. Completa tu checklist para unirte.
           </p>
         </div>
         <Link
@@ -99,12 +101,8 @@ export function ParticipatingAcademiesStrip({
                     {academy.name.slice(0, 2).toUpperCase()}
                   </div>
                 )}
-                <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full border border-[#0f2d52] bg-mf-accent text-[#0f2d52]">
-                  {academy.is_certified ? (
-                    <Award className="h-3 w-3" />
-                  ) : (
-                    <ShieldCheck className="h-3 w-3" />
-                  )}
+                <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full border border-[#0f2d52] bg-amber-400 text-[#0f2d52]">
+                  <Award className="h-3 w-3" />
                 </span>
               </div>
               <span className="max-w-[8rem] truncate text-sm font-medium text-white">

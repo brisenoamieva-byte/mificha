@@ -55,7 +55,7 @@ export async function fetchPublicDirectory(): Promise<PublicDirectoryData> {
 
   const [academiesResponse, playersResponse] = await Promise.all([
     fetch(
-      `${url}/rest/v1/academies?is_public=eq.true&select=id,name,slug,city,state,logo_url,is_certified&order=name.asc`,
+      `${url}/rest/v1/academies?is_public=eq.true&is_certified=eq.true&select=id,name,slug,city,state,logo_url,is_certified&order=name.asc`,
       {
         headers: {
           apikey: key,
@@ -82,10 +82,12 @@ export async function fetchPublicDirectory(): Promise<PublicDirectoryData> {
 
   const players = playersResponse.ok
     ? await Promise.all(
-        ((await playersResponse.json()) as DirectoryPlayer[]).map(async (player) => ({
-          ...player,
-          photo_url: await signPlayerPhotoUrl(player.photo_url),
-        })),
+        ((await playersResponse.json()) as DirectoryPlayer[])
+          .filter((player) => player.academies?.is_certified)
+          .map(async (player) => ({
+            ...player,
+            photo_url: await signPlayerPhotoUrl(player.photo_url),
+          })),
       )
     : [];
 

@@ -215,3 +215,11 @@ body {
     }
   }
 }
+
+@media print {
+  .demo-ficha-document {
+    box-shadow: none !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}

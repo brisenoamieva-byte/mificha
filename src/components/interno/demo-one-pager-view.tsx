@@ -29,7 +29,7 @@ export function DemoOnePagerView() {
   async function copyWhatsAppText() {
     await navigator.clipboard.writeText(plainText);
     setCopied(true);
-    toast.success("Texto copiado — pégalo en WhatsApp o email.");
+    toast.success("Texto copiado. Pégalo en WhatsApp o email.");
     setTimeout(() => setCopied(false), 2000);
   }
 
@@ -42,11 +42,11 @@ export function DemoOnePagerView() {
       <div className="no-print sticky top-0 z-20 border-b border-white/10 bg-[#0a1628] px-4 py-3 sm:px-6">
         <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-between gap-3">
           <Link
-            href="/interno/lanzamiento"
+            href="/interno/pitch"
             className="inline-flex items-center gap-2 text-sm font-medium text-white/70 hover:text-white"
           >
             <ArrowLeft className="h-4 w-4" />
-            Playbook
+            Presentación
           </Link>
           <div className="flex flex-wrap gap-2">
             <button
@@ -110,54 +110,13 @@ export function DemoOnePagerView() {
 
         <section className="mt-8 rounded-2xl bg-slate-50 px-5 py-5 print:bg-slate-50">
           <h2 className="text-sm font-bold uppercase tracking-wide text-[#1B4F8C]">
-            {DIRECTOR_ONE_PAGER.solutionTitle}
+            {DIRECTOR_ONE_PAGER.howTitle}
           </h2>
-          <p className="mt-3 text-sm leading-7 text-slate-700">
-            {DIRECTOR_ONE_PAGER.solution}
-          </p>
-        </section>
-
-        <section className="mt-8">
-          <h2 className="text-sm font-bold uppercase tracking-wide text-[#1B4F8C]">
-            {DIRECTOR_ONE_PAGER.governanceTitle}
-          </h2>
-          <ul className="mt-3 space-y-2">
-            {DIRECTOR_ONE_PAGER.governancePoints.map((item) => (
-              <li key={item} className="flex gap-2 text-sm leading-6 text-slate-700">
-                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-600" />
-                {item}
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        <section className="mt-8 rounded-2xl border border-[#1B4F8C]/15 bg-[#1B4F8C]/5 px-5 py-5 print:break-inside-avoid">
-          <h2 className="text-sm font-bold uppercase tracking-wide text-[#1B4F8C]">
-            {DIRECTOR_ONE_PAGER.visibilityTitle}
-          </h2>
-          <p className="mt-3 text-sm leading-7 text-slate-700">
-            {DIRECTOR_ONE_PAGER.visibilityIntro}
-          </p>
-          <ul className="mt-3 space-y-2">
-            {DIRECTOR_ONE_PAGER.visibilityPoints.map((item) => (
-              <li key={item} className="flex gap-2 text-sm leading-6 text-slate-700">
-                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#1B4F8C]" />
-                {item}
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        <section className="mt-8">
-          <h2 className="text-sm font-bold uppercase tracking-wide text-[#1B4F8C]">
-            {DIRECTOR_ONE_PAGER.demoTitle}
-          </h2>
-          <p className="mt-2 text-sm text-slate-600">{DIRECTOR_ONE_PAGER.demoIntro}</p>
-          <div className="mt-4 grid gap-3 sm:grid-cols-2 print:grid-cols-2">
-            {DIRECTOR_ONE_PAGER.demoSteps.map((step) => (
+          <div className="mt-4 grid gap-3 sm:grid-cols-3 print:grid-cols-3">
+            {DIRECTOR_ONE_PAGER.howSteps.map((step) => (
               <div
                 key={step.step}
-                className="rounded-xl border border-slate-200 px-4 py-4 print:break-inside-avoid"
+                className="rounded-xl border border-slate-200 bg-white px-4 py-4 print:break-inside-avoid"
               >
                 <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[#1B4F8C] text-xs font-bold text-white">
                   {step.step}
@@ -167,44 +126,44 @@ export function DemoOnePagerView() {
               </div>
             ))}
           </div>
+          <dl className="mt-5 grid grid-cols-3 gap-3 border-t border-slate-200 pt-5">
+            {DIRECTOR_ONE_PAGER.stats.map((stat) => (
+              <div key={stat.label} className="text-center">
+                <dt className="text-lg font-bold tabular-nums text-[#0a1628]">
+                  {stat.value}
+                </dt>
+                <dd className="mt-0.5 text-[10px] font-medium uppercase tracking-wide text-slate-500">
+                  {stat.label}
+                </dd>
+              </div>
+            ))}
+          </dl>
         </section>
 
-        <div className="mt-8 grid gap-6 sm:grid-cols-2 print:grid-cols-2">
-          <section>
-            <h2 className="text-sm font-bold uppercase tracking-wide text-[#1B4F8C]">
-              {DIRECTOR_ONE_PAGER.parentTitle}
-            </h2>
-            <ul className="mt-3 space-y-1.5">
-              {DIRECTOR_ONE_PAGER.parentPoints.map((item) => (
-                <li key={item} className="text-xs leading-5 text-slate-700">
-                  · {item}
-                </li>
-              ))}
-            </ul>
-          </section>
-
-          <section>
-            <h2 className="text-sm font-bold uppercase tracking-wide text-[#1B4F8C]">
-              {DIRECTOR_ONE_PAGER.founderTitle}
-            </h2>
-            <ul className="mt-3 space-y-1.5">
-              {DIRECTOR_ONE_PAGER.founderBenefits.map((item) => (
-                <li key={item} className="text-xs leading-5 text-slate-700">
-                  · {item}
-                </li>
-              ))}
-            </ul>
-          </section>
-        </div>
-
-        <section className="mt-8 rounded-2xl border border-emerald-200 bg-emerald-50/80 px-5 py-4 print:break-inside-avoid">
-          <h2 className="text-sm font-bold uppercase tracking-wide text-emerald-800">
-            {DIRECTOR_ONE_PAGER.pilotTitle}
+        <section className="mt-8 rounded-2xl border border-[#1B4F8C]/15 bg-[#1B4F8C]/5 px-5 py-5 print:break-inside-avoid">
+          <h2 className="text-sm font-bold uppercase tracking-wide text-[#1B4F8C]">
+            {DIRECTOR_ONE_PAGER.schoolTitle}
           </h2>
-          <ul className="mt-2 flex flex-wrap gap-x-6 gap-y-1">
-            {DIRECTOR_ONE_PAGER.pilotGoals.map((item) => (
-              <li key={item} className="text-sm font-medium text-emerald-900">
-                ✓ {item}
+          <p className="mt-2 text-sm text-slate-600">{DIRECTOR_ONE_PAGER.schoolSubtitle}</p>
+          <ul className="mt-3 space-y-2">
+            {DIRECTOR_ONE_PAGER.schoolPoints.map((item) => (
+              <li key={item} className="flex gap-2 text-sm leading-6 text-slate-700">
+                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-600" />
+                {item}
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <section className="mt-8 rounded-2xl border border-emerald-200 bg-emerald-50/80 px-5 py-5 print:break-inside-avoid">
+          <h2 className="text-sm font-bold uppercase tracking-wide text-emerald-800">
+            {DIRECTOR_ONE_PAGER.nextTitle}
+          </h2>
+          <ul className="mt-3 space-y-2">
+            {DIRECTOR_ONE_PAGER.nextPoints.map((item) => (
+              <li key={item} className="flex gap-2 text-sm font-medium leading-6 text-emerald-900">
+                <span className="mt-0.5 text-emerald-600">✓</span>
+                {item}
               </li>
             ))}
           </ul>

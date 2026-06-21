@@ -48,10 +48,11 @@ export function buildOnboardingSteps(progress: OnboardingProgress): OnboardingSt
       id: "match",
       done: progress.hasCompletedMatch,
       essential: true,
-      title: "Primera captura post-partido",
-      description: "Convocados + minutos (~1 min). MiFicha avisa tutores automáticamente.",
-      href: "/dashboard/partidos/nuevo",
-      cta: "Registrar partido",
+      title: "Primer partido con acta oficial",
+      description:
+        "Cuando el organizador publique el acta, MiFicha sincroniza stats y avisa tutores.",
+      href: "/dashboard/partidos",
+      cta: "Ver partidos",
     },
     {
       id: "share",
@@ -137,6 +138,7 @@ interface PlayerOnboardingRow {
   public_consent_at: string | null;
   is_discoverable: boolean;
   guardian_email: string | null;
+  guardian_phone?: string | null;
 }
 
 export function computeOnboardingProgress(
@@ -151,7 +153,9 @@ export function computeOnboardingProgress(
     hasPlayers: players.length > 0,
     hasScheduledMatch: scheduledMatchCount > 0,
     hasCompletedMatch: completedMatchCount > 0,
-    hasGuardianEmails: players.some((player) => player.guardian_email?.trim()),
+    hasGuardianEmails: players.some((player) =>
+      Boolean(player.guardian_email?.trim() || player.guardian_phone?.trim()),
+    ),
     hasShareableFicha: players.some((player) => hasPublicConsent(player)),
     hasDiscoverablePlayer: players.some(
       (player) => player.is_discoverable && hasPublicConsent(player),

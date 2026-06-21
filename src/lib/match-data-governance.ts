@@ -3,7 +3,7 @@ import { getMatchResultLabel } from "@/lib/match-utils";
 
 export type MatchActor = "organizer" | "academy" | "mificha" | "parent";
 export type MatchDataSource = "organizer" | "academy" | "mificha";
-export type AcademyCaptureScope = "full" | "roster_minutes";
+export type AcademyCaptureScope = "full" | "roster_minutes" | "none";
 
 export interface GovernanceResponsibility {
   id: string;
@@ -25,19 +25,19 @@ export interface MatchGovernanceInfo {
 
 export const MIFICHA_DATA_GOVERNANCE = {
   principle:
-    "Datos comparables y creíbles: lo que define el partido lo registra el organizador; lo que opera el plantel lo registra la academia; MiFicha calcula y muestra.",
+    "Datos oficiales del torneo: el organizador publica calendario, marcador y acta; MiFicha sincroniza cada jugador con su plantel, actualiza Passport e insignias y avisa al tutor. La academia carga plantel y consentimiento — no captura stats del partido.",
   roles: {
     organizer: {
-      title: "Organizador del torneo (MiFicha admin / liga)",
-      motto: "Fuente oficial del partido",
+      title: "Organizador del torneo (socio MiFicha)",
+      motto: "Fuente oficial del partido — calendario, marcador y acta",
     },
     academy: {
       title: "Academia / entrenador",
-      motto: "Operación del plantel, no árbitro del marcador",
+      motto: "Plantel, consentimiento y contacto del tutor",
     },
     mificha: {
       title: "MiFicha (plataforma)",
-      motto: "Calcula Passport, insignias y rankings — no inventa stats",
+      motto: "Aplica el acta oficial a cada ficha — Passport, insignias y avisos",
     },
     parent: {
       title: "Padres",
@@ -59,9 +59,9 @@ export const MIFICHA_DATA_GOVERNANCE = {
     },
     {
       id: "acta",
-      label: "Acta: goles, asistencias y tarjetas por jugador",
+      label: "Acta oficial: goles, asistencias, tarjetas y minutos por jugador",
       owner: "organizer",
-      why: "Misma fuente que la mesa de control / anotador del torneo.",
+      why: "Misma fuente que mesa de control / anotador del torneo interescolar.",
     },
     {
       id: "roster",
@@ -70,16 +70,16 @@ export const MIFICHA_DATA_GOVERNANCE = {
       why: "Solo la escuela conoce a sus jugadores y al tutor.",
     },
     {
-      id: "minutes",
-      label: "Convocados y minutos jugados",
-      owner: "academy",
-      why: "El cuerpo técnico sabe quién entró; es rápido (~1 min) y no compite con el acta.",
+      id: "sync",
+      label: "Cruzar acta con plantel, Passport, insignias y aviso al tutor",
+      owner: "mificha",
+      why: "Stats verificadas sin que cada coach reescriba el partido.",
     },
     {
       id: "passport",
-      label: "Passport Score, insignias, rankings, ficha pública",
+      label: "Passport Score, rankings y ficha pública",
       owner: "mificha",
-      why: "Automático a partir de datos con origen claro — credibilidad ante padres y scouts.",
+      why: "Automático a partir del acta oficial — credibilidad ante padres y scouts.",
     },
     {
       id: "parent_notify",
@@ -99,21 +99,22 @@ export const MIFICHA_DATA_GOVERNANCE = {
       phase: "Después del partido (orden fijo)",
       organizer: [
         "1. Registrar marcador oficial",
-        "2. Publicar acta (G / A / tarjetas por jugador)",
+        "2. Publicar acta completa (G / A / tarjetas / minutos)",
       ],
       academy: [
-        "3. Capturar convocados + minutos (solo cuando hay marcador y acta)",
-        "4. MiFicha avisa tutores automáticamente — sin WhatsApp manual",
+        "Tener plantel y consentimientos listos antes de la jornada",
+        "MiFicha avisa tutores al sincronizar el acta — sin captura manual",
       ],
       mificha: [
-        "Passport e insignias se actualizan al completar acta + minutos",
+        "Aplicar acta al plantel, actualizar Passport e insignias",
+        "Enviar aviso automático al tutor",
       ],
     },
   ],
   efficiency: [
-    "Organizador no captura minutos de 200 jugadores — eso lo hace cada academia en 1 minuto.",
-    "Academia no discute marcadores ni actas — solo opera su plantel.",
-    "MiFicha no pide app a padres — solo link con preview verificada.",
+    "El organizador publica una sola acta oficial; MiFicha actualiza cientos de fichas.",
+    "La academia no reescribe goles ni minutos — solo mantiene plantel y tutores.",
+    "MiFicha envía el link con stats del torneo al tutor.",
   ],
   credibility: [
     "Marcador bloqueado por RLS en jornadas is_official.",
@@ -162,7 +163,7 @@ export function getMatchGovernance(
     actaLocked: hasOfficialActa,
     scoreSource: isOfficial ? "organizer" : "academy",
     individualStatsSource: isOfficial ? "organizer" : "academy",
-    academyCaptureScope: isOfficial ? "roster_minutes" : "full",
+    academyCaptureScope: isOfficial ? "none" : "full",
   };
 }
 
@@ -176,6 +177,20 @@ export function formatOfficialScoreLine(
   return `${match.goals_for}-${match.goals_against} · ${getMatchResultLabel(match.result)}`;
 }
 
+export function canAcademyCaptureMatchStats(
+  match: Pick<
+    Match,
+    | "is_official"
+    | "result"
+    | "goals_for"
+    | "goals_against"
+    | "result_locked_at"
+    | "acta_published_at"
+  >,
+) {
+  return !getMatchGovernance(match).isOfficial;
+}
+
 export function canAcademyCompleteOfficialCapture(
   match: Pick<
     Match,
@@ -187,9 +202,7 @@ export function canAcademyCompleteOfficialCapture(
     | "acta_published_at"
   >,
 ) {
-  const governance = getMatchGovernance(match);
-  if (!governance.isOfficial) return true;
-  return governance.hasOfficialResult && governance.hasOfficialActa;
+  return canAcademyCaptureMatchStats(match);
 }
 
 export function buildAcademyCaptureBlockedMessage(
@@ -198,18 +211,23 @@ export function buildAcademyCaptureBlockedMessage(
   if (!match.is_official) return null;
 
   if (match.result == null) {
-    return "El marcador oficial lo publica el organizador del torneo (MiFicha). Cuando esté disponible podrás capturar convocados y minutos del plantel.";
+    return "El marcador oficial lo publica el organizador del torneo. MiFicha actualizará las fichas cuando el acta esté disponible.";
   }
 
   if (!match.acta_published_at) {
-    return "El acta oficial (goles, asistencias y tarjetas por jugador) la publica el organizador. Después podrás registrar convocados y minutos (~1 min).";
+    return "El acta oficial (goles, asistencias, tarjetas y minutos) la publica el organizador. MiFicha sincroniza stats y avisa a los tutores.";
   }
 
   return null;
 }
 
+export function buildOfficialStatsSyncNotice() {
+  return "Jornada oficial: stats del acta del torneo. MiFicha las aplica a cada ficha — la academia no captura goles ni minutos manualmente.";
+}
+
+/** @deprecated use buildOfficialStatsSyncNotice */
 export function buildAcademyRosterMinutesNotice() {
-  return "Jornada oficial: solo convocados y minutos. Goles, asistencias y tarjetas las publica el organizador en el acta — así el Passport es creíble para todos los colegios.";
+  return buildOfficialStatsSyncNotice();
 }
 
 export function getGovernanceResponsibilitiesFor(actor: MatchActor) {

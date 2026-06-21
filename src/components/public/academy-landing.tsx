@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { Award, ExternalLink, MapPin, Shield, Trophy, Users } from "lucide-react";
+import { CERTIFIED_ACADEMY_LABEL } from "@/lib/academy-certification";
 import { AcademyScheduleSection } from "@/components/marketing/match-schedule-card";
 import { PassportSegments } from "@/components/ui/passport-score-display";
 import { BrandLogoLink } from "@/components/ui/brand-logo";
+import { BrandWordmark } from "@/components/ui/brand-wordmark";
 import { getPositionLabel } from "@/lib/dashboard-utils";
 import {
   formatWhatsAppUrl,
@@ -73,9 +75,13 @@ export function AcademyLanding({ data }: AcademyLandingProps) {
               {academy.is_certified ? (
                 <span className="inline-flex items-center gap-2 rounded-full border border-amber-300/40 bg-gradient-to-r from-amber-400/20 to-[#1B4F8C]/30 px-4 py-2 text-sm font-bold text-amber-100">
                   <Award className="h-4 w-4 text-amber-300" />
-                  Academia Certificada MiFicha
+                  {CERTIFIED_ACADEMY_LABEL}
                 </span>
-              ) : null}
+              ) : (
+                <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold text-white/80">
+                  En proceso de certificación
+                </span>
+              )}
 
               <h1 className="mt-6 text-5xl font-black uppercase tracking-tight sm:text-7xl">
                 {academy.name}
@@ -145,7 +151,7 @@ export function AcademyLanding({ data }: AcademyLandingProps) {
               Plantel destacado
             </p>
             <h2 className="mt-2 text-3xl font-black uppercase tracking-tight sm:text-4xl">
-              Jugadores MiFicha
+              Jugadores <BrandWordmark />
             </h2>
           </div>
           <Trophy className="hidden h-10 w-10 text-slate-600 sm:block" />

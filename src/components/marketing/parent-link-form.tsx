@@ -4,13 +4,14 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowRight, Link2, MessageCircle, ShieldCheck } from "lucide-react";
 import { useState } from "react";
+import { WithBrandName } from "@/components/ui/brand-wordmark";
 import { parsePlayerSlugFromInput } from "@/lib/public-directory";
 
 const steps = [
   {
     icon: MessageCircle,
     title: "Recibe el link",
-    description: "Tu academia te lo envía por email o WhatsApp — también tras cada partido.",
+    description: "Tu academia te lo envía por email o WhatsApp, también tras cada partido.",
   },
   {
     icon: Link2,
@@ -20,7 +21,7 @@ const steps = [
   {
     icon: ShieldCheck,
     title: "Consulta stats verificados",
-    description: "Sin cuenta, sin contraseña, sin descargar nada.",
+    description: "Passport Score, stats e historial verificado.",
   },
 ];
 
@@ -90,8 +91,10 @@ export function ParentLinkForm() {
       <div className="rounded-xl border border-mf-border bg-mf-canvas p-6">
         <p className="text-sm font-semibold text-mf-text">¿Aún no tienes link?</p>
         <p className="mt-2 text-sm leading-7 text-mf-text-secondary">
-          Pídele a la academia de tu hijo que active la ficha pública y registre tu
-          contacto. MiFicha te enviará el enlace automáticamente.
+          <WithBrandName>
+            Pídele a la academia de tu hijo que active la ficha pública y registre tu
+            contacto. MiFicha te enviará el enlace automáticamente.
+          </WithBrandName>
         </p>
         <Link href="/explorar" className="mf-btn-secondary mt-5 inline-flex">
           Explorar fichas públicas

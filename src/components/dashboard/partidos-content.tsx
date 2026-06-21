@@ -95,7 +95,7 @@ export function PartidosContent() {
         <div>
           <h1 className="text-2xl font-bold text-slate-900 sm:text-3xl">Partidos</h1>
           <p className="mt-1 text-slate-600">
-            Captura post-partido en ~1 min: convocados, minutos y aviso automático al tutor
+            Jornadas oficiales: MiFicha sincroniza el acta del torneo y avisa al tutor
             {season ? ` · ${season.name}` : ""}
           </p>
         </div>
@@ -103,10 +103,10 @@ export function PartidosContent() {
         <div className="flex flex-wrap gap-2">
           <Link
             href="/dashboard/partidos/nuevo"
-            className="mf-btn-accent-solid inline-flex items-center justify-center gap-2 rounded-2xl px-5 py-4 text-sm"
+            className="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-5 py-4 text-sm font-semibold text-slate-700 hover:bg-slate-50"
           >
             <Plus className="h-4 w-4" />
-            Capturar resultado
+            Registrar amistoso
           </Link>
           <Link
             href="/dashboard/partidos/programar"
@@ -156,7 +156,8 @@ export function PartidosContent() {
                   <MatchScheduleCard
                     key={match.id}
                     match={match}
-                    showCaptureLink
+                    showCaptureLink={!match.is_official}
+                    detailHref={match.is_official ? `/dashboard/partidos/${match.id}` : undefined}
                     variant="light"
                   />
                 ))}
@@ -175,7 +176,7 @@ export function PartidosContent() {
                   Sin resultados todavía
                 </h3>
                 <p className="mt-2 text-sm text-slate-500">
-                  Captura convocados y minutos cuando el acta oficial esté publicada.
+                  MiFicha sincronizará stats cuando el organizador publique el acta oficial.
                 </p>
               </div>
             ) : (

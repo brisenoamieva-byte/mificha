@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ArrowLeft, CalendarPlus, CheckCircle2, Loader2 } from "lucide-react";
 import { PlatformSeasonSection } from "@/components/interno/platform-season-section";
+import { BrandWordmark } from "@/components/ui/brand-wordmark";
 import { defaultSeasonName } from "@/lib/match-utils";
 import { supabase } from "@/lib/supabase";
 import { toast } from "@/components/ui/toast";
@@ -144,7 +145,7 @@ export function SeasonsAdminPanel() {
         <div className="mx-auto flex max-w-4xl flex-wrap items-center justify-between gap-4">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/50">
-              Interno · MiFicha
+              Interno · <BrandWordmark />
             </p>
             <h1 className="mt-2 text-2xl font-semibold tracking-tight">
               Temporadas oficiales

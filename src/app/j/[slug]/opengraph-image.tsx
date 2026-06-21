@@ -1,4 +1,5 @@
 import { ImageResponse } from "next/og";
+import { OgBrandWordmark } from "@/components/ui/brand-wordmark";
 import {
   buildOgPlayerSharePayload,
 } from "@/lib/og-player-share";
@@ -32,7 +33,9 @@ export default async function Image({
             fontFamily: "system-ui, sans-serif",
           }}
         >
-          <p style={{ fontSize: 36, fontWeight: 700, margin: 0 }}>MiFicha</p>
+          <p style={{ fontSize: 36, margin: 0 }}>
+            <OgBrandWordmark />
+          </p>
           <p style={{ fontSize: 28, marginTop: 16, opacity: 0.75 }}>
             Ficha técnica verificada
           </p>
@@ -83,7 +86,9 @@ export default async function Image({
               {payload.initials}
             </div>
             <div style={{ display: "flex", flexDirection: "column" }}>
-              <span style={{ fontSize: 24, fontWeight: 700 }}>MiFicha</span>
+              <span style={{ fontSize: 24 }}>
+                <OgBrandWordmark />
+              </span>
               <span style={{ fontSize: 18, opacity: 0.65 }}>Ficha verificada</span>
             </div>
           </div>

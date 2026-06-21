@@ -136,6 +136,12 @@ export type Database = {
           jersey_number: number | null;
           photo_url: string | null;
           video_url: string | null;
+          secondary_position: Database["public"]["Enums"]["player_position"] | null;
+          trait_technical: number | null;
+          trait_tactical: number | null;
+          trait_physical: number | null;
+          trait_attitude: number | null;
+          coach_notes: string | null;
           academy_id: string;
           passport_score: number;
           qr_code: string | null;
@@ -161,6 +167,12 @@ export type Database = {
           jersey_number?: number | null;
           photo_url?: string | null;
           video_url?: string | null;
+          secondary_position?: Database["public"]["Enums"]["player_position"] | null;
+          trait_technical?: number | null;
+          trait_tactical?: number | null;
+          trait_physical?: number | null;
+          trait_attitude?: number | null;
+          coach_notes?: string | null;
           academy_id: string;
           passport_score?: number;
           qr_code?: string | null;
@@ -186,6 +198,12 @@ export type Database = {
           jersey_number?: number | null;
           photo_url?: string | null;
           video_url?: string | null;
+          secondary_position?: Database["public"]["Enums"]["player_position"] | null;
+          trait_technical?: number | null;
+          trait_tactical?: number | null;
+          trait_physical?: number | null;
+          trait_attitude?: number | null;
+          coach_notes?: string | null;
           academy_id?: string;
           passport_score?: number;
           qr_code?: string | null;

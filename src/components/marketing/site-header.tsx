@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { BrandLogoLink } from "@/components/ui/brand-logo";
+import { BrandWordmark } from "@/components/ui/brand-wordmark";
 import { SiteNavDesktop, SiteNavMobile } from "@/components/marketing/site-nav";
 import { LEGAL_ROUTES } from "@/lib/legal";
 
@@ -41,8 +42,8 @@ export function SiteFooter() {
     <footer className="border-t border-mf-border bg-mf-surface">
       <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
         <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-mf-text-secondary">
-          <Link href="/#funciones" className="transition hover:text-mf-text">
-            Funciones
+          <Link href="/#como-funciona" className="transition hover:text-mf-text">
+            Cómo funciona
           </Link>
           <Link href="/#accesos" className="transition hover:text-mf-text">
             Accesos
@@ -66,17 +67,27 @@ export function SiteFooter() {
       </div>
       <div className="mx-auto flex max-w-6xl flex-col gap-3 border-t border-mf-border px-4 py-8 text-sm text-mf-text-muted sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <BrandLogoLink size="sm" />
-        <div className="flex flex-wrap items-center gap-4">
-          <Link href={LEGAL_ROUTES.privacy} className="hover:text-mf-text">
-            Aviso de privacidad
-          </Link>
-          <Link href={LEGAL_ROUTES.terms} className="hover:text-mf-text">
-            Términos
-          </Link>
-          <Link href={LEGAL_ROUTES.cookies} className="hover:text-mf-text">
-            Cookies
-          </Link>
-          <p>© 2026 MiFicha · mificha.mx</p>
+        <div className="flex flex-col gap-2 sm:items-end">
+          <p className="text-mf-text-secondary">
+            Operado desde Querétaro, México ·{" "}
+            <a href="mailto:hola@mificha.mx" className="font-medium text-mf-brand hover:underline">
+              hola@mificha.mx
+            </a>
+          </p>
+          <div className="flex flex-wrap items-center gap-4">
+            <Link href={LEGAL_ROUTES.privacy} className="hover:text-mf-text">
+              Aviso de privacidad
+            </Link>
+            <Link href={LEGAL_ROUTES.terms} className="hover:text-mf-text">
+              Términos
+            </Link>
+            <Link href={LEGAL_ROUTES.cookies} className="hover:text-mf-text">
+              Cookies
+            </Link>
+            <p>
+              © 2026 <BrandWordmark />
+            </p>
+          </div>
         </div>
       </div>
     </footer>

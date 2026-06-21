@@ -3,6 +3,7 @@
 import { LogOut, Menu } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useDashboard } from "@/components/dashboard/dashboard-context";
+import { BrandWordmark } from "@/components/ui/brand-wordmark";
 import { signOut } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 
@@ -47,7 +48,7 @@ export function DashboardHeader({ onMenuClick }: DashboardHeaderProps) {
 
           <div className="min-w-0">
             <p className="truncate text-sm font-semibold text-mf-text">
-              {academy?.name ?? "MiFicha"}
+              {academy?.name ?? <BrandWordmark />}
             </p>
             <p className="truncate text-xs text-mf-text-muted">
               {profile?.full_name ?? profile?.email ?? "Panel de academia"}

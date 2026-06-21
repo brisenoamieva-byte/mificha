@@ -13,6 +13,7 @@ import {
   getMatchStatusLabel,
   isCompletedMatch,
 } from "@/lib/match-utils";
+import { buildOfficialStatsSyncNotice, getMatchGovernance } from "@/lib/match-data-governance";
 import { supabase } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
 import type { Match, MatchResult, MatchStat, Player } from "@/types/database";
@@ -139,7 +140,17 @@ export function PartidosDetail({ matchId }: PartidosDetailProps) {
         </div>
       ) : (
         <div className="space-y-3">
-          <MatchScheduleCard match={match} showCaptureLink variant="light" />
+          <MatchScheduleCard
+            match={match}
+            showCaptureLink={!match.is_official}
+            detailHref={match.is_official ? `/dashboard/partidos/${match.id}` : undefined}
+            variant="light"
+          />
+          {match.is_official ? (
+            <p className="rounded-xl bg-[#1B4F8C]/5 px-4 py-3 text-sm text-slate-700">
+              {buildOfficialStatsSyncNotice()}
+            </p>
+          ) : null}
           <button
             type="button"
             onClick={handleCancelScheduled}
@@ -155,8 +166,12 @@ export function PartidosDetail({ matchId }: PartidosDetailProps) {
         {stats.length === 0 ? (
           <p className="p-6 text-sm text-slate-500">
             {completed
-              ? "No hay stats registradas para este partido."
-              : "Registra el resultado y stats cuando termine el partido."}
+              ? match.is_official
+                ? "MiFicha sincronizará stats cuando el organizador publique el acta oficial."
+                : "No hay stats registradas para este partido."
+              : match.is_official
+                ? "MiFicha actualizará fichas al publicarse el acta oficial."
+                : "Registra el resultado y stats cuando termine el partido."}
           </p>
         ) : (
           <div className="divide-y divide-slate-100">

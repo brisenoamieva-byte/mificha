@@ -23,6 +23,7 @@ interface MatchScheduleCardProps {
   academyName?: string;
   academyHref?: string;
   showCaptureLink?: boolean;
+  detailHref?: string;
   variant?: "dark" | "light";
 }
 
@@ -31,6 +32,7 @@ export function MatchScheduleCard({
   academyName,
   academyHref,
   showCaptureLink,
+  detailHref,
   variant = "light",
 }: MatchScheduleCardProps) {
   const mapsUrl = buildVenueMapsUrl(match.venue_name, match.venue_address);
@@ -129,6 +131,15 @@ export function MatchScheduleCard({
             <Navigation className="h-4 w-4" />
             Cómo llegar
           </a>
+        ) : null}
+
+        {detailHref ? (
+          <Link
+            href={detailHref}
+            className="inline-flex items-center gap-2 rounded-full bg-[#1B4F8C] px-4 py-2 text-sm font-semibold text-white hover:bg-[#164278]"
+          >
+            Ver jornada
+          </Link>
         ) : null}
 
         {showCaptureLink ? (

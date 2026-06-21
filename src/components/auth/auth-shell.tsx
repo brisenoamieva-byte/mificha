@@ -4,7 +4,7 @@ import { BrandLogoLink } from "@/components/ui/brand-logo";
 
 interface AuthShellProps {
   title: string;
-  subtitle: string;
+  subtitle: ReactNode;
   children: ReactNode;
   footer: ReactNode;
 }

@@ -35,19 +35,19 @@ export const MARKETING_NAV: NavSection[] = [
     icon: Trophy,
     links: [
       {
-        href: "/#funciones",
-        label: "Funciones",
-        description: "Calendario, stats, reportes y avisos a tutores",
+        href: "/#como-funciona",
+        label: "Cómo funciona",
+        description: "Plantel, acta oficial y aviso al tutor",
       },
       {
         href: "/#complemento",
         label: "MiFicha + liga oficial",
-        description: "Complementa, no reemplaza tu federación",
+        description: "Stats individuales junto a tu liga",
       },
       {
-        href: "/padres#ejemplo",
+        href: "/padres",
         label: "Ficha del jugador",
-        description: "Passport Score y stats verificados",
+        description: "Progreso verificado al instante",
       },
     ],
   },
@@ -64,7 +64,12 @@ export const MARKETING_NAV: NavSection[] = [
       {
         href: "/padres",
         label: "Soy padre",
-        description: "Link automático sin cuenta",
+        description: "Link automático tras cada partido",
+      },
+      {
+        href: "/organizadores",
+        label: "Organizo torneos",
+        description: "Calendario y acta oficial en MiFicha",
       },
       {
         href: "/explorar",
@@ -103,7 +108,7 @@ export const HOME_FEATURES = [
     title: "Calendario y partidos",
     federation: "Calendarios y resultados oficiales",
     mificha:
-      "Jornadas oficiales MiFicha: acta del organizador + convocados y minutos de tu plantel (~1 min).",
+      "Jornadas oficiales MiFicha: acta del organizador → MiFicha sincroniza stats y avisa tutores.",
     href: "/signup",
     imageKey: "featureCalendario" satisfies MarketingImageKey,
   },
@@ -121,8 +126,8 @@ export const HOME_FEATURES = [
     title: "Comparativa",
     federation: "Comparativa de equipos en liga",
     mificha:
-      "Reporte jugador vs promedio del plantel — ideal para padres y visorías.",
-    href: "/#funciones",
+      "Reporte jugador vs promedio del plantel.",
+    href: "/signup",
     imageKey: "featureComparativa" satisfies MarketingImageKey,
   },
   {
@@ -139,7 +144,7 @@ export const HOME_FEATURES = [
     title: "Avisos automáticos",
     federation: "Portal federado con registro y pagos",
     mificha:
-      "MiFicha envía link por email o WhatsApp tras cada partido. Padres consultan sin registro.",
+      "MiFicha envía link por email o WhatsApp tras cada partido.",
     href: "/padres",
     imageKey: "featureQr" satisfies MarketingImageKey,
   },
@@ -157,7 +162,7 @@ export const HOME_FEATURES = [
 export const COMPLEMENT_ROWS = [
   {
     official: "Resultados y tabla de liga",
-    mificha: "Stats individuales verificados por tu academia",
+    mificha: "Stats individuales del acta oficial del torneo",
   },
   {
     official: "Licencia y mutualidad federativa",

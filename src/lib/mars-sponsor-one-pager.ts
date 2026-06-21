@@ -69,7 +69,7 @@ export const MARS_SPONSOR_ONE_PAGER = {
   pilotIntro:
     "Recomendamos cerrar 1–3 academias fundadoras con datos reales antes de firmar — así Mars entra con tracción, no con promesas.",
   pilotGoals: [
-    "1–3 academias con plantel cargado y captura post-partido",
+    "1–3 academias con plantel cargado y acta oficial sincronizada",
     "3+ padres abrieron ficha por academia piloto",
     "1 jornada escolar con acta oficial y stats verificadas",
   ],
@@ -116,7 +116,7 @@ export function buildMarsSponsorPlainText(options?: {
     "",
     "Te comparto una propuesta de patrocinio para Mars en Querétaro — MiFicha presentado por Mars.",
     "",
-    "MiFicha es la plataforma de fichas digitales verificadas para futbol escolar: academias cargan plantel, capturan minutos post-partido, y padres reciben el link automáticamente (sin app). Stats comparables, directorio público y destacados semanales.",
+    "MiFicha es la plataforma de fichas digitales verificadas para futbol escolar: academias cargan plantel; el organizador publica acta oficial; MiFicha sincroniza stats y padres reciben el link automáticamente. Stats comparables, directorio público y destacados semanales.",
     "",
     "Por qué puede interesar a Mars:",
     "· Audiencia recurrente: padres y familias activas en deporte juvenil cada fin de semana",

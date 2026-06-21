@@ -26,7 +26,7 @@ import {
   type RosterListMode,
 } from "@/lib/match-capture";
 import {
-  buildAcademyCaptureBlockedMessage,
+  buildOfficialStatsSyncNotice,
   formatOfficialScoreLine,
   getMatchGovernance,
 } from "@/lib/match-data-governance";
@@ -37,6 +37,7 @@ import {
   parseCategoryFilter,
 } from "@/lib/player-category";
 import { calculatePassportScoreForPlayer } from "@/lib/passport-score";
+import { requestAcademyCertificationSync } from "@/lib/academy-certification-client";
 import { loadActiveAcademySeason } from "@/lib/academy-season-client";
 import { supabase } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
@@ -170,10 +171,6 @@ export function PartidosNuevoContent() {
     effectiveGoalsFor > 0 &&
     playedCount > 0 &&
     playerGoalsTotal !== effectiveGoalsFor;
-
-  const captureBlockedMessage = selectedFixture
-    ? buildAcademyCaptureBlockedMessage(selectedFixture)
-    : null;
 
   const loadData = useCallback(async () => {
     if (!academy) {
@@ -316,16 +313,9 @@ export function PartidosNuevoContent() {
       return;
     }
 
-    if (matchGovernance.isOfficial && !matchGovernance.hasOfficialResult) {
+    if (matchGovernance.isOfficial) {
       setError(
-        "El marcador oficial aún no está publicado. El organizador (MiFicha) lo registrará tras el partido.",
-      );
-      return;
-    }
-
-    if (matchGovernance.isOfficial && !matchGovernance.hasOfficialActa) {
-      setError(
-        "El acta oficial aún no está publicada. El organizador registrará goles y tarjetas antes de tu captura de minutos.",
+        "Las jornadas oficiales se actualizan desde el acta del torneo. MiFicha sincroniza stats y avisa tutores automáticamente.",
       );
       return;
     }
@@ -604,6 +594,9 @@ export function PartidosNuevoContent() {
           ? `Partido guardado · ${unlockedCount} insignia${unlockedCount === 1 ? "" : "s"} desbloqueada${unlockedCount === 1 ? "" : "s"}.`
           : "Partido guardado. Passport Score actualizado.",
       );
+      if (academy?.id) {
+        void requestAcademyCertificationSync(academy.id);
+      }
     } catch (saveError) {
       setError(
         saveError instanceof Error
@@ -647,6 +640,71 @@ export function PartidosNuevoContent() {
     );
   }
 
+  if (matchGovernance.isOfficial && scheduledMatchId && selectedFixture) {
+    return (
+      <div className="mx-auto max-w-3xl space-y-6 pb-12">
+        <Link
+          href="/dashboard/partidos"
+          className="text-sm font-medium text-[#1B4F8C] hover:underline"
+        >
+          ← Volver a partidos
+        </Link>
+
+        <div className="rounded-2xl bg-white p-6 shadow-sm sm:p-8">
+          <h1 className="text-2xl font-bold text-slate-900">Jornada oficial</h1>
+          <p className="mt-1 text-slate-600">vs {opponent}</p>
+          {scheduledMatchCategory ? (
+            <p className="mt-1 text-sm text-slate-500">{scheduledMatchCategory}</p>
+          ) : null}
+
+          <OfficialMatchNotice className="mt-6" message={buildOfficialStatsSyncNotice()} />
+
+          {!matchGovernance.hasOfficialResult ? (
+            <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-950">
+              <p className="font-semibold">Marcador oficial pendiente</p>
+              <p className="mt-2 leading-6">
+                El organizador publicará el resultado. MiFicha actualizará las fichas cuando
+                el acta esté disponible.
+              </p>
+            </div>
+          ) : null}
+
+          {matchGovernance.hasOfficialResult && !matchGovernance.hasOfficialActa ? (
+            <div className="mt-6 rounded-2xl border border-sky-200 bg-sky-50 px-5 py-4 text-sm text-sky-950">
+              <p className="font-semibold">Acta oficial pendiente</p>
+              <p className="mt-2 leading-6">
+                Marcador publicado: {formatOfficialScoreLine(selectedFixture)}. Falta el acta
+                con goles, asistencias, tarjetas y minutos por jugador.
+              </p>
+            </div>
+          ) : null}
+
+          {matchGovernance.hasOfficialActa ? (
+            <div className="mt-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4">
+              <p className="text-xs font-semibold uppercase tracking-wide text-emerald-800">
+                Acta sincronizada
+              </p>
+              <p className="mt-2 text-2xl font-bold text-emerald-950">
+                {formatOfficialScoreLine(selectedFixture)}
+              </p>
+              <p className="mt-2 text-sm text-emerald-900/80">
+                MiFicha aplicó el acta oficial al plantel. Los tutores reciben aviso
+                automático.
+              </p>
+            </div>
+          ) : null}
+
+          <Link
+            href={`/dashboard/partidos/${scheduledMatchId}`}
+            className="mt-8 inline-flex rounded-2xl bg-[#1B4F8C] px-5 py-4 text-sm font-semibold text-white hover:bg-[#164278]"
+          >
+            Ver detalle del partido
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       <div className="mx-auto max-w-3xl pb-28">
@@ -685,59 +743,14 @@ export function PartidosNuevoContent() {
                   Paso 1 de 2 · Jornada publicada por MiFicha
                 </p>
                 <p className="mt-3 text-sm text-slate-500">
-                  {matchGovernance.isOfficial
-                    ? "El marcador y acta los publica el organizador. Aquí solo registras convocados y minutos."
-                    : "Marcador y stats del plantel. En el paso 2 eliges convocados y captura rápida o detallada."}
+                  Marcador y stats del plantel. En el paso 2 eliges convocados y captura
+                  rápida o detallada.
                 </p>
 
                 <p className="mt-4 rounded-xl bg-[#1B4F8C]/5 px-4 py-3 text-sm text-slate-700">
                   Jornada vs <strong>{opponent}</strong>
                   {scheduledMatchCategory ? ` · ${scheduledMatchCategory}` : ""}
-                  {matchGovernance.isOfficial ? " · Oficial MiFicha" : ""}
                 </p>
-
-                {matchGovernance.isOfficial ? (
-                  <OfficialMatchNotice className="mt-6" />
-                ) : null}
-
-                {captureBlockedMessage ? (
-                  <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-950">
-                    <p className="font-semibold">Captura no disponible aún</p>
-                    <p className="mt-2 leading-6">{captureBlockedMessage}</p>
-                    <Link
-                      href="/interno/jornadas"
-                      className="mt-4 inline-flex rounded-lg bg-amber-900 px-4 py-2 text-xs font-semibold text-amber-50 hover:bg-amber-950"
-                    >
-                      Publicar marcador y acta (interno)
-                    </Link>
-                  </div>
-                ) : null}
-
-                {matchGovernance.hasOfficialResult && selectedFixture && !matchGovernance.hasOfficialActa ? (
-                  <div className="mt-6 rounded-2xl border border-sky-200 bg-sky-50 px-5 py-4 text-sm text-sky-950">
-                    <p className="font-semibold">Acta oficial pendiente</p>
-                    <p className="mt-2 leading-6">
-                      Marcador publicado: {formatOfficialScoreLine(selectedFixture)}. Falta
-                      el acta con goles y tarjetas por jugador.
-                    </p>
-                  </div>
-                ) : null}
-
-                {matchGovernance.hasOfficialResult &&
-                matchGovernance.hasOfficialActa &&
-                selectedFixture ? (
-                  <div className="mt-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-emerald-800">
-                      Listo para captura de plantel
-                    </p>
-                    <p className="mt-2 text-2xl font-bold text-emerald-950">
-                      {formatOfficialScoreLine(selectedFixture)}
-                    </p>
-                    <p className="mt-2 text-sm text-emerald-900/80">
-                      Marcador y acta verificados. Solo captura convocados y minutos.
-                    </p>
-                  </div>
-                ) : null}
 
                 <div className="mt-8 space-y-6">
                   <div>
@@ -827,9 +840,8 @@ export function PartidosNuevoContent() {
 
                   <button
                     type="button"
-                    disabled={Boolean(captureBlockedMessage)}
                     onClick={() => setStep(2)}
-                    className="w-full rounded-2xl bg-[#1B4F8C] px-5 py-4 text-base font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
+                    className="w-full rounded-2xl bg-[#1B4F8C] px-5 py-4 text-base font-semibold text-white"
                   >
                     Siguiente · convocados y minutos
                   </button>
@@ -840,7 +852,7 @@ export function PartidosNuevoContent() {
         ) : (
           <MatchCaptureStep
             opponent={opponent}
-            captureStyle={matchGovernance.isOfficial ? "quick" : captureStyle}
+            captureStyle={captureStyle}
             listMode={listMode}
             convocadoIds={convocadoIds}
             visiblePlayers={visiblePlayers}

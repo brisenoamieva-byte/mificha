@@ -11,6 +11,8 @@ import {
 } from "@/lib/player-utils";
 import { uploadPlayerPhoto, uploadPlayerVideo } from "@/lib/storage";
 import { PlayerPrivacyControls } from "@/components/ui/player-privacy-controls";
+import { PlayerVisualProfileFields } from "@/components/dashboard/player-visual-profile-fields";
+import { COACH_NOTES_MAX_LENGTH, clampTrait } from "@/lib/player-visual-profile";
 import { buildPrivacyPayload } from "@/lib/privacy";
 import { supabase } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
@@ -66,6 +68,12 @@ export function PlayerModal({
   const [videoPreview, setVideoPreview] = useState<string | null>(null);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [secondaryPosition, setSecondaryPosition] = useState<PlayerPosition | "">("");
+  const [traitTechnical, setTraitTechnical] = useState<number | null>(null);
+  const [traitTactical, setTraitTactical] = useState<number | null>(null);
+  const [traitPhysical, setTraitPhysical] = useState<number | null>(null);
+  const [traitAttitude, setTraitAttitude] = useState<number | null>(null);
+  const [coachNotes, setCoachNotes] = useState("");
 
   useEffect(() => {
     if (!open) return;
@@ -92,6 +100,12 @@ export function PlayerModal({
       setNotifyGuardianOnMatch(player.notify_guardian_on_match ?? true);
       setPhotoPreview(player.photo_url);
       setVideoPreview(player.video_url);
+      setSecondaryPosition(player.secondary_position ?? "");
+      setTraitTechnical(player.trait_technical);
+      setTraitTactical(player.trait_tactical);
+      setTraitPhysical(player.trait_physical);
+      setTraitAttitude(player.trait_attitude);
+      setCoachNotes(player.coach_notes ?? "");
       return;
     }
 
@@ -110,6 +124,12 @@ export function PlayerModal({
     setGuardianEmail("");
     setPhotoPreview(null);
     setVideoPreview(null);
+    setSecondaryPosition("");
+    setTraitTechnical(null);
+    setTraitTactical(null);
+    setTraitPhysical(null);
+    setTraitAttitude(null);
+    setCoachNotes("");
   }, [open, player]);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -151,6 +171,12 @@ export function PlayerModal({
         guardian_email: guardianEmail.trim().toLowerCase() || null,
         guardian_phone: guardianPhone.trim() || null,
         notify_guardian_on_match: notifyGuardianOnMatch,
+        secondary_position: secondaryPosition || null,
+        trait_technical: clampTrait(traitTechnical),
+        trait_tactical: clampTrait(traitTactical),
+        trait_physical: clampTrait(traitPhysical),
+        trait_attitude: clampTrait(traitAttitude),
+        coach_notes: coachNotes.trim().slice(0, COACH_NOTES_MAX_LENGTH) || null,
         ...privacy,
       };
 
@@ -332,8 +358,11 @@ export function PlayerModal({
             <div className="grid gap-5 sm:grid-cols-2">
               <div>
                 <label className="block text-sm font-medium text-slate-700">
-                  Foto
+                  Foto {isPublic ? "*" : ""}
                 </label>
+                <p className="mt-0.5 text-xs text-slate-500">
+                  Requerida para certificación y directorio público.
+                </p>
                 <input
                   type="file"
                   accept="image/*"
@@ -372,6 +401,21 @@ export function PlayerModal({
                 ) : null}
               </div>
             </div>
+
+            <PlayerVisualProfileFields
+              secondaryPosition={secondaryPosition}
+              onSecondaryPositionChange={setSecondaryPosition}
+              traitTechnical={traitTechnical}
+              onTraitTechnicalChange={setTraitTechnical}
+              traitTactical={traitTactical}
+              onTraitTacticalChange={setTraitTactical}
+              traitPhysical={traitPhysical}
+              onTraitPhysicalChange={setTraitPhysical}
+              traitAttitude={traitAttitude}
+              onTraitAttitudeChange={setTraitAttitude}
+              coachNotes={coachNotes}
+              onCoachNotesChange={setCoachNotes}
+            />
 
             <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
               <p className="text-sm font-semibold text-slate-900">

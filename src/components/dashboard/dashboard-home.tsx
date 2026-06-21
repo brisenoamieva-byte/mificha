@@ -61,6 +61,7 @@ interface LastMatch {
   goals_against: number | null;
   venue_name: string | null;
   status: MatchStatus;
+  is_official: boolean | null;
 }
 
 export function DashboardHome() {
@@ -160,7 +161,7 @@ export function DashboardHome() {
           supabase
             .from("matches")
             .select(
-              "id, opponent, match_date, kickoff_at, result, goals_for, goals_against, venue_name, status",
+              "id, opponent, match_date, kickoff_at, result, goals_for, goals_against, venue_name, status, is_official",
             )
             .eq("academy_id", academy.id)
             .eq("status", "completed")
@@ -170,7 +171,7 @@ export function DashboardHome() {
           supabase
             .from("matches")
             .select(
-              "id, opponent, match_date, kickoff_at, result, goals_for, goals_against, venue_name, status",
+              "id, opponent, match_date, kickoff_at, result, goals_for, goals_against, venue_name, status, is_official",
             )
             .eq("academy_id", academy.id)
             .in("status", ["scheduled", "postponed"])
@@ -346,12 +347,14 @@ export function DashboardHome() {
                 >
                   Ver detalle →
                 </Link>
-                <Link
-                  href={`/dashboard/partidos/nuevo?matchId=${nextMatch.id}`}
-                  className="text-sm font-semibold text-mf-text-secondary hover:underline"
-                >
-                  Registrar resultado
-                </Link>
+                {!nextMatch.is_official ? (
+                  <Link
+                    href={`/dashboard/partidos/nuevo?matchId=${nextMatch.id}`}
+                    className="text-sm font-semibold text-mf-text-secondary hover:underline"
+                  >
+                    Registrar amistoso
+                  </Link>
+                ) : null}
               </div>
             </div>
           ) : lastMatch ? (

@@ -15,10 +15,12 @@ import {
 import QRCode from "react-qr-code";
 import { useState } from "react";
 import { BrandLogoLink } from "@/components/ui/brand-logo";
+import { BrandWordmark, WithBrandName } from "@/components/ui/brand-wordmark";
 import { calculateAge, getPositionLabel } from "@/lib/dashboard-utils";
 import { PlayerCategoryBadge } from "@/components/ui/player-category-badge";
 import type { PublicPlayerData } from "@/lib/public-player";
 import { PublicPlayerProgressSection } from "@/components/public/public-player-progress-section";
+import { PublicPlayerVisualProfileSection } from "@/components/public/public-player-visual-profile-section";
 import { PlayerAchievementsShelf } from "@/components/public/player-achievements-shelf";
 import { ProfileViewTracker } from "@/components/public/profile-view-tracker";
 import { PassportScoreDisplay } from "@/components/ui/passport-score-display";
@@ -89,7 +91,7 @@ export function PublicPlayerCard({ data }: PublicPlayerCardProps) {
           <BrandLogoLink size="sm" />
         </div>
         <section className="px-6 pb-8 pt-8 text-center sm:px-10">
-          <div className="mx-auto flex h-[150px] w-[150px] items-center justify-center overflow-hidden rounded-full border-4 border-white bg-slate-100 shadow-lg ring-4 ring-[#1B4F8C]/10">
+          <div className="mx-auto flex h-[180px] w-[180px] items-center justify-center overflow-hidden rounded-full border-4 border-white bg-slate-100 shadow-lg ring-4 ring-[#1B4F8C]/10 sm:h-[200px] sm:w-[200px]">
             {player.photo_url ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
@@ -143,7 +145,7 @@ export function PublicPlayerCard({ data }: PublicPlayerCardProps) {
                   className="h-5 w-5 rounded-full object-cover"
                 />
               ) : null}
-              Academia: {player.academies?.name ?? "MiFicha"}
+              Academia: {player.academies?.name ?? <BrandWordmark />}
             </span>
             {player.is_public ? (
               <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-4 py-2 text-sm font-semibold text-green-700">
@@ -206,6 +208,12 @@ export function PublicPlayerCard({ data }: PublicPlayerCardProps) {
           ) : null}
         </section>
 
+        <PublicPlayerVisualProfileSection
+          player={player}
+          currentSeasonStats={currentSeasonStats}
+          seasonProgress={seasonProgress}
+        />
+
         <PublicPlayerProgressSection
           seasonName={currentSeasonName}
           progress={seasonProgress}
@@ -256,8 +264,10 @@ export function PublicPlayerCard({ data }: PublicPlayerCardProps) {
             Link de la ficha
           </h2>
           <p className="mx-auto mt-2 max-w-md text-center text-sm leading-6 text-slate-500">
-            MiFicha envía este enlace al tutor automáticamente. También puedes copiarlo
-            o escanearlo desde pantalla.
+            <WithBrandName>
+              MiFicha envía este enlace al tutor automáticamente. También puedes copiarlo o
+              escanearlo desde pantalla.
+            </WithBrandName>
           </p>
           <div className="mx-auto mt-6 flex max-w-[220px] justify-center rounded-2xl bg-white p-4 shadow-inner ring-1 ring-slate-100">
             <QRCode value={publicUrl} size={180} />

@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useDashboard } from "@/components/dashboard/dashboard-context";
 import { getCurrentUser } from "@/lib/auth";
+import { requestAcademyCertificationSync } from "@/lib/academy-certification-client";
 import { countAcademiesForOwner } from "@/lib/academy-owner";
 import { buildPublicAcademyUrl } from "@/lib/public-academy";
 import { slugify } from "@/lib/slugify";
@@ -178,6 +179,21 @@ export function AcademyForm() {
       }
 
       await refresh();
+      if (academy?.id) {
+        await requestAcademyCertificationSync(academy.id);
+        await refresh();
+      } else {
+        const { data: created } = await supabase
+          .from("academies")
+          .select("id")
+          .eq("owner_id", user.id)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        if (created?.id) {
+          await requestAcademyCertificationSync(created.id);
+        }
+      }
       if (!academy) {
         router.push("/dashboard");
       }
@@ -407,9 +423,9 @@ export function AcademyForm() {
           <p className="text-sm text-slate-500">
             Activa la página pública en mificha.mx/a/{slug || "tu-academia"}
           </p>
-          <p className="mt-2 text-xs leading-5 text-amber-700">
-            Solo expone datos de jugadores con ficha autorizada. El directorio
-            general requiere consentimiento adicional por jugador.
+          <p className="mt-2 text-xs leading-5 text-slate-600">
+            Para aparecer certificada en /explorar necesitas perfil completo, logo,
+            plantel, captura de partido y al menos una ficha compartible con tutor.
           </p>
         </div>
         <input

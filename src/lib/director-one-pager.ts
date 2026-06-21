@@ -1,86 +1,51 @@
 export const DIRECTOR_ONE_PAGER = {
-  eyebrow: "Escolar Querétaro · Academias fundadoras",
+  eyebrow: "Futbol escolar · Querétaro",
   title: "MiFicha",
-  tagline:
-    "Ficha técnica digital verificada — padres informados, jugadores visibles, academia con renombre.",
-  problemTitle: "El reto de cada director",
+  tagline: "Ficha digital por jugador. Stats del acta oficial. Aviso al padre.",
+  problemTitle: "Hoy",
   problems: [
-    "Padres preguntan «¿cómo va mi hijo?» y no hay una respuesta clara el mismo día.",
-    "Stats en WhatsApp o Excel se pierden y no se comparan con otras escuelas.",
-    "Capturar después del partido da flojera — nadie lo hace con consistencia.",
-    "Nadie confía en stats si cualquier escuela puede inflar goles o marcadores.",
-    "Cuando un jugador destaca, no tiene nada verificable que mostrar a visorías o universidades.",
+    "Todo queda en WhatsApp o Excel",
+    "Cada escuela reporta números distintos",
+    "El jugador no tiene historial verificable",
   ],
-  solutionTitle: "Qué es MiFicha",
-  solution:
-    "Plataforma verificada para escuelas en red: MiFicha publica temporada y jornadas; el organizador registra marcador y acta; tu staff captura convocados y minutos en ~1 min; el padre recibe link con Passport Score automáticamente — sin app ni contraseña.",
-  governanceTitle: "Datos creíbles (quién hace qué)",
-  governancePoints: [
-    "Organizador: calendario, marcador final y acta (goles, asistencias, tarjetas).",
-    "Academia: plantel, consentimiento, convocados y minutos jugados.",
-    "MiFicha: Passport, insignias, rankings y aviso automático al tutor.",
-    "Padres: consultan y comparten — no capturan ni registran stats.",
-  ],
-  visibilityTitle: "Tu academia y tus jugadores ganan visibilidad",
-  visibilityIntro:
-    "MiFicha no garantiza becas ni fichajes — pero crea la evidencia verificada que hace posible que un jugador sea considerado, y eso refleja en el renombre de tu escuela.",
-  visibilityPoints: [
-    "Directorio público /explorar — academia certificada visible ante padres nuevos y visorías.",
-    "Once destacado semanal y ranking por posición — tus mejores salen sin depender del WhatsApp.",
-    "Ficha compartible con stats de temporada — el padre o coach la reenvía a quien importe.",
-    "Entra primero como fundadora — más visibilidad relativa cuando crece la red escolar.",
-  ],
-  demoTitle: "Demo en vivo · 15 minutos",
-  demoIntro:
-    "Te enseñamos con tu plantel real. Sin compromiso.",
-  demoSteps: [
+  howTitle: "Cómo funciona",
+  howSteps: [
     {
       step: "1",
-      title: "Plantel + tutores",
-      detail:
-        "Importamos 3–5 jugadores (Excel o manual), consentimiento y contacto del tutor para avisos automáticos.",
+      title: "Academia",
+      detail: "Plantel y contacto del tutor",
     },
     {
       step: "2",
-      title: "Partido oficial",
-      detail:
-        "Marcador y acta los publica MiFicha; tu staff captura convocados + minutos (~1 min).",
+      title: "Organizador",
+      detail: "Calendario, marcador y acta",
     },
     {
       step: "3",
-      title: "Aviso automático",
-      detail:
-        "MiFicha envía email o WhatsApp al tutor con link, Passport e insignias — sin pegar mensajes a mano.",
-    },
-    {
-      step: "4",
-      title: "Padre abre ficha",
-      detail:
-        "Preview visual en WhatsApp · historial partido a partido · contador de visitas en tu dashboard.",
+      title: "MiFicha",
+      detail: "Sincroniza cada ficha y avisa al padre",
     },
   ],
-  parentTitle: "Qué ve el padre",
-  parentPoints: [
-    "Recibe link por email o WhatsApp — sin descargar app.",
-    "Passport Score + stats de temporada + evolución partido a partido.",
-    "Puede reenviar a familia o compartir insignias.",
-    "Privacidad y consentimiento LFPDPPP integrados.",
+  stats: [
+    { value: "Acta", label: "Fuente oficial" },
+    { value: "Auto", label: "Aviso al tutor" },
+    { value: "100", label: "Passport Score" },
   ],
-  founderTitle: "Academia fundadora",
-  founderBenefits: [
-    "Academia fundadora en la red Querétaro.",
-    "Temporada y calendario escolar publicados por MiFicha.",
-    "Stats comparables con otras escuelas de la red en Querétaro.",
-    "Badge fundadora en /explorar mientras armamos la red verificada.",
-    "Acompañamiento en plantel, captura y avisos automáticos a tutores.",
+  schoolTitle: "Para tu colegio",
+  schoolSubtitle: "Complementa tu torneo o liga. No manejamos inscripciones.",
+  schoolPoints: [
+    "No reescribes el partido: el acta oficial alimenta cada ficha.",
+    "Menos mensajes de padres pidiendo stats cada fin de semana.",
+    "Plantel visible en el directorio con academia certificada.",
+    "Stats comparables con otras escuelas de tu categoría.",
   ],
-  pilotTitle: "Meta del piloto (1 semana)",
-  pilotGoals: [
-    "1 partido capturado (convocados + minutos) con acta oficial.",
-    "3 fichas públicas con consentimiento y contacto del tutor.",
-    "3 padres recibieron aviso y abrieron el link de la ficha.",
+  nextTitle: "Siguiente paso",
+  nextPoints: [
+    "Demo con tu plantel · 15 min",
+    "Primera jornada con acta oficial",
+    "Padres reciben link automático",
   ],
-  cta: "¿Agendamos 15 min esta semana?",
+  cta: "¿Lo vemos en vivo?",
   contact: {
     name: "Ricardo Briseño",
     email: "hola@mificha.mx",
@@ -102,25 +67,28 @@ export function buildDirectorOnePagerPlainText(options?: {
   const lines = [
     greeting,
     "",
-    "Te comparto MiFicha — ficha técnica digital verificada para escuelas en Querétaro.",
+    "MiFicha · ficha digital por jugador. Stats del acta oficial. Aviso al padre.",
     "",
-    "En 15 min te muestro en vivo:",
-    "· Cargamos plantel + contacto del tutor",
-    "· Marcador/acta oficial + captura de convocados y minutos (~1 min)",
-    "· MiFicha avisa al padre automáticamente con link y Passport Score",
-    "· Cómo se ve tu academia y tus destacados en el directorio verificado",
+    "Hoy:",
+    "· Todo queda en WhatsApp o Excel",
+    "· Cada escuela reporta números distintos",
+    "· El jugador no tiene historial verificable",
     "",
-    "Datos creíbles: el organizador registra marcador y acta; tu escuela opera el plantel.",
-    "Visibilidad real: ficha compartible para visorías — sin prometer becas, con evidencia verificada.",
+    "Cómo funciona:",
+    "1. Academia: plantel y contacto del tutor",
+    "2. Organizador: calendario, marcador y acta",
+    "3. MiFicha: sincroniza cada ficha y avisa al padre",
     "",
-    "Como academia fundadora en la red Querétaro.",
+    "Para tu colegio:",
+    "· No reescribes el partido: el acta alimenta cada ficha",
+    "· Menos WhatsApp de padres pidiendo stats",
+    "· Directorio con academia certificada",
+    "· Stats comparables en tu categoría",
     "",
-    ...(match
-      ? [`Ideal probarlo antes del partido del ${match}.`, ""]
-      : []),
+    "¿Lo vemos en vivo? Demo 15 min con tu plantel.",
+    "",
+    ...(match ? [`Ideal antes del partido del ${match}.`, ""] : []),
     ...(academy ? [`Para ${academy}.`, ""] : []),
-    "¿Te late martes o jueves 15 min?",
-    "",
     "Ricardo · mificha.mx · hola@mificha.mx",
   ];
 

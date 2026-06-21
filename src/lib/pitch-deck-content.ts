@@ -7,110 +7,86 @@ export interface PitchSlide {
   subtitle?: string;
   bullets?: string[];
   highlight?: string;
-  speakerNote?: string;
   /** cover = foto a pantalla completa · split = texto + foto · cta = cierre con foto de fondo */
   variant?: "cover" | "default" | "cta" | "split";
   stats?: { value: string; label: string }[];
   imageKey?: MarketingImageKey;
 }
 
-/** Pitch de venta · ~7 slides · 5 min presentación + demo en vivo */
+/** Presentación · 6 diapositivas · ~5 min */
 export const PITCH_SLIDES: PitchSlide[] = [
   {
     id: "cover",
     variant: "cover",
-    kicker: "Escolar Querétaro · mificha.mx",
+    kicker: "Futbol escolar · Querétaro",
     title: "MiFicha",
-    subtitle: "Una ficha por jugador. Padres informados. Academia visible.",
-    highlight: "Academias fundadoras · Querétaro",
-    speakerNote: "«¿Cuántos padres te piden stats el domingo?»",
+    subtitle: "Ficha digital por jugador. Stats del acta oficial. Aviso al padre.",
+    highlight: "mificha.mx",
     imageKey: "heroHome",
   },
   {
     id: "problema",
-    kicker: "El problema",
-    title: "El talento existe, pero no se ve",
+    kicker: "Hoy",
+    title: "Los stats no llegan a los padres",
     bullets: [
-      "Stats en WhatsApp o Excel",
-      "Padres sin respuesta clara",
-      "Nadie captura después del partido",
-      "Jugadores sin nada que mostrar",
+      "Todo queda en WhatsApp o Excel",
+      "Cada escuela reporta números distintos",
+      "El jugador no tiene historial verificable",
     ],
-    speakerNote: "«¿Te pasa cada semana?» Valida con el director antes de seguir.",
-  },
-  {
-    id: "solucion",
-    variant: "split",
-    kicker: "La solución",
-    title: "Una ficha por jugador",
-    subtitle: "Cargamos plantel, capturamos minutos, el padre recibe el link.",
-    stats: [
-      { value: "~1 min", label: "Por partido" },
-      { value: "Auto", label: "Aviso al padre" },
-      { value: "100", label: "Passport Score" },
-    ],
-    speakerNote: "«El padre recibe su ficha el mismo día, sin que pegues WhatsApp.»",
-    imageKey: "featurePassport",
   },
   {
     id: "como",
     variant: "split",
-    kicker: "Cada sábado",
-    title: "Cuatro pasos",
+    kicker: "Cómo funciona",
+    title: "Tres pasos",
     bullets: [
-      "Plantel + tutor",
-      "Jornada y acta",
-      "Captura de minutos",
-      "Aviso al padre",
+      "Academia: plantel y contacto del tutor",
+      "Organizador: calendario, marcador y acta",
+      "MiFicha: sincroniza cada ficha y avisa al padre",
     ],
     stats: [
+      { value: "Acta", label: "Fuente oficial" },
       { value: "Auto", label: "Aviso al tutor" },
-      { value: "OG", label: "Preview WhatsApp" },
-      { value: "3+", label: "Meta piloto" },
+      { value: "100", label: "Passport Score" },
     ],
-    speakerNote: "«Te lo muestro en vivo ahora.» Muestra el celular del padre con el link.",
-    imageKey: "featureCaptura",
+    imageKey: "featurePassport",
   },
   {
     id: "escuela",
     variant: "split",
-    kicker: "Para tu escuela",
-    title: "Tu plantel en la red",
+    kicker: "Para tu colegio",
+    title: "Menos operación, más confianza",
+    subtitle: "Complementa tu torneo o liga. No manejamos inscripciones.",
     bullets: [
-      "Jornadas centralizadas",
-      "Stats comparables",
-      "Directorio /explorar",
-      "Academia fundadora",
+      "El acta alimenta cada ficha — no capturas el partido",
+      "Padres informados sin que pegues WhatsApp",
+      "Directorio y academia certificada",
+      "Stats comparables en tu categoría",
     ],
-    speakerNote: "«Las que entran primero llenan el directorio.» Complementa tu liga, no la reemplaza.",
     imageKey: "heroExplorar",
   },
   {
-    id: "gobernanza",
-    variant: "split",
-    kicker: "Datos creíbles",
-    title: "Cada quien registra lo suyo",
-    subtitle: "Nadie infla goles.",
+    id: "todos",
+    kicker: "Red completa",
+    title: "Todos ganan con el mismo acta",
     bullets: [
-      "MiFicha: calendario, acta, minutos",
-      "Academia: plantel y consentimiento",
-      "Padres: consultan y comparten",
+      "Padres: link automático con stats reales",
+      "Jugadores: historial verificable para visorías",
+      "Scouts: directorio por categoría y posición",
+      "Organizador: torneo con credibilidad",
     ],
-    speakerNote: "«Tu rival no puede ponerse 5 goles.» Tú supervisas, MiFicha opera.",
-    imageKey: "featureCalendario",
   },
   {
     id: "cierre",
     variant: "cta",
     kicker: "Siguiente paso",
-    title: "¿Empezamos esta semana?",
+    title: "¿Lo vemos en vivo?",
     bullets: [
-      "Demo en vivo · 15 min",
-      "Academia fundadora",
-      "3 padres abren ficha",
+      "Demo con tu plantel · 15 min",
+      "Primera jornada con acta oficial",
+      "Padres reciben link automático",
     ],
-    highlight: "Ricardo Briseño · mificha.mx · hola@mificha.mx",
-    speakerNote: "Pide el sí. Agenda el primer partido antes de colgar. Guión: /interno/lanzamiento",
+    highlight: "Ricardo · mificha.mx · hola@mificha.mx",
     imageKey: "ctaBand",
   },
 ];

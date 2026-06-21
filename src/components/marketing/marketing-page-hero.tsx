@@ -13,7 +13,7 @@ interface MarketingStat {
 interface MarketingPageHeroProps {
   eyebrow: string;
   title: string;
-  description: string;
+  description: ReactNode;
   actions?: ReactNode;
   stats?: MarketingStat[];
   aside?: ReactNode;
@@ -33,7 +33,9 @@ export function MarketingPageHero({
   photoPriority = false,
   className,
 }: MarketingPageHeroProps) {
-  const hasVisual = Boolean(photo);
+  const hasAside = Boolean(aside);
+  const hasPhoto = Boolean(photo);
+  const twoColumn = hasPhoto || hasAside;
 
   return (
     <section
@@ -43,21 +45,17 @@ export function MarketingPageHero({
       )}
     >
       <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-20%,rgba(27,79,140,0.1),transparent)]"
-        aria-hidden
-      />
-      <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_50%_40%_at_90%_10%,rgba(52,211,153,0.07),transparent)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-10%,rgba(27,79,140,0.08),transparent)]"
         aria-hidden
       />
       <div
         className={cn(
           "relative mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:py-18",
-          hasVisual &&
+          twoColumn &&
             "grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-12 lg:py-20",
         )}
       >
-        <div className={hasVisual ? "max-w-xl" : "max-w-3xl"}>
+        <div className={twoColumn ? "max-w-xl" : "max-w-3xl"}>
           <p className="mf-marketing-eyebrow">{eyebrow}</p>
           <h1 className="mt-4 text-[2rem] font-semibold leading-[1.08] tracking-[-0.035em] text-mf-text sm:text-[2.5rem] lg:text-[2.75rem]">
             {title}
@@ -92,14 +90,14 @@ export function MarketingPageHero({
             </dl>
           ) : null}
         </div>
-        {hasVisual ? (
+        {hasPhoto ? (
           <MarketingHeroVisual
             meta={photo!}
             aside={aside}
             priority={photoPriority}
           />
-        ) : aside ? (
-          <div className="min-w-0">{aside}</div>
+        ) : hasAside ? (
+          <div className="min-w-0 lg:justify-self-end">{aside}</div>
         ) : null}
       </div>
     </section>

@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { ArrowRight, Award, Building2, ShieldCheck, Users } from "lucide-react";
+import { ArrowRight, Award, Building2, Users } from "lucide-react";
+import { CERTIFIED_ACADEMY_LABEL } from "@/lib/academy-certification";
 import {
   formatShowcaseLocation,
   getShowcaseStats,
@@ -7,6 +8,7 @@ import {
   type ShowcaseAcademy,
 } from "@/lib/participating-academies";
 import type { DirectoryAcademy } from "@/lib/public-directory";
+import { BrandWordmark, WithBrandName } from "@/components/ui/brand-wordmark";
 import { cn } from "@/lib/utils";
 
 interface VerifiedAcademiesShowcaseProps {
@@ -58,21 +60,12 @@ function AcademyLogoMark({
           </div>
         )}
 
-        {academy.is_certified ? (
-          <span
-            className="absolute -right-1.5 -top-1.5 flex h-6 w-6 items-center justify-center rounded-full border-2 border-[#0f2d52] bg-amber-400 text-[#0f2d52] shadow-md"
-            title="Academia certificada MiFicha"
-          >
-            <Award className="h-3.5 w-3.5" />
-          </span>
-        ) : (
-          <span
-            className="absolute -right-1.5 -top-1.5 flex h-6 w-6 items-center justify-center rounded-full border-2 border-[#0f2d52] bg-mf-accent text-[#0f2d52] shadow-md"
-            title="Academia verificada en MiFicha"
-          >
-            <ShieldCheck className="h-3.5 w-3.5" />
-          </span>
-        )}
+        <span
+          className="absolute -right-1.5 -top-1.5 flex h-6 w-6 items-center justify-center rounded-full border-2 border-[#0f2d52] bg-amber-400 text-[#0f2d52] shadow-md"
+          title={CERTIFIED_ACADEMY_LABEL}
+        >
+          <Award className="h-3.5 w-3.5" />
+        </span>
       </div>
 
       {showName ? (
@@ -154,10 +147,10 @@ export function VerifiedAcademiesShowcase({
           <div className="mb-5 flex flex-wrap items-end justify-between gap-4">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-mf-accent-bright">
-                Red verificada
+                Red certificada
               </p>
               <p className="mt-1 text-lg font-semibold text-white">
-                {stats.academyCount} academias ya compiten en MiFicha
+                {stats.academyCount} academias certificadas en <BrandWordmark />
               </p>
             </div>
             <Link
@@ -192,31 +185,24 @@ export function VerifiedAcademiesShowcase({
         <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-end">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-mf-accent-bright">
-              Academias que ya participan
+              Red certificada <BrandWordmark />
             </p>
             <h2 className="mt-3 text-3xl font-semibold tracking-[-0.03em] text-white sm:text-4xl">
-              Reconoce a quienes ya compiten contigo
+              Academias que cumplen el estándar de la red
             </h2>
             <p className="mt-4 max-w-2xl text-sm leading-7 text-white/72 sm:text-base">
-              Logos verificados, fichas públicas y stats reales. Cuando una academia
-              ve a sus rivales aquí, entiende que MiFicha ya es parte del juego.
+              <WithBrandName>
+                Plantel, acta oficial del torneo, consentimiento y perfil completo. Si
+                aparece aquí, la academia ya opera con MiFicha.
+              </WithBrandName>
             </p>
           </div>
 
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 gap-3">
             <div className="rounded-2xl border border-white/10 bg-black/15 px-4 py-4 text-center">
               <Building2 className="mx-auto h-5 w-5 text-mf-accent-bright" />
               <p className="mt-3 text-2xl font-semibold tabular-nums text-white">
                 {stats.academyCount}
-              </p>
-              <p className="mt-1 text-[11px] uppercase tracking-wide text-white/50">
-                Academias
-              </p>
-            </div>
-            <div className="rounded-2xl border border-white/10 bg-black/15 px-4 py-4 text-center">
-              <Award className="mx-auto h-5 w-5 text-amber-300" />
-              <p className="mt-3 text-2xl font-semibold tabular-nums text-white">
-                {stats.certifiedCount}
               </p>
               <p className="mt-1 text-[11px] uppercase tracking-wide text-white/50">
                 Certificadas
@@ -247,17 +233,10 @@ export function VerifiedAcademiesShowcase({
               className="group rounded-2xl border border-white/10 bg-white/[0.05] p-5 backdrop-blur-sm transition hover:border-mf-accent/35 hover:bg-white/[0.08] hover:shadow-[0_20px_50px_rgba(0,0,0,0.22)]"
             >
               <AcademyLogoMark academy={academy} size="lg" showName />
-              {academy.is_certified ? (
-                <span className="mt-4 inline-flex items-center gap-1.5 rounded-full border border-amber-300/30 bg-amber-400/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-amber-100">
-                  <Award className="h-3.5 w-3.5" />
-                  Certificada
-                </span>
-              ) : (
-                <span className="mt-4 inline-flex items-center gap-1.5 rounded-full border border-mf-accent/25 bg-mf-accent/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-mf-accent-bright">
-                  <ShieldCheck className="h-3.5 w-3.5" />
-                  Verificada
-                </span>
-              )}
+              <span className="mt-4 inline-flex items-center gap-1.5 rounded-full border border-amber-300/30 bg-amber-400/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-amber-100">
+                <Award className="h-3.5 w-3.5" />
+                Certificada
+              </span>
             </Link>
           ))}
         </div>

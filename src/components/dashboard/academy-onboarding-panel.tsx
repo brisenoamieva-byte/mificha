@@ -3,8 +3,14 @@
 import Link from "next/link";
 import { CheckCircle2, Circle, Rocket } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { AcademyCertificationPanel } from "@/components/dashboard/academy-certification-panel";
 import { AcademyLaunchCompletePanel } from "@/components/dashboard/academy-launch-complete-panel";
 import { useDashboard } from "@/components/dashboard/dashboard-context";
+import { requestAcademyCertificationSync } from "@/lib/academy-certification-client";
+import {
+  buildCertificationRequirements,
+  computeCertificationMetrics,
+} from "@/lib/academy-certification";
 import {
   buildOnboardingSteps,
   computeOnboardingProgress,
@@ -19,9 +25,20 @@ import { supabase } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
 
 export function AcademyOnboardingPanel() {
-  const { academy } = useDashboard();
+  const { academy, refresh } = useDashboard();
   const [progress, setProgress] = useState<OnboardingProgress | null>(null);
   const [viewStats, setViewStats] = useState(EMPTY_PROFILE_VIEW_STATS);
+  const [completedMatchCount, setCompletedMatchCount] = useState(0);
+  const [playerRows, setPlayerRows] = useState<
+    Array<{
+      is_public: boolean;
+      public_consent_at: string | null;
+      is_discoverable: boolean;
+      guardian_email: string | null;
+      guardian_phone: string | null;
+      photo_url: string | null;
+    }>
+  >([]);
   const [loading, setLoading] = useState(true);
 
   const loadProgress = useCallback(async () => {
@@ -31,29 +48,33 @@ export function AcademyOnboardingPanel() {
 
     const [playersResult, scheduledResult, completedResult, viewStatsResult] =
       await Promise.all([
-      supabase
-        .from("players")
-        .select("is_public, public_consent_at, is_discoverable, guardian_email")
-        .eq("academy_id", academy.id),
-      supabase
-        .from("matches")
-        .select("*", { count: "exact", head: true })
-        .eq("academy_id", academy.id)
-        .in("status", ["scheduled", "postponed"]),
-      supabase
-        .from("matches")
-        .select("*", { count: "exact", head: true })
-        .eq("academy_id", academy.id)
-        .eq("status", "completed"),
-      supabase.rpc("get_academy_profile_view_stats", {
-        p_academy_id: academy.id,
-      }),
-    ]);
+        supabase
+          .from("players")
+          .select(
+            "is_public, public_consent_at, is_discoverable, guardian_email, guardian_phone, photo_url",
+          )
+          .eq("academy_id", academy.id),
+        supabase
+          .from("matches")
+          .select("*", { count: "exact", head: true })
+          .eq("academy_id", academy.id)
+          .in("status", ["scheduled", "postponed"]),
+        supabase
+          .from("matches")
+          .select("*", { count: "exact", head: true })
+          .eq("academy_id", academy.id)
+          .eq("status", "completed"),
+        supabase.rpc("get_academy_profile_view_stats", {
+          p_academy_id: academy.id,
+        }),
+      ]);
 
     const parsedViewStats = viewStatsResult.error
       ? EMPTY_PROFILE_VIEW_STATS
       : parseProfileViewStats(viewStatsResult.data);
     setViewStats(parsedViewStats);
+    setCompletedMatchCount(completedResult.count ?? 0);
+    setPlayerRows(playersResult.data ?? []);
 
     setProgress(
       computeOnboardingProgress(
@@ -64,8 +85,13 @@ export function AcademyOnboardingPanel() {
         parsedViewStats.unique_visitors,
       ),
     );
+
+    const syncResult = await requestAcademyCertificationSync(academy.id);
+    if (syncResult?.changed) {
+      await refresh();
+    }
     setLoading(false);
-  }, [academy]);
+  }, [academy, refresh]);
 
   useEffect(() => {
     loadProgress();
@@ -77,6 +103,11 @@ export function AcademyOnboardingPanel() {
   );
   const summary = useMemo(() => getOnboardingSummary(steps), [steps]);
   const nextEssentialStep = summary.essentialSteps.find((step) => !step.done);
+  const certificationRequirements = useMemo(() => {
+    if (!academy) return [];
+    const metrics = computeCertificationMetrics(playerRows, completedMatchCount);
+    return buildCertificationRequirements(academy, metrics);
+  }, [academy, playerRows, completedMatchCount]);
 
   if (!academy || loading || !progress) {
     return null;
@@ -84,7 +115,13 @@ export function AcademyOnboardingPanel() {
 
   if (summary.allEssentialDone) {
     return (
-      <AcademyLaunchCompletePanel academySlug={academy.slug} viewStats={viewStats} />
+      <div className="space-y-4">
+        <AcademyLaunchCompletePanel academySlug={academy.slug} viewStats={viewStats} />
+        <AcademyCertificationPanel
+          requirements={certificationRequirements}
+          certified={academy.is_certified}
+        />
+      </div>
     );
   }
 

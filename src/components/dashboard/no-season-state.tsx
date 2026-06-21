@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { CalendarClock, Mail } from "lucide-react";
+import { BrandWordmark, WithBrandName } from "@/components/ui/brand-wordmark";
 import { cn } from "@/lib/utils";
 
 interface NoSeasonStateProps {
@@ -28,18 +29,29 @@ export function NoSeasonState({
           <CalendarClock className="h-6 w-6" />
         </div>
         <h1 className="mt-5 text-xl font-semibold tracking-[-0.02em] text-mf-text">
-          {title}
+          {title === "Temporada MiFicha pendiente" ? (
+            <>
+              Temporada <BrandWordmark /> pendiente
+            </>
+          ) : (
+            title
+          )}
         </h1>
         <p className="mt-3 text-sm leading-7 text-mf-text-secondary">
           Para capturar partidos tu academia necesita la{" "}
-          <strong className="font-semibold text-mf-text">temporada escolar MiFicha</strong>{" "}
+          <strong className="font-semibold text-mf-text">
+            temporada escolar <BrandWordmark />
+          </strong>{" "}
           activa. Esto no tiene que ver con el email de avisos a padres — es el calendario
           oficial de la red.
         </p>
         <p className="mt-3 text-sm leading-7 text-mf-text-secondary">
-          Si acabas de registrarte, la temporada se asigna en cuanto MiFicha publica el ciclo
-          escolar (por ejemplo <strong className="font-semibold text-mf-text">Escolar 2025–2026</strong>
-          ). Luego publicamos jornadas en Partidos.
+          <WithBrandName>
+            Si acabas de registrarte, la temporada se asigna en cuanto MiFicha publica el ciclo
+            escolar (por ejemplo
+          </WithBrandName>{" "}
+          <strong className="font-semibold text-mf-text">Escolar 2025–2026</strong>). Luego
+          publicamos jornadas en Partidos.
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
           <Link

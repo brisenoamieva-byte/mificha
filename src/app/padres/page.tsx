@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { AudienceBenefitsSection } from "@/components/marketing/audience-benefits-section";
 import { HomeFichaPreview } from "@/components/marketing/home-ficha-preview";
 import { MarketingPageHero } from "@/components/marketing/marketing-page-hero";
 import { ParentLinkForm } from "@/components/marketing/parent-link-form";
@@ -10,7 +11,7 @@ import { MARKETING_MEDIA } from "@/lib/marketing-assets";
 export const metadata: Metadata = {
   title: "Padres y jugadores | MiFicha",
   description:
-    "Abre la ficha técnica de tu hijo con el link que envía su academia. Sin cuenta necesaria.",
+    "Abre la ficha técnica de tu hijo con el link que envía su academia.",
 };
 
 export default function PadresPage() {
@@ -21,8 +22,8 @@ export default function PadresPage() {
       <main className="flex-1">
         <MarketingPageHero
           eyebrow="Padres y jugadores"
-          title="La ficha de tu hijo, sin app ni contraseña"
-          description="Tu academia te envía el link por email o WhatsApp — también tras cada partido. Consulta Passport Score, stats e historial verificado al instante."
+          title="La ficha de tu hijo"
+          description="Tu academia te envía el link por email o WhatsApp. Consulta Passport Score, stats e historial del torneo."
           photo={MARKETING_MEDIA.heroPadres}
           photoPriority
           actions={
@@ -33,11 +34,18 @@ export default function PadresPage() {
           }
           stats={[
             { value: "Auto", label: "Aviso post-partido" },
-            { value: "Sin cuenta", label: "Abre el link" },
+            { value: "Link", label: "WhatsApp o email" },
             { value: "100", label: "Passport Score", accent: true },
           ]}
           aside={<HomeFichaPreview />}
         />
+
+        <section className="border-b border-mf-border bg-mf-surface">
+          <div className="mx-auto grid max-w-5xl gap-10 px-4 py-12 sm:px-6 lg:grid-cols-2 lg:py-16">
+            <AudienceBenefitsSection audienceId="padres" title="Para padres" />
+            <AudienceBenefitsSection audienceId="jugadores" title="Para jugadores" />
+          </div>
+        </section>
 
         <section id="abrir-ficha" className="mx-auto max-w-3xl px-4 py-14 sm:px-6 lg:py-16">
           <ParentLinkForm />

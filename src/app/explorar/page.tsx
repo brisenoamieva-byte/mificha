@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { AudienceBenefitsSection } from "@/components/marketing/audience-benefits-section";
 import { ExploreDirectory } from "@/components/marketing/explore-directory";
 import { ExploreHeroAside } from "@/components/marketing/explore-hero-aside";
 import { PublicScheduleExploreSection } from "@/components/marketing/public-schedule-explore-section";
@@ -19,7 +20,7 @@ import { fetchPublicUpcomingMatches } from "@/lib/public-schedule";
 export const metadata: Metadata = {
   title: "Explorar talento | MiFicha",
   description:
-    "Directorio público de academias certificadas y jugadores con ficha verificada para visorías y scouts.",
+    "Directorio de academias certificadas MiFicha y jugadores con ficha verificada para visorías y scouts.",
 };
 
 export default async function ExplorarPage() {
@@ -42,8 +43,8 @@ export default async function ExplorarPage() {
       <main className="flex-1">
         <MarketingPageHero
           eyebrow="Visorías y scouts"
-          title="Explora talento verificado en México"
-          description="Directorio por categoría, destacados de la semana y fichas verificadas para visorías — oportunidad ordenada, no presión."
+          title="Directorio de jugadores verificados"
+          description="Busca por categoría, posición y ciudad. Stats del acta oficial del torneo."
           photo={MARKETING_MEDIA.heroExplorar}
           actions={
             <>
@@ -58,7 +59,7 @@ export default async function ExplorarPage() {
           }
           stats={[
             { value: String(playerCount), label: "Jugadores públicos" },
-            { value: String(academyCount), label: "Academias" },
+            { value: String(academyCount), label: "Academias certificadas" },
             { value: "11", label: "Destacados semanales", accent: true },
           ]}
           aside={<ExploreHeroAside />}
@@ -71,6 +72,12 @@ export default async function ExplorarPage() {
         />
 
         <PublicScheduleExploreSection matches={upcomingMatches} />
+
+        <section className="border-b border-mf-border bg-mf-surface">
+          <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:py-14">
+            <AudienceBenefitsSection audienceId="scout" title="Para visorías" />
+          </div>
+        </section>
 
         <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:py-16">
           <ExploreDirectory

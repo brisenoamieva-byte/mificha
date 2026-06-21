@@ -9,7 +9,6 @@ import {
   ExternalLink,
   LayoutDashboard,
   Maximize2,
-  Minimize2,
   X,
 } from "lucide-react";
 import { PITCH_SLIDES, type PitchSlide } from "@/lib/pitch-deck-content";
@@ -19,6 +18,7 @@ import {
   type MarketingImageMeta,
 } from "@/lib/marketing-assets";
 import { BrandLogo } from "@/components/ui/brand-logo";
+import { BrandWordmark, containsBrandName, WithBrandName } from "@/components/ui/brand-wordmark";
 import { cn } from "@/lib/utils";
 
 function PitchBrandMark({ size = "sm" }: { size?: "sm" | "md" }) {
@@ -104,6 +104,7 @@ function SlideContent({
     <div
       className={cn(
         "flex flex-col justify-center px-6 py-10 sm:px-10 lg:px-14 lg:py-12",
+        presenting && "px-8 py-12 sm:px-14 lg:px-20 lg:py-16",
         isCover && "relative z-10 items-center text-center",
         isCta && "relative z-10 items-center text-center",
         isSplit && "min-h-0",
@@ -111,31 +112,53 @@ function SlideContent({
       )}
     >
       {slide.kicker ? (
-        <p className="mf-marketing-eyebrow text-white/60">{slide.kicker}</p>
+        <p
+          className={cn(
+            "mf-marketing-eyebrow text-white/60",
+            presenting && "text-sm tracking-[0.2em]",
+          )}
+        >
+          {slide.kicker}
+        </p>
       ) : null}
 
       <h2
         className={cn(
           "mt-4 font-semibold tracking-[-0.03em] text-white",
           isCover
-            ? "text-4xl sm:text-5xl lg:text-6xl"
-            : "text-2xl sm:text-3xl lg:text-[2.35rem] leading-tight",
+            ? presenting
+              ? "text-5xl sm:text-6xl lg:text-7xl"
+              : "text-4xl sm:text-5xl lg:text-6xl"
+            : presenting
+              ? "text-3xl sm:text-4xl lg:text-[2.75rem] leading-tight"
+              : "text-2xl sm:text-3xl lg:text-[2.35rem] leading-tight",
           isCta && "max-w-3xl",
           isSplit && "max-w-xl",
         )}
       >
-        {slide.title}
+        {slide.title === "MiFicha" ? (
+          <BrandWordmark />
+        ) : containsBrandName(slide.title) ? (
+          <WithBrandName>{slide.title}</WithBrandName>
+        ) : (
+          slide.title
+        )}
       </h2>
 
       {slide.subtitle ? (
         <p
           className={cn(
             "mt-4 text-base leading-7 text-white/75 sm:text-lg sm:leading-8",
+            presenting && "mt-5 text-lg sm:text-xl sm:leading-9",
             isCover ? "max-w-2xl" : "max-w-2xl",
             isSplit && "max-w-lg",
           )}
         >
-          {slide.subtitle}
+          {slide.subtitle.includes("MiFicha") ? (
+            <WithBrandName>{slide.subtitle}</WithBrandName>
+          ) : (
+            slide.subtitle
+          )}
         </p>
       ) : null}
 
@@ -143,16 +166,20 @@ function SlideContent({
         <ul
           className={cn(
             "mt-6 space-y-3 sm:mt-8 sm:space-y-4",
+            presenting && "mt-8 space-y-4 sm:space-y-5",
             isCta ? "max-w-xl text-left" : isSplit ? "max-w-lg" : "max-w-3xl",
           )}
         >
           {slide.bullets.map((bullet) => (
             <li
               key={bullet}
-              className="flex gap-3 text-sm leading-7 text-white/85 sm:text-base sm:leading-8"
+              className={cn(
+                "flex gap-3 text-sm leading-7 text-white/85 sm:text-base sm:leading-8",
+                presenting && "text-base sm:text-lg sm:leading-9",
+              )}
             >
               <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-400" />
-              <span>{bullet}</span>
+              <span>{containsBrandName(bullet) ? <WithBrandName>{bullet}</WithBrandName> : bullet}</span>
             </li>
           ))}
         </ul>
@@ -186,17 +213,11 @@ function SlideContent({
         <p
           className={cn(
             "mt-8 rounded-full border border-white/15 bg-white/10 px-5 py-2.5 text-sm font-medium text-white/90 sm:mt-10",
+            presenting && "mt-10 px-6 py-3 text-base",
             isCover && "mt-8",
           )}
         >
           {slide.highlight}
-        </p>
-      ) : null}
-
-      {slide.speakerNote && !presenting ? (
-        <p className="mt-6 max-w-2xl rounded-xl border border-amber-400/25 bg-amber-400/10 px-4 py-3 text-left text-sm leading-6 text-amber-100/90">
-          <span className="font-semibold text-amber-200">Nota al presentar: </span>
-          {slide.speakerNote}
         </p>
       ) : null}
     </div>
@@ -340,7 +361,7 @@ export function PitchDeckView() {
           <div className="flex items-center gap-4">
             <PitchBrandMark />
             <span className="hidden text-xs font-medium uppercase tracking-widest text-white/40 sm:inline">
-              Pitch · uso interno
+              Presentación
             </span>
           </div>
           <div className="flex items-center gap-2">
@@ -349,12 +370,6 @@ export function PitchDeckView() {
               className="inline-flex items-center gap-2 rounded-full border border-sky-400/30 px-3 py-2 text-sm font-medium text-sky-200 transition hover:bg-sky-500/10"
             >
               One-pager
-            </Link>
-            <Link
-              href="/interno/patrocinio-mars"
-              className="inline-flex items-center gap-2 rounded-full border border-[#0000B2]/40 px-3 py-2 text-sm font-medium text-[#B8B8FF] transition hover:bg-[#0000B2]/10"
-            >
-              Mars
             </Link>
             <Link
               href="/interno/lanzamiento"
@@ -392,70 +407,72 @@ export function PitchDeckView() {
           <PitchSlideFrame slide={slide} priority={index === 0} presenting={presenting} />
         </div>
 
-        <footer className="shrink-0 border-t border-white/10 bg-[#0a1628]/95 px-4 py-4 sm:px-6">
-          <div className="mx-auto flex max-w-6xl flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center gap-2 overflow-x-auto pb-1">
-              {PITCH_SLIDES.map((item, i) => (
-                <button
-                  key={item.id}
-                  type="button"
-                  onClick={() => setIndex(i)}
-                  className={cn(
-                    "h-2 shrink-0 rounded-full transition-all",
-                    i === index ? "w-8 bg-white" : "w-2 bg-white/25 hover:bg-white/40",
-                  )}
-                  aria-label={`Ir a diapositiva ${i + 1}: ${item.title}`}
-                  title={item.title}
-                />
-              ))}
-              <span className="ml-3 shrink-0 text-sm tabular-nums text-white/45">
-                {index + 1} / {total}
-              </span>
-            </div>
+        <footer
+          className={cn(
+            "shrink-0 border-t border-white/10 bg-[#0a1628]/95 px-4 py-4 sm:px-6",
+            presenting && "absolute inset-x-0 bottom-0 border-transparent bg-transparent py-6",
+          )}
+        >
+          {presenting ? (
+            <p className="text-center text-sm tabular-nums text-white/40">
+              {index + 1} / {total}
+            </p>
+          ) : (
+            <>
+              <div className="mx-auto flex max-w-6xl flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-center gap-2 overflow-x-auto pb-1">
+                  {PITCH_SLIDES.map((item, i) => (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => setIndex(i)}
+                      className={cn(
+                        "h-2 shrink-0 rounded-full transition-all",
+                        i === index ? "w-8 bg-white" : "w-2 bg-white/25 hover:bg-white/40",
+                      )}
+                      aria-label={`Ir a diapositiva ${i + 1}: ${item.title}`}
+                      title={item.title}
+                    />
+                  ))}
+                  <span className="ml-3 shrink-0 text-sm tabular-nums text-white/45">
+                    {index + 1} / {total}
+                  </span>
+                </div>
 
-            <div className="flex flex-wrap items-center gap-2">
-              <button
-                type="button"
-                onClick={goPrev}
-                disabled={index === 0}
-                className="inline-flex items-center gap-1 rounded-full border border-white/15 px-4 py-2 text-sm font-medium text-white disabled:opacity-30"
-              >
-                <ChevronLeft className="h-4 w-4" />
-                Anterior
-              </button>
-              <button
-                type="button"
-                onClick={goNext}
-                disabled={index === total - 1}
-                className="inline-flex items-center gap-1 rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#0a1628] disabled:opacity-30"
-              >
-                Siguiente
-                <ChevronRight className="h-4 w-4" />
-              </button>
-              <button
-                type="button"
-                onClick={() => setPresenting((value) => !value)}
-                className="inline-flex items-center gap-2 rounded-full border border-white/15 px-4 py-2 text-sm font-medium text-white"
-              >
-                {presenting ? (
-                  <>
-                    <Minimize2 className="h-4 w-4" />
-                    Salir
-                  </>
-                ) : (
-                  <>
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={goPrev}
+                    disabled={index === 0}
+                    className="inline-flex items-center gap-1 rounded-full border border-white/15 px-4 py-2 text-sm font-medium text-white disabled:opacity-30"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                    Anterior
+                  </button>
+                  <button
+                    type="button"
+                    onClick={goNext}
+                    disabled={index === total - 1}
+                    className="inline-flex items-center gap-1 rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#0a1628] disabled:opacity-30"
+                  >
+                    Siguiente
+                    <ChevronRight className="h-4 w-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPresenting(true)}
+                    className="inline-flex items-center gap-2 rounded-full border border-emerald-400/40 bg-emerald-500/10 px-4 py-2 text-sm font-semibold text-emerald-200"
+                  >
                     <Maximize2 className="h-4 w-4" />
                     Presentar
-                  </>
-                )}
-              </button>
-            </div>
-          </div>
-          {!presenting ? (
-            <p className="mx-auto mt-3 max-w-6xl text-xs text-white/35">
-              Atajos: ← → navegar · F pantalla completa · Esc salir
-            </p>
-          ) : null}
+                  </button>
+                </div>
+              </div>
+              <p className="mx-auto mt-3 max-w-6xl text-xs text-white/35">
+                Atajos: ← → navegar · F pantalla completa
+              </p>
+            </>
+          )}
         </footer>
       </main>
 

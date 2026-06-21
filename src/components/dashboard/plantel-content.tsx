@@ -217,7 +217,7 @@ export function PlantelContent() {
             <ol className="mt-3 list-decimal space-y-2 pl-5 text-sm text-slate-600">
               <li>Descarga la plantilla Excel (incluye columnas opcionales de tutor).</li>
               <li>Importa todo el roster (ideal al inicio de temporada).</li>
-              <li>Filtra por generación o Sub-X y completa foto, video y consentimiento.</li>
+              <li>Filtra por generación o Sub-X y completa foto, perfil visual y consentimiento.</li>
               <li>Registra contacto del tutor y envía el link desde Avisos a tutores.</li>
             </ol>
           </div>

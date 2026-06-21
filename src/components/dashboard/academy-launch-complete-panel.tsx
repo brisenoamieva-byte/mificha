@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { CheckCircle2, ExternalLink, Eye, Mail, MessageCircle } from "lucide-react";
+import { BrandWordmark, WithBrandName } from "@/components/ui/brand-wordmark";
 import {
   PARENT_ENGAGEMENT_GOAL,
   type AcademyProfileViewStats,
@@ -21,14 +22,16 @@ export function AcademyLaunchCompletePanel({
       <div className="border-b border-emerald-100 px-5 py-4">
         <div className="flex items-center gap-2 text-sm font-semibold text-emerald-800">
           <CheckCircle2 className="h-4 w-4" />
-          MiFicha activo en tu academia
+          <BrandWordmark /> activo en tu academia
         </div>
         <h2 className="mt-2 text-lg font-semibold text-slate-900">
-          MiFicha activo — rutina de sábado
+          Qué hacer después de cada jornada
         </h2>
         <p className="mt-1 text-sm text-slate-600">
-          Convocados + minutos (~1 min) + aviso automático al tutor. El resto es
-          opcional cuando quieras visorías o calendario público.
+          <WithBrandName>
+            Mantén plantel y tutores al día. MiFicha sincroniza el acta y avisa a las
+            familias.
+          </WithBrandName>
         </p>
       </div>
 

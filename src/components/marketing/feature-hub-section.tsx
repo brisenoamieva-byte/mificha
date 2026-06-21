@@ -3,6 +3,7 @@ import { ArrowRight } from "lucide-react";
 import { MarketingCardPhoto } from "@/components/marketing/marketing-hero-visual";
 import { COMPLEMENT_ROWS, HOME_FEATURES } from "@/lib/marketing-nav";
 import { MARKETING_MEDIA } from "@/lib/marketing-assets";
+import { BrandWordmark, WithBrandName } from "@/components/ui/brand-wordmark";
 import { cn } from "@/lib/utils";
 
 export function FeatureHubSection() {
@@ -16,8 +17,10 @@ export function FeatureHubSection() {
               Todo lo que tu portal de liga no cubre
             </h2>
             <p className="mt-4 text-sm leading-7 text-mf-text-secondary">
-              La liga publica calendario y tabla. MiFicha registra rendimiento individual
-              con acta verificada, avisos automáticos a tutores y directorio público.
+              <WithBrandName>
+                La liga publica calendario y tabla. MiFicha registra rendimiento individual
+                con acta verificada, avisos automáticos a tutores y directorio público.
+              </WithBrandName>
             </p>
           </div>
 
@@ -44,7 +47,7 @@ export function FeatureHubSection() {
                     {feature.title}
                   </h3>
                   <p className="mt-2 flex-1 text-sm leading-7 text-mf-text-secondary">
-                    {feature.mificha}
+                    <WithBrandName>{feature.mificha}</WithBrandName>
                   </p>
                   <Link
                     href={feature.href}
@@ -71,12 +74,14 @@ export function FeatureHubSection() {
             <div className="lg:sticky lg:top-24">
               <p className="mf-marketing-eyebrow">Complemento, no competidor</p>
               <h2 className="mt-3 text-2xl font-semibold tracking-[-0.02em] text-mf-text sm:text-[1.75rem]">
-                MiFicha + tu liga oficial
+                <BrandWordmark /> + tu liga oficial
               </h2>
               <p className="mt-4 text-sm leading-7 text-mf-text-secondary">
-                En configuración enlazas el calendario de tu competición (FMF,
-                estatal o municipal). MiFicha registra el rendimiento individual;
-                la liga sigue siendo la fuente del marcador oficial.
+                <WithBrandName>
+                  En configuración enlazas el calendario de tu competición (FMF, estatal o
+                  municipal). MiFicha registra el rendimiento individual; la liga sigue siendo
+                  la fuente del marcador oficial.
+                </WithBrandName>
               </p>
               <Link href="/signup" className="mf-btn-primary mt-8 inline-flex">
                 Registrar colegio
@@ -90,7 +95,7 @@ export function FeatureHubSection() {
                   Portal de liga
                 </div>
                 <div className="border-l border-mf-border-subtle bg-mf-accent-soft/50 px-5 py-3.5 text-xs font-semibold uppercase tracking-[0.12em] text-mf-accent-dark">
-                  MiFicha
+                  <BrandWordmark />
                 </div>
               </div>
               {COMPLEMENT_ROWS.map((row) => (
@@ -102,7 +107,7 @@ export function FeatureHubSection() {
                     {row.official}
                   </div>
                   <div className="border-l border-mf-border-subtle bg-mf-accent-soft/30 px-5 py-4 text-sm font-medium leading-6 text-mf-text">
-                    {row.mificha}
+                    <WithBrandName>{row.mificha}</WithBrandName>
                   </div>
                 </div>
               ))}
