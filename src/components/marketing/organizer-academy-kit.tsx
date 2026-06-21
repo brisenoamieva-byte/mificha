@@ -7,10 +7,15 @@ import {
   ORGANIZER_ONE_PAGER,
 } from "@/lib/organizer-one-pager";
 import { toast } from "@/components/ui/toast";
+import { cn } from "@/lib/utils";
 
 const DEFAULT_TOURNAMENT = "Interescolar MiFicha";
 
-export function OrganizerAcademyKit() {
+interface OrganizerAcademyKitProps {
+  embedded?: boolean;
+}
+
+export function OrganizerAcademyKit({ embedded = false }: OrganizerAcademyKitProps) {
   const [copied, setCopied] = useState(false);
   const blastText = buildOrganizerAcademyBlastText({
     tournamentName: DEFAULT_TOURNAMENT,
@@ -24,19 +29,26 @@ export function OrganizerAcademyKit() {
   }
 
   return (
-    <section className="border-b border-mf-border bg-mf-surface">
-      <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:py-16">
+    <div className={cn(embedded ? "mt-10 border-t border-mf-border pt-10" : "border-b border-mf-border bg-mf-surface")}>
+      <div className={cn(!embedded && "mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:py-16")}>
         <div className="max-w-2xl">
-          <p className="mf-marketing-eyebrow">Para tus academias</p>
-          <h2 className="mt-3 text-2xl font-semibold tracking-[-0.02em] text-mf-text">
+          {!embedded ? (
+            <p className="mf-marketing-eyebrow">Para tus academias</p>
+          ) : null}
+          <h2
+            className={cn(
+              "font-semibold tracking-[-0.02em] text-mf-text",
+              embedded ? "text-lg" : "mt-3 text-2xl",
+            )}
+          >
             {ORGANIZER_ONE_PAGER.academyKitTitle}
           </h2>
-          <p className="mt-3 text-sm leading-7 text-mf-text-secondary sm:text-base">
+          <p className="mt-2 text-sm leading-7 text-mf-text-secondary">
             {ORGANIZER_ONE_PAGER.academyKitDescription}
           </p>
         </div>
 
-        <div className="mt-6 rounded-xl border border-mf-border bg-mf-canvas p-5 sm:p-6">
+        <div className="mt-4 rounded-xl border border-mf-border bg-mf-canvas p-4 sm:p-5">
           <pre className="overflow-x-auto whitespace-pre-wrap break-words font-sans text-sm leading-7 text-mf-text-secondary">
             {blastText}
           </pre>
@@ -50,6 +62,6 @@ export function OrganizerAcademyKit() {
           </button>
         </div>
       </div>
-    </section>
+    </div>
   );
 }

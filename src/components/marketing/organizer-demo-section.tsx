@@ -9,7 +9,7 @@ export function OrganizerDemoSection() {
     <section className="border-b border-mf-border bg-mf-canvas">
       <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:py-16">
         <div className="max-w-2xl">
-          <p className="mf-marketing-eyebrow">Ejemplo</p>
+          <p className="mf-marketing-eyebrow">Cómo funciona</p>
           <h2 className="mt-3 text-2xl font-semibold tracking-[-0.02em] text-mf-text">
             {ORGANIZER_ONE_PAGER.demoTitle}
           </h2>

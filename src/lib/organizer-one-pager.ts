@@ -14,9 +14,8 @@ export const ORGANIZER_ONE_PAGER = {
   solutionTitle: "Qué es MiFicha (en una frase)",
   solution:
     "MiFicha publica jornadas, marcador y acta como fuente oficial. Cruza esos datos con cada plantel y avisa al padre. No sustituye tu inscripción ni tu reglamento.",
-  demoTitle: "Así se ve tu torneo",
-  demoSubtitle:
-    "Ejemplo con liga interescolar en Querétaro: calendario, acta y ficha por jugador.",
+  demoTitle: "Así funciona",
+  demoSubtitle: "Ejemplo en Querétaro: jornada, acta y ficha del jugador.",
   demoMatch: {
     league: "Liga Interescolar Querétaro",
     category: "Sub-15",
@@ -32,53 +31,19 @@ export const ORGANIZER_ONE_PAGER = {
   ],
   demoFichaHref: "/j/santiago-hernandez-demo",
   demoExploreHref: "/explorar",
-  pilotTitle: "Piloto sin riesgo",
-  pilotPoints: [
-    "Torneo fundador gratis: 1 categoría, 1 temporada — cupos muy limitados.",
-    "Cargamos tu calendario contigo antes de la primera jornada.",
-    "Post-partido: unos 15 min para marcador y acta — lo mismo que ya anotas.",
-  ],
-  boundariesTitle: "Qué no hacemos",
-  boundariesPoints: [
-    "No cobramos inscripciones ni comisión por equipo.",
-    "No dejamos que academias editen marcador ni acta.",
-    "No competimos por tus inscripciones.",
-    "No cobramos a padres ni academias.",
-  ],
-  academyKitTitle: "Mensaje para academias",
-  academyKitDescription:
-    "Cuando actives la temporada, manda esto en tu grupo de WhatsApp con directores.",
-  winTitle: "Qué gana tu torneo",
-  winPoints: [
-    {
-      title: "Diferenciador real",
-      description: "Torneo con ficha MiFicha y stats verificadas por categoría.",
-    },
-    {
-      title: "Menos ruido post-jornada",
-      description: "El padre consulta su link; no te escribe a ti el domingo.",
-    },
-    {
-      title: "Visibilidad del torneo",
-      description: "Calendario y resultados en mificha.mx/explorar — refuerza la marca de tu torneo.",
-    },
-    {
-      title: "Credibilidad",
-      description: "El acta la registra el organizador, no la escuela rival.",
-    },
-  ],
+  academyKitTitle: "Guión para academias",
+  academyKitDescription: "Copia y pega en WhatsApp cuando abras inscripciones.",
   askTitle: "Qué necesitamos de ti",
   askPoints: [
-    "Calendario de jornadas (rivales, fecha, sede, categoría) — lo cargamos juntos una vez por temporada.",
-    "Marcador y acta oficial tras cada jornada.",
-    "Promoción a academias inscritas: «Activa plantel en MiFicha» — nosotros damos el guión y el link.",
-    "Logo y nombre del torneo en la temporada MiFicha (co-branding en la red escolar).",
+    "Calendario de jornadas — lo cargamos contigo al inicio.",
+    "Marcador y acta oficial tras cada partido.",
+    "Que academias activen plantel (usa el guión de abajo).",
   ],
   governanceTitle: "Quién hace qué",
   governancePoints: [
-    "Organizador: calendario, marcador final y acta (goles, asistencias, tarjetas, minutos).",
+    "Tú: calendario, marcador y acta.",
     "Academia: plantel, consentimiento y contacto del tutor.",
-    "MiFicha: cruza acta con plantel, progreso de ficha, insignias y avisos al tutor.",
+    "MiFicha: sincroniza fichas y avisa al tutor.",
   ],
   cta: "¿Agendamos 20 min para ver tu calendario en MiFicha?",
   contact: {

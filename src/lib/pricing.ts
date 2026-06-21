@@ -3,12 +3,11 @@
 export const ACADEMY_ACCESS = {
   headline: "Gratis para academias",
   summary:
-    "Plantel, fichas, avisos al tutor y directorio — sin mensualidad. Si tu torneo usa MiFicha, el organizador activa la temporada.",
+    "Plantel, fichas y avisos al tutor — sin costo para la escuela. El torneo activa la temporada.",
   features: [
-    "Carga de plantel y consentimiento parental",
-    "Ficha por jugador sincronizada con el acta",
-    "Avisos automáticos al tutor tras cada jornada",
-    "Aparición en directorio cuando certificas tu academia",
+    "Plantel y consentimiento parental",
+    "Ficha sincronizada con el acta del torneo",
+    "Avisos automáticos al tutor",
   ],
 } as const;
 
@@ -22,44 +21,39 @@ export interface OrganizerPricingPlan {
   badge?: string;
 }
 
-/** Precios de arranque en Querétaro — accesibles para primeros torneos. */
 export const ORGANIZER_PRICING = {
-  title: "Precios de arranque",
+  title: "Precios",
   subtitle:
-    "Las academias no pagan. El torneo contrata MiFicha por temporada — puedes repartir el costo en la inscripción si quieres.",
-  footnote:
-    "Precios piloto en Querétaro · Temporada 2026. Cupos limitados para torneos fundadores.",
+    "Las academias no pagan. Elige tarifa por categoría o por jugador — puedes incluirla en la inscripción del torneo.",
+  footnote: "Temporada 2026 · Querétaro · Cupos limitados para torneos fundadores.",
   costExample: {
-    label: "Ejemplo",
-    summary: "12 equipos × 18 jugadores = 216 jugadores → $2,160 MXN temporada ($10/jugador).",
-    note: "Puedes sumarlo a la cuota de inscripción del torneo.",
+    label: "Ejemplo por jugador",
+    summary: "12 equipos × 18 jugadores = 216 → $4,320 MXN ($20/jugador).",
+    note: "Súmalo a la cuota de inscripción si prefieres.",
   },
   plans: [
     {
       id: "piloto-fundador",
       label: "Torneo fundador",
       priceLabel: "Gratis",
-      period: "1 categoría · 1 temporada",
-      description:
-        "Calendario + acta en MiFicha. Te acompañamos a cargar la primera jornada. Cupos muy limitados.",
+      period: "1 categoría · 1 torneo",
+      description: "Primera temporada con MiFicha. Te ayudamos a cargar calendario y acta.",
       highlight: true,
       badge: "Piloto",
     },
     {
       id: "temporada-categoria",
       label: "Por categoría",
-      priceLabel: "$999",
-      period: "MXN / categoría / temporada",
-      description:
-        "Calendario oficial, acta, fichas para todas las academias inscritas y visibilidad en Explorar.",
+      priceLabel: "$1,999",
+      period: "MXN / categoría / torneo",
+      description: "Calendario, acta, fichas de todas las academias y visibilidad en Explorar.",
     },
     {
       id: "por-jugador",
       label: "Por jugador",
-      priceLabel: "$10",
-      period: "MXN / jugador / temporada",
-      description:
-        "Ideal si prefieres sumarlo a la cuota de inscripción del torneo.",
+      priceLabel: "$20",
+      period: "MXN / jugador / torneo",
+      description: "Pagas solo por jugadores inscritos. Ideal para sumar a la cuota del torneo.",
     },
   ] satisfies OrganizerPricingPlan[],
 } as const;
@@ -71,7 +65,7 @@ export const SCOUT_PRICING = {
   proLabel: "Explorar Pro",
   proStatus: "Próximamente",
   description:
-    "Búsqueda avanzada, listas guardadas y alertas por categoría — cuando la red tenga masa crítica. El directorio público sigue abierto.",
+    "Búsqueda avanzada, listas guardadas y alertas por categoría — cuando la red tenga masa crítica.",
 } as const;
 
 /** Suscripción legacy para academias — desactivada en producto; conservada para Stripe futuro. */

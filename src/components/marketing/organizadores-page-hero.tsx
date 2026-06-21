@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, BarChart3, Calendar, ShieldCheck } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { WithBrandName } from "@/components/ui/brand-wordmark";
 import { CURRENT_SEASON_LABEL } from "@/lib/marketing-season";
 
@@ -16,44 +16,27 @@ export function OrganizadoresPageHero({ mailtoHref }: OrganizadoresPageHeroProps
       />
 
       <div className="relative mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:py-16">
-        <div className="max-w-3xl">
+        <div className="max-w-2xl">
           <p className="mf-marketing-eyebrow">
-            Organizadores de torneo · {CURRENT_SEASON_LABEL}
+            Organizadores · {CURRENT_SEASON_LABEL}
           </p>
           <h1 className="mt-4 text-[2rem] font-semibold leading-[1.08] tracking-[-0.035em] text-mf-text sm:text-[2.5rem]">
             Stats oficiales para tu torneo
           </h1>
           <p className="mt-5 text-base leading-8 text-mf-text-secondary sm:text-[1.0625rem]">
             <WithBrandName>
-              Publicas calendario, marcador y acta. MiFicha sincroniza stats con cada
-              plantel y avisa a los padres. Las academias usan MiFicha gratis — el torneo
-              contrata la temporada.
+              Tú publicas calendario y acta. MiFicha actualiza la ficha de cada jugador
+              y avisa al tutor. Las academias no pagan.
             </WithBrandName>
           </p>
-
-          <ul className="mt-6 flex flex-wrap gap-2">
-            {[
-              { icon: Calendar, label: "Calendario + acta" },
-              { icon: BarChart3, label: "Stats por jugador" },
-              { icon: ShieldCheck, label: "Academias gratis · piloto fundador" },
-            ].map(({ icon: Icon, label }) => (
-              <li
-                key={label}
-                className="inline-flex items-center gap-1.5 rounded-full border border-mf-border-subtle bg-mf-canvas px-3 py-1.5 text-xs font-medium text-mf-text-secondary"
-              >
-                <Icon className="h-3.5 w-3.5 shrink-0 text-mf-brand" aria-hidden />
-                {label}
-              </li>
-            ))}
-          </ul>
 
           <div className="mt-8 flex flex-wrap gap-3">
             <a href={mailtoHref} className="mf-btn-primary">
               Agendar conversación
               <ArrowRight className="h-4 w-4" />
             </a>
-            <Link href="/explorar" className="mf-btn-accent">
-              Ver red escolar
+            <Link href="#precios" className="mf-btn-accent">
+              Ver precios
             </Link>
           </div>
         </div>

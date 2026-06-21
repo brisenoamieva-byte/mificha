@@ -1,10 +1,6 @@
 import Link from "next/link";
-import { ArrowRight, Check } from "lucide-react";
-import {
-  ACADEMY_ACCESS,
-  ORGANIZER_PRICING,
-  SCOUT_PRICING,
-} from "@/lib/pricing";
+import { ArrowRight } from "lucide-react";
+import { ACADEMY_ACCESS, ORGANIZER_PRICING } from "@/lib/pricing";
 import { cn } from "@/lib/utils";
 
 interface OrganizerPricingSectionProps {
@@ -13,16 +9,17 @@ interface OrganizerPricingSectionProps {
 
 export function OrganizerPricingSection({ mailtoHref }: OrganizerPricingSectionProps) {
   return (
-    <section className="border-y border-mf-border bg-mf-surface">
+    <section id="precios" className="border-y border-mf-border bg-mf-surface">
       <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:py-16">
         <div className="max-w-2xl">
-          <p className="mf-marketing-eyebrow">Modelo claro</p>
+          <p className="mf-marketing-eyebrow">Modelo</p>
           <h2 className="mt-3 text-2xl font-semibold tracking-[-0.02em] text-mf-text">
             {ORGANIZER_PRICING.title}
           </h2>
           <p className="mt-3 text-sm leading-7 text-mf-text-secondary sm:text-base">
             {ORGANIZER_PRICING.subtitle}
           </p>
+          <p className="mt-2 text-sm font-medium text-mf-brand">{ACADEMY_ACCESS.summary}</p>
         </div>
 
         <div className="mt-8 grid gap-4 lg:grid-cols-3">
@@ -55,64 +52,13 @@ export function OrganizerPricingSection({ mailtoHref }: OrganizerPricingSectionP
 
         <p className="mt-4 text-xs text-mf-text-muted">{ORGANIZER_PRICING.footnote}</p>
 
-        <p className="mt-3 rounded-lg border border-mf-border bg-mf-canvas px-4 py-3 text-sm text-mf-text-secondary">
+        <p className="mt-3 text-sm text-mf-text-secondary">
           <span className="font-semibold text-mf-text">{ORGANIZER_PRICING.costExample.label}:</span>{" "}
           {ORGANIZER_PRICING.costExample.summary}{" "}
           <span className="text-mf-text-muted">{ORGANIZER_PRICING.costExample.note}</span>
         </p>
 
-        <div className="mt-10 grid gap-4 lg:grid-cols-2">
-          <div className="rounded-xl border border-mf-border bg-mf-canvas p-5 sm:p-6">
-            <p className="text-sm font-semibold text-mf-text">{ACADEMY_ACCESS.headline}</p>
-            <p className="mt-2 text-sm leading-7 text-mf-text-secondary">
-              {ACADEMY_ACCESS.summary}
-            </p>
-            <ul className="mt-4 space-y-2">
-              {ACADEMY_ACCESS.features.map((item) => (
-                <li
-                  key={item}
-                  className="flex gap-2 text-sm leading-6 text-mf-text-secondary"
-                >
-                  <Check className="mt-0.5 h-4 w-4 shrink-0 text-mf-accent-dark" />
-                  {item}
-                </li>
-              ))}
-            </ul>
-            <Link
-              href="/signup"
-              className="mt-5 inline-flex text-sm font-semibold text-mf-brand hover:underline"
-            >
-              Registrar academia gratis
-            </Link>
-          </div>
-
-          <div className="rounded-xl border border-dashed border-mf-border bg-white p-5 sm:p-6">
-            <p className="text-sm font-semibold text-mf-text">{SCOUT_PRICING.headline}</p>
-            <div className="mt-3 flex flex-wrap items-baseline gap-x-4 gap-y-1">
-              <p className="text-sm text-mf-text-secondary">
-                {SCOUT_PRICING.basicLabel}:{" "}
-                <span className="font-semibold text-mf-text">{SCOUT_PRICING.basicPrice}</span>
-              </p>
-              <p className="text-sm text-mf-text-secondary">
-                {SCOUT_PRICING.proLabel}:{" "}
-                <span className="font-medium text-mf-text-muted">
-                  ({SCOUT_PRICING.proStatus})
-                </span>
-              </p>
-            </div>
-            <p className="mt-3 text-sm leading-7 text-mf-text-secondary">
-              {SCOUT_PRICING.description}
-            </p>
-            <Link
-              href="/explorar"
-              className="mt-5 inline-flex text-sm font-semibold text-mf-brand hover:underline"
-            >
-              Ver directorio
-            </Link>
-          </div>
-        </div>
-
-        <div className="mt-10 flex flex-wrap gap-3">
+        <div className="mt-8">
           <a href={mailtoHref} className="mf-btn-primary">
             Cotizar mi torneo
             <ArrowRight className="h-4 w-4" />

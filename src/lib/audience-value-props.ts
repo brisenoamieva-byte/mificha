@@ -71,7 +71,7 @@ export const AUDIENCE_VALUE_PROPS: AudienceValueProp[] = [
       "Publicas calendario y acta como hoy.",
       "Cada escuela recibe fichas actualizadas solas — gratis para ellas.",
       "Tu torneo visible en Explorar.",
-      "Piloto fundador gratis · precios accesibles por temporada.",
+      "Desde $1,999/categoría o $20/jugador · piloto fundador gratis.",
     ],
     href: "/organizadores",
     cta: "Ver precios",

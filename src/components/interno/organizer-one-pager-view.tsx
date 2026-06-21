@@ -130,20 +130,6 @@ export function OrganizerOnePagerView() {
           </p>
         </section>
 
-        <section className="mt-8">
-          <h2 className="text-sm font-bold uppercase tracking-wide text-[#1B4F8C]">
-            {ORGANIZER_ONE_PAGER.winTitle}
-          </h2>
-          <ul className="mt-3 space-y-2">
-            {ORGANIZER_ONE_PAGER.winPoints.map((item) => (
-              <li key={item.title} className="text-sm leading-6 text-slate-700">
-                <span className="font-semibold text-slate-900">{item.title}.</span>{" "}
-                {item.description}
-              </li>
-            ))}
-          </ul>
-        </section>
-
         <section className="mt-8 rounded-2xl border border-amber-200 bg-amber-50/80 px-5 py-5">
           <h2 className="text-sm font-bold uppercase tracking-wide text-amber-900">
             {ORGANIZER_ONE_PAGER.askTitle}
