@@ -30,7 +30,7 @@ import {
   matchesCategoryFilter,
   parseCategoryFilter,
 } from "@/lib/player-category";
-import { getAveragePassportScore } from "@/lib/stats-analytics";
+import { getPassportTier } from "@/lib/passport-score";
 import { downloadPlayerImportTemplate } from "@/lib/excel-import";
 import {
   getDominantFootLabel,
@@ -107,12 +107,13 @@ export function PlantelContent() {
     page * PAGE_SIZE,
   );
 
-  const passportAverage = useMemo(
-    () => getAveragePassportScore(players.map((player) => player.passport_score)),
-    [players],
-  );
+  const progressAverage = useMemo(() => {
+    if (players.length === 0) return 0;
+    const total = players.reduce((sum, player) => sum + player.passport_score, 0);
+    return Math.round(total / players.length);
+  }, [players]);
 
-  const topPassportPlayer = useMemo(
+  const topProgressPlayer = useMemo(
     () =>
       [...players].sort((a, b) => b.passport_score - a.passport_score)[0] ??
       null,
@@ -226,16 +227,20 @@ export function PlantelContent() {
         {players.length > 0 ? (
           <div className="grid gap-4 sm:grid-cols-3">
             <MiniStatCard
-              label="Passport promedio"
-              value={passportAverage}
-              hint="Salud general del plantel"
+              label="Progreso del plantel"
+              value={getPassportTier(progressAverage).label}
+              hint="Etapa promedio de completitud y participación"
             />
             <MiniStatCard
-              label="Mejor PASSPORT"
-              value={topPassportPlayer?.passport_score ?? 0}
+              label="Mayor avance"
+              value={
+                topProgressPlayer
+                  ? getPassportTier(topProgressPlayer.passport_score).label
+                  : "—"
+              }
               hint={
-                topPassportPlayer
-                  ? `${topPassportPlayer.first_name} ${topPassportPlayer.last_name}`
+                topProgressPlayer
+                  ? `${topProgressPlayer.first_name} ${topProgressPlayer.last_name}`
                   : "Sin jugadores"
               }
               tone="green"
@@ -332,7 +337,7 @@ export function PlantelContent() {
                     <th className="px-4 py-4 font-medium sm:px-6">Edad</th>
                     <th className="px-4 py-4 font-medium sm:px-6">Posición</th>
                     <th className="px-4 py-4 font-medium sm:px-6">Pie</th>
-                    <th className="px-4 py-4 font-medium sm:px-6">PASSPORT</th>
+                    <th className="px-4 py-4 font-medium sm:px-6">Progreso</th>
                     <th className="px-4 py-4 font-medium sm:px-6">Acciones</th>
                   </tr>
                 </thead>

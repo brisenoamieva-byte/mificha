@@ -7,6 +7,7 @@ import {
   QuickGoalPicker,
 } from "@/components/dashboard/match-stat-capture";
 import { PlayerAvatar } from "@/components/ui/player-avatar";
+import { ProgressTierBadge } from "@/components/ui/passport-score-display";
 import { getPositionLabel } from "@/lib/dashboard-utils";
 import type { CaptureStyle, PlayerCapture, RosterListMode } from "@/lib/match-capture";
 import type { AcademyCaptureScope } from "@/lib/match-data-governance";
@@ -264,8 +265,8 @@ export function MatchCaptureStep({
                       {player.first_name} {player.last_name}
                     </p>
                     <p className="text-xs text-slate-500">
-                      {getPositionLabel(player.position)} · Passport{" "}
-                      {player.passport_score}
+                      {getPositionLabel(player.position)} ·{" "}
+                      <ProgressTierBadge score={player.passport_score} />
                     </p>
                   </div>
                   {listMode === "convocados" ? (

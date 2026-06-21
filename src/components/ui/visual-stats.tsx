@@ -102,6 +102,7 @@ export function PassportRing({
       score={score}
       variant="hero"
       showLabel={false}
+      showScore={false}
       className={ringSizes[size]}
     />
   );

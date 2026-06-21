@@ -78,14 +78,14 @@ export const ACHIEVEMENT_DEFINITIONS: Record<string, AchievementDefinition> = {
   tier_pro: {
     key: "tier_pro",
     title: "En ascenso",
-    description: "Passport Score tier Pro (65+).",
+    description: "Etapa En ascenso en el progreso de ficha.",
     rarity: "rare",
     emoji: "🚀",
   },
   tier_elite: {
     key: "tier_elite",
     title: "Consolidado",
-    description: "Passport Score tier Elite (80+).",
+    description: "Etapa Consolidado en el progreso de ficha.",
     rarity: "epic",
     emoji: "🏆",
   },
@@ -241,16 +241,6 @@ export function buildMatchRewardsWhatsAppMessage(options: {
   achievementShareUrl?: string | null;
   weeklyRankLine?: string | null;
 }) {
-  const delta =
-    options.previousPassportScore !== undefined
-      ? options.passportScore - options.previousPassportScore
-      : 0;
-
-  const deltaLine =
-    delta > 0
-      ? `Passport Score: ${options.passportScore} (+${delta})`
-      : `Passport Score: ${options.passportScore}`;
-
   const achievementLine = options.achievementKeys?.length
     ? buildAchievementShareLine(options.achievementKeys)
     : null;
@@ -264,8 +254,7 @@ export function buildMatchRewardsWhatsAppMessage(options: {
     options.achievementShareUrl
       ? `Tarjeta del logro: ${options.achievementShareUrl}`
       : null,
-    deltaLine,
-    `Ver progreso completo: ${options.fichaUrl}`,
+    `Ver ficha completa: ${options.fichaUrl}`,
   ]
     .filter(Boolean)
     .join("\n");

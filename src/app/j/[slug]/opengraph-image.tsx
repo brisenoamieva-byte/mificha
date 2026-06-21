@@ -117,51 +117,30 @@ export default async function Image({
           </div>
         </div>
 
-        <div style={{ display: "flex", alignItems: "flex-end", gap: 40 }}>
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            <span style={{ fontSize: 18, opacity: 0.6, textTransform: "uppercase" }}>
-              Passport Score
-            </span>
-            <div style={{ display: "flex", alignItems: "baseline", gap: 16 }}>
-              <span
-                style={{
-                  fontSize: 88,
-                  fontWeight: 800,
-                  color: payload.passportAccent,
-                  lineHeight: 1,
-                }}
-              >
-                {payload.passportScore}
-              </span>
-              <span style={{ fontSize: 24, opacity: 0.75 }}>{payload.passportLabel}</span>
+        <div style={{ display: "flex", alignItems: "flex-end", gap: 18, marginLeft: "auto" }}>
+          {[
+            { label: "PJ", value: payload.stats.matches },
+            { label: "Goles", value: payload.stats.goals },
+            { label: "Asist.", value: payload.stats.assists },
+            { label: "Min", value: payload.stats.minutes },
+          ].map((stat) => (
+            <div
+              key={stat.label}
+              style={{
+                minWidth: 110,
+                borderRadius: 20,
+                border: "1px solid rgba(255,255,255,0.12)",
+                background: "rgba(0,0,0,0.22)",
+                padding: "18px 20px",
+                display: "flex",
+                flexDirection: "column",
+                gap: 6,
+              }}
+            >
+              <span style={{ fontSize: 34, fontWeight: 700 }}>{stat.value}</span>
+              <span style={{ fontSize: 16, opacity: 0.62 }}>{stat.label}</span>
             </div>
-          </div>
-
-          <div style={{ display: "flex", gap: 18, marginLeft: "auto" }}>
-            {[
-              { label: "PJ", value: payload.stats.matches },
-              { label: "Goles", value: payload.stats.goals },
-              { label: "Asist.", value: payload.stats.assists },
-              { label: "Min", value: payload.stats.minutes },
-            ].map((stat) => (
-              <div
-                key={stat.label}
-                style={{
-                  minWidth: 110,
-                  borderRadius: 20,
-                  border: "1px solid rgba(255,255,255,0.12)",
-                  background: "rgba(0,0,0,0.22)",
-                  padding: "18px 20px",
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 6,
-                }}
-              >
-                <span style={{ fontSize: 34, fontWeight: 700 }}>{stat.value}</span>
-                <span style={{ fontSize: 16, opacity: 0.62 }}>{stat.label}</span>
-              </div>
-            ))}
-          </div>
+          ))}
         </div>
       </div>
     ),

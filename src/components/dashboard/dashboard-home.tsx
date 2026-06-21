@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { useDashboard } from "@/components/dashboard/dashboard-context";
 import { MetricCard } from "@/components/dashboard/metric-card";
+import { ProgressTierBadge } from "@/components/ui/passport-score-display";
 import { NoAcademyState } from "@/components/dashboard/no-academy-state";
 import { AcademyOnboardingPanel } from "@/components/dashboard/academy-onboarding-panel";
 import { SubscriptionPanel } from "@/components/dashboard/subscription-panel";
@@ -282,7 +283,7 @@ export function DashboardHome() {
                     <th className="pb-3 pr-4 font-medium">Jugador</th>
                     <th className="pb-3 pr-4 font-medium">Posición</th>
                     <th className="pb-3 pr-4 font-medium">Edad</th>
-                    <th className="pb-3 font-medium">PASSPORT</th>
+                    <th className="pb-3 font-medium">Progreso</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -314,8 +315,8 @@ export function DashboardHome() {
                       <td className="py-4 pr-4 text-slate-600">
                         {calculateAge(player.birth_date)} años
                       </td>
-                      <td className="py-4 font-semibold text-[#1B4F8C]">
-                        {player.passport_score}
+                      <td className="py-4">
+                        <ProgressTierBadge score={player.passport_score} />
                       </td>
                     </tr>
                   ))}

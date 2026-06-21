@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Award, ExternalLink, MapPin, Shield, Trophy, Users } from "lucide-react";
 import { CERTIFIED_ACADEMY_LABEL } from "@/lib/academy-certification";
 import { AcademyScheduleSection } from "@/components/marketing/match-schedule-card";
-import { PassportSegments } from "@/components/ui/passport-score-display";
+import { ProgressTierBadge } from "@/components/ui/passport-score-display";
 import { BrandLogoLink } from "@/components/ui/brand-logo";
 import { BrandWordmark } from "@/components/ui/brand-wordmark";
 import { getPositionLabel } from "@/lib/dashboard-utils";
@@ -206,13 +206,16 @@ export function AcademyLanding({ data }: AcademyLandingProps) {
 
                   <div className="p-5">
                     <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-500">
-                      Passport Score
+                      Progreso de ficha
                     </p>
-                    <PassportSegments
-                      score={player.passport_score}
-                      surface="dark"
-                      className="mt-3"
-                    />
+                    <div className="mt-3 flex items-center justify-between gap-3">
+                      <ProgressTierBadge
+                        score={player.passport_score}
+                        surface="dark"
+                        className="text-xs"
+                      />
+                      <span className="text-xs text-slate-400">Stats verificadas</span>
+                    </div>
                   </div>
                 </Link>
               );

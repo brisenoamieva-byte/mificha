@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { TrendingUp } from "lucide-react";
 import { PlayerAvatar } from "@/components/ui/player-avatar";
+import { ProgressTierBadge } from "@/components/ui/passport-score-display";
 import { ComparisonBar } from "@/components/ui/visual-stats";
 import { getPositionLabel } from "@/lib/dashboard-utils";
 import {
@@ -80,8 +81,8 @@ export function ComparativeReportPanel({
                 {selectedPlayer.first_name} {selectedPlayer.last_name}
               </p>
               <p className="text-sm text-mf-text-secondary">
-                {getPositionLabel(selectedPlayer.position)} · Passport{" "}
-                {selectedPlayer.passport_score}
+                {getPositionLabel(selectedPlayer.position)} ·{" "}
+                <ProgressTierBadge score={selectedPlayer.passport_score} />
               </p>
             </div>
           </div>

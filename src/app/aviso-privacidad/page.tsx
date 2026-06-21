@@ -75,7 +75,7 @@ export default function AvisoPrivacidadPage() {
             "Desempeño: estadísticas de partidos verificados por la academia (goles, asistencias, minutos, etc.).",
             "Multimedia opcional: fotografía y video cargados por la academia.",
             "Contacto del tutor (opcional): correo o teléfono para reportes, solo si la academia lo captura.",
-            "Passport Score y métricas derivadas del rendimiento registrado.",
+            "Progreso de ficha y métricas derivadas del rendimiento registrado.",
           ]}
         />
         <LegalParagraph>

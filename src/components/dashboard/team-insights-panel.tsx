@@ -3,12 +3,11 @@
 import Link from "next/link";
 import { Crown, Medal } from "lucide-react";
 import { PassportBar } from "@/components/ui/passport-bar";
+import { ProgressTierBadge } from "@/components/ui/passport-score-display";
 import { MiniStatCard, PassportRing } from "@/components/ui/visual-stats";
 import { getPositionLabel } from "@/lib/dashboard-utils";
-import {
-  computeTeamAverages,
-  getAveragePassportScore,
-} from "@/lib/stats-analytics";
+import { getPassportTier } from "@/lib/passport-score";
+import { computeTeamAverages } from "@/lib/stats-analytics";
 import { cn } from "@/lib/utils";
 import type { Player, PlayerSeasonStat } from "@/types/database";
 
@@ -23,9 +22,13 @@ export function TeamInsightsPanel({
   seasonStats,
   seasonName,
 }: TeamInsightsPanelProps) {
-  const passportAverage = getAveragePassportScore(
-    players.map((player) => player.passport_score),
-  );
+  const progressAverage =
+    players.length === 0
+      ? 0
+      : Math.round(
+          players.reduce((sum, player) => sum + player.passport_score, 0) /
+            players.length,
+        );
 
   const leaderboard = [...players]
     .sort((a, b) => b.passport_score - a.passport_score)
@@ -63,9 +66,9 @@ export function TeamInsightsPanel({
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <MiniStatCard
-          label="Passport promedio"
-          value={passportAverage}
-          hint="Índice general del plantel"
+          label="Progreso del plantel"
+          value={getPassportTier(progressAverage).label}
+          hint="Etapa promedio de completitud y participación"
         />
         <MiniStatCard
           label="Goles totales"
@@ -95,7 +98,7 @@ export function TeamInsightsPanel({
         <div className="mf-card p-6">
           <div className="flex items-center gap-2">
             <Crown className="h-5 w-5 text-mf-warning" />
-            <h3 className="mf-section-title">Ranking Passport</h3>
+            <h3 className="mf-section-title">Progreso del plantel</h3>
           </div>
 
           <div className="mt-5 space-y-3">
@@ -125,9 +128,7 @@ export function TeamInsightsPanel({
                       {getPositionLabel(player.position)}
                     </p>
                   </div>
-                  <span className="text-lg font-semibold tabular-nums text-mf-brand">
-                    {player.passport_score}
-                  </span>
+                  <ProgressTierBadge score={player.passport_score} />
                 </div>
                 <div className="mt-3">
                   <PassportBar score={player.passport_score} />
@@ -189,7 +190,7 @@ export function TeamInsightsPanel({
           </div>
 
           <div className="mt-6 flex items-center justify-center">
-            <PassportRing score={passportAverage} label="AVG" size="lg" />
+            <PassportRing score={progressAverage} size="lg" />
           </div>
         </div>
       </div>

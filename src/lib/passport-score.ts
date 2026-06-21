@@ -1,5 +1,15 @@
 import type { Player, PlayerSeasonStat } from "@/types/database";
 
+/** Etiqueta pública — evitar "Passport" en UI. */
+export const PROGRESS_SCORE_LABEL = "Progreso";
+
+export const PROGRESS_TIER_FILTER_OPTIONS = [
+  { value: 0, label: "Etapa: cualquiera" },
+  { value: 50, label: "En progreso o más" },
+  { value: 65, label: "En ascenso o más" },
+  { value: 80, label: "Consolidado" },
+] as const;
+
 export type PassportTier = "elite" | "pro" | "desarrollo" | "base";
 
 export interface PassportTierStyle {
@@ -89,20 +99,11 @@ export function buildMatchUpdateWhatsAppMessage(options: {
   goals: number;
   assists: number;
   minutes: number;
-  passportScore: number;
+  /** @deprecated Ya no se incluye en el mensaje al tutor. */
+  passportScore?: number;
   previousPassportScore?: number;
   fichaUrl: string;
 }) {
-  const delta =
-    options.previousPassportScore !== undefined
-      ? options.passportScore - options.previousPassportScore
-      : 0;
-
-  const deltaLine =
-    delta > 0
-      ? `Passport Score: ${options.passportScore} (+${delta})`
-      : `Passport Score: ${options.passportScore}`;
-
   const contribution = options.goals + options.assists;
   const contributionLine =
     contribution > 0
@@ -114,8 +115,7 @@ export function buildMatchUpdateWhatsAppMessage(options: {
     `vs ${options.opponent}`,
     `${options.goals}G · ${options.assists}A · ${options.minutes} min`,
     contributionLine,
-    deltaLine,
-    `Ver progreso completo: ${options.fichaUrl}`,
+    `Ver ficha completa: ${options.fichaUrl}`,
   ]
     .filter(Boolean)
     .join("\n");

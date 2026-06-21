@@ -271,7 +271,8 @@ export function PerformancePlayerPanel({
                 score={selectedPlayer.passport_score}
                 variant="compact"
                 surface="dark"
-                scoreLabel="Progreso verificado"
+                scoreLabel="Progreso de ficha"
+                showScore={false}
                 className="w-[160px]"
               />
               <AreaTrendChart

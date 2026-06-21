@@ -1,8 +1,4 @@
 import { getPositionLabel } from "@/lib/dashboard-utils";
-import {
-  calculatePassportScoreForPlayer,
-  getPassportTier,
-} from "@/lib/passport-score";
 import { getProtectedProfileTitle } from "@/lib/privacy";
 import type { PublicPlayerData } from "@/lib/public-player";
 
@@ -11,9 +7,6 @@ export interface OgPlayerSharePayload {
   academyName: string;
   seasonName: string | null;
   positionLabel: string;
-  passportScore: number;
-  passportLabel: string;
-  passportAccent: string;
   stats: {
     matches: number;
     goals: number;
@@ -25,8 +18,6 @@ export interface OgPlayerSharePayload {
 
 export function buildOgPlayerSharePayload(data: PublicPlayerData): OgPlayerSharePayload {
   const { player, currentSeasonStats, currentSeasonName } = data;
-  const passportScore = calculatePassportScoreForPlayer(player, currentSeasonStats);
-  const tier = getPassportTier(passportScore);
   const stats = currentSeasonStats ?? {
     total_matches: 0,
     total_goals: 0,
@@ -43,9 +34,6 @@ export function buildOgPlayerSharePayload(data: PublicPlayerData): OgPlayerShare
     academyName: player.academies?.name ?? "Academia verificada",
     seasonName: currentSeasonName,
     positionLabel: getPositionLabel(player.position),
-    passportScore,
-    passportLabel: tier.label,
-    passportAccent: tier.accent,
     stats: {
       matches: stats.total_matches,
       goals: stats.total_goals,
@@ -57,5 +45,5 @@ export function buildOgPlayerSharePayload(data: PublicPlayerData): OgPlayerShare
 }
 
 export function buildOgPlayerImageAlt(payload: OgPlayerSharePayload) {
-  return `${payload.title} · Passport ${payload.passportScore} · MiFicha`;
+  return `${payload.title} · Ficha verificada · MiFicha`;
 }

@@ -592,7 +592,7 @@ export function PartidosNuevoContent() {
       toast.success(
         unlockedCount > 0
           ? `Partido guardado · ${unlockedCount} insignia${unlockedCount === 1 ? "" : "s"} desbloqueada${unlockedCount === 1 ? "" : "s"}.`
-          : "Partido guardado. Passport Score actualizado.",
+          : "Partido guardado. Stats actualizadas en la ficha.",
       );
       if (academy?.id) {
         void requestAcademyCertificationSync(academy.id);

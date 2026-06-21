@@ -1,6 +1,9 @@
+"use client";
+
 import {
   clampPassportScore,
   getPassportTier,
+  PROGRESS_SCORE_LABEL,
 } from "@/lib/passport-score";
 import { cn } from "@/lib/utils";
 
@@ -10,6 +13,8 @@ interface PassportScoreDisplayProps {
   surface?: "light" | "dark";
   showLabel?: boolean;
   showTier?: boolean;
+  /** Muestra el número 1–100. Desactivar en superficies públicas. */
+  showScore?: boolean;
   /** Player-facing copy; default keeps product name for coaches */
   scoreLabel?: string;
   className?: string;
@@ -40,6 +45,7 @@ function PassportProgressBar({
       aria-valuenow={value}
       aria-valuemin={0}
       aria-valuemax={100}
+      aria-label={`${PROGRESS_SCORE_LABEL}: ${tier.label}`}
     >
       <div
         className={cn(
@@ -50,6 +56,32 @@ function PassportProgressBar({
         style={{ width: `${value}%` }}
       />
     </div>
+  );
+}
+
+export function ProgressTierBadge({
+  score,
+  className,
+  surface = "light",
+}: {
+  score: number;
+  className?: string;
+  surface?: "light" | "dark";
+}) {
+  const tier = getPassportTier(clampPassportScore(score));
+
+  return (
+    <span
+      className={cn(
+        "inline-flex rounded-md px-2 py-0.5 text-[10px] font-semibold",
+        surface === "dark"
+          ? "bg-white/10 text-white/90 ring-1 ring-white/15"
+          : cn(tier.badgeBg, tier.badgeText, "ring-1 ring-black/5"),
+        className,
+      )}
+    >
+      {tier.label}
+    </span>
   );
 }
 
@@ -79,7 +111,8 @@ export function PassportScoreDisplay({
   surface = "light",
   showLabel = true,
   showTier = true,
-  scoreLabel = "Passport Score",
+  showScore = true,
+  scoreLabel = PROGRESS_SCORE_LABEL,
   className,
 }: PassportScoreDisplayProps) {
   const value = clampPassportScore(score);
@@ -94,14 +127,18 @@ export function PassportScoreDisplay({
     return (
       <div className={cn("flex min-w-[88px] items-center gap-2.5", className)}>
         <PassportProgressBar score={value} surface={surface} className="flex-1" />
-        <span
-          className={cn(
-            "w-7 shrink-0 text-right text-xs font-semibold tabular-nums",
-            surface === "dark" ? "text-white/90" : "text-slate-700",
-          )}
-        >
-          {value}
-        </span>
+        {showScore ? (
+          <span
+            className={cn(
+              "w-7 shrink-0 text-right text-xs font-semibold tabular-nums",
+              surface === "dark" ? "text-white/90" : "text-slate-700",
+            )}
+          >
+            {value}
+          </span>
+        ) : (
+          <ProgressTierBadge score={value} surface={surface} className="shrink-0" />
+        )}
       </div>
     );
   }
@@ -122,15 +159,17 @@ export function PassportScoreDisplay({
             {tier.label}
           </p>
         ) : null}
-        <p
-          className={cn(
-            "font-semibold tabular-nums leading-none tracking-tight",
-            showTier ? "mt-1 text-2xl" : "text-xl",
-            scoreColor,
-          )}
-        >
-          {value}
-        </p>
+        {showScore ? (
+          <p
+            className={cn(
+              "font-semibold tabular-nums leading-none tracking-tight",
+              showTier ? "mt-1 text-2xl" : "text-xl",
+              scoreColor,
+            )}
+          >
+            {value}
+          </p>
+        ) : null}
         {showLabel ? (
           <p className={cn("mt-1 text-[9px] font-medium", labelColor)}>
             {scoreLabel}
@@ -165,14 +204,16 @@ export function PassportScoreDisplay({
                 {tier.label}
               </p>
             ) : null}
-            <p
-              className={cn(
-                "mt-1 text-5xl font-semibold tabular-nums leading-none tracking-tight",
-                scoreColor,
-              )}
-            >
-              {value}
-            </p>
+            {showScore ? (
+              <p
+                className={cn(
+                  "mt-1 text-5xl font-semibold tabular-nums leading-none tracking-tight",
+                  scoreColor,
+                )}
+              >
+                {value}
+              </p>
+            ) : null}
             {showLabel ? (
               <p className={cn("mt-2 text-xs font-medium", labelColor)}>
                 {scoreLabel}
@@ -201,15 +242,17 @@ export function PassportScoreDisplay({
         </p>
       ) : null}
 
-      <p
-        className={cn(
-          "font-semibold tabular-nums leading-none tracking-tight",
-          showTier ? "mt-2 text-5xl" : "text-5xl",
-          scoreColor,
-        )}
-      >
-        {value}
-      </p>
+      {showScore ? (
+        <p
+          className={cn(
+            "font-semibold tabular-nums leading-none tracking-tight",
+            showTier ? "mt-2 text-5xl" : "text-5xl",
+            scoreColor,
+          )}
+        >
+          {value}
+        </p>
+      ) : null}
 
       {showLabel ? (
         <p className={cn("mt-2 text-xs font-medium", labelColor)}>

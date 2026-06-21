@@ -77,7 +77,7 @@ export const MIFICHA_DATA_GOVERNANCE = {
     },
     {
       id: "passport",
-      label: "Passport Score, rankings y ficha pública",
+      label: "Progreso de ficha, rankings y ficha pública",
       owner: "mificha",
       why: "Automático a partir del acta oficial — credibilidad ante padres y scouts.",
     },

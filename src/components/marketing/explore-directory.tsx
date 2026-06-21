@@ -27,6 +27,7 @@ import {
 } from "@/lib/public-directory";
 import { cn } from "@/lib/utils";
 import { CURRENT_SEASON_LABEL } from "@/lib/marketing-season";
+import { PROGRESS_TIER_FILTER_OPTIONS } from "@/lib/passport-score";
 import type { PlayerPosition } from "@/types/database";
 
 type ExploreView = "directorio" | "semana";
@@ -201,16 +202,17 @@ export function ExploreDirectory({
           </label>
 
           <label className="block">
-            <span className="sr-only">Perfil mínimo</span>
+            <span className="sr-only">Etapa de progreso</span>
             <select
               value={minPassport}
               onChange={(event) => setMinPassport(Number(event.target.value))}
               className="mf-input"
             >
-              <option value={0}>Perfil: cualquiera</option>
-              <option value={50}>Perfil 50+</option>
-              <option value={70}>Perfil 70+</option>
-              <option value={80}>Perfil 80+</option>
+              {PROGRESS_TIER_FILTER_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
             </select>
           </label>
         </div>
@@ -335,14 +337,11 @@ export function ExploreDirectory({
           />
 
           <PositionRankingsPanel
-            players={data.players}
             rankedPerformances={rankedPerformances}
             weekLabel={weekLabel}
             state={state}
             city={city}
-            minPassport={minPassport}
             categoryFilter={categoryFilter}
-            passportOnly
           />
         </div>
       )}

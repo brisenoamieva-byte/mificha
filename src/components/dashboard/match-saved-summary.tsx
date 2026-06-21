@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowUp, MessageCircle, Share2, Sparkles, TrendingUp, Trophy } from "lucide-react";
+import { ArrowUp, MessageCircle, Share2, Sparkles, Trophy } from "lucide-react";
+import { ProgressTierBadge } from "@/components/ui/passport-score-display";
 import { AchievementBadge } from "@/components/ui/achievement-badge";
 import {
   buildMatchRewardsWhatsAppMessage,
@@ -76,7 +77,7 @@ export function MatchSavedSummary({
             </p>
             <h1 className="mt-1 text-2xl font-bold text-slate-900">Partido guardado</h1>
             <p className="mt-2 text-slate-600">
-              Stats vs {opponent}. Passport actualizado
+              Stats vs {opponent}
               {totalUnlocked > 0
                 ? ` · ${totalUnlocked} insignia${totalUnlocked === 1 ? "" : "s"} nueva${totalUnlocked === 1 ? "" : "s"}`
                 : ""}
@@ -125,7 +126,6 @@ export function MatchSavedSummary({
           </p>
         ) : (
           players.map((player) => {
-            const delta = player.passport_score - player.previous_passport_score;
             const fichaUrl = buildPlayerShareUrl(player.slug);
             const achievementKeys = player.unlocked_achievements.map((item) => item.key);
             const primaryAchievementKey =
@@ -174,13 +174,7 @@ export function MatchSavedSummary({
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="inline-flex items-center gap-1 text-sm font-medium text-[#1B4F8C]">
-                        <TrendingUp className="h-4 w-4" />
-                        Passport {player.passport_score}
-                      </p>
-                      {delta > 0 ? (
-                        <p className="mt-1 text-lg font-bold text-mf-accent-dark">+{delta}</p>
-                      ) : null}
+                      <ProgressTierBadge score={player.passport_score} />
                     </div>
                   </div>
                   {player.weekly ? (
@@ -223,7 +217,7 @@ export function MatchSavedSummary({
                   </div>
                 ) : (
                   <div className="px-4 py-4 text-sm text-slate-500 sm:px-5">
-                    Sin insignias nuevas esta vez — el Passport igual subió con la captura.
+                    Sin insignias nuevas esta vez — las stats ya quedaron en la ficha.
                   </div>
                 )}
 

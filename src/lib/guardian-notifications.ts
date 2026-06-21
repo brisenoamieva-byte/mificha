@@ -74,7 +74,7 @@ export function buildWelcomeFichaMessage(options: {
   return [
     `Ficha verificada de ${options.firstName} ${options.lastName}`,
     `${options.academyName} · MiFicha`,
-    `Consulta Passport Score y stats oficiales: ${url}`,
+    `Consulta stats oficiales y evaluación del entrenador: ${url}`,
     "Recibirás avisos automáticos después de cada partido.",
   ].join("\n");
 }

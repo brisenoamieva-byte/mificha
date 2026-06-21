@@ -4,6 +4,7 @@ import {
   getPassportBarColor,
   getReportSubject,
 } from "@/lib/email/report-utils";
+import { getPassportTier, PROGRESS_SCORE_LABEL } from "@/lib/passport-score";
 import type { PlayerSeasonStat } from "@/types/database";
 
 export interface ReportEmailData {
@@ -48,6 +49,7 @@ export function buildReportEmailHtml(data: ReportEmailData) {
   const logoUrl = getBrandLogoUrl(appUrl);
   const score = Math.min(Math.max(data.passportScore, 0), 100);
   const barColor = getPassportBarColor(score);
+  const progressTier = getPassportTier(score).label;
   const photoBlock = data.playerPhotoUrl
     ? `<img src="${data.playerPhotoUrl}" alt="${fullName}" width="120" height="120" style="display:block;width:120px;height:120px;border-radius:999px;object-fit:cover;border:4px solid #ffffff;box-shadow:0 8px 24px rgba(15,45,82,0.18);" />`
     : `<div style="width:120px;height:120px;border-radius:999px;background:#e2e8f0;color:#475569;font-size:36px;font-weight:700;line-height:120px;text-align:center;border:4px solid #ffffff;">${data.playerFirstName[0] ?? ""}${data.playerLastName[0] ?? ""}</div>`;
@@ -123,12 +125,12 @@ export function buildReportEmailHtml(data: ReportEmailData) {
                 <table width="100%" cellpadding="0" cellspacing="0" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:16px;">
                   <tr>
                     <td style="padding:20px 22px;">
-                      <div style="font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#64748b;">Passport Score</div>
+                      <div style="font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#64748b;">${PROGRESS_SCORE_LABEL}</div>
                       <div style="margin-top:10px;height:12px;background:#e2e8f0;border-radius:999px;overflow:hidden;">
                         <div style="width:${score}%;height:12px;background:${barColor};border-radius:999px;"></div>
                       </div>
-                      <div style="margin-top:10px;font-size:24px;font-weight:800;color:${barColor};">${score}<span style="font-size:14px;color:#64748b;font-weight:600;"> / 100</span></div>
-                      <div style="margin-top:6px;font-size:13px;color:#64748b;">Basado en stats verificados por la academia</div>
+                      <div style="margin-top:10px;font-size:24px;font-weight:800;color:${barColor};">${progressTier}</div>
+                      <div style="margin-top:6px;font-size:13px;color:#64748b;">Completitud de ficha y participación en torneo</div>
                     </td>
                   </tr>
                 </table>
@@ -174,7 +176,7 @@ export function buildReportEmailText(data: ReportEmailData) {
     `Asistencias: ${data.stats.total_assists}`,
     `Minutos: ${data.stats.total_minutes}`,
     `Tarjetas: ${data.stats.total_yellow_cards} amarillas, ${data.stats.total_red_cards} rojas`,
-    `Passport Score: ${data.passportScore}`,
+    `${PROGRESS_SCORE_LABEL}: ${getPassportTier(data.passportScore).label}`,
     "",
     `Ver ficha completa: ${profileUrl}`,
     "",
