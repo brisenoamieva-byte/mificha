@@ -44,8 +44,7 @@ export const ORGANIZER_ONE_PAGER = {
   governancePoints: [
     "Organizador: calendario, marcador final y acta (goles, asistencias, tarjetas, minutos).",
     "Academia: plantel, consentimiento y contacto del tutor.",
-    "MiFicha: cruza acta con plantel, Passport, insignias y avisos al tutor.",
-    "MiFicha no cobra inscripciones ni compite con tu negocio del torneo.",
+    "MiFicha: cruza acta con plantel, progreso de ficha, insignias y avisos al tutor.",
   ],
   pilotTitle: "Piloto en Querétaro",
   pilotSteps: [
