@@ -46,7 +46,7 @@ function AcademyLogoMark({
             alt={academy.name}
             className={cn(
               sizeClasses,
-              "border border-white/80 bg-white object-cover shadow-[0_8px_24px_rgba(15,45,82,0.12)] ring-1 ring-black/[0.04] transition duration-300 group-hover/logo:scale-[1.04] group-hover/logo:shadow-[0_12px_32px_rgba(15,45,82,0.18)]",
+              "border border-white/80 bg-white object-contain p-1 shadow-[0_8px_24px_rgba(15,45,82,0.12)] ring-1 ring-black/[0.04] transition duration-300 group-hover/logo:scale-[1.04] group-hover/logo:shadow-[0_12px_32px_rgba(15,45,82,0.18)]",
             )}
           />
         ) : (

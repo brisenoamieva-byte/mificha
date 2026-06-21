@@ -54,6 +54,9 @@ export function SiteFooter() {
           <Link href="/padres" className="transition hover:text-mf-text">
             Padres
           </Link>
+          <Link href="/organizadores" className="transition hover:text-mf-text">
+            Organizadores
+          </Link>
           <Link href={LEGAL_ROUTES.privacy} className="transition hover:text-mf-text">
             Privacidad
           </Link>

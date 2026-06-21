@@ -236,8 +236,11 @@ export default function AvisoPrivacidadPage() {
           </Link>
           .
         </LegalParagraph>
-        <Link href="/dashboard/plantel" className="mf-btn-secondary mt-4 inline-flex">
-          Ir a mi plantel
+        <Link href="/signup" className="mf-btn-secondary mt-4 inline-flex">
+          Registrar academia
+        </Link>
+        <Link href="/login" className="mf-btn-ghost mt-3 inline-flex">
+          Ya tengo cuenta
         </Link>
       </section>
     </LegalPageShell>

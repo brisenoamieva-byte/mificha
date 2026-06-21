@@ -280,11 +280,13 @@ body {
     max-width: 0.75in !important;
   }
 
-  .demo-ficha-stats-row {
+  .demo-ficha-stats-row,
+  .ficha-stats-row {
     grid-template-columns: repeat(6, 1fr) !important;
   }
 
-  .demo-ficha-stat {
+  .demo-ficha-stat,
+  .ficha-stat {
     padding: 0.12in 0.08in !important;
   }
 

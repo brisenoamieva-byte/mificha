@@ -1,44 +1,26 @@
 "use client";
 
 import Link from "next/link";
-import {
-  BadgeCheck,
-  Copy,
-  MapPin,
-  Shield,
-  Timer,
-} from "lucide-react";
-import QRCode from "react-qr-code";
+import { Copy, Printer, Timer } from "lucide-react";
 import { useState } from "react";
+import { FichaDocument } from "@/components/ficha/ficha-document";
 import { BrandLogoLink } from "@/components/ui/brand-logo";
-import { BrandWordmark, WithBrandName } from "@/components/ui/brand-wordmark";
-import { calculateAge, getPositionLabel } from "@/lib/dashboard-utils";
-import { PlayerCategoryBadge } from "@/components/ui/player-category-badge";
-import type { PublicPlayerData } from "@/lib/public-player";
-import { PublicPlayerProgressSection } from "@/components/public/public-player-progress-section";
-import { PublicPlayerVisualProfileSection } from "@/components/public/public-player-visual-profile-section";
 import { PlayerAchievementsShelf } from "@/components/public/player-achievements-shelf";
 import { ProfileViewTracker } from "@/components/public/profile-view-tracker";
-import { PassportScoreDisplay } from "@/components/ui/passport-score-display";
-import {
-  buildPublicPlayerUrl,
-  getDominantFootLabel,
-  getPlayerInitials,
-  getPositionBadgeClass,
-} from "@/lib/player-utils";
-import { cn } from "@/lib/utils";
+import { buildPublicFichaDocument } from "@/lib/ficha-document-model";
+import type { PublicPlayerData } from "@/lib/public-player";
+import { buildPublicPlayerUrl } from "@/lib/player-utils";
 
 interface PublicPlayerCardProps {
   data: PublicPlayerData;
 }
 
 export function PublicPlayerCard({ data }: PublicPlayerCardProps) {
-  const { player, currentSeasonStats, currentSeasonName, history, seasonProgress, seasonHighlights, achievements } = data;
+  const { player, history, achievements } = data;
   const [copied, setCopied] = useState(false);
 
-  const fullName = `${player.first_name} ${player.last_name}`;
-  const age = calculateAge(player.birth_date);
-  const positionLabel = getPositionLabel(player.position);
+  const model = buildPublicFichaDocument(data);
+  const fullName = model.fullName;
   const publicUrl = buildPublicPlayerUrl(player.slug);
   const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(
     `Mira la ficha de ${fullName}: ${publicUrl}`,
@@ -50,192 +32,107 @@ export function PublicPlayerCard({ data }: PublicPlayerCardProps) {
     setTimeout(() => setCopied(false), 2000);
   }
 
+  function handlePrint() {
+    window.print();
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#1B4F8C] to-[#0F2D52] px-4 py-8 sm:px-6">
+    <div className="min-h-screen bg-mf-canvas px-4 py-8 sm:px-6">
       <ProfileViewTracker slug={player.slug} />
-      <div className="mx-auto w-full max-w-[800px] overflow-hidden rounded-2xl bg-white shadow-xl">
-        <div className="flex justify-center border-b border-slate-100 px-6 py-4 sm:px-10">
+      <div className="mx-auto w-full max-w-[780px]">
+        <div className="mb-5 flex justify-center">
           <BrandLogoLink size="sm" />
         </div>
-        <section className="px-6 pb-8 pt-8 text-center sm:px-10">
-          <div className="mx-auto flex h-[180px] w-[180px] items-center justify-center overflow-hidden rounded-full border-4 border-white bg-slate-100 shadow-lg ring-4 ring-[#1B4F8C]/10 sm:h-[200px] sm:w-[200px]">
-            {player.photo_url ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={player.photo_url}
-                alt={fullName}
-                className="h-full w-full object-cover"
+
+        <FichaDocument model={model} priorityPhoto />
+
+        <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:justify-end print:hidden">
+          <a
+            href={whatsappUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-mf-accent-dark px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#047857] sm:flex-none sm:px-5"
+          >
+            Compartir por WhatsApp
+          </a>
+          <button
+            type="button"
+            onClick={handleCopyLink}
+            className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg border border-mf-border bg-white px-4 py-2.5 text-sm font-semibold text-mf-text hover:bg-mf-canvas sm:flex-none sm:px-5"
+          >
+            <Copy className="h-4 w-4" />
+            {copied ? "Link copiado" : "Copiar link"}
+          </button>
+          <button
+            type="button"
+            onClick={handlePrint}
+            className="demo-ficha-print-btn inline-flex flex-1 items-center justify-center gap-2 rounded-lg border border-mf-border bg-white px-4 py-2.5 text-sm font-semibold text-mf-brand hover:bg-mf-canvas sm:flex-none sm:px-5"
+          >
+            <Printer className="h-4 w-4" />
+            Imprimir ficha
+          </button>
+        </div>
+
+        <div className="print:hidden">
+          <PlayerAchievementsShelf slug={player.slug} achievements={achievements} />
+
+          {history.length > 0 ? (
+            <section className="mt-6 rounded-xl border border-mf-border bg-white px-5 py-6 sm:px-6">
+              <h2 className="text-lg font-semibold text-mf-text">Historial</h2>
+              <div className="mt-5 space-y-5 border-l-2 border-mf-border pl-5">
+                {history.map((item) => (
+                  <div key={item.stats.id} className="relative">
+                    <span className="absolute -left-[27px] top-1 h-2.5 w-2.5 rounded-full bg-mf-brand" />
+                    <p className="font-semibold text-mf-text">{item.season_name}</p>
+                    <p className="text-sm text-mf-text-secondary">{item.academy_name}</p>
+                    <p className="mt-1.5 text-sm text-mf-text-secondary">
+                      {item.stats.total_matches} partidos · {item.stats.total_goals} goles ·{" "}
+                      {item.stats.total_assists} asistencias · {item.stats.total_minutes} min
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </section>
+          ) : null}
+
+          <section className="mt-6 rounded-xl border border-mf-border bg-white px-5 py-6 sm:px-6">
+            <h2 className="text-lg font-semibold text-mf-text">Video</h2>
+            {player.video_url ? (
+              <video
+                controls
+                className="mt-4 max-h-[400px] w-full rounded-xl bg-black"
+                src={player.video_url}
               />
             ) : (
-              <span className="text-3xl font-bold text-slate-500">
-                {getPlayerInitials(player.first_name, player.last_name)}
-              </span>
+              <div className="mt-4 rounded-xl border border-dashed border-mf-border bg-mf-canvas px-6 py-10 text-center">
+                <Timer className="mx-auto h-8 w-8 text-mf-text-muted/40" />
+                <p className="mt-3 text-sm font-medium text-mf-text-secondary">
+                  Próximamente video highlight
+                </p>
+              </div>
             )}
-          </div>
-
-          <h1 className="mt-6 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
-            {fullName}
-          </h1>
-
-          <div className="mt-5 flex flex-wrap justify-center gap-2">
-            <PlayerCategoryBadge birthDate={player.birth_date} />
-            <span className="rounded-full bg-slate-100 px-3 py-1.5 text-sm font-medium text-slate-700">
-              {age} años
-            </span>
-            {player.academies?.city ? (
-              <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-3 py-1.5 text-sm font-medium text-slate-700">
-                <MapPin className="h-3.5 w-3.5" />
-                {player.academies.city}
-              </span>
-            ) : null}
-            <span
-              className={cn(
-                "inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-sm font-medium",
-                getPositionBadgeClass(player.position),
-              )}
-            >
-              <Shield className="h-3.5 w-3.5" />
-              {positionLabel}
-            </span>
-            <span className="rounded-full bg-slate-100 px-3 py-1.5 text-sm font-medium text-slate-700">
-              Pie {getDominantFootLabel(player.dominant_foot).toLowerCase()}
-            </span>
-          </div>
-
-          <div className="mt-5 flex flex-wrap justify-center gap-2">
-            <span className="inline-flex items-center gap-2 rounded-full bg-[#1B4F8C]/10 px-4 py-2 text-sm font-medium text-[#1B4F8C]">
-              {player.academies?.logo_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={player.academies.logo_url}
-                  alt=""
-                  className="h-5 w-5 rounded-full object-cover"
-                />
-              ) : null}
-              Academia: {player.academies?.name ?? <BrandWordmark />}
-            </span>
-            {player.is_public ? (
-              <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-4 py-2 text-sm font-semibold text-green-700">
-                <BadgeCheck className="h-4 w-4" />
-                Ficha verificada
-              </span>
-            ) : null}
-          </div>
-        </section>
-
-        <section className="border-t border-slate-100 px-6 py-8 sm:px-10">
-          <h2 className="text-center text-lg font-semibold text-slate-900">
-            Tu progreso
-          </h2>
-          <div className="mt-6 flex justify-center">
-            <PassportScoreDisplay
-              score={player.passport_score}
-              variant="hero"
-              scoreLabel="Progreso verificado"
-            />
-          </div>
-          <p className="mx-auto mt-4 max-w-sm text-center text-sm leading-6 text-slate-500">
-            Participación y rendimiento registrados por tu academia. Crece partido
-            a partido — no es una calificación escolar.
-          </p>
-        </section>
-
-        <PublicPlayerVisualProfileSection
-          player={player}
-          currentSeasonStats={currentSeasonStats}
-          currentSeasonName={currentSeasonName}
-          seasonProgress={seasonProgress}
-        />
-
-        <PublicPlayerProgressSection
-          seasonName={currentSeasonName}
-          progress={seasonProgress}
-          highlights={seasonHighlights}
-        />
-
-        <PlayerAchievementsShelf slug={player.slug} achievements={achievements} />
-
-        {history.length > 0 ? (
-          <section className="border-t border-slate-100 px-6 py-8 sm:px-10">
-            <h2 className="text-lg font-semibold text-slate-900">Historial</h2>
-            <div className="mt-6 space-y-6 border-l-2 border-slate-200 pl-6">
-              {history.map((item) => (
-                <div key={item.stats.id} className="relative">
-                  <span className="absolute -left-[31px] top-1 h-3 w-3 rounded-full bg-[#1B4F8C]" />
-                  <p className="font-semibold text-slate-900">{item.season_name}</p>
-                  <p className="text-sm text-slate-500">{item.academy_name}</p>
-                  <p className="mt-2 text-sm text-slate-600">
-                    {item.stats.total_matches} partidos · {item.stats.total_goals} goles ·{" "}
-                    {item.stats.total_assists} asistencias · {item.stats.total_minutes} min
-                  </p>
-                </div>
-              ))}
-            </div>
           </section>
-        ) : null}
+        </div>
 
-        <section className="border-t border-slate-100 px-6 py-8 sm:px-10">
-          <h2 className="text-lg font-semibold text-slate-900">Video</h2>
-          {player.video_url ? (
-            <video
-              controls
-              className="mt-4 max-h-[400px] w-full rounded-2xl bg-black"
-              src={player.video_url}
-            />
-          ) : (
-            <div className="mt-4 rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-6 py-10 text-center">
-              <Timer className="mx-auto h-8 w-8 text-slate-300" />
-              <p className="mt-3 text-sm font-medium text-slate-600">
-                Próximamente video highlight
-              </p>
-            </div>
-          )}
-        </section>
-
-        <section className="border-t border-slate-100 px-6 py-8 sm:px-10">
-          <h2 className="text-center text-lg font-semibold text-slate-900">
-            Link de la ficha
-          </h2>
-          <p className="mx-auto mt-2 max-w-md text-center text-sm leading-6 text-slate-500">
-            <WithBrandName>
-              MiFicha envía este enlace al tutor automáticamente. También puedes copiarlo o
-              escanearlo desde pantalla.
-            </WithBrandName>
-          </p>
-          <div className="mx-auto mt-6 flex max-w-[220px] justify-center rounded-2xl bg-white p-4 shadow-inner ring-1 ring-slate-100">
-            <QRCode value={publicUrl} size={180} />
-          </div>
-          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-            <a
-              href={whatsappUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-mf-accent-dark px-4 py-3 text-sm font-semibold text-white hover:bg-[#047857]"
-            >
-              Compartir manual
-            </a>
-            <button
-              type="button"
-              onClick={handleCopyLink}
-              className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50"
-            >
-              <Copy className="h-4 w-4" />
-              {copied ? "Link copiado" : "Copiar link"}
-            </button>
-          </div>
-        </section>
-
-        <footer className="border-t border-slate-100 bg-slate-50 px-6 py-5 text-center sm:px-10">
+        <footer className="mt-8 border-t border-mf-border pt-6 text-center print:hidden">
           <BrandLogoLink className="justify-center" size="sm" />
-          <p className="mt-2 text-xs text-slate-400">mificha.mx</p>
-          <p className="mx-auto mt-3 max-w-lg text-xs leading-5 text-slate-400">
-            Ficha compartida con autorización parental. Si deseas rectificar o
-            eliminar estos datos, contacta a la academia.{" "}
-            <Link href="/aviso-privacidad" className="text-[#1B4F8C] hover:underline">
+          <div className="mt-4 flex flex-wrap justify-center gap-x-4 gap-y-2 text-sm font-medium">
+            <Link href="/padres" className="text-mf-brand hover:underline">
+              ¿Eres padre?
+            </Link>
+            <Link href="/explorar" className="text-mf-brand hover:underline">
+              Explorar directorio
+            </Link>
+          </div>
+          <p className="mt-2 text-xs text-mf-text-muted">mificha.mx</p>
+          <p className="mx-auto mt-3 max-w-lg text-xs leading-5 text-mf-text-muted">
+            Ficha compartida con autorización parental. Si deseas rectificar o eliminar estos
+            datos, contacta a la academia.{" "}
+            <Link href="/aviso-privacidad" className="text-mf-brand hover:underline">
               Privacidad
             </Link>
             {" · "}
-            <Link href="/terminos" className="text-[#1B4F8C] hover:underline">
+            <Link href="/terminos" className="text-mf-brand hover:underline">
               Términos
             </Link>
           </p>

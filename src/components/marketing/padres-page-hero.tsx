@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowDown, BarChart3, MessageCircle, Printer, ShieldCheck } from "lucide-react";
 import { HomeFichaPreview } from "@/components/marketing/home-ficha-preview";
+import { CURRENT_SEASON_LABEL } from "@/lib/marketing-season";
 import { WithBrandName } from "@/components/ui/brand-wordmark";
 
 export function PadresPageHero() {
@@ -14,7 +15,7 @@ export function PadresPageHero() {
       <div className="relative mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:py-16">
         <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:items-start lg:gap-12">
           <div className="max-w-xl lg:pt-2">
-            <p className="mf-marketing-eyebrow">Padres y jugadores · Temporada 2026</p>
+            <p className="mf-marketing-eyebrow">Padres y jugadores · {CURRENT_SEASON_LABEL}</p>
             <h1 className="mt-4 text-[2rem] font-semibold leading-[1.08] tracking-[-0.035em] text-mf-text sm:text-[2.5rem]">
               La ficha de tu hijo, después de cada jornada
             </h1>

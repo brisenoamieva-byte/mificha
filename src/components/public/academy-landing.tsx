@@ -254,6 +254,14 @@ export function AcademyLanding({ data }: AcademyLandingProps) {
           variant="onDark"
           size="sm"
         />
+        <div className="mt-4 flex flex-wrap justify-center gap-x-4 gap-y-2">
+          <Link href="/explorar" className="text-slate-400 transition hover:text-white">
+            Explorar directorio
+          </Link>
+          <Link href="/padres" className="text-slate-400 transition hover:text-white">
+            ¿Eres padre?
+          </Link>
+        </div>
         <p className="mt-2">mificha.mx</p>
       </footer>
     </div>

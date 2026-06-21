@@ -230,15 +230,13 @@ export function filterDemoExploreAcademy(
 }
 
 /** Academias visibles en el directorio (demo + reales, sin duplicar slug). */
-export function countExploreDirectoryAcademies(data: PublicDirectoryData): number {
-  const hasRealDuplicate = data.academies.some(
-    (academy) => academy.slug === DEMO_ACADEMY_SLUG,
-  );
-  const realCount = data.academies.filter(
-    (academy) => academy.slug !== DEMO_ACADEMY_SLUG,
-  ).length;
+export function buildHomeShowcaseAcademies(data: PublicDirectoryData): DirectoryAcademy[] {
+  const real = data.academies.filter((academy) => academy.slug !== DEMO_ACADEMY_SLUG);
+  return [DEMO_EXPLORE_ACADEMY, ...real];
+}
 
-  return realCount + (hasRealDuplicate ? 0 : 1);
+export function countExploreDirectoryAcademies(data: PublicDirectoryData): number {
+  return buildHomeShowcaseAcademies(data).length;
 }
 
 const DEMO_ACADEMY_PROFILE: PublicAcademy = {

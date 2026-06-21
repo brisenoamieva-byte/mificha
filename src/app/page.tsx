@@ -6,10 +6,16 @@ import { HomeHero } from "@/components/marketing/home-hero";
 import { HomeHowItWorks } from "@/components/marketing/home-how-it-works";
 import { HomeTrustSection } from "@/components/marketing/home-trust-section";
 import { VerifiedAcademiesShowcase } from "@/components/marketing/verified-academies-showcase";
+import {
+  buildHomeShowcaseAcademies,
+  countExploreDirectoryPlayers,
+} from "@/lib/explore-demo-data";
 import { fetchPublicDirectory } from "@/lib/public-directory";
 
 export default async function Home() {
-  const { academies, players } = await fetchPublicDirectory();
+  const directory = await fetchPublicDirectory();
+  const showcaseAcademies = buildHomeShowcaseAcademies(directory);
+  const playerCount = countExploreDirectoryPlayers(directory);
 
   return (
     <div className="flex min-h-full flex-col bg-mf-canvas">
@@ -20,13 +26,11 @@ export default async function Home() {
         <HomeHowItWorks />
         <HomeTrustSection />
         <HomeAudienceSection />
-        {academies.length > 0 ? (
-          <VerifiedAcademiesShowcase
-            academies={academies}
-            playerCount={players.length}
-            variant="marquee"
-          />
-        ) : null}
+        <VerifiedAcademiesShowcase
+          academies={showcaseAcademies}
+          playerCount={playerCount}
+          variant="marquee"
+        />
         <HomeComplementSection />
         <HomeCtaBand />
       </main>

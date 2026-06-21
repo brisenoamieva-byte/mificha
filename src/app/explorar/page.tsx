@@ -34,7 +34,7 @@ export default async function ExplorarPage() {
 
   return (
     <div className="flex min-h-full flex-col bg-mf-canvas">
-      <SiteHeader actionHref="/explorar" actionLabel="Explorar" />
+      <SiteHeader />
 
       <main className="flex-1">
         <ExplorePageHero

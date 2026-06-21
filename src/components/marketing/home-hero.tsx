@@ -20,7 +20,7 @@ export function HomeHero() {
       actions={
         <>
           <Link href="/signup" className="mf-btn-primary">
-            Registrar colegio
+            Registrar academia
             <ArrowRight className="h-4 w-4" />
           </Link>
           <Link href="#como-funciona" className="mf-btn-accent">

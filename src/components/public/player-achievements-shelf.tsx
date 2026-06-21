@@ -19,12 +19,12 @@ export function PlayerAchievementsShelf({
   }
 
   return (
-    <section className="border-t border-slate-100 px-6 py-8 sm:px-10">
+    <section className="mt-6 rounded-xl border border-mf-border bg-white px-5 py-6 sm:px-6">
       <div className="flex items-center gap-2">
         <Trophy className="h-5 w-5 text-amber-500" />
-        <h2 className="text-lg font-semibold text-slate-900">Insignias verificadas</h2>
+        <h2 className="text-lg font-semibold text-mf-text">Insignias verificadas</h2>
       </div>
-      <p className="mt-2 text-sm text-slate-600">
+      <p className="mt-2 text-sm text-mf-text-secondary">
         Logros desbloqueados con stats oficiales. Toca una insignia para compartir su tarjeta.
       </p>
       <div className="mt-5 grid gap-3 sm:grid-cols-2">

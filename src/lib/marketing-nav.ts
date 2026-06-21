@@ -1,17 +1,10 @@
 import type { LucideIcon } from "lucide-react";
 import {
-  BarChart3,
   Building2,
-  Calendar,
-  FileSpreadsheet,
-  MessageCircle,
-  Scale,
   Search,
-  ShieldCheck,
   Trophy,
   Users,
 } from "lucide-react";
-import type { MarketingImageKey } from "@/lib/marketing-assets";
 import { MARKETING_MEDIA } from "@/lib/marketing-assets";
 
 export interface NavLink {
@@ -101,63 +94,6 @@ export const MARKETING_NAV: NavSection[] = [
     ],
   },
 ];
-
-export const HOME_FEATURES = [
-  {
-    icon: Calendar,
-    title: "Calendario y partidos",
-    federation: "Calendarios y resultados oficiales",
-    mificha:
-      "Jornadas oficiales MiFicha: acta del organizador → MiFicha sincroniza stats y avisa tutores.",
-    href: "/signup",
-    imageKey: "featureCalendario" satisfies MarketingImageKey,
-  },
-  {
-    icon: BarChart3,
-    title: "Clasificaciones",
-    federation: "Tabla de la competición (puntos del equipo)",
-    mificha:
-      "Marcador semanal del plantel y progreso individual por categoría.",
-    href: "/explorar",
-    imageKey: "featurePassport" satisfies MarketingImageKey,
-  },
-  {
-    icon: Scale,
-    title: "Comparativa",
-    federation: "Comparativa de equipos en liga",
-    mificha:
-      "Reporte jugador vs promedio del plantel.",
-    href: "/signup",
-    imageKey: "featureComparativa" satisfies MarketingImageKey,
-  },
-  {
-    icon: FileSpreadsheet,
-    title: "Plantel",
-    federation: "Altas federativas y licencias",
-    mificha:
-      "Import Excel, fichas privadas por defecto, link automático para padres.",
-    href: "/signup",
-    imageKey: "featureCaptura" satisfies MarketingImageKey,
-  },
-  {
-    icon: MessageCircle,
-    title: "Avisos automáticos",
-    federation: "Portal federado con registro y pagos",
-    mificha:
-      "MiFicha envía link por email o WhatsApp tras cada partido.",
-    href: "/padres",
-    imageKey: "featureQr" satisfies MarketingImageKey,
-  },
-  {
-    icon: ShieldCheck,
-    title: "Menores protegidos",
-    federation: "Mutualidad y reconocimiento médico",
-    mificha:
-      "Consentimiento parental, fichas privadas y aviso de privacidad LFPDPPP.",
-    href: "/aviso-privacidad",
-    imageKey: "featureMenores" satisfies MarketingImageKey,
-  },
-] as const;
 
 export const COMPLEMENT_ROWS = [
   {

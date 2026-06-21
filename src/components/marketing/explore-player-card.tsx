@@ -8,6 +8,7 @@ import {
   type ExploreDemoPlayer,
 } from "@/lib/explore-demo-data";
 import type { DirectoryPlayer } from "@/lib/public-directory";
+import { CURRENT_SEASON_LABEL } from "@/lib/marketing-season";
 import { cn } from "@/lib/utils";
 
 type ExplorePlayerCardProps = {
@@ -78,7 +79,7 @@ export function ExplorePlayerCard({ player, className }: ExplorePlayerCardProps)
             <span className="font-semibold text-mf-text">{stats.minutes}</span> min
           </p>
         ) : (
-          <p className="mt-2 text-xs text-mf-text-muted">Temporada 2026</p>
+          <p className="mt-2 text-xs text-mf-text-muted">{CURRENT_SEASON_LABEL}</p>
         )}
 
         <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px]">

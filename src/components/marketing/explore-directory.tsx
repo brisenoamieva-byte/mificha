@@ -26,6 +26,7 @@ import {
   type PublicDirectoryData,
 } from "@/lib/public-directory";
 import { cn } from "@/lib/utils";
+import { CURRENT_SEASON_LABEL } from "@/lib/marketing-season";
 import type { PlayerPosition } from "@/types/database";
 
 type ExploreView = "directorio" | "semana";
@@ -138,7 +139,7 @@ export function ExploreDirectory({
       <div className="mf-card p-4 sm:p-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="text-sm text-mf-text-secondary">
-            Fichas con consentimiento parental · stats del torneo · Temporada 2026
+            Fichas con consentimiento parental · stats del torneo · {CURRENT_SEASON_LABEL}
           </p>
           <div className="flex gap-1 rounded-lg border border-mf-border bg-mf-canvas p-1">
             {(

@@ -1,4 +1,5 @@
 import { MARKETING_IMAGES } from "@/lib/marketing-assets";
+import { CURRENT_SEASON_LABEL } from "@/lib/marketing-season";
 import type { PlayerPosition } from "@/types/database";
 
 /** Datos de ejemplo para la ficha demo en marketing (no es un jugador real). */
@@ -20,7 +21,7 @@ export const DEMO_FICHA_PREVIEW = {
   academy: "Academia Gallos",
   academyLogoSrc: MARKETING_IMAGES.demoAcademiaGallosLogo,
   city: "Querétaro",
-  seasonLabel: "Temporada 2026",
+  seasonLabel: CURRENT_SEASON_LABEL,
   photoSrc: MARKETING_IMAGES.demoPlayerHeadshot,
   stats: {
     matches: 14,
@@ -50,5 +51,5 @@ export const DEMO_FICHA_PREVIEW = {
     "Buena definición y movimiento sin balón. Presiona arriba y genera espacios en ataque.",
   /** Insignia real del sistema MiFicha (2+ goles en un partido). */
   achievements: [{ key: "brace", title: "Doblete", emoji: "🔥" }],
-  publicUrl: "mificha.mx/j/santiago-hernandez-demo",
+  publicUrl: "mificha.mx/#demo-ficha-documento",
 } as const;

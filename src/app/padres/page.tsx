@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 export default function PadresPage() {
   return (
     <div className="flex min-h-full flex-col bg-mf-canvas">
-      <SiteHeader actionHref="/padres" actionLabel="Padres" />
+      <SiteHeader />
 
       <main className="flex-1">
         <PadresPageHero />

@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Calendar, Megaphone, Shield, Trophy } from "lucide-react";
-import { MarketingPageHero } from "@/components/marketing/marketing-page-hero";
+import { ArrowRight, Trophy } from "lucide-react";
+import { OrganizadoresPageHero } from "@/components/marketing/organizadores-page-hero";
 import { SiteFooter, SiteHeader } from "@/components/marketing/site-header";
 import { WithBrandName } from "@/components/ui/brand-wordmark";
 import { ORGANIZER_ONE_PAGER } from "@/lib/organizer-one-pager";
-import { MARKETING_MEDIA } from "@/lib/marketing-assets";
 
 export const metadata: Metadata = {
   title: "Organizadores de torneo | MiFicha",
@@ -22,39 +21,10 @@ export default function OrganizadoresPage() {
 
   return (
     <div className="flex min-h-full flex-col bg-mf-canvas">
-      <SiteHeader actionHref="/signup" actionLabel="Academias" />
+      <SiteHeader />
 
       <main className="flex-1">
-        <MarketingPageHero
-          eyebrow="Organizadores de torneo interescolar"
-          title="Stats oficiales para tu torneo"
-          description={
-            <>
-              <WithBrandName>
-                Publicas calendario, marcador y acta. MiFicha sincroniza stats con cada
-                plantel y avisa a los padres. No manejamos inscripciones: sumamos valor a
-                tu torneo con fichas verificadas por jugador.
-              </WithBrandName>
-            </>
-          }
-          photo={MARKETING_MEDIA.featureCalendario}
-          actions={
-            <>
-              <a href={mailto} className="mf-btn-primary">
-                Agendar conversación
-                <ArrowRight className="h-4 w-4" />
-              </a>
-              <Link href="/explorar" className="mf-btn-accent">
-                Ver red escolar
-              </Link>
-            </>
-          }
-          stats={[
-            { value: "Tú", label: "Calendario + acta" },
-            { value: "Escuelas", label: "Plantel + tutores" },
-            { value: "Auto", label: "Aviso al padre", accent: true },
-          ]}
-        />
+        <OrganizadoresPageHero mailtoHref={mailto} />
 
         <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:py-16">
           <div className="max-w-2xl">
@@ -87,7 +57,7 @@ export default function OrganizadoresPage() {
                       key={point}
                       className="flex gap-3 text-sm leading-7 text-mf-text-secondary"
                     >
-                      <Calendar className="mt-0.5 h-5 w-5 shrink-0 text-mf-accent-dark" />
+                      <ArrowRight className="mt-0.5 h-5 w-5 shrink-0 text-mf-accent-dark" />
                       {point}
                     </li>
                   ))}
@@ -104,7 +74,7 @@ export default function OrganizadoresPage() {
                       key={point}
                       className="flex gap-3 text-sm leading-7 text-mf-text-secondary"
                     >
-                      <Shield className="mt-0.5 h-5 w-5 shrink-0 text-mf-brand" />
+                      <Trophy className="mt-0.5 h-5 w-5 shrink-0 text-mf-brand" />
                       {point}
                     </li>
                   ))}
@@ -125,7 +95,7 @@ export default function OrganizadoresPage() {
                 <ul className="mt-4 space-y-2 text-sm leading-7 text-mf-text-secondary">
                   {ORGANIZER_ONE_PAGER.pilotSteps.map((step) => (
                     <li key={step} className="flex gap-2">
-                      <Megaphone className="mt-1 h-4 w-4 shrink-0 text-mf-accent-dark" />
+                      <ArrowRight className="mt-1 h-4 w-4 shrink-0 text-mf-accent-dark" />
                       {step}
                     </li>
                   ))}

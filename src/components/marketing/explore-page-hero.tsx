@@ -8,6 +8,7 @@ import {
   Trophy,
   Users,
 } from "lucide-react";
+import { CURRENT_SEASON_LABEL } from "@/lib/marketing-season";
 import { cn } from "@/lib/utils";
 
 interface ExplorePageHeroProps {
@@ -71,7 +72,7 @@ export function ExplorePageHero({
       <div className="relative mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:py-16">
         <div className="grid gap-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:items-start lg:gap-12">
           <div className="max-w-xl">
-            <p className="mf-marketing-eyebrow">Visorías · Temporada 2026</p>
+            <p className="mf-marketing-eyebrow">Visorías · {CURRENT_SEASON_LABEL}</p>
             <h1 className="mt-4 text-[2rem] font-semibold leading-[1.08] tracking-[-0.035em] text-mf-text sm:text-[2.5rem]">
               Encuentra jugadores verificados
             </h1>
