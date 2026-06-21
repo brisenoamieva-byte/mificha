@@ -1,27 +1,17 @@
 import Stripe from "stripe";
 import type { PlanStatus } from "@/types/database";
+import { LEGACY_ACADEMY_PLANS } from "@/lib/pricing";
 
 export type SubscriptionPlan = "starter" | "pro" | "elite";
 
+/** @deprecated Cobro a academias desactivado — ver ORGANIZER_PRICING en pricing.ts */
 export const PLAN_CONFIG: Record<
   SubscriptionPlan,
   { label: string; priceLabel: string; amount: number }
 > = {
-  starter: {
-    label: "Starter",
-    priceLabel: "$699/mes",
-    amount: 69_900,
-  },
-  pro: {
-    label: "Pro",
-    priceLabel: "$1,199/mes",
-    amount: 119_900,
-  },
-  elite: {
-    label: "Elite",
-    priceLabel: "$1,999/mes",
-    amount: 199_900,
-  },
+  starter: LEGACY_ACADEMY_PLANS.starter,
+  pro: LEGACY_ACADEMY_PLANS.pro,
+  elite: LEGACY_ACADEMY_PLANS.elite,
 };
 
 export function getStripeClient() {

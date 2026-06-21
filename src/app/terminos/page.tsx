@@ -88,11 +88,23 @@ export default function TerminosPage() {
 
       <LegalSection title="6. Planes, pagos y cancelación">
         <LegalParagraph>
-          Algunas funciones pueden requerir suscripción de pago procesada por Stripe.
-          Los precios y características se muestran al contratar. Puedes cancelar
+          MiFicha es <strong className="text-mf-text">gratuito para academias</strong>{" "}
+          en la fase de lanzamiento: plantel, fichas y avisos al tutor no requieren
+          suscripción de la escuela.
+        </LegalParagraph>
+        <LegalParagraph>
+          Los <strong className="text-mf-text">organizadores de torneo</strong> pueden
+          contratar una temporada MiFicha (calendario, acta y fichas para las academias
+          inscritas). Los precios vigentes se muestran en{" "}
+          <Link href="/organizadores" className="text-mf-brand hover:underline">
+            mificha.mx/organizadores
+          </Link>
+          . Funciones futuras para scouts o visorías pueden requerir suscripción
+          separada.
+        </LegalParagraph>
+        <LegalParagraph>
+          Los pagos en línea, cuando apliquen, se procesan por Stripe. Puedes cancelar
           conforme a las opciones del panel o contactando a {LEGAL_ENTITY.contactEmail}.
-          No hay reembolsos por periodos ya iniciados salvo que la ley aplicable lo
-          exija.
         </LegalParagraph>
       </LegalSection>
 

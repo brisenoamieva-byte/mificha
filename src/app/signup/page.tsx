@@ -14,8 +14,8 @@ export default function SignUpPage() {
       title="Crea tu cuenta de academia"
       subtitle={
         <WithBrandName>
-          Para academias del piloto en Querétaro. Carga plantel; MiFicha sincroniza el
-          acta del torneo.
+          Gratis para academias en Querétaro. Carga plantel; MiFicha sincroniza el acta
+          del torneo cuando tu organizador activa la temporada.
         </WithBrandName>
       }
       footer={

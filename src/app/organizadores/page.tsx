@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { ArrowRight, Trophy } from "lucide-react";
 import { OrganizadoresPageHero } from "@/components/marketing/organizadores-page-hero";
+import { OrganizerPricingSection } from "@/components/marketing/organizer-pricing-section";
 import { SiteFooter, SiteHeader } from "@/components/marketing/site-header";
 import { WithBrandName } from "@/components/ui/brand-wordmark";
 import { ORGANIZER_ONE_PAGER } from "@/lib/organizer-one-pager";
@@ -46,6 +47,8 @@ export default function OrganizadoresPage() {
             ))}
           </ul>
         </section>
+
+        <OrganizerPricingSection mailtoHref={mailto} />
 
         <section className="border-y border-mf-border bg-mf-surface">
           <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:py-16">

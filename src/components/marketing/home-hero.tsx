@@ -12,8 +12,9 @@ export function HomeHero() {
       description={
         <>
           <WithBrandName>
-            MiFicha lleva las stats del torneo a la ficha de cada jugador. La academia
-            carga plantel y contacto del tutor; el link llega solo después de cada jornada.
+            MiFicha lleva las stats del torneo a la ficha de cada jugador. Gratis para
+            academias — carga plantel y contacto del tutor; el link llega solo después de
+            cada jornada.
           </WithBrandName>
         </>
       }

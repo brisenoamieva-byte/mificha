@@ -26,8 +26,8 @@ export function OrganizadoresPageHero({ mailtoHref }: OrganizadoresPageHeroProps
           <p className="mt-5 text-base leading-8 text-mf-text-secondary sm:text-[1.0625rem]">
             <WithBrandName>
               Publicas calendario, marcador y acta. MiFicha sincroniza stats con cada
-              plantel y avisa a los padres. No manejamos inscripciones: sumamos valor con
-              fichas verificadas por jugador.
+              plantel y avisa a los padres. Las academias usan MiFicha gratis — el torneo
+              contrata la temporada.
             </WithBrandName>
           </p>
 
@@ -35,7 +35,7 @@ export function OrganizadoresPageHero({ mailtoHref }: OrganizadoresPageHeroProps
             {[
               { icon: Calendar, label: "Calendario + acta" },
               { icon: BarChart3, label: "Stats por jugador" },
-              { icon: ShieldCheck, label: "Aviso al tutor" },
+              { icon: ShieldCheck, label: "Academias gratis" },
             ].map(({ icon: Icon, label }) => (
               <li
                 key={label}
