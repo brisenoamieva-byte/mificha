@@ -1,5 +1,5 @@
 import { Bell, FileCheck, Users } from "lucide-react";
-import { WithBrandName } from "@/components/ui/brand-wordmark";
+import { BrandWordmark } from "@/components/ui/brand-wordmark";
 
 const STEPS = [
   {
@@ -7,21 +7,24 @@ const STEPS = [
     step: "1",
     title: "Plantel y tutores",
     description:
-      "La academia carga jugadores, consentimiento y contacto del tutor. Es lo único que opera en cancha.",
+      "La academia registra jugadores, consentimiento y contacto del tutor.",
   },
   {
     icon: FileCheck,
     step: "2",
-    title: "Acta oficial del torneo",
+    title: "Stats del torneo",
     description:
-      "El organizador publica calendario, marcador y acta con goles, minutos y tarjetas por jugador.",
+      "El organizador publica calendario, marcador y stats por jugador en cada jornada.",
   },
   {
     icon: Bell,
     step: "3",
-    title: "MiFicha sincroniza",
-    description:
-      "Cruzamos el acta con el plantel, actualizamos Passport e insignias y avisamos al tutor.",
+    title: "Fichas y avisos",
+    description: (
+      <>
+        <BrandWordmark /> actualiza cada ficha y envía el link al tutor.
+      </>
+    ),
   },
 ] as const;
 
@@ -32,11 +35,11 @@ export function HomeHowItWorks() {
         <div className="max-w-2xl">
           <p className="mf-marketing-eyebrow">Cómo funciona</p>
           <h2 className="mt-3 text-2xl font-semibold tracking-[-0.02em] text-mf-text sm:text-3xl">
-            Tres pasos, una sola fuente de verdad
+            Tres pasos, una sola fuente
           </h2>
           <p className="mt-3 text-sm leading-7 text-mf-text-secondary">
-            No pedimos a cada coach que reescriba el partido. El acta del torneo
-            alimenta cada ficha.
+            El torneo publica los resultados. Cada colegio opera su plantel. Nadie reescribe
+            el partido dos veces.
           </p>
         </div>
 
@@ -51,9 +54,7 @@ export function HomeHowItWorks() {
                   <item.icon className="h-5 w-5" strokeWidth={1.75} />
                 </div>
               </div>
-              <h3 className="mt-4 text-base font-semibold text-mf-text">
-                <WithBrandName>{item.title}</WithBrandName>
-              </h3>
+              <h3 className="mt-4 text-base font-semibold text-mf-text">{item.title}</h3>
               <p className="mt-2 text-sm leading-7 text-mf-text-secondary">
                 {item.description}
               </p>

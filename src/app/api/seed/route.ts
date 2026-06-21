@@ -5,22 +5,22 @@ const SEED_ACADEMY_SLUG = "academia-nortenios";
 
 const PLAYERS = [
   {
-    first_name: "Santiago",
-    last_name: "Hernández",
+    first_name: "Renato",
+    last_name: "Gómez",
     birth_date: "2011-03-14",
     position: "forward" as const,
     dominant_foot: "right" as const,
     passport_score: 78,
-    photo_url: "https://placehold.co/400x500/1B4F8C/ffffff?text=SH",
+    photo_url: "/marketing/demo-player-headshot.png",
   },
   {
-    first_name: "Diego",
-    last_name: "Ramírez",
+    first_name: "Iván",
+    last_name: "Ruiz",
     birth_date: "2012-07-22",
     position: "midfielder" as const,
     dominant_foot: "both" as const,
     passport_score: 71,
-    photo_url: "https://placehold.co/400x500/0F2D52/ffffff?text=DR",
+    photo_url: "/marketing/demo-explore-player-2.png",
   },
   {
     first_name: "Emiliano",
@@ -29,16 +29,16 @@ const PLAYERS = [
     position: "defender" as const,
     dominant_foot: "left" as const,
     passport_score: 69,
-    photo_url: "https://placehold.co/400x500/334155/ffffff?text=ET",
+    photo_url: "/marketing/demo-explore-player-3.png",
   },
   {
-    first_name: "Mateo",
+    first_name: "Tomás",
     last_name: "Vázquez",
     birth_date: "2013-01-18",
     position: "goalkeeper" as const,
     dominant_foot: "right" as const,
     passport_score: 74,
-    photo_url: "https://placehold.co/400x500/15803d/ffffff?text=MV",
+    photo_url: "/marketing/demo-explore-player-4.png",
   },
   {
     first_name: "Sebastián",
@@ -47,7 +47,7 @@ const PLAYERS = [
     position: "forward" as const,
     dominant_foot: "right" as const,
     passport_score: 82,
-    photo_url: "https://placehold.co/400x500/b45309/ffffff?text=SM",
+    photo_url: "/marketing/demo-player-headshot.png",
   },
 ];
 
@@ -180,12 +180,12 @@ export async function POST(request: Request) {
 
     const consentTimestamp = new Date().toISOString();
 
-    const playerRows = PLAYERS.map((player, index) => ({
+    const playerRows = PLAYERS.map((player) => ({
       ...player,
       slug: buildSlug(player.first_name, player.last_name),
       academy_id: academy.id,
       is_public: true,
-      is_discoverable: index < 3,
+      is_discoverable: false,
       public_consent_at: consentTimestamp,
     }));
 

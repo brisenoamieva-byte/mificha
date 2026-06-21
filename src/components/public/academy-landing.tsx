@@ -6,6 +6,7 @@ import { PassportSegments } from "@/components/ui/passport-score-display";
 import { BrandLogoLink } from "@/components/ui/brand-logo";
 import { BrandWordmark } from "@/components/ui/brand-wordmark";
 import { getPositionLabel } from "@/lib/dashboard-utils";
+import { isDemoAcademySlug } from "@/lib/explore-demo-data";
 import {
   formatWhatsAppUrl,
   type PublicAcademyData,
@@ -64,7 +65,7 @@ export function AcademyLanding({ data }: AcademyLandingProps) {
                 <img
                   src={academy.logo_url}
                   alt={academy.name}
-                  className="mb-8 h-24 w-24 rounded-2xl border border-white/20 bg-white/10 object-cover shadow-2xl"
+                  className="mb-8 h-28 w-28 rounded-2xl border border-white/20 bg-white object-contain p-2 shadow-2xl"
                 />
               ) : (
                 <div className="mb-8 flex h-24 w-24 items-center justify-center rounded-2xl border border-white/20 bg-white/10 text-3xl font-black shadow-2xl">
@@ -168,11 +169,14 @@ export function AcademyLanding({ data }: AcademyLandingProps) {
           <div className="mt-10 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
             {featuredPlayers.map((player) => {
               const fullName = `${player.first_name} ${player.last_name}`;
+              const playerHref = isDemoAcademySlug(academy.slug)
+                ? "/#demo-ficha-documento"
+                : `/j/${player.slug}`;
 
               return (
                 <Link
                   key={player.slug}
-                  href={`/j/${player.slug}`}
+                  href={playerHref}
                   className="group overflow-hidden rounded-3xl border border-slate-800 bg-slate-950 transition hover:-translate-y-1 hover:border-slate-600 hover:shadow-2xl hover:shadow-black/40"
                 >
                   <div className="relative aspect-[4/5] overflow-hidden bg-slate-900">

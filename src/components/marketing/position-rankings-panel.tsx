@@ -31,6 +31,8 @@ interface PositionRankingsPanelProps {
   city: string;
   minPassport: number;
   categoryFilter?: string;
+  /** En /explorar la actividad semanal ya está en Top 10 — solo mostrar temporada. */
+  passportOnly?: boolean;
 }
 
 const metricOptions: { value: RankingMetric; label: string }[] = [
@@ -217,8 +219,10 @@ export function PositionRankingsPanel({
   city,
   minPassport,
   categoryFilter = "all",
+  passportOnly = false,
 }: PositionRankingsPanelProps) {
   const [metric, setMetric] = useState<RankingMetric>("passport");
+  const activeMetric = passportOnly ? "passport" : metric;
 
   const scopeLabel = getRankingScopeLabel(state, city, categoryFilter);
 
@@ -244,7 +248,7 @@ export function PositionRankingsPanel({
   }, [rankedPerformances, state, city, categoryFilter]);
 
   const hasAnyRankings =
-    metric === "passport"
+    activeMetric === "passport"
       ? POSITION_RANKING_ORDER.some(
           (position) => passportRankings[position].length > 0,
         )
@@ -254,7 +258,7 @@ export function PositionRankingsPanel({
 
   if (!isCompetitionCategoryFilter(categoryFilter)) {
     return (
-      <section className="space-y-5">
+      <section id="rankings" className="scroll-mt-24 space-y-5">
         <div>
           <div className="inline-flex items-center gap-2 rounded-full bg-mf-brand-soft px-3 py-1 text-xs font-semibold text-mf-brand">
             <BarChart3 className="h-3.5 w-3.5" />
@@ -268,7 +272,7 @@ export function PositionRankingsPanel({
   }
 
   return (
-    <section className="space-y-5">
+    <section id="rankings" className="scroll-mt-24 space-y-5">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <div className="inline-flex items-center gap-2 rounded-full bg-mf-brand-soft px-3 py-1 text-xs font-semibold text-mf-brand">
@@ -279,34 +283,36 @@ export function PositionRankingsPanel({
             Referencia por posición · {scopeLabel}
           </h2>
           <p className="mt-2 text-sm text-mf-text-secondary">
-            {metric === "passport"
-              ? "Passport Score verificado en cada línea — contexto para visorías."
+            {activeMetric === "passport"
+              ? "Mejor perfil verificado en cada línea — referencia para visorías."
               : `Actividad de la semana ${weekLabel} por posición.`}
           </p>
         </div>
 
-        <div className="flex flex-wrap gap-2">
-          {metricOptions.map((option) => (
-            <button
-              key={option.value}
-              type="button"
-              onClick={() => setMetric(option.value)}
-              className={cn(
-                "rounded-full px-4 py-2 text-sm font-semibold transition",
-                metric === option.value
-                  ? "bg-mf-brand text-white"
-                  : "bg-mf-surface text-mf-text-secondary ring-1 ring-mf-border hover:text-mf-text",
-              )}
-            >
-              {option.label}
-            </button>
-          ))}
-        </div>
+        {!passportOnly ? (
+          <div className="flex flex-wrap gap-2">
+            {metricOptions.map((option) => (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => setMetric(option.value)}
+                className={cn(
+                  "rounded-full px-4 py-2 text-sm font-semibold transition",
+                  metric === option.value
+                    ? "bg-mf-brand text-white"
+                    : "bg-mf-surface text-mf-text-secondary ring-1 ring-mf-border hover:text-mf-text",
+                )}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+        ) : null}
       </div>
 
       {!hasAnyRankings ? (
         <div className="mf-card border-dashed p-8 text-center text-sm text-mf-text-secondary">
-          {metric === "week"
+          {activeMetric === "week"
             ? "Aún no hay partidos registrados esta semana para armar rankings por posición."
             : "No hay jugadores públicos en esta zona todavía."}
         </div>
@@ -316,7 +322,7 @@ export function PositionRankingsPanel({
             <PositionRankingCard
               key={position}
               position={position}
-              metric={metric}
+              metric={activeMetric}
               passportPlayers={passportRankings[position]}
               weeklyPlayers={weeklyRankings[position]}
             />

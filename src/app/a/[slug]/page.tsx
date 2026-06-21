@@ -2,6 +2,10 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { AcademyLanding } from "@/components/public/academy-landing";
 import {
+  getDemoAcademyPublicData,
+  isDemoAcademySlug,
+} from "@/lib/explore-demo-data";
+import {
   fetchPublicAcademyBySlug,
   getPublicAcademyDescription,
 } from "@/lib/public-academy";
@@ -12,6 +16,23 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
+
+  if (isDemoAcademySlug(slug)) {
+    const data = getDemoAcademyPublicData();
+    const description = getPublicAcademyDescription(data.academy);
+
+    return {
+      title: `${data.academy.name} | Academia de Fútbol | MiFicha`,
+      description,
+      openGraph: {
+        title: `${data.academy.name} | Academia de Fútbol | MiFicha`,
+        description,
+        images: data.academy.logo_url ? [data.academy.logo_url] : undefined,
+        type: "website",
+      },
+    };
+  }
+
   const data = await fetchPublicAcademyBySlug(slug);
 
   if (!data) {
@@ -42,6 +63,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function AcademyPublicPage({ params }: PageProps) {
   const { slug } = await params;
+
+  if (isDemoAcademySlug(slug)) {
+    return <AcademyLanding data={getDemoAcademyPublicData()} />;
+  }
+
   const data = await fetchPublicAcademyBySlug(slug);
 
   if (!data) {

@@ -150,7 +150,7 @@ export function VerifiedAcademiesShowcase({
                 Red certificada
               </p>
               <p className="mt-1 text-lg font-semibold text-white">
-                {stats.academyCount} academias certificadas en <BrandWordmark />
+                {stats.academyCount} academias en la red <BrandWordmark />
               </p>
             </div>
             <Link

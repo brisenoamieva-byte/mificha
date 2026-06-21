@@ -217,9 +217,119 @@ body {
 }
 
 @media print {
+  @page {
+    size: letter;
+    margin: 0.45in;
+  }
+
+  body {
+    background: white !important;
+  }
+
+  body * {
+    visibility: hidden;
+  }
+
+  .demo-ficha-document,
+  .demo-ficha-document * {
+    visibility: visible;
+  }
+
+  .demo-ficha-shell {
+    position: absolute;
+    inset: 0;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
   .demo-ficha-document {
     box-shadow: none !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 0 !important;
     break-inside: avoid;
     page-break-inside: avoid;
+    width: 100%;
+    max-height: none;
+  }
+
+  .demo-ficha-actions,
+  .demo-ficha-print-btn {
+    display: none !important;
+  }
+
+  .demo-ficha-identity {
+    grid-template-columns: 1.35in 1fr !important;
+  }
+
+  .demo-ficha-identity > div:first-child {
+    max-height: 1.8in !important;
+    aspect-ratio: auto !important;
+    border-right: 1px solid #e2e8f0 !important;
+    border-bottom: none !important;
+  }
+
+  .demo-ficha-academy-logo {
+    width: 0.9in !important;
+    padding: 0.08in 0.06in !important;
+    border-left: 1px solid #e2e8f0 !important;
+    background: #fff !important;
+  }
+
+  .demo-ficha-academy-logo img {
+    max-width: 0.75in !important;
+  }
+
+  .demo-ficha-stats-row {
+    grid-template-columns: repeat(6, 1fr) !important;
+  }
+
+  .demo-ficha-stat {
+    padding: 0.12in 0.08in !important;
+  }
+
+  .demo-ficha-stat p:first-child {
+    font-size: 11pt !important;
+  }
+
+  .demo-ficha-stat p:last-child {
+    font-size: 7pt !important;
+  }
+
+  .demo-ficha-context {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  .demo-ficha-profile .grid {
+    grid-template-columns: 0.95in 1fr 1fr !important;
+    gap: 0.12in !important;
+  }
+
+  .demo-ficha-label {
+    font-size: 7pt !important;
+  }
+
+  .demo-ficha-footer {
+    padding-top: 0.12in !important;
+    padding-bottom: 0.1in !important;
+  }
+
+  .demo-ficha-qr {
+    display: flex !important;
+  }
+
+  .demo-ficha-print-url {
+    display: none !important;
+  }
+}
+
+.demo-ficha-hero .demo-ficha-shell {
+  width: 100%;
+}
+
+@media (min-width: 1024px) {
+  .demo-ficha-hero > div > div:last-child {
+    justify-self: end;
+    width: min(100%, 780px);
   }
 }

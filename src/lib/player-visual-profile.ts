@@ -18,6 +18,14 @@ export const VERIFIED_RADAR_LABELS = [
   "Disciplina",
 ] as const;
 
+/** Etiquetas cortas para el radar en espacios reducidos. */
+export const VERIFIED_RADAR_SHORT_LABELS = [
+  "Part.",
+  "Aporte",
+  "Min.",
+  "Disc.",
+] as const;
+
 export type PlayerCoachTraits = Pick<
   Player,
   | "secondary_position"
@@ -114,20 +122,29 @@ export function computeVerifiedRadarValues(
     total_red_cards: 0,
   };
 
-  const participation = Math.min(10, safe.total_matches * 2);
-  const contribution = Math.min(10, safe.total_goals * 2.5 + safe.total_assists * 2);
-  const minutesScore = Math.min(10, safe.total_minutes / 36);
+  const matchCount = Math.max(safe.total_matches, 1);
+  const minutesPerMatch = safe.total_minutes / matchCount;
+  const ninetiesPlayed = safe.total_minutes / 90;
+
+  // Jornadas disputadas vs referencia de torneo escolar (~14 fechas).
+  const participation = Math.min(10, (safe.total_matches / 14) * 10);
+
+  // G+A normalizado por cada 90 min (delantero fuerte ≈ 7–8, no siempre 10).
+  const contributionRaw =
+    (safe.total_goals + safe.total_assists * 0.7) / Math.max(ninetiesPlayed, 0.5);
+  const contribution = Math.min(10, contributionRaw * 5.5);
+
+  // Promedio de minutos por partido respecto a 90.
+  const minutesScore = Math.min(10, (minutesPerMatch / 90) * 10);
+
   const discipline = Math.max(
     0,
     10 - safe.total_yellow_cards * 1.5 - safe.total_red_cards * 4,
   );
 
-  return [
-    Math.round(participation * 10) / 10,
-    Math.round(contribution * 10) / 10,
-    Math.round(minutesScore * 10) / 10,
-    Math.round(discipline * 10) / 10,
-  ];
+  return [participation, contribution, minutesScore, discipline].map((value) =>
+    Math.round(Math.max(0, Math.min(10, value)) * 10) / 10,
+  );
 }
 
 export function buildCoachRadarSeries(player: PlayerCoachTraits): RadarSeries | null {
@@ -146,7 +163,7 @@ export function buildVerifiedRadarSeries(
   stats: PlayerSeasonStat | null,
 ): RadarSeries {
   return {
-    label: "Stats del acta",
+    label: "Temporada en torneo",
     values: computeVerifiedRadarValues(stats),
     color: "#059669",
     fillOpacity: 0.18,

@@ -10,11 +10,10 @@ export function HomeAudienceSection() {
       <div className="max-w-2xl">
         <p className="mf-marketing-eyebrow">¿Eres…?</p>
         <h2 className="mt-3 text-2xl font-semibold tracking-[-0.02em] text-mf-text sm:text-3xl">
-          ¿Por qué te interesa <BrandWordmark />?
+          ¿Para quién es <BrandWordmark />?
         </h2>
         <p className="mt-3 text-sm leading-7 text-mf-text-secondary">
-          Cada quien gana algo distinto. El acta oficial del torneo es el punto de
-          partida para todos.
+          Mismo torneo, distintas necesidades. Elige tu perfil.
         </p>
       </div>
 
@@ -37,9 +36,7 @@ export function HomeAudienceSection() {
               </div>
               <div className="min-w-0">
                 <h3 className="font-semibold text-mf-text">{item.title}</h3>
-                <p className="mt-1 text-sm font-medium text-mf-text">
-                  {item.headline}
-                </p>
+                <p className="mt-1 text-sm font-medium text-mf-text">{item.headline}</p>
               </div>
             </div>
 

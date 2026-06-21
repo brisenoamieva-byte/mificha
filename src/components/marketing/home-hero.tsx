@@ -8,13 +8,12 @@ export function HomeHero() {
   return (
     <MarketingPageHero
       eyebrow="Torneos interescolares · Querétaro"
-      title="La ficha técnica que el torneo ya debería tener"
+      title="La ficha de cada jugador, sincronizada con el torneo"
       description={
         <>
           <WithBrandName>
-            MiFicha conecta el acta oficial de cada jornada con el plantel de tu colegio.
-            Stats verificables, historial por jugador y aviso automático al tutor. Pensado
-            para directores, organizadores y familias que hoy dependen de WhatsApp.
+            MiFicha lleva las stats del torneo a la ficha de cada jugador. La academia
+            carga plantel y contacto del tutor; el link llega solo después de cada jornada.
           </WithBrandName>
         </>
       }
@@ -30,6 +29,7 @@ export function HomeHero() {
         </>
       }
       aside={<HomeFichaPreview />}
+      className="demo-ficha-hero"
     />
   );
 }

@@ -3,14 +3,10 @@
 import Link from "next/link";
 import {
   BadgeCheck,
-  Clock3,
   Copy,
-  Goal,
-  Handshake,
   MapPin,
   Shield,
   Timer,
-  Trophy,
 } from "lucide-react";
 import QRCode from "react-qr-code";
 import { useState } from "react";
@@ -36,26 +32,6 @@ interface PublicPlayerCardProps {
   data: PublicPlayerData;
 }
 
-function StatTile({
-  icon: Icon,
-  label,
-  value,
-}: {
-  icon: typeof Trophy;
-  label: string;
-  value: number;
-}) {
-  return (
-    <div className="rounded-2xl bg-slate-50 px-4 py-5 text-center transition hover:-translate-y-0.5 hover:bg-white hover:shadow-md">
-      <Icon className="mx-auto h-5 w-5 text-[#1B4F8C]" />
-      <p className="mt-3 text-2xl font-bold text-slate-900">{value}</p>
-      <p className="mt-1 text-xs font-medium uppercase tracking-wide text-slate-500">
-        {label}
-      </p>
-    </div>
-  );
-}
-
 export function PublicPlayerCard({ data }: PublicPlayerCardProps) {
   const { player, currentSeasonStats, currentSeasonName, history, seasonProgress, seasonHighlights, achievements } = data;
   const [copied, setCopied] = useState(false);
@@ -67,15 +43,6 @@ export function PublicPlayerCard({ data }: PublicPlayerCardProps) {
   const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(
     `Mira la ficha de ${fullName}: ${publicUrl}`,
   )}`;
-
-  const stats = currentSeasonStats ?? {
-    total_matches: 0,
-    total_goals: 0,
-    total_assists: 0,
-    total_minutes: 0,
-    total_yellow_cards: 0,
-    total_red_cards: 0,
-  };
 
   async function handleCopyLink() {
     await navigator.clipboard.writeText(publicUrl);
@@ -173,44 +140,10 @@ export function PublicPlayerCard({ data }: PublicPlayerCardProps) {
           </p>
         </section>
 
-        <section className="border-t border-slate-100 px-6 py-8 sm:px-10">
-          <div className="flex items-center justify-between gap-3">
-            <h2 className="text-lg font-semibold text-slate-900">
-              Temporada actual
-            </h2>
-            {currentSeasonName ? (
-              <span className="text-sm text-slate-500">{currentSeasonName}</span>
-            ) : null}
-          </div>
-
-          <div className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
-            <StatTile icon={Trophy} label="Partidos" value={stats.total_matches} />
-            <StatTile icon={Goal} label="Goles" value={stats.total_goals} />
-            <StatTile icon={Handshake} label="Asistencias" value={stats.total_assists} />
-            <StatTile icon={Clock3} label="Minutos" value={stats.total_minutes} />
-          </div>
-
-          {stats.total_yellow_cards > 0 || stats.total_red_cards > 0 ? (
-            <div className="mt-4 flex flex-wrap gap-3">
-              {stats.total_yellow_cards > 0 ? (
-                <span className="rounded-full bg-amber-100 px-3 py-1.5 text-sm font-medium text-amber-800">
-                  🟨 {stats.total_yellow_cards} amarilla
-                  {stats.total_yellow_cards === 1 ? "" : "s"}
-                </span>
-              ) : null}
-              {stats.total_red_cards > 0 ? (
-                <span className="rounded-full bg-red-100 px-3 py-1.5 text-sm font-medium text-red-700">
-                  🟥 {stats.total_red_cards} roja
-                  {stats.total_red_cards === 1 ? "" : "s"}
-                </span>
-              ) : null}
-            </div>
-          ) : null}
-        </section>
-
         <PublicPlayerVisualProfileSection
           player={player}
           currentSeasonStats={currentSeasonStats}
+          currentSeasonName={currentSeasonName}
           seasonProgress={seasonProgress}
         />
 

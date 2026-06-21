@@ -24,6 +24,9 @@ interface IdealXIPanelProps {
   performances: WeeklyPlayerPerformance[];
   weekLabel: string;
   categoryFilter?: string;
+  /** Usar filtros del directorio en lugar de controles propios de zona. */
+  filterState?: string;
+  filterCity?: string;
 }
 
 const scopeOptions: { value: IdealXIScope; label: string }[] = [
@@ -84,17 +87,39 @@ export function IdealXIPanel({
   performances,
   weekLabel,
   categoryFilter = "all",
+  filterState = "",
+  filterCity = "",
 }: IdealXIPanelProps) {
-  const [scope, setScope] = useState<IdealXIScope>("mexico");
-  const [state, setState] = useState("");
-  const [city, setCity] = useState("");
+  const useSharedLocation = Boolean(filterState);
+  const [scope, setScope] = useState<IdealXIScope>(
+    filterCity ? "city" : filterState ? "state" : "mexico",
+  );
+  const [state, setState] = useState(filterState);
+  const [city, setCity] = useState(filterCity);
+
+  const effectiveState = useSharedLocation ? filterState : state;
+  const effectiveCity = useSharedLocation ? filterCity : city;
+  const effectiveScope: IdealXIScope = useSharedLocation
+    ? filterCity
+      ? "city"
+      : filterState
+        ? "state"
+        : "mexico"
+    : scope;
 
   const categoryLabel = getCategoryFilterLabel(parseCategoryFilter(categoryFilter));
   const categorySelected = isCompetitionCategoryFilter(categoryFilter);
 
   const idealXI = useMemo(
-    () => buildIdealXI(performances, scope, state, city, categoryFilter),
-    [performances, scope, state, city, categoryFilter],
+    () =>
+      buildIdealXI(
+        performances,
+        effectiveScope,
+        effectiveState,
+        effectiveCity,
+        categoryFilter,
+      ),
+    [performances, effectiveScope, effectiveState, effectiveCity, categoryFilter],
   );
 
   const pitchRows = useMemo(
@@ -104,12 +129,12 @@ export function IdealXIPanel({
 
   const hasEnoughPlayers = idealXI.lineup.length >= 5;
   const scopeReady =
-    scope === "mexico" ||
-    (scope === "state" && Boolean(state)) ||
-    (scope === "city" && Boolean(state && city));
+    effectiveScope === "mexico" ||
+    (effectiveScope === "state" && Boolean(effectiveState)) ||
+    (effectiveScope === "city" && Boolean(effectiveState && effectiveCity));
 
   return (
-    <section className="space-y-5">
+    <section id="ideal-11" className="scroll-mt-24 space-y-5">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <div className="inline-flex items-center gap-2 rounded-full bg-mf-brand-soft px-3 py-1 text-xs font-semibold text-mf-brand">
@@ -127,25 +152,27 @@ export function IdealXIPanel({
         </div>
 
         <div className="flex flex-wrap gap-2">
-          {scopeOptions.map((option) => (
-            <button
-              key={option.value}
-              type="button"
-              onClick={() => setScope(option.value)}
-              className={cn(
-                "rounded-full px-4 py-2 text-sm font-semibold transition",
-                scope === option.value
-                  ? "bg-mf-brand text-white"
-                  : "bg-mf-surface text-mf-text-secondary ring-1 ring-mf-border hover:text-mf-text",
-              )}
-            >
-              {option.label}
-            </button>
-          ))}
+          {!useSharedLocation
+            ? scopeOptions.map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => setScope(option.value)}
+                  className={cn(
+                    "rounded-full px-4 py-2 text-sm font-semibold transition",
+                    scope === option.value
+                      ? "bg-mf-brand text-white"
+                      : "bg-mf-surface text-mf-text-secondary ring-1 ring-mf-border hover:text-mf-text",
+                  )}
+                >
+                  {option.label}
+                </button>
+              ))
+            : null}
         </div>
       </div>
 
-      {scope !== "mexico" ? (
+      {!useSharedLocation && scope !== "mexico" ? (
         <div className="mf-card p-5">
           <MexicoLocationSelect
             allowAll={false}

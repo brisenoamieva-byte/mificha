@@ -19,6 +19,11 @@ export const MARKETING_IMAGES = {
   featureCaptura: "/marketing/feature-captura.png",
   featureQr: "/marketing/feature-qr.png",
   featurePassport: "/marketing/feature-passport.png",
+  demoPlayerHeadshot: "/marketing/demo-player-headshot.png",
+  demoExplorePlayer2: "/marketing/demo-explore-player-2.png",
+  demoExplorePlayer3: "/marketing/demo-explore-player-3.png",
+  demoExplorePlayer4: "/marketing/demo-explore-player-4.png",
+  demoAcademiaGallosLogo: "/marketing/demo-academia-gallos-logo.png",
   featureCalendario: "/marketing/feature-calendario.png",
   featureComparativa: "/marketing/feature-comparativa.png",
   featureMenores: "/marketing/feature-menores.png",
@@ -80,6 +85,31 @@ export const MARKETING_MEDIA: Record<MarketingImageKey, MarketingImageMeta> = {
     src: MARKETING_IMAGES.featurePassport,
     alt: "Jugador celebrando gol en partido escolar",
     objectPosition: "55% 35%",
+  },
+  demoPlayerHeadshot: {
+    src: MARKETING_IMAGES.demoPlayerHeadshot,
+    alt: "Retrato de jugador Sub-15 para ficha demo",
+    objectPosition: "50% 22%",
+  },
+  demoExplorePlayer2: {
+    src: MARKETING_IMAGES.demoExplorePlayer2,
+    alt: "Retrato de jugador demo para directorio explorar",
+    objectPosition: "50% 20%",
+  },
+  demoExplorePlayer3: {
+    src: MARKETING_IMAGES.demoExplorePlayer3,
+    alt: "Retrato de jugador demo para directorio explorar",
+    objectPosition: "50% 22%",
+  },
+  demoExplorePlayer4: {
+    src: MARKETING_IMAGES.demoExplorePlayer4,
+    alt: "Retrato de jugador demo para directorio explorar",
+    objectPosition: "50% 20%",
+  },
+  demoAcademiaGallosLogo: {
+    src: MARKETING_IMAGES.demoAcademiaGallosLogo,
+    alt: "Logotipo Academia Gallos — fútbol para niños",
+    objectPosition: "center center",
   },
   featureCalendario: {
     src: MARKETING_IMAGES.featureCalendario,

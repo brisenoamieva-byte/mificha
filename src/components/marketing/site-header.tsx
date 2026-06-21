@@ -69,7 +69,6 @@ export function SiteFooter() {
         <BrandLogoLink size="sm" />
         <div className="flex flex-col gap-2 sm:items-end">
           <p className="text-mf-text-secondary">
-            Operado desde Querétaro, México ·{" "}
             <a href="mailto:hola@mificha.mx" className="font-medium text-mf-brand hover:underline">
               hola@mificha.mx
             </a>

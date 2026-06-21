@@ -1,12 +1,11 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { MarketingBackgroundPhoto } from "@/components/marketing/marketing-hero-visual";
-import { WithBrandName } from "@/components/ui/brand-wordmark";
 import { MARKETING_MEDIA } from "@/lib/marketing-assets";
 
 export function HomeCtaBand() {
   return (
-    <section className="relative min-h-[300px] overflow-hidden border-t border-mf-brand-dark">
+    <section className="relative min-h-[280px] overflow-hidden border-t border-mf-brand-dark">
       <MarketingBackgroundPhoto meta={MARKETING_MEDIA.ctaBand} />
       <div className="absolute inset-0 bg-gradient-to-r from-mf-brand-dark/95 via-mf-brand/88 to-mf-brand-dark/55 lg:to-transparent" />
       <div
@@ -17,16 +16,13 @@ export function HomeCtaBand() {
       <div className="relative mx-auto flex max-w-6xl flex-col items-start gap-6 px-4 py-14 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:py-16">
         <div className="max-w-xl">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-white/60">
-            Piloto en Querétaro
+            Piloto · Querétaro
           </p>
           <h2 className="mt-3 text-2xl font-semibold tracking-[-0.02em] text-white sm:text-3xl">
-            Stats del torneo que llegan a cada familia
+            ¿Tu colegio ya está en la red?
           </h2>
           <p className="mt-3 text-sm leading-7 text-white/80">
-            <WithBrandName>
-              Carga plantel y contacto del tutor. MiFicha sincroniza el acta oficial,
-              actualiza cada ficha y avisa a las familias tras cada jornada.
-            </WithBrandName>
+            Registra plantel y tutores, o entra como padre si tu escuela ya participa.
           </p>
         </div>
         <div className="flex flex-wrap gap-3">

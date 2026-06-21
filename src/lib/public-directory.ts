@@ -39,6 +39,11 @@ export interface PublicDirectoryData {
   players: DirectoryPlayer[];
 }
 
+/** Jugadores de demo local (`/api/seed`) — no mezclar con perfiles de ejemplo en /explorar. */
+export function isDevSeedPlayer(player: Pick<DirectoryPlayer, "slug">) {
+  return player.slug.endsWith("-seed");
+}
+
 function getSupabaseHeaders() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;

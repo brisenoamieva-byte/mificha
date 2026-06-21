@@ -161,19 +161,19 @@ export const HOME_FEATURES = [
 
 export const COMPLEMENT_ROWS = [
   {
-    official: "Resultados y tabla de liga",
-    mificha: "Stats individuales del acta oficial del torneo",
+    official: "Resultados y tabla",
+    mificha: "Stats por jugador en cada jornada",
   },
   {
-    official: "Licencia y mutualidad federativa",
-    mificha: "Ficha técnica digital para padres y scouts",
+    official: "Calendario del torneo",
+    mificha: "Ficha técnica digital e imprimible",
   },
   {
-    official: "Noticias institucionales",
-    mificha: "Aviso automático post-partido y reporte mensual al tutor",
+    official: "Comunicados de la liga",
+    mificha: "Aviso al tutor tras cada partido",
   },
   {
-    official: "Carnet del federado",
-    mificha: "Passport Score + historial por temporada",
+    official: "Registro federativo",
+    mificha: "Historial por temporada y progreso",
   },
 ] as const;
