@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import { ArrowRight, Trophy } from "lucide-react";
 import { OrganizadoresPageHero } from "@/components/marketing/organizadores-page-hero";
+import { OrganizerAcademyKit } from "@/components/marketing/organizer-academy-kit";
+import { OrganizerDemoSection } from "@/components/marketing/organizer-demo-section";
 import { OrganizerPricingSection } from "@/components/marketing/organizer-pricing-section";
+import { OrganizerTrustSection } from "@/components/marketing/organizer-trust-section";
 import { SiteFooter, SiteHeader } from "@/components/marketing/site-header";
 import { WithBrandName } from "@/components/ui/brand-wordmark";
 import { ORGANIZER_ONE_PAGER } from "@/lib/organizer-one-pager";
@@ -26,6 +29,8 @@ export default function OrganizadoresPage() {
       <main className="flex-1">
         <OrganizadoresPageHero mailtoHref={mailto} />
 
+        <OrganizerDemoSection />
+
         <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:py-16">
           <div className="max-w-2xl">
             <p className="mf-marketing-eyebrow">Por qué aliarte</p>
@@ -49,6 +54,10 @@ export default function OrganizadoresPage() {
         </section>
 
         <OrganizerPricingSection mailtoHref={mailto} />
+
+        <OrganizerTrustSection />
+
+        <OrganizerAcademyKit />
 
         <section className="border-y border-mf-border bg-mf-surface">
           <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:py-16">

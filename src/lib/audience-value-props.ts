@@ -71,7 +71,7 @@ export const AUDIENCE_VALUE_PROPS: AudienceValueProp[] = [
       "Publicas calendario y acta como hoy.",
       "Cada escuela recibe fichas actualizadas solas — gratis para ellas.",
       "Tu torneo visible en Explorar.",
-      "Desde $999 MXN por categoría en piloto Querétaro.",
+      "Piloto fundador gratis · precios accesibles por temporada.",
     ],
     href: "/organizadores",
     cta: "Ver precios",

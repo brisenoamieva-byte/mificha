@@ -14,6 +14,40 @@ export const ORGANIZER_ONE_PAGER = {
   solutionTitle: "Qué es MiFicha (en una frase)",
   solution:
     "MiFicha publica jornadas, marcador y acta como fuente oficial. Cruza esos datos con cada plantel y avisa al padre. No sustituye tu inscripción ni tu reglamento.",
+  demoTitle: "Así se ve tu torneo",
+  demoSubtitle:
+    "Ejemplo con liga interescolar en Querétaro: calendario, acta y ficha por jugador.",
+  demoMatch: {
+    league: "Liga Interescolar Querétaro",
+    category: "Sub-15",
+    opponent: "Instituto Cervantes",
+    jornada: "Jornada 11",
+    date: "14 mar 2026 · 10:00",
+    venue: "Unidad Deportiva Jurica",
+  },
+  demoSteps: [
+    "Publicas calendario, marcador y acta.",
+    "MiFicha sincroniza stats con cada plantel.",
+    "El padre recibe link automático a la ficha.",
+  ],
+  demoFichaHref: "/j/santiago-hernandez-demo",
+  demoExploreHref: "/explorar",
+  pilotTitle: "Piloto sin riesgo",
+  pilotPoints: [
+    "Torneo fundador gratis: 1 categoría, 1 temporada — cupos muy limitados.",
+    "Cargamos tu calendario contigo antes de la primera jornada.",
+    "Post-partido: unos 15 min para marcador y acta — lo mismo que ya anotas.",
+  ],
+  boundariesTitle: "Qué no hacemos",
+  boundariesPoints: [
+    "No cobramos inscripciones ni comisión por equipo.",
+    "No dejamos que academias editen marcador ni acta.",
+    "No competimos por tus inscripciones.",
+    "No cobramos a padres ni academias.",
+  ],
+  academyKitTitle: "Mensaje para academias",
+  academyKitDescription:
+    "Cuando actives la temporada, manda esto en tu grupo de WhatsApp con directores.",
   winTitle: "Qué gana tu torneo",
   winPoints: [
     {

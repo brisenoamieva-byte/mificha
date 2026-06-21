@@ -29,6 +29,11 @@ export const ORGANIZER_PRICING = {
     "Las academias no pagan. El torneo contrata MiFicha por temporada — puedes repartir el costo en la inscripción si quieres.",
   footnote:
     "Precios piloto en Querétaro · Temporada 2026. Cupos limitados para torneos fundadores.",
+  costExample: {
+    label: "Ejemplo",
+    summary: "12 equipos × 18 jugadores = 216 jugadores → $2,160 MXN temporada ($10/jugador).",
+    note: "Puedes sumarlo a la cuota de inscripción del torneo.",
+  },
   plans: [
     {
       id: "piloto-fundador",
@@ -36,7 +41,7 @@ export const ORGANIZER_PRICING = {
       priceLabel: "Gratis",
       period: "1 categoría · 1 temporada",
       description:
-        "Para el primer torneo que active calendario + acta en MiFicha. Cupos muy limitados.",
+        "Calendario + acta en MiFicha. Te acompañamos a cargar la primera jornada. Cupos muy limitados.",
       highlight: true,
       badge: "Piloto",
     },

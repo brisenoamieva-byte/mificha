@@ -55,6 +55,12 @@ export function OrganizerPricingSection({ mailtoHref }: OrganizerPricingSectionP
 
         <p className="mt-4 text-xs text-mf-text-muted">{ORGANIZER_PRICING.footnote}</p>
 
+        <p className="mt-3 rounded-lg border border-mf-border bg-mf-canvas px-4 py-3 text-sm text-mf-text-secondary">
+          <span className="font-semibold text-mf-text">{ORGANIZER_PRICING.costExample.label}:</span>{" "}
+          {ORGANIZER_PRICING.costExample.summary}{" "}
+          <span className="text-mf-text-muted">{ORGANIZER_PRICING.costExample.note}</span>
+        </p>
+
         <div className="mt-10 grid gap-4 lg:grid-cols-2">
           <div className="rounded-xl border border-mf-border bg-mf-canvas p-5 sm:p-6">
             <p className="text-sm font-semibold text-mf-text">{ACADEMY_ACCESS.headline}</p>

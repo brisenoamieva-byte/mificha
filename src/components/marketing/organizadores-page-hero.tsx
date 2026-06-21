@@ -35,7 +35,7 @@ export function OrganizadoresPageHero({ mailtoHref }: OrganizadoresPageHeroProps
             {[
               { icon: Calendar, label: "Calendario + acta" },
               { icon: BarChart3, label: "Stats por jugador" },
-              { icon: ShieldCheck, label: "Academias gratis" },
+              { icon: ShieldCheck, label: "Academias gratis · piloto fundador" },
             ].map(({ icon: Icon, label }) => (
               <li
                 key={label}
