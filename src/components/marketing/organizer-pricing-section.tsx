@@ -89,8 +89,7 @@ export function OrganizerPricingSection({ mailtoHref }: OrganizerPricingSectionP
               </p>
               <p className="text-sm text-mf-text-secondary">
                 {SCOUT_PRICING.proLabel}:{" "}
-                <span className="font-semibold text-mf-text">{SCOUT_PRICING.proPriceLabel}</span>
-                <span className="ml-1 text-xs text-mf-text-muted">
+                <span className="font-medium text-mf-text-muted">
                   ({SCOUT_PRICING.proStatus})
                 </span>
               </p>

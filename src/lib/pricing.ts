@@ -64,7 +64,6 @@ export const SCOUT_PRICING = {
   basicLabel: "Directorio básico",
   basicPrice: "Gratis",
   proLabel: "Explorar Pro",
-  proPriceLabel: "$199/mes",
   proStatus: "Próximamente",
   description:
     "Búsqueda avanzada, listas guardadas y alertas por categoría — cuando la red tenga masa crítica. El directorio público sigue abierto.",
