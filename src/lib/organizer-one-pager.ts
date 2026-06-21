@@ -33,10 +33,10 @@ export const ORGANIZER_ONE_PAGER = {
       description: "El acta la registra el organizador, no la escuela rival.",
     },
   ],
-  askTitle: "Qué necesitamos de ti (operación mínima)",
+  askTitle: "Qué necesitamos de ti",
   askPoints: [
     "Calendario de jornadas (rivales, fecha, sede, categoría) — lo cargamos juntos una vez por temporada.",
-    "Marcador y acta oficial tras cada jornada (lo que ya anotas en mesa de control).",
+    "Marcador y acta oficial tras cada jornada.",
     "Promoción a academias inscritas: «Activa plantel en MiFicha» — nosotros damos el guión y el link.",
     "Logo y nombre del torneo en la temporada MiFicha (co-branding en la red escolar).",
   ],
