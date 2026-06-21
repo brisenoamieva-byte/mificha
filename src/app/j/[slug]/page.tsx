@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { DemoPublicPlayerCard } from "@/components/public/demo-public-player-card";
 import { PublicPlayerCard } from "@/components/public/public-player-card";
 import { getPositionLabel } from "@/lib/dashboard-utils";
+import { DEMO_FICHA_PREVIEW, isDemoPlayerSlug } from "@/lib/demo-ficha-preview";
 import {
   buildOgPlayerImageAlt,
   buildOgPlayerSharePayload,
@@ -19,6 +21,16 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
+
+  if (isDemoPlayerSlug(slug)) {
+    return {
+      title: `${DEMO_FICHA_PREVIEW.fullName} (ejemplo) | MiFicha`,
+      description:
+        "Ficha de ejemplo con stats del torneo, evaluación del entrenador e insignias MiFicha.",
+      robots: { index: false, follow: false },
+    };
+  }
+
   const data = await fetchPublicPlayerBySlug(slug);
 
   if (!data) {
@@ -70,6 +82,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function PlayerPublicPage({ params }: PageProps) {
   const { slug } = await params;
+
+  if (isDemoPlayerSlug(slug)) {
+    return <DemoPublicPlayerCard />;
+  }
+
   const data = await fetchPublicPlayerBySlug(slug);
 
   if (!data) {

@@ -51,5 +51,9 @@ export const DEMO_FICHA_PREVIEW = {
     "Buena definición y movimiento sin balón. Presiona arriba y genera espacios en ataque.",
   /** Insignia real del sistema MiFicha (2+ goles en un partido). */
   achievements: [{ key: "brace", title: "Doblete", emoji: "🔥" }],
-  publicUrl: "mificha.mx/#demo-ficha-documento",
+  publicUrl: "mificha.mx/j/santiago-hernandez-demo",
 } as const;
+
+export function isDemoPlayerSlug(slug: string) {
+  return slug === DEMO_FICHA_PREVIEW.slug;
+}

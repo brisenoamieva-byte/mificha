@@ -26,16 +26,9 @@ export function HomeFichaPreview({ variant = "hero" }: HomeFichaPreviewProps) {
 
       <div className="demo-ficha-actions mt-3 flex flex-wrap items-center justify-between gap-2">
         <p className="text-[11px] leading-5 text-mf-text-muted">
-          {isHero ? (
-            <>
-              Ejemplo · stats del torneo ·{" "}
-              <Link href={DEMO_FICHA_HREF} className="font-semibold text-mf-brand hover:underline">
-                ver ficha completa
-              </Link>
-            </>
-          ) : (
-            "Ejemplo · formato carta · stats del torneo + evaluación del entrenador"
-          )}
+          {isHero
+            ? "Ejemplo · stats del torneo"
+            : "Ejemplo · formato carta · stats del torneo + evaluación del entrenador"}
         </p>
         {!isHero ? (
           <button
