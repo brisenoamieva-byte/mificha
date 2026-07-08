@@ -11,6 +11,7 @@ import {
 } from "@/lib/player-utils";
 import { uploadPlayerPhoto, uploadPlayerVideo } from "@/lib/storage";
 import { PlayerPrivacyControls } from "@/components/ui/player-privacy-controls";
+import { PlayerVideosPanel } from "@/components/dashboard/player-videos-panel";
 import { PlayerVisualProfileFields } from "@/components/dashboard/player-visual-profile-fields";
 import { COACH_NOTES_MAX_LENGTH, clampTrait } from "@/lib/player-visual-profile";
 import { buildPrivacyPayload } from "@/lib/privacy";
@@ -355,52 +356,47 @@ export function PlayerModal({
               </div>
             </div>
 
-            <div className="grid gap-5 sm:grid-cols-2">
-              <div>
-                <label className="block text-sm font-medium text-slate-700">
-                  Foto {isPublic ? "*" : ""}
-                </label>
-                <p className="mt-0.5 text-xs text-slate-500">
-                  Requerida para certificación y directorio público.
-                </p>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(event) => {
-                    const file = event.target.files?.[0] ?? null;
-                    setPhotoFile(file);
-                    setPhotoPreview(file ? URL.createObjectURL(file) : null);
-                  }}
-                  className="mt-1 block w-full text-sm text-slate-600"
+            <div>
+              <label className="block text-sm font-medium text-slate-700">
+                Foto {isPublic ? "*" : ""}
+              </label>
+              <p className="mt-0.5 text-xs text-slate-500">
+                Requerida para certificación y directorio público.
+              </p>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(event) => {
+                  const file = event.target.files?.[0] ?? null;
+                  setPhotoFile(file);
+                  setPhotoPreview(file ? URL.createObjectURL(file) : null);
+                }}
+                className="mt-1 block w-full text-sm text-slate-600"
+              />
+              {photoPreview ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={photoPreview}
+                  alt="Preview"
+                  className="mt-3 h-24 w-24 rounded-full object-cover"
                 />
-                {photoPreview ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={photoPreview}
-                    alt="Preview"
-                    className="mt-3 h-24 w-24 rounded-full object-cover"
-                  />
-                ) : null}
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700">
-                  Video (max 50 MB)
-                </label>
-                <input
-                  type="file"
-                  accept="video/*"
-                  onChange={(event) => {
-                    const file = event.target.files?.[0] ?? null;
-                    setVideoFile(file);
-                    setVideoPreview(file ? file.name : null);
-                  }}
-                  className="mt-1 block w-full text-sm text-slate-600"
-                />
-                {videoPreview ? (
-                  <p className="mt-3 text-sm text-slate-500">{videoPreview}</p>
-                ) : null}
-              </div>
+              ) : null}
             </div>
+
+            <PlayerVideosPanel
+              academyId={academyId}
+              playerId={player?.id ?? null}
+              primaryVideoUrl={player?.video_url ?? null}
+              primaryVideoPreview={videoPreview}
+              onPrimaryVideoChange={(file) => {
+                setVideoFile(file);
+                if (file) {
+                  setVideoPreview(URL.createObjectURL(file));
+                  return;
+                }
+                setVideoPreview(player?.video_url ?? null);
+              }}
+            />
 
             <PlayerVisualProfileFields
               secondaryPosition={secondaryPosition}

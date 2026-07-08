@@ -25,6 +25,7 @@ export interface DirectoryPlayer {
   position: PlayerPosition;
   passport_score: number;
   photo_url: string | null;
+  video_url?: string | null;
   academies: {
     name: string;
     city: string | null;
@@ -70,7 +71,7 @@ export async function fetchPublicDirectory(): Promise<PublicDirectoryData> {
       },
     ),
     fetch(
-      `${url}/rest/v1/players?is_public=eq.true&is_discoverable=eq.true&public_consent_at=not.is.null&select=slug,first_name,last_name,birth_date,position,passport_score,photo_url,academies(name,city,state,slug,is_certified)&order=passport_score.desc&limit=500`,
+      `${url}/rest/v1/players?is_public=eq.true&is_discoverable=eq.true&public_consent_at=not.is.null&select=slug,first_name,last_name,birth_date,position,passport_score,photo_url,video_url,academies(name,city,state,slug,is_certified)&order=passport_score.desc&limit=500`,
       {
         headers: {
           apikey: key,

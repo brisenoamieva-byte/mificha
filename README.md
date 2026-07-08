@@ -66,7 +66,7 @@ En **Supabase → SQL Editor**, ejecuta el schema base (pasos 1–10 del README 
 
 ```bash
 # Orden recomendado (ver supabase/production-rollout.sql):
-# 11 → 13 → 14 → 15 → 20 → 21 → 22 → 16 → 17 → 18 → 19 → 12
+# 11 → 13 → 14 → 15 → 20 → 21 → 22 → 16 → 17 → 18 → 19 → 23 → 12
 ```
 
 Verifica con `supabase/verify-production-readiness.sql`.
@@ -107,7 +107,7 @@ Crea la academia **Academia Norteños Querétaro** con 5 jugadores, 1 temporada 
 
 ## Checklist de lanzamiento (prod)
 
-Ejecuta **`supabase/production-rollout.sql`** (orden 11→…→12) y verifica con `verify-production-readiness.sql` antes de pláticas con academias.
+Ejecuta **`supabase/production-rollout.sql`** (orden 11→…→23→12) y verifica con `verify-production-readiness.sql` antes de pláticas con academias.
 
 En la app, valida este flujo con tu academia real:
 
@@ -163,10 +163,11 @@ Vercel despliega automáticamente en cada push a `master`.
 - Pitch, one-pager, playbook y marketing alineados al flujo digital (sin QR imprimibles)
 - Insignias se re-evalúan al publicar acta oficial (si la academia capturó minutos antes)
 - Gamificación: Passport, logros OG, ranking semanal
+- **Videos promocionales** — academia sube highlight + clips; visibles en ficha y explorar
 
 ### Tú debes hacer manual (una vez)
 
-1. **Supabase SQL** — ejecutar `production-rollout.sql` en orden `11→13→14→15→20→21→22→16→17→18→19→12`
+1. **Supabase SQL** — ejecutar `production-rollout.sql` en orden `11→13→14→15→20→21→22→16→17→18→19→23→12`
 2. Verificar con `supabase/verify-production-readiness.sql` (todas las columnas `true`)
 3. **Vercel env:** `RESEND_API_KEY` + `RESEND_FROM_EMAIL` (avisos email) · opcional `TWILIO_*` o `WHATSAPP_*`
 4. **Primera academia piloto:** temporada + jornada en `/interno/jornadas` → demo con `/interno/lanzamiento`

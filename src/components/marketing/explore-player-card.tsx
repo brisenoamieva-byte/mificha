@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { MapPin, ShieldCheck } from "lucide-react";
+import { Film, MapPin, ShieldCheck } from "lucide-react";
 import { PlayerPortraitImage } from "@/components/ui/player-portrait-image";
 import { PlayerCategoryBadge } from "@/components/ui/player-category-badge";
 import { getPositionLabel } from "@/lib/dashboard-utils";
@@ -87,6 +87,12 @@ export function ExplorePlayerCard({ player, className }: ExplorePlayerCardProps)
             <ShieldCheck className="h-3 w-3 shrink-0" aria-hidden />
             Verificada
           </span>
+          {player.video_url ? (
+            <span className="inline-flex items-center gap-1 font-medium text-violet-700">
+              <Film className="h-3 w-3 shrink-0" aria-hidden />
+              Video
+            </span>
+          ) : null}
           <span className="truncate text-mf-text-muted">
             {player.academies?.name ?? "Academia"}
           </span>

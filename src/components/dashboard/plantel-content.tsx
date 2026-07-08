@@ -219,7 +219,7 @@ export function PlantelContent() {
               <li>Descarga la plantilla Excel (incluye columnas opcionales de tutor).</li>
               <li>Importa todo el roster (ideal al inicio de temporada).</li>
               <li>Filtra por generación o Sub-X y completa foto, perfil visual y consentimiento.</li>
-              <li>Registra contacto del tutor y envía el link desde Avisos a tutores.</li>
+              <li>Registra contacto del tutor y sube video highlight desde el jugador.</li>
             </ol>
           </div>
         ) : null}
@@ -360,6 +360,8 @@ export function PlantelContent() {
                             </p>
                             {!isProfileComplete(player) ? (
                               <p className="text-xs text-amber-600">Incompleto</p>
+                            ) : player.video_url ? (
+                              <p className="text-xs text-violet-700">Video publicado</p>
                             ) : null}
                           </div>
                         </div>

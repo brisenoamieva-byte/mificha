@@ -542,6 +542,51 @@ export type Database = {
           },
         ];
       };
+      player_videos: {
+        Row: {
+          id: string;
+          player_id: string;
+          academy_id: string;
+          title: string;
+          video_url: string;
+          sort_order: number;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          player_id: string;
+          academy_id: string;
+          title?: string;
+          video_url: string;
+          sort_order?: number;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          player_id?: string;
+          academy_id?: string;
+          title?: string;
+          video_url?: string;
+          sort_order?: number;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "player_videos_player_id_fkey";
+            columns: ["player_id"];
+            isOneToOne: false;
+            referencedRelation: "players";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "player_videos_academy_id_fkey";
+            columns: ["academy_id"];
+            isOneToOne: false;
+            referencedRelation: "academies";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       player_profile_views: {
         Row: {
           id: string;
@@ -669,4 +714,5 @@ export type Match = Database["public"]["Tables"]["matches"]["Row"];
 export type MatchStat = Database["public"]["Tables"]["match_stats"]["Row"];
 export type PlayerSeasonStat =
   Database["public"]["Tables"]["player_season_stats"]["Row"];
+export type PlayerVideo = Database["public"]["Tables"]["player_videos"]["Row"];
 export type EmailLog = Database["public"]["Tables"]["email_logs"]["Row"];

@@ -15,6 +15,13 @@ export interface PublicPlayerAchievement {
   unlocked_at: string;
 }
 
+export interface PublicPlayerVideo {
+  id: string;
+  title: string;
+  video_url: string;
+  sort_order: number;
+}
+
 export interface PublicPlayerAcademy {
   name: string;
   city: string | null;
@@ -36,6 +43,7 @@ export interface PublicPlayerData {
   seasonProgress: MatchPerformanceRow[];
   seasonHighlights: ReturnType<typeof getPerformanceHighlights>;
   achievements: PublicPlayerAchievement[];
+  promoVideos: PublicPlayerVideo[];
 }
 
 function getSupabaseHeaders() {
@@ -194,6 +202,31 @@ export async function fetchPublicPlayerBySlug(
     achievements = (await achievementsResponse.json()) as PublicPlayerAchievement[];
   }
 
+  let promoVideos: PublicPlayerVideo[] = [];
+
+  const videosResponse = await fetch(
+    `${url}/rest/v1/player_videos?player_id=eq.${player.id}&select=id,title,video_url,sort_order&order=sort_order.asc,created_at.asc`,
+    {
+      headers: {
+        apikey: key,
+        Authorization: `Bearer ${key}`,
+      },
+      next: { revalidate: 60 },
+    },
+  );
+
+  if (videosResponse.ok) {
+    const rawVideos = (await videosResponse.json()) as PublicPlayerVideo[];
+    promoVideos = await Promise.all(
+      rawVideos.map(async (clip) => ({
+        ...clip,
+        video_url: options?.skipMediaSigning
+          ? clip.video_url
+          : (await signPlayerVideoUrl(clip.video_url)) ?? clip.video_url,
+      })),
+    );
+  }
+
   return {
     player: {
       ...player,
@@ -210,6 +243,7 @@ export async function fetchPublicPlayerBySlug(
     seasonProgress,
     seasonHighlights,
     achievements,
+    promoVideos,
   };
 }
 

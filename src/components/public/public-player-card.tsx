@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { Copy, Printer, Timer } from "lucide-react";
+import { Copy, Printer } from "lucide-react";
 import { useState } from "react";
 import { FichaDocument } from "@/components/ficha/ficha-document";
 import { BrandLogoLink } from "@/components/ui/brand-logo";
 import { PlayerAchievementsShelf } from "@/components/public/player-achievements-shelf";
+import { PlayerVideoGallery } from "@/components/public/player-video-gallery";
 import { ProfileViewTracker } from "@/components/public/profile-view-tracker";
 import { buildPublicFichaDocument } from "@/lib/ficha-document-model";
 import type { PublicPlayerData } from "@/lib/public-player";
@@ -16,7 +17,7 @@ interface PublicPlayerCardProps {
 }
 
 export function PublicPlayerCard({ data }: PublicPlayerCardProps) {
-  const { player, history, achievements } = data;
+  const { player, history, achievements, promoVideos } = data;
   const [copied, setCopied] = useState(false);
 
   const model = buildPublicFichaDocument(data);
@@ -95,23 +96,11 @@ export function PublicPlayerCard({ data }: PublicPlayerCardProps) {
             </section>
           ) : null}
 
-          <section className="mt-6 rounded-xl border border-mf-border bg-white px-5 py-6 sm:px-6">
-            <h2 className="text-lg font-semibold text-mf-text">Video</h2>
-            {player.video_url ? (
-              <video
-                controls
-                className="mt-4 max-h-[400px] w-full rounded-xl bg-black"
-                src={player.video_url}
-              />
-            ) : (
-              <div className="mt-4 rounded-xl border border-dashed border-mf-border bg-mf-canvas px-6 py-10 text-center">
-                <Timer className="mx-auto h-8 w-8 text-mf-text-muted/40" />
-                <p className="mt-3 text-sm font-medium text-mf-text-secondary">
-                  Próximamente video highlight
-                </p>
-              </div>
-            )}
-          </section>
+          <PlayerVideoGallery
+            primaryVideoUrl={player.video_url}
+            clips={promoVideos}
+            playerName={player.first_name}
+          />
         </div>
 
         <footer className="mt-8 border-t border-mf-border pt-6 text-center print:hidden">
