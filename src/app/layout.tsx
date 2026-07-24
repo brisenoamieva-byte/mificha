@@ -14,6 +14,9 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
+// Avoid build-time Supabase fetches when DNS/env is unavailable on the builder.
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "MiFicha · Ficha técnica para torneos escolares",
   description:
