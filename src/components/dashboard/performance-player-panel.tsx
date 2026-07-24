@@ -180,7 +180,7 @@ export function PerformancePlayerPanel({
         <p className="text-sm text-mf-text-secondary">
           Carga jugadores en Plantel para ver gráficas de rendimiento.
         </p>
-        <Link href="/dashboard/plantel" className="mf-btn-primary mt-4 inline-flex">
+        <Link href="/fut/dashboard/plantel" className="mf-btn-primary mt-4 inline-flex">
           Ir a plantel
         </Link>
       </div>

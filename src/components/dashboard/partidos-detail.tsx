@@ -83,7 +83,7 @@ export function PartidosDetail({ matchId }: PartidosDetailProps) {
     }
 
     toast.success("Partido cancelado.");
-    router.push("/dashboard/partidos");
+    router.push("/fut/dashboard/partidos");
     router.refresh();
   }
 
@@ -100,7 +100,7 @@ export function PartidosDetail({ matchId }: PartidosDetailProps) {
     return (
       <div className="rounded-xl bg-white p-8 text-center shadow-sm">
         <p className="text-slate-600">Partido no encontrado.</p>
-        <Link href="/dashboard/partidos" className="mt-4 inline-block text-[#1B4F8C]">
+        <Link href="/fut/dashboard/partidos" className="mt-4 inline-block text-[#1B4F8C]">
           Volver
         </Link>
       </div>
@@ -112,7 +112,7 @@ export function PartidosDetail({ matchId }: PartidosDetailProps) {
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <Link
-        href="/dashboard/partidos"
+        href="/fut/dashboard/partidos"
         className="text-sm font-medium text-[#1B4F8C] hover:underline"
       >
         ← Volver a partidos
@@ -143,7 +143,7 @@ export function PartidosDetail({ matchId }: PartidosDetailProps) {
           <MatchScheduleCard
             match={match}
             showCaptureLink={!match.is_official}
-            detailHref={match.is_official ? `/dashboard/partidos/${match.id}` : undefined}
+            detailHref={match.is_official ? `/fut/dashboard/partidos/${match.id}` : undefined}
             variant="light"
           />
           {match.is_official ? (

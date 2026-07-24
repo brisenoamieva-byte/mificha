@@ -27,14 +27,14 @@ export function HomeCtaBand() {
         </div>
         <div className="flex flex-wrap gap-3">
           <Link
-            href="/signup"
+            href="/fut/signup"
             className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-mf-brand transition hover:bg-white/95"
           >
             Registrar academia
             <ArrowRight className="h-4 w-4" />
           </Link>
           <Link
-            href="/padres"
+            href="/fut/padres"
             className="inline-flex items-center gap-2 rounded-full border border-mf-accent/40 bg-mf-accent/10 px-6 py-3 text-sm font-semibold text-mf-accent-bright transition hover:bg-mf-accent/20"
           >
             Soy padre

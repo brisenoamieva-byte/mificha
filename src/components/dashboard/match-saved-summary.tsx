@@ -97,7 +97,7 @@ export function MatchSavedSummary({
         <p className="text-sm text-slate-600">
           MiFicha envía la actualización sola a quien tenga consentimiento, ficha pública
           y contacto del tutor. Configura avisos en{" "}
-          <Link href="/dashboard/plantel/tutores" className="font-semibold text-[#1B4F8C] hover:underline">
+          <Link href="/fut/dashboard/plantel/tutores" className="font-semibold text-[#1B4F8C] hover:underline">
             Avisos a tutores
           </Link>
           .
@@ -242,7 +242,7 @@ export function MatchSavedSummary({
                     Reenviar manual
                   </a>
                   <Link
-                    href={`/j/${player.slug}`}
+                    href={`/fut/j/${player.slug}`}
                     target="_blank"
                     className="inline-flex items-center rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
                   >

@@ -26,17 +26,17 @@ export const MARKETING_NAV: NavSection[] = [
     icon: Trophy,
     links: [
       {
-        href: "/#como-funciona",
+        href: "/fut/#como-funciona",
         label: "Cómo funciona",
         description: "Plantel, acta oficial y aviso al tutor",
       },
       {
-        href: "/j/santiago-hernandez-demo",
+        href: "/fut/j/santiago-hernandez-demo",
         label: "Ficha de ejemplo",
         description: "Stats del torneo en una ficha real",
       },
       {
-        href: "/padres",
+        href: "/fut/padres",
         label: "Padres",
         description: "Ficha post-partido por WhatsApp o email",
       },
@@ -48,17 +48,17 @@ export const MARKETING_NAV: NavSection[] = [
     icon: Users,
     links: [
       {
-        href: "/signup",
+        href: "/fut/signup",
         label: "Registrar academia",
         description: "Plantel, partidos y reportes",
       },
       {
-        href: "/organizadores",
+        href: "/fut/organizadores",
         label: "Organizadores",
         description: "Calendario y acta oficial",
       },
       {
-        href: "/explorar",
+        href: "/fut/explorar",
         label: "Explorar",
         description: "Directorio, rankings e 11 ideal semanal",
       },

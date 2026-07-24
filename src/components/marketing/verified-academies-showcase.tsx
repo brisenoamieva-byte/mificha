@@ -102,7 +102,7 @@ function MarqueeRow({
         {loop.map((academy, index) => (
           <Link
             key={`${academy.id}-${index}`}
-            href={`/a/${academy.slug}`}
+            href={`/fut/a/${academy.slug}`}
             className="group flex shrink-0 items-center gap-4 rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-3 backdrop-blur-sm transition hover:border-mf-accent/40 hover:bg-white/[0.1]"
           >
             <AcademyLogoMark academy={academy} size="sm" />
@@ -155,7 +155,7 @@ export function VerifiedAcademiesShowcase({
               </p>
             </div>
             <Link
-              href="/explorar"
+              href="/fut/explorar"
               className="inline-flex items-center gap-1.5 text-sm font-semibold text-mf-accent-bright hover:text-white"
             >
               Ver directorio
@@ -230,7 +230,7 @@ export function VerifiedAcademiesShowcase({
           {featured.map((academy) => (
             <Link
               key={academy.id}
-              href={`/a/${academy.slug}`}
+              href={`/fut/a/${academy.slug}`}
               className="group rounded-2xl border border-white/10 bg-white/[0.05] p-5 backdrop-blur-sm transition hover:border-mf-accent/35 hover:bg-white/[0.08] hover:shadow-[0_20px_50px_rgba(0,0,0,0.22)]"
             >
               <AcademyLogoMark academy={academy} size="lg" showName />
@@ -243,12 +243,12 @@ export function VerifiedAcademiesShowcase({
         </div>
 
         <div className="mt-10 flex flex-wrap items-center gap-4">
-          <Link href="/explorar" className="mf-btn-accent-solid">
+          <Link href="/fut/explorar" className="mf-btn-accent-solid">
             Explorar la red completa
             <ArrowRight className="h-4 w-4" />
           </Link>
           <Link
-            href="/signup"
+            href="/fut/signup"
             className="inline-flex items-center gap-2 rounded-full border border-white/20 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10"
           >
             Tu academia también puede aparecer aquí

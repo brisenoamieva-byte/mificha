@@ -186,7 +186,7 @@ export function buildPublicAcademyUrl(slug: string) {
   const base =
     process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ??
     "https://mificha.mx";
-  return `${base}/a/${slug}`;
+  return `${base}/fut/a/${slug}`;
 }
 
 export function formatWhatsAppUrl(phone: string | null) {

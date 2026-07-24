@@ -62,7 +62,7 @@ export function SignUpForm() {
       const data = await signUp(email, password, "academy_admin", fullName);
 
       if (data.session) {
-        router.push("/dashboard");
+        router.push("/fut/dashboard");
         router.refresh();
         return;
       }
@@ -171,7 +171,7 @@ export function SignUpForm() {
 
       <p className="text-center text-sm text-gray-600">
         ¿Ya tienes cuenta?{" "}
-        <Link href="/login" className="font-medium text-[#1B4F8C] hover:underline">
+        <Link href="/fut/login" className="font-medium text-[#1B4F8C] hover:underline">
           Inicia sesión
         </Link>
       </p>

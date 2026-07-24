@@ -40,7 +40,7 @@ export function buildPublicPlayerUrl(slug: string) {
   const base =
     process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ??
     "http://localhost:3000";
-  return `${base}/j/${slug}`;
+  return `${base}/fut/j/${slug}`;
 }
 
 export function getDominantFootLabel(foot: DominantFoot) {

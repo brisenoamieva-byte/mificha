@@ -5,7 +5,7 @@ import { ArrowRight, Printer } from "lucide-react";
 import { FichaDocument } from "@/components/ficha/ficha-document";
 import { buildDemoFichaDocument } from "@/lib/ficha-document-model";
 
-const DEMO_FICHA_HREF = "/j/santiago-hernandez-demo";
+const DEMO_FICHA_HREF = "/fut/j/santiago-hernandez-demo";
 
 interface HomeFichaPreviewProps {
   /** Recorta la ficha para el hero — evita hueco bajo el copy. */

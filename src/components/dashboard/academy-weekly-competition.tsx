@@ -103,7 +103,7 @@ export function AcademyWeeklyCompetition({ academyId }: AcademyWeeklyCompetition
                 )}
                 <div className="min-w-0 flex-1">
                   <Link
-                    href={`/j/${player.slug}`}
+                    href={`/fut/j/${player.slug}`}
                     target="_blank"
                     className="truncate font-semibold text-mf-text hover:text-mf-brand"
                   >

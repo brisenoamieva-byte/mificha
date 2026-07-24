@@ -28,11 +28,11 @@ const defaultOutreach = buildFounderOutreachMessage({
 });
 
 const QUICK_LINKS: Array<{ href: string; label: string; primary?: boolean }> = [
-  { href: "/interno/pitch", label: "Presentación", primary: true },
-  { href: "/interno/demo-one-pager", label: "One-pager" },
-  { href: "/interno/organizadores", label: "Organizador" },
-  { href: "/interno/jornadas", label: "Jornadas / acta" },
-  { href: "/dashboard", label: "Dashboard" },
+  { href: "/fut/interno/pitch", label: "Presentación", primary: true },
+  { href: "/fut/interno/demo-one-pager", label: "One-pager" },
+  { href: "/fut/interno/fut/organizadores", label: "Organizador" },
+  { href: "/fut/interno/jornadas", label: "Jornadas / acta" },
+  { href: "/fut/dashboard", label: "Dashboard" },
 ];
 
 export function FounderLaunchPlaybook() {
@@ -122,7 +122,7 @@ export function FounderLaunchPlaybook() {
             ))}
           </ul>
           <Link
-            href="/interno/gobernanza"
+            href="/fut/interno/gobernanza"
             className="mt-4 inline-flex text-sm font-medium text-violet-300 hover:text-violet-200"
           >
             Detalle completo →
@@ -205,14 +205,14 @@ export function FounderLaunchPlaybook() {
           </ol>
           <div className="mt-4 flex flex-wrap gap-2">
             <Link
-              href="/interno/jornadas"
+              href="/fut/interno/jornadas"
               className="inline-flex items-center gap-2 rounded-lg border border-white/15 px-4 py-2 text-sm font-semibold hover:bg-white/10"
             >
               <FileText className="h-4 w-4" />
               Publicar acta
             </Link>
             <Link
-              href="/dashboard/plantel/tutores"
+              href="/fut/dashboard/plantel/tutores"
               className="inline-flex items-center gap-2 rounded-lg border border-white/15 px-4 py-2 text-sm font-semibold hover:bg-white/10"
             >
               <MessageCircle className="h-4 w-4" />

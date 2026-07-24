@@ -40,7 +40,7 @@ export function ParentLinkForm() {
       return;
     }
 
-    router.push(`/j/${encodeURIComponent(slug)}`);
+    router.push(`/fut/j/${encodeURIComponent(slug)}`);
   }
 
   return (
@@ -77,7 +77,7 @@ export function ParentLinkForm() {
           type="text"
           value={input}
           onChange={(event) => setInput(event.target.value)}
-          placeholder="https://mificha.mx/j/nombre-jugador-abc123"
+          placeholder="https://mificha.mx/fut/j/nombre-jugador-abc123"
           className="mf-input mt-5"
         />
         {error ? <p className="mt-3 text-sm text-mf-danger">{error}</p> : null}
@@ -95,7 +95,7 @@ export function ParentLinkForm() {
             contacto. MiFicha te enviará el enlace automáticamente.
           </WithBrandName>
         </p>
-        <Link href="/explorar" className="mf-btn-secondary mt-5 inline-flex">
+        <Link href="/fut/explorar" className="mf-btn-secondary mt-5 inline-flex">
           Explorar fichas públicas
           <ArrowRight className="h-4 w-4" />
         </Link>

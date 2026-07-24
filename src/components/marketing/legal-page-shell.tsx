@@ -18,7 +18,7 @@ export function LegalPageShell({
 }: LegalPageShellProps) {
   return (
     <div className="flex min-h-dvh flex-col bg-mf-canvas">
-      <SiteHeader actionHref="/login" actionLabel="Iniciar sesión" />
+      <SiteHeader actionHref="/fut/login" actionLabel="Iniciar sesión" />
 
       <main className="flex-1">
         <article className="mx-auto max-w-3xl px-4 py-12 sm:px-6">

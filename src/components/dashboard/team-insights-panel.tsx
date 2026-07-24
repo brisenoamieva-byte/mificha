@@ -105,7 +105,7 @@ export function TeamInsightsPanel({
             {leaderboard.map((player, index) => (
               <Link
                 key={player.id}
-                href={`/j/${player.slug}`}
+                href={`/fut/j/${player.slug}`}
                 target="_blank"
                 className="group block rounded-md border border-transparent p-3 transition hover:border-mf-border hover:bg-mf-canvas"
               >

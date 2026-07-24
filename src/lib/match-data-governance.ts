@@ -91,7 +91,7 @@ export const MIFICHA_DATA_GOVERNANCE = {
   workflow: [
     {
       phase: "Antes del partido",
-      organizer: ["Publicar jornada en /interno/jornadas"],
+      organizer: ["Publicar jornada en /fut/interno/jornadas"],
       academy: ["Tener plantel cargado y consentimientos listos"],
       mificha: ["Mostrar jornada en dashboard de la academia"],
     },

@@ -18,7 +18,7 @@ export function PitchDeckNavLink({ onClose }: { onClose?: () => void }) {
 
       if (!session) return;
 
-      const response = await fetch("/api/interno/pitch-access", {
+      const response = await fetch("/fut/api/fut/interno/pitch-access", {
         headers: {
           Authorization: `Bearer ${session.access_token}`,
         },
@@ -40,7 +40,7 @@ export function PitchDeckNavLink({ onClose }: { onClose?: () => void }) {
   return (
     <div className="mt-2 space-y-1 border-t border-mf-border pt-3">
       <Link
-        href="/interno/pitch"
+        href="/fut/interno/pitch"
         target="_blank"
         rel="noopener noreferrer"
         onClick={onClose}
@@ -50,7 +50,7 @@ export function PitchDeckNavLink({ onClose }: { onClose?: () => void }) {
         Pitch deck
       </Link>
       <Link
-        href="/interno/lanzamiento"
+        href="/fut/interno/lanzamiento"
         target="_blank"
         rel="noopener noreferrer"
         onClick={onClose}

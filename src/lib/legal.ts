@@ -12,9 +12,9 @@ export const LEGAL_ENTITY = {
 } as const;
 
 export const LEGAL_ROUTES = {
-  privacy: "/aviso-privacidad",
-  terms: "/terminos",
-  cookies: "/cookies",
+  privacy: "/fut/aviso-privacidad",
+  terms: "/fut/terminos",
+  cookies: "/fut/cookies",
 } as const;
 
 /** Aviso simplificado (LFPDPPP) para formularios de recolección. */

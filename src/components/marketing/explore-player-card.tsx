@@ -19,7 +19,7 @@ type ExplorePlayerCardProps = {
 export function ExplorePlayerCard({ player, className }: ExplorePlayerCardProps) {
   const demo = isExploreDemoPlayer(player);
   const fullName = `${player.first_name} ${player.last_name}`;
-  const href = demo ? player.example_href : `/j/${player.slug}`;
+  const href = demo ? player.example_href : `/fut/j/${player.slug}`;
   const stats = demo ? player.season_stats : null;
   const location = [player.academies?.city, player.academies?.state]
     .filter(Boolean)

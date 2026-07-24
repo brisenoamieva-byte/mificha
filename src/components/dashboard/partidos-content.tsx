@@ -102,14 +102,14 @@ export function PartidosContent() {
 
         <div className="flex flex-wrap gap-2">
           <Link
-            href="/dashboard/partidos/nuevo"
+            href="/fut/dashboard/partidos/nuevo"
             className="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-5 py-4 text-sm font-semibold text-slate-700 hover:bg-slate-50"
           >
             <Plus className="h-4 w-4" />
             Registrar amistoso
           </Link>
           <Link
-            href="/dashboard/partidos/programar"
+            href="/fut/dashboard/partidos/programar"
             className="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-5 py-4 text-sm font-semibold text-slate-700 hover:bg-slate-50"
           >
             <CalendarPlus className="h-4 w-4" />
@@ -144,7 +144,7 @@ export function PartidosContent() {
                   MiFicha publicará aquí las jornadas de tu competición.
                 </p>
                 <Link
-                  href="/dashboard/partidos/programar"
+                  href="/fut/dashboard/partidos/programar"
                   className="mt-3 inline-block text-sm font-semibold text-[#1B4F8C] hover:underline"
                 >
                   Más información →
@@ -157,7 +157,7 @@ export function PartidosContent() {
                     key={match.id}
                     match={match}
                     showCaptureLink={!match.is_official}
-                    detailHref={match.is_official ? `/dashboard/partidos/${match.id}` : undefined}
+                    detailHref={match.is_official ? `/fut/dashboard/partidos/${match.id}` : undefined}
                     variant="light"
                   />
                 ))}
@@ -184,7 +184,7 @@ export function PartidosContent() {
                 {completedMatches.map((match) => (
                   <Link
                     key={match.id}
-                    href={`/dashboard/partidos/${match.id}`}
+                    href={`/fut/dashboard/partidos/${match.id}`}
                     className="flex items-center justify-between gap-4 px-4 py-5 transition-colors hover:bg-slate-50 sm:px-6"
                   >
                     <div>

@@ -55,7 +55,7 @@ export function NoSeasonState({
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
           <Link
-            href="/interno/temporadas"
+            href="/fut/interno/temporadas"
             className="inline-flex items-center gap-2 rounded-full bg-mf-brand px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-mf-brand-dark"
           >
             Activar temporada (interno)

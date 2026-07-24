@@ -144,7 +144,7 @@ export function MatchScheduleCard({
 
         {showCaptureLink ? (
           <Link
-            href={`/dashboard/partidos/nuevo?matchId=${match.id}`}
+            href={`/fut/dashboard/partidos/nuevo?matchId=${match.id}`}
             className="inline-flex items-center gap-2 rounded-full bg-[#1B4F8C] px-4 py-2 text-sm font-semibold text-white hover:bg-[#164278]"
           >
             Registrar resultado
@@ -171,7 +171,7 @@ export function AcademyScheduleSection({
   if (matches.length === 0) return null;
 
   const isDark = variant === "dark";
-  const academyHref = academySlug ? `/a/${academySlug}` : undefined;
+  const academyHref = academySlug ? `/fut/a/${academySlug}` : undefined;
 
   return (
     <section className={isDark ? "mx-auto max-w-6xl px-6 py-16 sm:px-10" : ""}>

@@ -21,7 +21,7 @@ export async function loadActiveAcademySeason(
 
   if (!session) return null;
 
-  const response = await fetch("/api/academy/ensure-season", {
+  const response = await fetch("/fut/api/academy/ensure-season", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

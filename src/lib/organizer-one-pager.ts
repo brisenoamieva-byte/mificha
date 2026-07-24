@@ -29,8 +29,8 @@ export const ORGANIZER_ONE_PAGER = {
     "MiFicha sincroniza stats con cada plantel.",
     "El padre recibe link automático a la ficha.",
   ],
-  demoFichaHref: "/j/santiago-hernandez-demo",
-  demoExploreHref: "/explorar",
+  demoFichaHref: "/fut/j/santiago-hernandez-demo",
+  demoExploreHref: "/fut/explorar",
   academyKitTitle: "Guión para academias",
   academyKitDescription: "Copia y pega en WhatsApp cuando abras inscripciones.",
   askTitle: "Qué necesitamos de ti",
@@ -49,7 +49,7 @@ export const ORGANIZER_ONE_PAGER = {
   contact: {
     name: "Ricardo Briseño",
     email: "hola@mificha.mx",
-    web: "mificha.mx/organizadores",
+    web: "mificha.mx/fut/organizadores",
   },
 } as const;
 
@@ -88,7 +88,7 @@ export function buildOrganizerAcademyBlastText(options: {
   tournamentName: string;
   signupUrl?: string;
 }) {
-  const url = options.signupUrl ?? "https://mificha.mx/signup";
+  const url = options.signupUrl ?? "https://mificha.mx/fut/signup";
   return [
     `Torneo ${options.tournamentName} · MiFicha activo`,
     "",

@@ -42,7 +42,7 @@ export function DemoOnePagerView() {
       <div className="no-print sticky top-0 z-20 border-b border-white/10 bg-[#0a1628] px-4 py-3 sm:px-6">
         <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-between gap-3">
           <Link
-            href="/interno/pitch"
+            href="/fut/interno/pitch"
             className="inline-flex items-center gap-2 text-sm font-medium text-white/70 hover:text-white"
           >
             <ArrowLeft className="h-4 w-4" />

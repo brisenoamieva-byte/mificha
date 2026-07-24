@@ -343,14 +343,14 @@ export function DashboardHome() {
               ) : null}
               <div className="mt-4 flex flex-wrap gap-3">
                 <Link
-                  href={`/dashboard/partidos/${nextMatch.id}`}
+                  href={`/fut/dashboard/partidos/${nextMatch.id}`}
                   className="text-sm font-semibold text-mf-brand hover:underline"
                 >
                   Ver detalle →
                 </Link>
                 {!nextMatch.is_official ? (
                   <Link
-                    href={`/dashboard/partidos/nuevo?matchId=${nextMatch.id}`}
+                    href={`/fut/dashboard/partidos/nuevo?matchId=${nextMatch.id}`}
                     className="text-sm font-semibold text-mf-text-secondary hover:underline"
                   >
                     Registrar amistoso
@@ -380,7 +380,7 @@ export function DashboardHome() {
                 {formatMatchDate(lastMatch.match_date)}
               </p>
               <Link
-                href={`/dashboard/partidos/${lastMatch.id}`}
+                href={`/fut/dashboard/partidos/${lastMatch.id}`}
                 className="mt-4 inline-flex text-sm font-semibold text-mf-brand hover:underline"
               >
                 Ver detalle →
@@ -396,7 +396,7 @@ export function DashboardHome() {
                 Programa el siguiente juego o captura un resultado.
               </p>
               <Link
-                href="/dashboard/partidos/programar"
+                href="/fut/dashboard/partidos/programar"
                 className="mt-4 inline-flex text-sm font-semibold text-mf-brand hover:underline"
               >
                 Programar partido →

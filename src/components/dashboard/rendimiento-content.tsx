@@ -116,7 +116,7 @@ export function RendimientoContent() {
             </p>
           </div>
           <Link
-            href="/dashboard/partidos/nuevo"
+            href="/fut/dashboard/partidos/nuevo"
             className="inline-flex shrink-0 items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-mf-brand transition hover:bg-white/95"
           >
             <BarChart3 className="h-4 w-4" />

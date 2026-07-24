@@ -28,7 +28,7 @@ export function DataGovernancePlaybook() {
       <header className="border-b border-white/10 px-6 py-5 sm:px-10">
         <div className="mx-auto max-w-4xl">
           <Link
-            href="/interno/lanzamiento"
+            href="/fut/interno/lanzamiento"
             className="inline-flex items-center gap-1 text-sm text-white/55 hover:text-white"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -162,13 +162,13 @@ export function DataGovernancePlaybook() {
 
         <section className="flex flex-wrap gap-3">
           <Link
-            href="/interno/jornadas"
+            href="/fut/interno/jornadas"
             className="rounded-full bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-[#0a1628]"
           >
             Ir a jornadas (marcador + acta)
           </Link>
           <Link
-            href="/interno/lanzamiento"
+            href="/fut/interno/lanzamiento"
             className="rounded-full border border-white/15 px-5 py-2.5 text-sm font-semibold text-white/80 hover:bg-white/5"
           >
             Playbook de venta

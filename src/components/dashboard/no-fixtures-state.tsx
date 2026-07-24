@@ -9,7 +9,7 @@ interface NoFixturesStateProps {
 }
 
 export function NoFixturesState({
-  backHref = "/dashboard/partidos",
+  backHref = "/fut/dashboard/partidos",
   backLabel = "← Volver a partidos",
   className,
 }: NoFixturesStateProps) {
@@ -35,13 +35,13 @@ export function NoFixturesState({
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
           <Link
-            href="/interno/jornadas"
+            href="/fut/interno/jornadas"
             className="inline-flex items-center gap-2 rounded-full bg-mf-brand px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-mf-brand-dark"
           >
             Publicar jornada (interno)
           </Link>
           <Link
-            href="/dashboard/partidos"
+            href="/fut/dashboard/partidos"
             className="inline-flex items-center gap-2 rounded-full border border-mf-brand/20 bg-white px-4 py-2.5 text-sm font-semibold text-mf-brand transition hover:bg-mf-brand-soft"
           >
             Volver a partidos

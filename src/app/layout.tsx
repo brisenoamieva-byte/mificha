@@ -18,18 +18,18 @@ const inter = Inter({
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "MiFicha · Ficha técnica para torneos escolares",
+  title: "MiFicha · Tu ficha deportiva",
   description:
-    "Acta oficial del torneo, plantel verificado y aviso al tutor. Plataforma para academias interescolares en Querétaro.",
+    "Fútbol y pádel bajo la misma marca. Elige el deporte y entra a tu ficha.",
   metadataBase: new URL(appUrl),
   icons: {
     icon: BRAND_ICON,
     apple: BRAND_ICON,
   },
   openGraph: {
-    title: "MiFicha · Ficha técnica para torneos escolares",
+    title: "MiFicha · Tu ficha deportiva",
     description:
-      "Acta oficial, plantel verificado y aviso al tutor. Torneos interescolares en Querétaro.",
+      "Fútbol y pádel bajo la misma marca. Elige el deporte y entra a tu ficha.",
     url: appUrl,
     siteName: "MiFicha",
     locale: "es_MX",
@@ -45,9 +45,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "MiFicha · Ficha técnica para torneos escolares",
+    title: "MiFicha · Tu ficha deportiva",
     description:
-      "Acta oficial, plantel verificado y aviso al tutor. Torneos interescolares en Querétaro.",
+      "Fútbol y pádel bajo la misma marca. Elige el deporte y entra a tu ficha.",
     images: [BRAND_OG_IMAGE],
   },
 };

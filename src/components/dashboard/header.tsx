@@ -29,7 +29,7 @@ export function DashboardHeader({ onMenuClick }: DashboardHeaderProps) {
 
   async function handleSignOut() {
     await signOut();
-    router.push("/login");
+    router.push("/fut/login");
     router.refresh();
   }
 

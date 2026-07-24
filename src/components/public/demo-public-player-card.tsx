@@ -36,7 +36,7 @@ export function DemoPublicPlayerCard() {
             Imprimir ficha
           </button>
           <Link
-            href="/signup"
+            href="/fut/signup"
             className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-mf-brand px-4 py-2.5 text-sm font-semibold text-white hover:bg-mf-brand-dark sm:flex-none sm:px-5"
           >
             Registrar academia
@@ -50,7 +50,7 @@ export function DemoPublicPlayerCard() {
             <Link href="/" className="text-mf-brand hover:underline">
               Volver al inicio
             </Link>
-            <Link href="/explorar" className="text-mf-brand hover:underline">
+            <Link href="/fut/explorar" className="text-mf-brand hover:underline">
               Explorar directorio
             </Link>
           </div>

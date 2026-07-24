@@ -51,7 +51,7 @@ export function SiteNavDesktop() {
       ))}
 
       <Link
-        href="/aviso-privacidad"
+        href="/fut/aviso-privacidad"
         className="rounded-full px-3 py-2 text-sm font-medium text-mf-text-secondary transition hover:bg-black/[0.04] hover:text-mf-text"
       >
         Privacidad
@@ -61,7 +61,7 @@ export function SiteNavDesktop() {
 }
 
 export function SiteNavMobile({
-  actionHref = "/login",
+  actionHref = "/fut/login",
   actionLabel = "Iniciar sesión",
 }: {
   actionHref?: string;
@@ -125,7 +125,7 @@ export function SiteNavMobile({
                   {actionLabel}
                 </Link>
                 <Link
-                  href="/signup"
+                  href="/fut/signup"
                   className="mf-btn-primary w-full justify-center"
                   onClick={() => setMobileOpen(false)}
                 >
@@ -133,7 +133,7 @@ export function SiteNavMobile({
                 </Link>
               </div>
               <Link
-                href="/aviso-privacidad"
+                href="/fut/aviso-privacidad"
                 className={cn(
                   "mt-2 block rounded-lg px-2 py-2.5 text-sm font-medium text-mf-text-secondary",
                   "hover:bg-mf-brand-soft",

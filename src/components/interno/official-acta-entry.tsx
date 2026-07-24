@@ -39,7 +39,7 @@ export function OfficialActaEntry({
     setLoading(true);
     try {
       const payload = (await authedFetch(
-        `/api/interno/fixtures/acta?fixture_id=${encodeURIComponent(fixture.id)}`,
+        `/fut/api/fut/interno/fixtures/acta?fixture_id=${encodeURIComponent(fixture.id)}`,
       )) as {
         players?: Player[];
         stats?: ActaStatRow[];
@@ -125,7 +125,7 @@ export function OfficialActaEntry({
         return;
       }
 
-      await authedFetch("/api/interno/fixtures/acta", {
+      await authedFetch("/fut/api/fut/interno/fixtures/acta", {
         method: "POST",
         body: JSON.stringify({
           fixture_id: fixture.id,

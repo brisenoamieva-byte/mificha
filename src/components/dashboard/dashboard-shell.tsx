@@ -35,7 +35,7 @@ export function DashboardShell({ children }: DashboardShellProps) {
 
       const user = session?.user ?? (await getCurrentUser());
       if (!user) {
-        router.replace("/login");
+        router.replace("/fut/login");
         return;
       }
 
@@ -52,7 +52,7 @@ export function DashboardShell({ children }: DashboardShellProps) {
       setProfile(profileData);
       setAcademy(academyData);
     } catch {
-      router.replace("/login");
+      router.replace("/fut/login");
     } finally {
       setLoading(false);
     }

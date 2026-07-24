@@ -19,7 +19,7 @@ export function HomeHero() {
       }
       actions={
         <>
-          <Link href="/signup" className="mf-btn-primary">
+          <Link href="/fut/signup" className="mf-btn-primary">
             Registrar academia
             <ArrowRight className="h-4 w-4" />
           </Link>

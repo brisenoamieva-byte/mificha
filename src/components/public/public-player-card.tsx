@@ -106,10 +106,10 @@ export function PublicPlayerCard({ data }: PublicPlayerCardProps) {
         <footer className="mt-8 border-t border-mf-border pt-6 text-center print:hidden">
           <BrandLogoLink className="justify-center" size="sm" />
           <div className="mt-4 flex flex-wrap justify-center gap-x-4 gap-y-2 text-sm font-medium">
-            <Link href="/padres" className="text-mf-brand hover:underline">
+            <Link href="/fut/padres" className="text-mf-brand hover:underline">
               ¿Eres padre?
             </Link>
-            <Link href="/explorar" className="text-mf-brand hover:underline">
+            <Link href="/fut/explorar" className="text-mf-brand hover:underline">
               Explorar directorio
             </Link>
           </div>
@@ -117,11 +117,11 @@ export function PublicPlayerCard({ data }: PublicPlayerCardProps) {
           <p className="mx-auto mt-3 max-w-lg text-xs leading-5 text-mf-text-muted">
             Ficha compartida con autorización parental. Si deseas rectificar o eliminar estos
             datos, contacta a la academia.{" "}
-            <Link href="/aviso-privacidad" className="text-mf-brand hover:underline">
+            <Link href="/fut/aviso-privacidad" className="text-mf-brand hover:underline">
               Privacidad
             </Link>
             {" · "}
-            <Link href="/terminos" className="text-mf-brand hover:underline">
+            <Link href="/fut/terminos" className="text-mf-brand hover:underline">
               Términos
             </Link>
           </p>

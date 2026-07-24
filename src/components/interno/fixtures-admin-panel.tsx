@@ -78,7 +78,7 @@ export function FixturesAdminPanel() {
   const loadAcademies = useCallback(async () => {
     setLoading(true);
     try {
-      const payload = (await authedFetch("/api/interno/fixtures")) as {
+      const payload = (await authedFetch("/fut/api/fut/interno/fixtures")) as {
         academies: AcademyOption[];
       };
       setAcademies(payload.academies);
@@ -99,7 +99,7 @@ export function FixturesAdminPanel() {
 
     try {
       const payload = (await authedFetch(
-        `/api/interno/fixtures?academy_id=${encodeURIComponent(academyId)}`,
+        `/fut/api/fut/interno/fixtures?academy_id=${encodeURIComponent(academyId)}`,
       )) as { season: Season | null; fixtures: Match[] };
 
       setActiveSeason(payload.season);
@@ -138,7 +138,7 @@ export function FixturesAdminPanel() {
 
     setSaving(true);
     try {
-      await authedFetch("/api/interno/fixtures", {
+      await authedFetch("/fut/api/fut/interno/fixtures", {
         method: "POST",
         body: JSON.stringify({
           academy_id: selectedAcademyId,
@@ -171,7 +171,7 @@ export function FixturesAdminPanel() {
 
   async function cancelFixture(fixtureId: string) {
     try {
-      await authedFetch("/api/interno/fixtures", {
+      await authedFetch("/fut/api/fut/interno/fixtures", {
         method: "PATCH",
         body: JSON.stringify({ fixture_id: fixtureId, status: "cancelled" }),
       });
@@ -200,19 +200,19 @@ export function FixturesAdminPanel() {
           </div>
           <div className="flex flex-wrap gap-3">
             <Link
-              href="/interno/gobernanza"
+              href="/fut/interno/gobernanza"
               className="rounded-full border border-white/15 px-4 py-2 text-sm font-semibold text-white/80 hover:bg-white/5"
             >
               Quién hace qué
             </Link>
             <Link
-              href="/interno/temporadas"
+              href="/fut/interno/temporadas"
               className="inline-flex items-center gap-2 rounded-full border border-white/20 px-4 py-2 text-sm font-semibold text-white/90 hover:bg-white/10"
             >
               Temporadas
             </Link>
             <Link
-              href="/interno/lanzamiento"
+              href="/fut/interno/lanzamiento"
               className="inline-flex items-center gap-2 rounded-full border border-white/20 px-4 py-2 text-sm font-semibold text-white/90 hover:bg-white/10"
             >
               <ArrowLeft className="h-3.5 w-3.5" />
@@ -251,7 +251,7 @@ export function FixturesAdminPanel() {
               ) : (
                 <p className="mt-3 text-sm text-amber-300">
                   Sin temporada activa — publícala en{" "}
-                  <Link href="/interno/temporadas" className="underline">
+                  <Link href="/fut/interno/temporadas" className="underline">
                     Temporadas
                   </Link>{" "}
                   antes de cargar jornadas.

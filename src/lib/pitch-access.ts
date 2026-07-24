@@ -11,7 +11,7 @@ function parseList(raw: string): string[] {
     .filter(Boolean);
 }
 
-/** Usuarios autorizados para /interno/pitch (comma-separated UUIDs). */
+/** Usuarios autorizados para /fut/interno/pitch (comma-separated UUIDs). */
 export function getPitchAllowedUserIds(): string[] {
   const explicit = process.env.PITCH_ALLOWED_USER_IDS?.trim();
   if (explicit) return parseList(explicit);

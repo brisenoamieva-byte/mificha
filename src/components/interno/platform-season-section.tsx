@@ -55,7 +55,7 @@ export function PlatformSeasonSection() {
   const loadPlatformSeasons = useCallback(async () => {
     setLoading(true);
     try {
-      const payload = (await authedFetch("/api/interno/platform-seasons")) as {
+      const payload = (await authedFetch("/fut/api/fut/interno/platform-seasons")) as {
         platformSeasons: PlatformSeasonRecord[];
       };
       setPlatformSeasons(payload.platformSeasons ?? []);
@@ -79,7 +79,7 @@ export function PlatformSeasonSection() {
     event.preventDefault();
     setSaving(true);
     try {
-      await authedFetch("/api/interno/platform-seasons", {
+      await authedFetch("/fut/api/fut/interno/platform-seasons", {
         method: "POST",
         body: JSON.stringify({
           name: name.trim(),
@@ -101,7 +101,7 @@ export function PlatformSeasonSection() {
   async function assignToPublicAcademies(platformSeasonId: string) {
     setAssigning(true);
     try {
-      const result = await authedFetch("/api/interno/platform-seasons", {
+      const result = await authedFetch("/fut/api/fut/interno/platform-seasons", {
         method: "POST",
         body: JSON.stringify({
           platform_season_id: platformSeasonId,

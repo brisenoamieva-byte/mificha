@@ -71,7 +71,7 @@ export function PublicScheduleExploreSection({
                 key={match.id}
                 match={match}
                 academyName={match.academy_name}
-                academyHref={`/a/${match.academy_slug}`}
+                academyHref={`/fut/a/${match.academy_slug}`}
                 variant="light"
               />
             ))
@@ -80,7 +80,7 @@ export function PublicScheduleExploreSection({
 
         <p className="mt-6 text-sm text-mf-text-muted">
           ¿Eres academia?{" "}
-          <Link href="/signup" className="font-semibold text-mf-brand hover:underline">
+          <Link href="/fut/signup" className="font-semibold text-mf-brand hover:underline">
             Publica tu calendario en MiFicha
           </Link>
         </p>

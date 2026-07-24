@@ -13,7 +13,7 @@ export function ProfileViewTracker({ slug }: ProfileViewTrackerProps) {
     if (trackedRef.current || !slug) return;
     trackedRef.current = true;
 
-    void fetch("/api/public/profile-view", {
+    void fetch("/fut/api/public/profile-view", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ slug }),

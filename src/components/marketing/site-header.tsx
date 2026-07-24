@@ -10,7 +10,7 @@ interface SiteHeaderProps {
 }
 
 export function SiteHeader({
-  actionHref = "/login",
+  actionHref = "/fut/login",
   actionLabel = "Iniciar sesión",
 }: SiteHeaderProps) {
   return (
@@ -21,7 +21,7 @@ export function SiteHeader({
       />
       <div className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-mf-brand via-mf-accent/80 to-mf-brand" />
       <div className="relative mx-auto flex h-14 max-w-6xl items-center gap-3 px-4 sm:gap-4 sm:px-6">
-        <BrandLogoLink className="shrink-0" />
+        <BrandLogoLink href="/fut" className="shrink-0" />
 
         <div className="hidden min-w-0 flex-1 justify-center lg:flex">
           <SiteNavDesktop />
@@ -31,7 +31,7 @@ export function SiteHeader({
           <Link href={actionHref} className="mf-btn-ghost hidden sm:inline-flex">
             {actionLabel}
           </Link>
-          <Link href="/signup" className="mf-btn-primary hidden sm:inline-flex">
+          <Link href="/fut/signup" className="mf-btn-primary hidden sm:inline-flex">
             Registrar academia
           </Link>
           <SiteNavMobile actionHref={actionHref} actionLabel={actionLabel} />
@@ -46,19 +46,19 @@ export function SiteFooter() {
     <footer className="border-t border-mf-border bg-mf-surface">
       <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
         <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-mf-text-secondary">
-          <Link href="/#como-funciona" className="transition hover:text-mf-text">
+          <Link href="/fut#como-funciona" className="transition hover:text-mf-text">
             Cómo funciona
           </Link>
-          <Link href="/#accesos" className="transition hover:text-mf-text">
+          <Link href="/fut#accesos" className="transition hover:text-mf-text">
             Accesos
           </Link>
-          <Link href="/explorar" className="transition hover:text-mf-text">
+          <Link href="/fut/explorar" className="transition hover:text-mf-text">
             Explorar
           </Link>
-          <Link href="/padres" className="transition hover:text-mf-text">
+          <Link href="/fut/padres" className="transition hover:text-mf-text">
             Padres
           </Link>
-          <Link href="/organizadores" className="transition hover:text-mf-text">
+          <Link href="/fut/organizadores" className="transition hover:text-mf-text">
             Organizadores
           </Link>
           <Link href={LEGAL_ROUTES.privacy} className="transition hover:text-mf-text">
@@ -73,7 +73,7 @@ export function SiteFooter() {
         </div>
       </div>
       <div className="mx-auto flex max-w-6xl flex-col gap-3 border-t border-mf-border px-4 py-8 text-sm text-mf-text-muted sm:flex-row sm:items-center sm:justify-between sm:px-6">
-        <BrandLogoLink size="sm" />
+        <BrandLogoLink href="/fut" size="sm" />
         <div className="flex flex-col gap-2 sm:items-end">
           <p className="text-mf-text-secondary">
             <a href="mailto:hola@mificha.mx" className="font-medium text-mf-brand hover:underline">

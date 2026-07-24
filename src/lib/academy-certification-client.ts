@@ -8,7 +8,7 @@ export async function requestAcademyCertificationSync(academyId: string) {
   if (!session) return null;
 
   try {
-    const response = await fetch("/api/academy/sync-certification", {
+    const response = await fetch("/fut/api/academy/sync-certification", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

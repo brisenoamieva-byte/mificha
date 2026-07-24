@@ -14,7 +14,7 @@ export function NoAcademyState() {
         partidos y fichas.
       </p>
       <Link
-        href="/dashboard/configuracion"
+        href="/fut/dashboard/configuracion"
         className="mt-6 inline-flex items-center gap-2 rounded-lg bg-[#1B4F8C] px-5 py-3 text-sm font-semibold text-white hover:bg-[#164278]"
       >
         <Settings className="h-4 w-4" />

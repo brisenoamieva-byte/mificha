@@ -15,12 +15,12 @@ import { BrandLogo } from "@/components/ui/brand-logo";
 import { PitchDeckNavLink } from "@/components/dashboard/pitch-deck-nav-link";
 
 const navItems = [
-  { href: "/dashboard", label: "Inicio", icon: LayoutDashboard },
-  { href: "/dashboard/plantel", label: "Plantel", icon: Users },
-  { href: "/dashboard/plantel/tutores", label: "Avisos a tutores", icon: Mail },
-  { href: "/dashboard/partidos", label: "Partidos", icon: Trophy },
-  { href: "/dashboard/rendimiento", label: "Rendimiento", icon: LineChart },
-  { href: "/dashboard/configuracion", label: "Configuración", icon: Settings },
+  { href: "/fut/dashboard", label: "Inicio", icon: LayoutDashboard },
+  { href: "/fut/dashboard/plantel", label: "Plantel", icon: Users },
+  { href: "/fut/dashboard/plantel/tutores", label: "Avisos a tutores", icon: Mail },
+  { href: "/fut/dashboard/partidos", label: "Partidos", icon: Trophy },
+  { href: "/fut/dashboard/rendimiento", label: "Rendimiento", icon: LineChart },
+  { href: "/fut/dashboard/configuracion", label: "Configuración", icon: Settings },
 ];
 
 interface DashboardSidebarProps {
@@ -48,9 +48,9 @@ export function DashboardSidebar({ open, onClose }: DashboardSidebarProps) {
       <nav className="flex-1 space-y-1 px-3 py-4">
         {navItems.map(({ href, label, icon: Icon }) => {
           const isActive =
-            href === "/dashboard"
+            href === "/fut/dashboard"
               ? pathname === href
-              : href === "/dashboard/plantel"
+              : href === "/fut/dashboard/plantel"
                 ? pathname === href
                 : pathname.startsWith(href);
 

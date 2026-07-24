@@ -179,7 +179,7 @@ export function ComparativeReportPanel({
           Base visual del reporte que reciben los padres.
         </p>
         <Link
-          href={`/j/${selectedPlayer.slug}`}
+          href={`/fut/j/${selectedPlayer.slug}`}
           target="_blank"
           className="text-sm font-semibold text-mf-brand hover:underline"
         >

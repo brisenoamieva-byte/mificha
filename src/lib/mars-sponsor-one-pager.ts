@@ -21,7 +21,7 @@ export const MARS_SPONSOR_ONE_PAGER = {
     "Padres y tutores (25–50 años) — reciben avisos post-partido por email/WhatsApp con link a ficha del jugador.",
     "Jugadores escolares (6–18 años) — ficha pública con Passport Score, insignias y progreso verificado.",
     "Directores y coordinadores deportivos — operan plantel, captura y visibilidad de su academia en la red.",
-    "Scouts y visorías — directorio público /explorar con destacados semanales por categoría.",
+    "Scouts y visorías — directorio público /fut/explorar con destacados semanales por categoría.",
   ],
   fitTitle: "Por qué Mars encaja",
   fitPoints: [
@@ -130,6 +130,6 @@ export function buildMarsSponsorPlainText(options?: {
     "",
     "Ricardo · mificha.mx · hola@mificha.mx",
     "",
-    "(One-pager visual: mificha.mx/interno/patrocinio-mars — requiere acceso interno)",
+    "(One-pager visual: mificha.mx/fut/interno/patrocinio-mars — requiere acceso interno)",
   ].join("\n");
 }

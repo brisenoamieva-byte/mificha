@@ -70,7 +70,7 @@ export function ParticipatingAcademiesStrip({
           </p>
         </div>
         <Link
-          href="/explorar"
+          href="/fut/explorar"
           className="inline-flex shrink-0 items-center gap-1.5 text-sm font-semibold text-mf-accent-bright hover:text-white"
         >
           Ver directorio
@@ -83,7 +83,7 @@ export function ParticipatingAcademiesStrip({
           {loop.map((academy, index) => (
             <Link
               key={`${academy.id}-${index}`}
-              href={`/a/${academy.slug}`}
+              href={`/fut/a/${academy.slug}`}
               target="_blank"
               rel="noopener noreferrer"
               className="group flex shrink-0 items-center gap-3 rounded-xl border border-white/10 bg-white/[0.06] px-3 py-2.5 transition hover:border-mf-accent/35 hover:bg-white/[0.1]"

@@ -81,7 +81,7 @@ export function PlantelGuardiansContent() {
         return;
       }
 
-      const response = await fetch("/api/notifications/welcome-ficha", {
+      const response = await fetch("/fut/api/notifications/welcome-ficha", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -141,7 +141,7 @@ export function PlantelGuardiansContent() {
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div>
           <Link
-            href="/dashboard/plantel"
+            href="/fut/dashboard/plantel"
             className="text-sm font-medium text-[#1B4F8C] hover:underline"
           >
             ← Volver al plantel
@@ -284,7 +284,7 @@ export function PlantelGuardiansContent() {
                     Enviar automático
                   </button>
                   <Link
-                    href="/dashboard/plantel"
+                    href="/fut/dashboard/plantel"
                     className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50"
                   >
                     <UserRound className="h-3.5 w-3.5" />

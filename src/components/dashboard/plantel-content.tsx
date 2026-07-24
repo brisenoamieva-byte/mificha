@@ -174,7 +174,7 @@ export function PlantelContent() {
 
           <div className="flex flex-wrap gap-3">
             <Link
-              href="/dashboard/plantel/tutores"
+              href="/fut/dashboard/plantel/tutores"
               className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50"
             >
               <Mail className="h-4 w-4" />
@@ -392,7 +392,7 @@ export function PlantelContent() {
                             compact
                           />
                           <Link
-                            href={`/j/${player.slug}`}
+                            href={`/fut/j/${player.slug}`}
                             target="_blank"
                             className="rounded-lg p-2 text-[#1B4F8C] hover:bg-slate-100"
                             title="Ver ficha"

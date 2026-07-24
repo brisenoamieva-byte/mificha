@@ -277,7 +277,7 @@ export function ExploreDirectory({
                 {displayAcademies.map((academy) => (
                   <li key={academy.id}>
                     <Link
-                      href={`/a/${academy.slug}`}
+                      href={`/fut/a/${academy.slug}`}
                       className="flex items-center gap-3 px-4 py-3 transition hover:bg-mf-canvas"
                     >
                       {academy.logo_url ? (

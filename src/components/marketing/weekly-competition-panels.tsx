@@ -122,7 +122,7 @@ export function WeeklyCompetitionPanels({
           {filteredLeaderboard.map((player) => (
             <Link
               key={player.player_id}
-              href={`/j/${player.slug}`}
+              href={`/fut/j/${player.slug}`}
               className="flex items-center gap-4 px-5 py-4 transition hover:bg-mf-canvas"
             >
               <span
@@ -174,7 +174,7 @@ export function WeeklyCompetitionPanels({
             {filteredRising.map((player) => (
               <Link
                 key={player.player_id}
-                href={`/j/${player.slug}`}
+                href={`/fut/j/${player.slug}`}
                 className="flex items-center gap-3 rounded-lg border border-mf-border-subtle px-3 py-3 transition hover:border-mf-brand/30 hover:bg-mf-canvas"
               >
                 <RankAvatar player={player} />

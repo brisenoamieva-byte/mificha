@@ -38,7 +38,7 @@ const scopeOptions: { value: IdealXIScope; label: string }[] = [
 function PlayerChip({ player }: { player: WeeklyPlayerPerformance }) {
   return (
     <Link
-      href={`/j/${player.slug}`}
+      href={`/fut/j/${player.slug}`}
       className="group flex min-w-[92px] max-w-[120px] flex-col items-center gap-2 text-center transition hover:-translate-y-0.5"
     >
       {player.photo_url ? (
@@ -240,7 +240,7 @@ export function IdealXIPanel({
             {idealXI.lineup.map((player) => (
               <Link
                 key={player.player_id}
-                href={`/j/${player.slug}`}
+                href={`/fut/j/${player.slug}`}
                 className="flex items-center gap-3 rounded-xl bg-white/10 px-4 py-3 text-white transition hover:bg-white/15"
               >
                 <div className="min-w-0 flex-1">

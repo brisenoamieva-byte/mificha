@@ -25,8 +25,8 @@ export function AcademyCertificationPanel({
         </div>
         <p className="mt-2 text-sm text-amber-900/80">
           Tu academia aparece en{" "}
-          <Link href="/explorar" className="font-semibold underline">
-            /explorar
+          <Link href="/fut/explorar" className="font-semibold underline">
+            /fut/explorar
           </Link>{" "}
           y en la red certificada de <BrandWordmark />.
         </p>
@@ -44,7 +44,7 @@ export function AcademyCertificationPanel({
           Certificación en la red <BrandWordmark />
         </p>
         <p className="mt-1 text-sm text-mf-text-secondary">
-          Completa estos requisitos para aparecer en /explorar como academia
+          Completa estos requisitos para aparecer en /fut/explorar como academia
           certificada ({doneCount}/{requirements.length}).
         </p>
       </div>

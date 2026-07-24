@@ -195,7 +195,7 @@ export function AcademyForm() {
         }
       }
       if (!academy) {
-        router.push("/dashboard");
+        router.push("/fut/dashboard");
       }
       router.refresh();
     } catch (submitError) {
@@ -246,7 +246,7 @@ export function AcademyForm() {
           placeholder="academia-monterrey"
         />
         <p className="mt-2 text-sm text-slate-500">
-          URL pública: mificha.mx/a/{slug || "tu-academia"}
+          URL pública: mificha.mx/fut/a/{slug || "tu-academia"}
         </p>
       </div>
 
@@ -421,10 +421,10 @@ export function AcademyForm() {
         <div>
           <p className="text-sm font-medium text-slate-900">Landing pública</p>
           <p className="text-sm text-slate-500">
-            Activa la página pública en mificha.mx/a/{slug || "tu-academia"}
+            Activa la página pública en mificha.mx/fut/a/{slug || "tu-academia"}
           </p>
           <p className="mt-2 text-xs leading-5 text-slate-600">
-            Para aparecer certificada en /explorar necesitas perfil completo, logo,
+            Para aparecer certificada en /fut/explorar necesitas perfil completo, logo,
             plantel, captura de partido y al menos una ficha compartible con tutor.
           </p>
         </div>
@@ -444,7 +444,7 @@ export function AcademyForm() {
               <p className="text-sm text-slate-500">{landingUrl}</p>
             </div>
             <Link
-              href={`/a/${slug}`}
+              href={`/fut/a/${slug}`}
               target="_blank"
               className="inline-flex items-center gap-2 text-sm font-semibold text-[#1B4F8C] hover:underline"
             >
@@ -454,7 +454,7 @@ export function AcademyForm() {
           </div>
           <iframe
             title="Vista previa landing academia"
-            src={`/a/${slug}`}
+            src={`/fut/a/${slug}`}
             className="mt-4 h-[420px] w-full rounded-xl border border-slate-200 bg-white"
           />
         </div>

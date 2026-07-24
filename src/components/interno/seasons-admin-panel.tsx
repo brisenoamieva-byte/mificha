@@ -58,7 +58,7 @@ export function SeasonsAdminPanel() {
   const loadAcademies = useCallback(async () => {
     setLoading(true);
     try {
-      const payload = (await authedFetch("/api/interno/seasons")) as {
+      const payload = (await authedFetch("/fut/api/fut/interno/seasons")) as {
         academies: AcademyOption[];
       };
       setAcademies(payload.academies);
@@ -78,7 +78,7 @@ export function SeasonsAdminPanel() {
 
     try {
       const payload = (await authedFetch(
-        `/api/interno/seasons?academy_id=${encodeURIComponent(academyId)}`,
+        `/fut/api/fut/interno/seasons?academy_id=${encodeURIComponent(academyId)}`,
       )) as { seasons: Season[] };
       setSeasons(payload.seasons);
     } catch (error) {
@@ -107,7 +107,7 @@ export function SeasonsAdminPanel() {
 
     setSaving(true);
     try {
-      await authedFetch("/api/interno/seasons", {
+      await authedFetch("/fut/api/fut/interno/seasons", {
         method: "POST",
         body: JSON.stringify({
           academy_id: selectedAcademyId,
@@ -128,7 +128,7 @@ export function SeasonsAdminPanel() {
 
   async function activateSeason(seasonId: string) {
     try {
-      await authedFetch("/api/interno/seasons", {
+      await authedFetch("/fut/api/fut/interno/seasons", {
         method: "PATCH",
         body: JSON.stringify({ season_id: seasonId, is_active: true }),
       });
@@ -157,20 +157,20 @@ export function SeasonsAdminPanel() {
           </div>
           <div className="flex flex-wrap gap-3">
             <Link
-              href="/interno/jornadas"
+              href="/fut/interno/jornadas"
               className="inline-flex items-center gap-2 rounded-full border border-white/20 px-4 py-2 text-sm font-semibold text-white/90 hover:bg-white/10"
             >
               Jornadas
             </Link>
             <Link
-              href="/interno/lanzamiento"
+              href="/fut/interno/lanzamiento"
               className="inline-flex items-center gap-2 rounded-full border border-white/20 px-4 py-2 text-sm font-semibold text-white/90 hover:bg-white/10"
             >
               <ArrowLeft className="h-3.5 w-3.5" />
               Playbook
             </Link>
             <Link
-              href="/dashboard"
+              href="/fut/dashboard"
               className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#0a1628]"
             >
               Dashboard
@@ -211,11 +211,11 @@ export function SeasonsAdminPanel() {
                 <p className="mt-3 text-sm text-white/55">
                   Slug público:{" "}
                   <Link
-                    href={`/a/${selectedAcademy.slug}`}
+                    href={`/fut/a/${selectedAcademy.slug}`}
                     className="text-emerald-300 hover:underline"
                     target="_blank"
                   >
-                    /a/{selectedAcademy.slug}
+                    /fut/a/{selectedAcademy.slug}
                   </Link>
                 </p>
               ) : null}

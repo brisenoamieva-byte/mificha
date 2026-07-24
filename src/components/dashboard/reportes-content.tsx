@@ -107,7 +107,7 @@ export function ReportesContent({ embedded = false }: ReportesContentProps) {
 
       if (!session) return;
 
-      const response = await fetch("/api/platform/email-status", {
+      const response = await fetch("/fut/api/platform/email-status", {
         headers: {
           Authorization: `Bearer ${session.access_token}`,
         },
@@ -243,7 +243,7 @@ export function ReportesContent({ embedded = false }: ReportesContentProps) {
         return;
       }
 
-      const response = await fetch("/api/send-report", {
+      const response = await fetch("/fut/api/send-report", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -322,7 +322,7 @@ export function ReportesContent({ embedded = false }: ReportesContentProps) {
               </div>
             </div>
             <Link
-              href="/dashboard/plantel/tutores"
+              href="/fut/dashboard/plantel/tutores"
               className="inline-flex shrink-0 items-center justify-center rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700"
             >
               Avisos a tutores

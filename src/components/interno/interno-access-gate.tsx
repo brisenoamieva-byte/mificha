@@ -28,11 +28,11 @@ export function InternoAccessGate({
       } = await supabase.auth.getSession();
 
       if (!session) {
-        router.replace(`/login?next=${encodeURIComponent(nextPath)}`);
+        router.replace(`/fut/login?next=${encodeURIComponent(nextPath)}`);
         return;
       }
 
-      const response = await fetch("/api/interno/pitch-access", {
+      const response = await fetch("/fut/api/fut/interno/pitch-access", {
         headers: {
           Authorization: `Bearer ${session.access_token}`,
         },
@@ -43,7 +43,7 @@ export function InternoAccessGate({
       if (cancelled) return;
 
       if (!data.allowed) {
-        router.replace("/dashboard");
+        router.replace("/fut/dashboard");
         return;
       }
 

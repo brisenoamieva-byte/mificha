@@ -40,7 +40,7 @@ export interface PublicDirectoryData {
   players: DirectoryPlayer[];
 }
 
-/** Jugadores de demo local (`/api/seed`) — no mezclar con perfiles de ejemplo en /explorar. */
+/** Jugadores de demo local (`/fut/api/seed`) — no mezclar con perfiles de ejemplo en /explorar. */
 export function isDevSeedPlayer(player: Pick<DirectoryPlayer, "slug">) {
   return player.slug.endsWith("-seed");
 }
@@ -57,47 +57,52 @@ function getSupabaseHeaders() {
 }
 
 export async function fetchPublicDirectory(): Promise<PublicDirectoryData> {
-  const { url, key } = getSupabaseHeaders();
+  try {
+    const { url, key } = getSupabaseHeaders();
 
-  const [academiesResponse, playersResponse] = await Promise.all([
-    fetch(
-      `${url}/rest/v1/academies?is_public=eq.true&is_certified=eq.true&select=id,name,slug,city,state,logo_url,is_certified&order=name.asc`,
-      {
-        headers: {
-          apikey: key,
-          Authorization: `Bearer ${key}`,
+    const [academiesResponse, playersResponse] = await Promise.all([
+      fetch(
+        `${url}/rest/v1/academies?is_public=eq.true&is_certified=eq.true&select=id,name,slug,city,state,logo_url,is_certified&order=name.asc`,
+        {
+          headers: {
+            apikey: key,
+            Authorization: `Bearer ${key}`,
+          },
+          next: { revalidate: 60 },
         },
-        next: { revalidate: 60 },
-      },
-    ),
-    fetch(
-      `${url}/rest/v1/players?is_public=eq.true&is_discoverable=eq.true&public_consent_at=not.is.null&select=slug,first_name,last_name,birth_date,position,passport_score,photo_url,video_url,academies(name,city,state,slug,is_certified)&order=passport_score.desc&limit=500`,
-      {
-        headers: {
-          apikey: key,
-          Authorization: `Bearer ${key}`,
+      ),
+      fetch(
+        `${url}/rest/v1/players?is_public=eq.true&is_discoverable=eq.true&public_consent_at=not.is.null&select=slug,first_name,last_name,birth_date,position,passport_score,photo_url,video_url,academies(name,city,state,slug,is_certified)&order=passport_score.desc&limit=500`,
+        {
+          headers: {
+            apikey: key,
+            Authorization: `Bearer ${key}`,
+          },
+          next: { revalidate: 60 },
         },
-        next: { revalidate: 60 },
-      },
-    ),
-  ]);
+      ),
+    ]);
 
-  const academies = academiesResponse.ok
-    ? ((await academiesResponse.json()) as DirectoryAcademy[])
-    : [];
+    const academies = academiesResponse.ok
+      ? ((await academiesResponse.json()) as DirectoryAcademy[])
+      : [];
 
-  const players = playersResponse.ok
-    ? await Promise.all(
-        ((await playersResponse.json()) as DirectoryPlayer[])
-          .filter((player) => player.academies?.is_certified)
-          .map(async (player) => ({
-            ...player,
-            photo_url: await signPlayerPhotoUrl(player.photo_url),
-          })),
-      )
-    : [];
+    const players = playersResponse.ok
+      ? await Promise.all(
+          ((await playersResponse.json()) as DirectoryPlayer[])
+            .filter((player) => player.academies?.is_certified)
+            .map(async (player) => ({
+              ...player,
+              photo_url: await signPlayerPhotoUrl(player.photo_url),
+            })),
+        )
+      : [];
 
-  return { academies, players };
+    return { academies, players };
+  } catch (error) {
+    console.error("fetchPublicDirectory failed:", error);
+    return { academies: [], players: [] };
+  }
 }
 
 export function parsePlayerSlugFromInput(input: string) {
@@ -106,7 +111,7 @@ export function parsePlayerSlugFromInput(input: string) {
   if (!trimmed) return "";
 
   try {
-    if (trimmed.includes("://") || trimmed.startsWith("/j/")) {
+    if (trimmed.includes("://") || trimmed.startsWith("/fut/j/")) {
       const path = trimmed.includes("://")
         ? new URL(trimmed).pathname
         : trimmed;

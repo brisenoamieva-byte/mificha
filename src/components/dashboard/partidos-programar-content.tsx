@@ -14,7 +14,7 @@ export function PartidosProgramarContent() {
   return (
     <div className="mx-auto max-w-2xl space-y-6 pb-12">
       <Link
-        href="/dashboard/partidos"
+        href="/fut/dashboard/partidos"
         className="text-sm font-medium text-[#1B4F8C] hover:underline"
       >
         ← Volver a partidos
@@ -39,7 +39,7 @@ export function PartidosProgramarContent() {
         </p>
 
         <div className="mt-6 flex flex-wrap gap-3">
-          <Link href="/dashboard/partidos" className="mf-btn-primary">
+          <Link href="/fut/dashboard/partidos" className="mf-btn-primary">
             Ver jornadas
           </Link>
           <a

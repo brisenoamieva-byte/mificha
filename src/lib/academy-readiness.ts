@@ -41,7 +41,7 @@ export function buildOnboardingSteps(progress: OnboardingProgress): OnboardingSt
       essential: true,
       title: "Carga tu plantel",
       description: "Importa Excel una vez o agrega jugadores manualmente.",
-      href: "/dashboard/plantel",
+      href: "/fut/dashboard/plantel",
       cta: "Ir a plantel",
     },
     {
@@ -51,7 +51,7 @@ export function buildOnboardingSteps(progress: OnboardingProgress): OnboardingSt
       title: "Primer partido con acta oficial",
       description:
         "Cuando el organizador publique el acta, MiFicha sincroniza stats y avisa tutores.",
-      href: "/dashboard/partidos",
+      href: "/fut/dashboard/partidos",
       cta: "Ver partidos",
     },
     {
@@ -60,7 +60,7 @@ export function buildOnboardingSteps(progress: OnboardingProgress): OnboardingSt
       essential: true,
       title: "Comparte con un padre",
       description: "Consentimiento + ficha pública + aviso automático al tutor.",
-      href: "/dashboard/plantel/tutores",
+      href: "/fut/dashboard/plantel/tutores",
       cta: "Avisos a tutores",
     },
     {
@@ -69,7 +69,7 @@ export function buildOnboardingSteps(progress: OnboardingProgress): OnboardingSt
       optional: true,
       title: "Padres abrieron la ficha",
       description: `Meta del piloto: ${PARENT_ENGAGEMENT_GOAL}+ visitas únicas (${progress.parentUniqueViews} hasta ahora).`,
-      href: "/dashboard/plantel/tutores",
+      href: "/fut/dashboard/plantel/tutores",
       cta: "Ver avisos",
     },
     {
@@ -78,7 +78,7 @@ export function buildOnboardingSteps(progress: OnboardingProgress): OnboardingSt
       optional: true,
       title: "Perfil de academia",
       description: "Ciudad, estado y descripción para generar confianza.",
-      href: "/dashboard/configuracion",
+      href: "/fut/dashboard/configuracion",
       cta: "Completar perfil",
     },
     {
@@ -87,7 +87,7 @@ export function buildOnboardingSteps(progress: OnboardingProgress): OnboardingSt
       optional: true,
       title: "Calendario publicado",
       description: "MiFicha publica jornadas oficiales; confirma en Partidos.",
-      href: "/dashboard/partidos",
+      href: "/fut/dashboard/partidos",
       cta: "Ver partidos",
     },
     {
@@ -96,7 +96,7 @@ export function buildOnboardingSteps(progress: OnboardingProgress): OnboardingSt
       optional: true,
       title: "Contacto del tutor",
       description: "Email o WhatsApp para enviar el link y avisos post-partido.",
-      href: "/dashboard/plantel/tutores",
+      href: "/fut/dashboard/plantel/tutores",
       cta: "Avisos a tutores",
     },
     {
@@ -105,7 +105,7 @@ export function buildOnboardingSteps(progress: OnboardingProgress): OnboardingSt
       optional: true,
       title: "Aparecer en Explorar",
       description: "Solo si quieres visorías — directorio por categoría.",
-      href: "/explorar",
+      href: "/fut/explorar",
       cta: "Ver directorio",
     },
   ];

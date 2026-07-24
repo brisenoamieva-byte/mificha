@@ -34,7 +34,7 @@ function AcademyFreePanel() {
             ))}
           </ul>
           <Link
-            href="/organizadores"
+            href="/fut/organizadores"
             className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-[#1B4F8C] hover:underline"
           >
             ¿Organizas torneo? Ver precios para temporadas
@@ -77,7 +77,7 @@ export function SubscriptionPanel() {
         return;
       }
 
-      const response = await fetch("/api/stripe/create-checkout", {
+      const response = await fetch("/fut/api/stripe/create-checkout", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -114,7 +114,7 @@ export function SubscriptionPanel() {
         return;
       }
 
-      const response = await fetch("/api/stripe/create-portal", {
+      const response = await fetch("/fut/api/stripe/create-portal", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

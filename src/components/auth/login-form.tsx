@@ -23,7 +23,7 @@ const inputClassName = "mf-input mt-1";
 export function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const nextPath = searchParams.get("next") || "/dashboard";
+  const nextPath = searchParams.get("next") || "/fut/dashboard";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -36,7 +36,7 @@ export function LoginForm() {
 
     try {
       await signIn(email, password);
-      router.push(nextPath.startsWith("/") ? nextPath : "/dashboard");
+      router.push(nextPath.startsWith("/") ? nextPath : "/fut/dashboard");
       router.refresh();
     } catch (submitError) {
       setError(getErrorMessage(submitError));
@@ -95,7 +95,7 @@ export function LoginForm() {
 
       <p className="text-center text-sm text-gray-600">
         ¿No tienes cuenta?{" "}
-        <Link href="/signup" className="font-medium text-[#1B4F8C] hover:underline">
+        <Link href="/fut/signup" className="font-medium text-[#1B4F8C] hover:underline">
           Regístrate
         </Link>
       </p>

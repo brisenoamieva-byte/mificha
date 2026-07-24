@@ -435,7 +435,7 @@ export function PartidosNuevoContent() {
           } = await supabase.auth.getSession();
 
           if (session) {
-            const achievementResponse = await fetch("/api/achievements/evaluate-match", {
+            const achievementResponse = await fetch("/fut/api/achievements/evaluate-match", {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
@@ -530,7 +530,7 @@ export function PartidosNuevoContent() {
           } = await supabase.auth.getSession();
 
           if (session) {
-            const notificationResponse = await fetch("/api/notifications/match-update", {
+            const notificationResponse = await fetch("/fut/api/notifications/match-update", {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
@@ -617,7 +617,7 @@ export function PartidosNuevoContent() {
   if (!season) {
     return (
       <NoSeasonState
-        backHref="/dashboard/partidos"
+        backHref="/fut/dashboard/partidos"
         backLabel="← Volver a partidos"
       />
     );
@@ -634,7 +634,7 @@ export function PartidosNuevoContent() {
           opponent={opponent}
           players={savedSummaries}
           notificationSummary={notificationSummary ?? undefined}
-          onDone={() => router.push("/dashboard/partidos")}
+          onDone={() => router.push("/fut/dashboard/partidos")}
         />
       </div>
     );
@@ -644,7 +644,7 @@ export function PartidosNuevoContent() {
     return (
       <div className="mx-auto max-w-3xl space-y-6 pb-12">
         <Link
-          href="/dashboard/partidos"
+          href="/fut/dashboard/partidos"
           className="text-sm font-medium text-[#1B4F8C] hover:underline"
         >
           ← Volver a partidos
@@ -695,7 +695,7 @@ export function PartidosNuevoContent() {
           ) : null}
 
           <Link
-            href={`/dashboard/partidos/${scheduledMatchId}`}
+            href={`/fut/dashboard/partidos/${scheduledMatchId}`}
             className="mt-8 inline-flex rounded-2xl bg-[#1B4F8C] px-5 py-4 text-sm font-semibold text-white hover:bg-[#164278]"
           >
             Ver detalle del partido
@@ -709,7 +709,7 @@ export function PartidosNuevoContent() {
     <>
       <div className="mx-auto max-w-3xl pb-28">
         <Link
-          href="/dashboard/partidos"
+          href="/fut/dashboard/partidos"
           className="text-sm font-medium text-[#1B4F8C] hover:underline"
         >
           ← Cancelar

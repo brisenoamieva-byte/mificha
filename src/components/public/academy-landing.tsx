@@ -171,7 +171,7 @@ export function AcademyLanding({ data }: AcademyLandingProps) {
               const fullName = `${player.first_name} ${player.last_name}`;
               const playerHref = isDemoAcademySlug(academy.slug)
                 ? "/#demo-ficha-documento"
-                : `/j/${player.slug}`;
+                : `/fut/j/${player.slug}`;
 
               return (
                 <Link
@@ -258,10 +258,10 @@ export function AcademyLanding({ data }: AcademyLandingProps) {
           size="sm"
         />
         <div className="mt-4 flex flex-wrap justify-center gap-x-4 gap-y-2">
-          <Link href="/explorar" className="text-slate-400 transition hover:text-white">
+          <Link href="/fut/explorar" className="text-slate-400 transition hover:text-white">
             Explorar directorio
           </Link>
-          <Link href="/padres" className="text-slate-400 transition hover:text-white">
+          <Link href="/fut/padres" className="text-slate-400 transition hover:text-white">
             ¿Eres padre?
           </Link>
         </div>

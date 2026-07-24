@@ -41,7 +41,7 @@ export function PadresAcademyExample() {
           </div>
 
           <Link
-            href={`/a/${DEMO_EXPLORE_ACADEMY.slug}`}
+            href={`/fut/a/${DEMO_EXPLORE_ACADEMY.slug}`}
             className="mf-btn-secondary shrink-0 self-start sm:self-center"
           >
             Ver academia ejemplo

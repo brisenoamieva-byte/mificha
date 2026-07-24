@@ -25,7 +25,7 @@ export const DEMO_ACADEMY_PLAYER_LINK = {
   is_certified: true,
 } as const;
 
-/** Academia certificada de ejemplo para /explorar y /a/academia-gallos-demo. */
+/** Academia certificada de ejemplo para /fut/explorar y /fut/a/academia-gallos-demo. */
 export const DEMO_EXPLORE_ACADEMY: DirectoryAcademy = {
   id: "demo-academia-gallos",
   name: "Academia Gallos",
@@ -48,7 +48,7 @@ export interface ExploreDemoPlayer extends DirectoryPlayer {
   example_href: string;
 }
 
-/** Perfiles de ejemplo para /explorar — Temporada 2026. */
+/** Perfiles de ejemplo para /fut/explorar — Temporada 2026. */
 export const DEMO_EXPLORE_PLAYERS: ExploreDemoPlayer[] = [
   {
     is_demo: true,

@@ -41,7 +41,7 @@ export function buildFounderOrganizerOutreachMessage(options: {
     "",
     `¿20 min esta semana para ver cómo cargaríamos tu calendario?`,
     "",
-    `Ricardo · mificha.mx/organizadores · hola@mificha.mx`,
+    `Ricardo · mificha.mx/fut/organizadores · hola@mificha.mx`,
   ].join("\n");
 }
 
@@ -93,8 +93,8 @@ export const FOUNDER_CONVERSION_CRITERIA = [
 export const FOUNDER_DEMO_PRECHECK = [
   "Academia demo con temporada y 1 jornada publicada",
   "3–5 jugadores con consentimiento y contacto del tutor",
-  "Pitch ensayado (6 slides · /interno/pitch · tecla F)",
-  "One-pager listo (/interno/demo-one-pager)",
+  "Pitch ensayado (6 slides · /fut/interno/pitch · tecla F)",
+  "One-pager listo (/fut/interno/demo-one-pager)",
   "Un ensayo completo del guión antes de la llamada",
 ] as const;
 
@@ -111,35 +111,35 @@ export const FOUNDER_LIVE_DEMO_SCRIPT: FounderDemoStep[] = [
     title: "Presentación",
     action:
       "6 slides: problema → tres pasos → colegio → red completa → cierre. Termina con «¿Lo vemos en vivo?»",
-    href: "/interno/pitch",
+    href: "/fut/interno/pitch",
   },
   {
     minute: "4–7",
     title: "Plantel y tutores",
     action:
       "Muestra 3–5 jugadores con consentimiento y contacto del tutor. La academia solo opera esto.",
-    href: "/dashboard/plantel/tutores",
+    href: "/fut/dashboard/plantel/tutores",
   },
   {
     minute: "7–10",
     title: "Acta oficial",
     action:
       "Publica marcador y acta de la jornada. MiFicha sincroniza stats con cada ficha.",
-    href: "/interno/jornadas",
+    href: "/fut/interno/jornadas",
   },
   {
     minute: "10–12",
     title: "Ficha del jugador",
     action:
       "Abre la ficha pública y el aviso al tutor en el celular. Stats vienen del acta, no del coach.",
-    href: "/explorar",
+    href: "/fut/explorar",
   },
   {
     minute: "12–15",
     title: "Cierre",
     action:
       "Propón piloto: primera jornada real + 3 padres con link. Agenda fecha y envía one-pager.",
-    href: "/interno/demo-one-pager",
+    href: "/fut/interno/demo-one-pager",
   },
 ];
 

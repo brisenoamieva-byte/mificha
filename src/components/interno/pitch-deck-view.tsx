@@ -366,19 +366,19 @@ export function PitchDeckView() {
           </div>
           <div className="flex items-center gap-2">
             <Link
-              href="/interno/demo-one-pager"
+              href="/fut/interno/demo-one-pager"
               className="inline-flex items-center gap-2 rounded-full border border-sky-400/30 px-3 py-2 text-sm font-medium text-sky-200 transition hover:bg-sky-500/10"
             >
               One-pager
             </Link>
             <Link
-              href="/interno/lanzamiento"
+              href="/fut/interno/lanzamiento"
               className="inline-flex items-center gap-2 rounded-full border border-emerald-400/30 px-3 py-2 text-sm font-medium text-emerald-200 transition hover:bg-emerald-500/10"
             >
               Guión demo
             </Link>
             <Link
-              href="/dashboard"
+              href="/fut/dashboard"
               className="inline-flex items-center gap-2 rounded-full px-3 py-2 text-sm font-medium text-white/70 transition hover:bg-white/10 hover:text-white"
             >
               <LayoutDashboard className="h-4 w-4" />

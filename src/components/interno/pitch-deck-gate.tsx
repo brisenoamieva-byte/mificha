@@ -18,11 +18,11 @@ export function PitchDeckGate() {
       } = await supabase.auth.getSession();
 
       if (!session) {
-        router.replace("/login?next=/interno/pitch");
+        router.replace("/fut/login?next=/fut/interno/pitch");
         return;
       }
 
-      const response = await fetch("/api/interno/pitch-access", {
+      const response = await fetch("/fut/api/fut/interno/pitch-access", {
         headers: {
           Authorization: `Bearer ${session.access_token}`,
         },
@@ -33,7 +33,7 @@ export function PitchDeckGate() {
       if (cancelled) return;
 
       if (!data.allowed) {
-        router.replace("/dashboard");
+        router.replace("/fut/dashboard");
         return;
       }
 

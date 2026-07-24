@@ -75,21 +75,21 @@ export function AcademyLaunchCompletePanel({
 
       <div className="grid gap-3 px-5 py-4 sm:grid-cols-3">
         <Link
-          href="/dashboard/plantel/tutores"
+          href="/fut/dashboard/plantel/tutores"
           className="flex items-center gap-3 rounded-lg border border-emerald-100 bg-white px-4 py-3 text-sm font-semibold text-slate-800 transition hover:border-emerald-200"
         >
           <Mail className="h-4 w-4 text-emerald-700" />
           Enviar link a tutores
         </Link>
         <Link
-          href="/dashboard/plantel"
+          href="/fut/dashboard/plantel"
           className="flex items-center gap-3 rounded-lg border border-emerald-100 bg-white px-4 py-3 text-sm font-semibold text-slate-800 transition hover:border-emerald-200"
         >
           <MessageCircle className="h-4 w-4 text-green-700" />
           Editar plantel
         </Link>
         <Link
-          href={`/a/${academySlug}`}
+          href={`/fut/a/${academySlug}`}
           target="_blank"
           className="flex items-center gap-3 rounded-lg border border-emerald-100 bg-white px-4 py-3 text-sm font-semibold text-slate-800 transition hover:border-emerald-200"
         >
