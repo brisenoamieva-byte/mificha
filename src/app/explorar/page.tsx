@@ -12,6 +12,8 @@ import {
 import { fetchPublicDirectory } from "@/lib/public-directory";
 import { fetchPublicUpcomingMatches } from "@/lib/public-schedule";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Explorar talento | MiFicha",
   description:
