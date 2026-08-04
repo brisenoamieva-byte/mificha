@@ -10,6 +10,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { FixtureImportSection } from "@/components/interno/fixture-import-section";
+import { ActaSessionControls } from "@/components/interno/acta-session-controls";
 import { OfficialActaEntry } from "@/components/interno/official-acta-entry";
 import { OfficialResultEntry } from "@/components/interno/official-result-entry";
 import { BrandWordmark } from "@/components/ui/brand-wordmark";
@@ -298,6 +299,10 @@ export function FixturesAdminPanel() {
                             <OfficialResultEntry
                               fixture={fixture}
                               onSaved={() => void loadFixtures(selectedAcademyId)}
+                              authedFetch={authedFetch}
+                            />
+                            <ActaSessionControls
+                              fixture={fixture}
                               authedFetch={authedFetch}
                             />
                             <OfficialActaEntry

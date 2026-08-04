@@ -313,6 +313,14 @@ export async function createActaSession(
     throw new Error("Ya existe una sesión de acta para este partido.");
   }
 
+  if (existing?.status === "cancelled") {
+    const { error: deleteError } = await admin
+      .from("match_acta_sessions")
+      .delete()
+      .eq("id", existing.id);
+    if (deleteError) throw new Error(deleteError.message);
+  }
+
   const refereeToken = createActaToken();
   const insert = {
     home_match_id: match.id,
