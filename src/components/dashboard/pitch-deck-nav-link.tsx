@@ -18,7 +18,7 @@ export function PitchDeckNavLink({ onClose }: { onClose?: () => void }) {
 
       if (!session) return;
 
-      const response = await fetch("/fut/api/fut/interno/pitch-access", {
+      const response = await fetch("/fut/api/interno/pitch-access", {
         headers: {
           Authorization: `Bearer ${session.access_token}`,
         },

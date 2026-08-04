@@ -58,7 +58,7 @@ export function SeasonsAdminPanel() {
   const loadAcademies = useCallback(async () => {
     setLoading(true);
     try {
-      const payload = (await authedFetch("/fut/api/fut/interno/seasons")) as {
+      const payload = (await authedFetch("/fut/api/interno/seasons")) as {
         academies: AcademyOption[];
       };
       setAcademies(payload.academies);
@@ -78,7 +78,7 @@ export function SeasonsAdminPanel() {
 
     try {
       const payload = (await authedFetch(
-        `/fut/api/fut/interno/seasons?academy_id=${encodeURIComponent(academyId)}`,
+        `/fut/api/interno/seasons?academy_id=${encodeURIComponent(academyId)}`,
       )) as { seasons: Season[] };
       setSeasons(payload.seasons);
     } catch (error) {
@@ -107,7 +107,7 @@ export function SeasonsAdminPanel() {
 
     setSaving(true);
     try {
-      await authedFetch("/fut/api/fut/interno/seasons", {
+      await authedFetch("/fut/api/interno/seasons", {
         method: "POST",
         body: JSON.stringify({
           academy_id: selectedAcademyId,
@@ -128,7 +128,7 @@ export function SeasonsAdminPanel() {
 
   async function activateSeason(seasonId: string) {
     try {
-      await authedFetch("/fut/api/fut/interno/seasons", {
+      await authedFetch("/fut/api/interno/seasons", {
         method: "PATCH",
         body: JSON.stringify({ season_id: seasonId, is_active: true }),
       });

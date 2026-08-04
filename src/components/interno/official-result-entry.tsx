@@ -44,7 +44,7 @@ export function OfficialResultEntry({
     setSaving(true);
 
     try {
-      await authedFetch("/fut/api/fut/interno/fixtures", {
+      await authedFetch("/fut/api/interno/fixtures", {
         method: "PATCH",
         body: JSON.stringify({
           fixture_id: fixture.id,

@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
 import { supabase } from "@/lib/supabase";
@@ -23,31 +22,37 @@ export function InternoAccessGate({
     let cancelled = false;
 
     async function verifyAccess() {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+      try {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
 
-      if (!session) {
-        router.replace(`/fut/login?next=${encodeURIComponent(nextPath)}`);
-        return;
+        if (!session) {
+          router.replace(`/fut/login?next=${encodeURIComponent(nextPath)}`);
+          return;
+        }
+
+        const response = await fetch("/fut/api/interno/pitch-access", {
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+          },
+        });
+
+        const data = (await response.json()) as { allowed?: boolean };
+
+        if (cancelled) return;
+
+        if (!response.ok || !data.allowed) {
+          router.replace("/fut/dashboard");
+          return;
+        }
+
+        setReady(true);
+      } catch {
+        if (!cancelled) {
+          router.replace(`/fut/login?next=${encodeURIComponent(nextPath)}`);
+        }
       }
-
-      const response = await fetch("/fut/api/fut/interno/pitch-access", {
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
-        },
-      });
-
-      const data = (await response.json()) as { allowed?: boolean };
-
-      if (cancelled) return;
-
-      if (!data.allowed) {
-        router.replace("/fut/dashboard");
-        return;
-      }
-
-      setReady(true);
     }
 
     void verifyAccess();

@@ -79,7 +79,7 @@ export function FixturesAdminPanel() {
   const loadAcademies = useCallback(async () => {
     setLoading(true);
     try {
-      const payload = (await authedFetch("/fut/api/fut/interno/fixtures")) as {
+      const payload = (await authedFetch("/fut/api/interno/fixtures")) as {
         academies: AcademyOption[];
       };
       setAcademies(payload.academies);
@@ -100,7 +100,7 @@ export function FixturesAdminPanel() {
 
     try {
       const payload = (await authedFetch(
-        `/fut/api/fut/interno/fixtures?academy_id=${encodeURIComponent(academyId)}`,
+        `/fut/api/interno/fixtures?academy_id=${encodeURIComponent(academyId)}`,
       )) as { season: Season | null; fixtures: Match[] };
 
       setActiveSeason(payload.season);
@@ -139,7 +139,7 @@ export function FixturesAdminPanel() {
 
     setSaving(true);
     try {
-      await authedFetch("/fut/api/fut/interno/fixtures", {
+      await authedFetch("/fut/api/interno/fixtures", {
         method: "POST",
         body: JSON.stringify({
           academy_id: selectedAcademyId,
@@ -172,7 +172,7 @@ export function FixturesAdminPanel() {
 
   async function cancelFixture(fixtureId: string) {
     try {
-      await authedFetch("/fut/api/fut/interno/fixtures", {
+      await authedFetch("/fut/api/interno/fixtures", {
         method: "PATCH",
         body: JSON.stringify({ fixture_id: fixtureId, status: "cancelled" }),
       });

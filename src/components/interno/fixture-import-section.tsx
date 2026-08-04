@@ -88,7 +88,7 @@ export function FixtureImportSection({
 
     setImporting(true);
     try {
-      const result = await authedFetch("/fut/api/fut/interno/fixtures/bulk", {
+      const result = await authedFetch("/fut/api/interno/fixtures/bulk", {
         method: "POST",
         body: JSON.stringify({
           ...(isMultiAcademy ? {} : { academy_id: academyId }),
