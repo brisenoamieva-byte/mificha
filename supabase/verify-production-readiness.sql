@@ -88,7 +88,25 @@ select
     from information_schema.tables
     where table_schema = 'public'
       and table_name = 'player_videos'
-  ) as player_videos_sql;
+  ) as player_videos_sql,
+  exists (
+    select 1
+    from information_schema.tables
+    where table_schema = 'public'
+      and table_name = 'match_acta_sessions'
+  ) as match_acta_session_sql,
+  exists (
+    select 1
+    from information_schema.tables
+    where table_schema = 'public'
+      and table_name = 'match_events'
+  ) as match_events_sql,
+  exists (
+    select 1
+    from information_schema.tables
+    where table_schema = 'public'
+      and table_name = 'match_signatures'
+  ) as match_signatures_sql;
 
 -- Si alguna columna es false, ejecuta el script correspondiente:
 -- #11 player-guardian-contact.sql
@@ -103,3 +121,4 @@ select
 -- #20 official-match-scoring-rls.sql
 -- #21 official-match-stats-rls.sql
 -- #23 player-videos.sql
+-- #24 match-acta-session.sql (Acta en cancha Fase 1 — docs/acta-en-cancha-fase-1.md)

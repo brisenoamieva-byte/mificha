@@ -61,7 +61,13 @@ export const MIFICHA_DATA_GOVERNANCE = {
       id: "acta",
       label: "Acta oficial: goles, asistencias, tarjetas y minutos por jugador",
       owner: "organizer",
-      why: "Misma fuente que mesa de control / anotador del torneo interescolar.",
+      why: "Misma fuente que mesa / árbitro. Canal preferido: Acta en cancha (sesión + firmas); fallback: panel interno.",
+    },
+    {
+      id: "acta_signoff",
+      label: "Firma digital de cierre (árbitro + delegado de cada equipo)",
+      owner: "organizer",
+      why: "Evidencia de conformidad o disputa antes de publicar a fichas (Fase 1 Acta en cancha).",
     },
     {
       id: "roster",
@@ -98,15 +104,17 @@ export const MIFICHA_DATA_GOVERNANCE = {
     {
       phase: "Después del partido (orden fijo)",
       organizer: [
-        "1. Registrar marcador oficial",
-        "2. Publicar acta completa (G / A / tarjetas / minutos)",
+        "1. Preferido: sesión Acta en cancha (árbitro captura timeline + firmas QR)",
+        "2. Fallback: registrar marcador y acta en /fut/interno/jornadas",
+        "3. Si hay objeción de delegado → resolver disputa antes de publicar",
       ],
       academy: [
         "Tener plantel y consentimientos listos antes de la jornada",
+        "Delegado firma o objeta el acta desde el QR (no edita stats)",
         "MiFicha avisa tutores al sincronizar el acta — sin captura manual",
       ],
       mificha: [
-        "Aplicar acta al plantel, actualizar Passport e insignias",
+        "Aplicar acta firmada al plantel, actualizar Passport e insignias",
         "Enviar aviso automático al tutor",
       ],
     },
