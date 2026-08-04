@@ -231,16 +231,18 @@ Base: service role + validación de token hasheado (no guardar token en claro).
 
 | Método | Ruta | Auth | Acción |
 |---|---|---|---|
-| `POST` | `/api/interno/acta-sessions` | pitch-access | Crear sesión para `home_match_id` |
-| `GET` | `/api/acta/[token]` | token árbitro | Cargar sesión + lineups + events |
-| `PUT` | `/api/acta/[token]/lineup` | token árbitro | Upsert alineación |
-| `POST` | `/api/acta/[token]/events` | token árbitro | Agregar evento |
-| `POST` | `/api/acta/[token]/events/[id]/void` | token árbitro | Anular evento |
-| `POST` | `/api/acta/[token]/close` | token árbitro | Cerrar → pending_signatures |
-| `GET` | `/api/firmar/[token]` | token firma | Resumen para delegado |
-| `POST` | `/api/firmar/[token]` | token firma | accept \| object |
-| `POST` | `/api/interno/acta-sessions/[id]/publish` | pitch-access | Publicar (también auto al 2º accept) |
-| `POST` | `/api/interno/acta-sessions/[id]/resolve` | pitch-access | Resolver disputa |
+| `POST` | `/fut/api/interno/acta-sessions` | pitch-access | Crear sesión para `home_match_id` |
+| `GET` | `/fut/api/interno/acta-sessions?home_match_id=` | pitch-access | Estado de sesión |
+| `GET` | `/fut/api/acta/[token]` | token árbitro | Cargar sesión + lineups + events + planteles |
+| `PUT` | `/fut/api/acta/[token]/lineup` | token árbitro | Upsert alineación (`start_capturing?`) |
+| `POST` | `/fut/api/acta/[token]/status` | token árbitro | `capturing` \| `review` |
+| `POST` | `/fut/api/acta/[token]/events` | token árbitro | Agregar evento |
+| `POST` | `/fut/api/acta/[token]/events/[id]/void` | token árbitro | Anular evento |
+| `POST` | `/fut/api/acta/[token]/close` | token árbitro | Cerrar → pending_signatures + QR links |
+| `GET` | `/fut/api/firmar/[token]` | token firma | Resumen para delegado |
+| `POST` | `/fut/api/firmar/[token]` | token firma | accept \| object |
+| `POST` | `/fut/api/interno/acta-sessions/[id]/publish` | pitch-access | Publicar (también auto al 2º accept) |
+| `POST` | `/fut/api/interno/acta-sessions/[id]/resolve` | pitch-access | Resolver disputa |
 
 ### Publicación (efecto en tablas actuales)
 
