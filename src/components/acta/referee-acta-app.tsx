@@ -5,8 +5,10 @@ import {
   ArrowLeft,
   Check,
   Loader2,
+  RefreshCw,
   Trash2,
 } from "lucide-react";
+import { ActaQrCard } from "@/components/acta/acta-qr-card";
 import { BrandLogoLink } from "@/components/ui/brand-logo";
 import {
   ACTA_EVENT_LABELS,
@@ -288,6 +290,31 @@ export function RefereeActaApp({ token }: { token: string }) {
         away: payload.away_sign_url ?? "",
       });
       await load();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function regenerateSignLinks() {
+    setSaving(true);
+    setError(null);
+    try {
+      const response = await fetch(
+        `/fut/api/acta/${encodeURIComponent(token)}/regenerate-signs`,
+        { method: "POST" },
+      );
+      const payload = (await response.json()) as {
+        error?: string;
+        home_sign_url?: string;
+        away_sign_url?: string;
+      };
+      if (!response.ok) throw new Error(payload.error ?? "No se regeneraron firmas.");
+      setSignLinks({
+        home: payload.home_sign_url ?? "",
+        away: payload.away_sign_url ?? "",
+      });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error.");
     } finally {
@@ -745,34 +772,32 @@ export function RefereeActaApp({ token }: { token: string }) {
                   : "Esperando firmas de delegados"}
             </p>
             {signLinks ? (
+              <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                <ActaQrCard label="Firma local" url={signLinks.home} size={150} />
+                <ActaQrCard label="Firma visitante" url={signLinks.away} size={150} />
+              </div>
+            ) : status === "pending_signatures" ? (
               <div className="mt-4 space-y-3">
-                <div className="rounded-xl bg-mf-canvas p-3">
-                  <p className="text-xs font-semibold uppercase text-mf-text-muted">
-                    QR / link local
-                  </p>
-                  <a
-                    href={signLinks.home}
-                    className="mt-1 block break-all text-sm font-medium text-mf-brand underline"
-                  >
-                    {signLinks.home}
-                  </a>
-                </div>
-                <div className="rounded-xl bg-mf-canvas p-3">
-                  <p className="text-xs font-semibold uppercase text-mf-text-muted">
-                    QR / link visitante
-                  </p>
-                  <a
-                    href={signLinks.away}
-                    className="mt-1 block break-all text-sm font-medium text-mf-brand underline"
-                  >
-                    {signLinks.away}
-                  </a>
-                </div>
+                <p className="text-sm text-mf-text-secondary">
+                  Si cerraste el acta en otro dispositivo, regenera los QR de firma aquí.
+                </p>
+                <button
+                  type="button"
+                  disabled={saving}
+                  onClick={() => void regenerateSignLinks()}
+                  className="mf-btn-accent inline-flex w-full justify-center gap-2"
+                >
+                  {saving ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <RefreshCw className="h-4 w-4" />
+                  )}
+                  Regenerar QR de firmas
+                </button>
               </div>
             ) : (
               <p className="mt-2 text-sm text-mf-text-secondary">
-                Los links de firma se mostraron al cerrar. Pedí al organizador que regenere
-                la sesión si se perdieron.
+                No hay links de firma activos para este estado.
               </p>
             )}
           </section>

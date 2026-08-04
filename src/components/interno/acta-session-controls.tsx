@@ -1,7 +1,13 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { ClipboardPen, Copy, ExternalLink, Loader2 } from "lucide-react";
+import {
+  ClipboardPen,
+  ExternalLink,
+  Loader2,
+  RefreshCw,
+} from "lucide-react";
+import { ActaQrCard } from "@/components/acta/acta-qr-card";
 import { toast } from "@/components/ui/toast";
 import { ACTA_STATUS_LABELS, type ActaSessionStatus } from "@/lib/match-acta";
 import type { Match } from "@/types/database";
@@ -25,6 +31,7 @@ export function ActaSessionControls({
   const [busy, setBusy] = useState(false);
   const [session, setSession] = useState<SessionSummary | null>(null);
   const [refereeUrl, setRefereeUrl] = useState<string | null>(null);
+  const [showQr, setShowQr] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -56,7 +63,8 @@ export function ActaSessionControls({
       };
       setSession(payload.session ?? null);
       setRefereeUrl(payload.referee_url ?? null);
-      toast.success("Sesión de acta creada. Copia el link del árbitro.");
+      setShowQr(true);
+      toast.success("Sesión creada. Muestra el QR al árbitro.");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "No se creó la sesión.");
     } finally {
@@ -64,9 +72,26 @@ export function ActaSessionControls({
     }
   }
 
-  async function copy(text: string) {
-    await navigator.clipboard.writeText(text);
-    toast.success("Link copiado");
+  async function regenerateReferee() {
+    if (!session) return;
+    setBusy(true);
+    try {
+      const payload = (await authedFetch(
+        `/fut/api/interno/acta-sessions/${session.id}/regenerate-referee`,
+        { method: "POST" },
+      )) as {
+        session?: SessionSummary;
+        referee_url?: string;
+      };
+      setSession(payload.session ?? null);
+      setRefereeUrl(payload.referee_url ?? null);
+      setShowQr(true);
+      toast.success("Link regenerado. El anterior ya no funciona.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se regeneró el link.");
+    } finally {
+      setBusy(false);
+    }
   }
 
   async function resolve(action: "publish" | "cancel") {
@@ -81,6 +106,10 @@ export function ActaSessionControls({
         },
       )) as { session?: SessionSummary };
       setSession(payload.session ?? null);
+      if (action === "cancel") {
+        setRefereeUrl(null);
+        setShowQr(false);
+      }
       toast.success(action === "publish" ? "Acta publicada." : "Sesión cancelada.");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "No se pudo resolver.");
@@ -105,43 +134,36 @@ export function ActaSessionControls({
     );
   }
 
+  const canRegenerate =
+    session &&
+    session.status !== "published" &&
+    session.status !== "cancelled";
+
   return (
-    <div className="flex flex-col items-end gap-2">
+    <div className="flex w-full max-w-xs flex-col items-end gap-2">
       {session ? (
         <>
           <span className="rounded-full border border-white/15 px-3 py-1.5 text-xs font-semibold text-white/80">
             Acta: {ACTA_STATUS_LABELS[session.status]}
           </span>
-          {session.status === "disputed" ? (
-            <div className="flex flex-wrap justify-end gap-2">
+
+          <div className="flex flex-wrap justify-end gap-2">
+            {canRegenerate ? (
               <button
                 type="button"
                 disabled={busy}
-                onClick={() => void resolve("publish")}
-                className="rounded-full border border-emerald-400/30 px-3 py-1.5 text-xs font-semibold text-emerald-200 hover:bg-emerald-500/10"
+                onClick={() => void regenerateReferee()}
+                className="inline-flex items-center gap-1 rounded-full border border-sky-400/30 px-3 py-1.5 text-xs font-semibold text-sky-100 hover:bg-sky-500/10 disabled:opacity-50"
               >
-                Forzar publicar
+                {busy ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <RefreshCw className="h-3.5 w-3.5" />
+                )}
+                Regenerar link árbitro
               </button>
-              <button
-                type="button"
-                disabled={busy}
-                onClick={() => void resolve("cancel")}
-                className="rounded-full border border-red-400/30 px-3 py-1.5 text-xs font-semibold text-red-200 hover:bg-red-500/10"
-              >
-                Cancelar sesión
-              </button>
-            </div>
-          ) : null}
-          {refereeUrl ? (
-            <div className="flex flex-wrap justify-end gap-2">
-              <button
-                type="button"
-                onClick={() => void copy(refereeUrl)}
-                className="inline-flex items-center gap-1 rounded-full border border-white/15 px-3 py-1.5 text-xs font-semibold text-white hover:bg-white/10"
-              >
-                <Copy className="h-3.5 w-3.5" />
-                Copiar link árbitro
-              </button>
+            ) : null}
+            {refereeUrl ? (
               <a
                 href={refereeUrl}
                 target="_blank"
@@ -151,13 +173,38 @@ export function ActaSessionControls({
                 <ExternalLink className="h-3.5 w-3.5" />
                 Abrir
               </a>
+            ) : null}
+            {session.status === "disputed" ? (
+              <>
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={() => void resolve("publish")}
+                  className="rounded-full border border-emerald-400/30 px-3 py-1.5 text-xs font-semibold text-emerald-200 hover:bg-emerald-500/10"
+                >
+                  Forzar publicar
+                </button>
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={() => void resolve("cancel")}
+                  className="rounded-full border border-red-400/30 px-3 py-1.5 text-xs font-semibold text-red-200 hover:bg-red-500/10"
+                >
+                  Cancelar sesión
+                </button>
+              </>
+            ) : null}
+          </div>
+
+          {showQr && refereeUrl ? (
+            <div className="mt-1 w-full rounded-xl bg-white p-2">
+              <ActaQrCard label="QR árbitro" url={refereeUrl} size={140} />
             </div>
-          ) : (
-            <p className="max-w-[220px] text-right text-[11px] text-white/45">
-              El link del árbitro solo se muestra al crear la sesión. Crea una nueva si lo
-              perdiste (cancela antes si aplica).
+          ) : canRegenerate && !refereeUrl ? (
+            <p className="max-w-[240px] text-right text-[11px] text-white/45">
+              Si perdiste el link, usa <strong>Regenerar link árbitro</strong>.
             </p>
-          )}
+          ) : null}
         </>
       ) : (
         <button

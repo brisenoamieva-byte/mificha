@@ -277,6 +277,87 @@ function resultFromScore(goalsFor: number, goalsAgainst: number) {
   return "draw" as const;
 }
 
+export async function regenerateRefereeToken(
+  admin: SupabaseClient,
+  sessionId: string,
+) {
+  const { data: row, error } = await admin
+    .from("match_acta_sessions")
+    .select("*")
+    .eq("id", sessionId)
+    .maybeSingle();
+
+  if (error) throw new Error(error.message);
+  if (!row) throw new Error("Sesión no encontrada.");
+
+  const session = row as ActaSessionRow;
+  if (session.status === "published" || session.status === "cancelled") {
+    throw new Error("No se puede regenerar el link de una acta cerrada.");
+  }
+
+  const refereeToken = createActaToken();
+  const { data, error: updateError } = await admin
+    .from("match_acta_sessions")
+    .update({
+      referee_token_hash: hashActaToken(refereeToken),
+      referee_token_expires_at: hoursFromNow(ACTA_REFEREE_TOKEN_TTL_HOURS),
+    })
+    .eq("id", sessionId)
+    .select("*")
+    .single();
+
+  if (updateError) throw new Error(updateError.message);
+
+  return {
+    session: data as ActaSessionRow,
+    refereeToken,
+    refereeUrl: buildRefereeActaUrl(refereeToken),
+  };
+}
+
+export async function regenerateSignTokens(
+  admin: SupabaseClient,
+  sessionId: string,
+) {
+  const { data: row, error } = await admin
+    .from("match_acta_sessions")
+    .select("*")
+    .eq("id", sessionId)
+    .maybeSingle();
+
+  if (error) throw new Error(error.message);
+  if (!row) throw new Error("Sesión no encontrada.");
+
+  const session = row as ActaSessionRow;
+  if (session.status !== "pending_signatures") {
+    throw new Error("Solo se regeneran firmas cuando el acta espera firmas.");
+  }
+
+  const homeSignToken = createActaToken();
+  const awaySignToken = createActaToken();
+
+  const { data, error: updateError } = await admin
+    .from("match_acta_sessions")
+    .update({
+      home_sign_token_hash: hashActaToken(homeSignToken),
+      away_sign_token_hash: hashActaToken(awaySignToken),
+      sign_tokens_expires_at: hoursFromNow(ACTA_SIGN_TOKEN_TTL_HOURS),
+    })
+    .eq("id", sessionId)
+    .select("*")
+    .single();
+
+  if (updateError) throw new Error(updateError.message);
+
+  return {
+    session: data as ActaSessionRow,
+    homeSignToken,
+    awaySignToken,
+    homeSignUrl: buildSignActaUrl(homeSignToken),
+    awaySignUrl: buildSignActaUrl(awaySignToken),
+  };
+}
+
 export async function createActaSession(
   admin: SupabaseClient,
   input: {
