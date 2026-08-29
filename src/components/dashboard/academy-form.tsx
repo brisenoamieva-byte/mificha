@@ -199,7 +199,7 @@ export function AcademyForm() {
         }
       }
       if (!academy) {
-        router.push("/fut/dashboard");
+        router.push("/fut/dashboard/plantel");
       }
       router.refresh();
     } catch (submitError) {

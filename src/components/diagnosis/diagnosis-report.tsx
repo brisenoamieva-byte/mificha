@@ -346,6 +346,9 @@ export function DiagnosisReport({
         </p>
         <p className="mt-1 text-xs text-mf-text-muted">
           Escala 1–5 · {DIAGNOSIS_SCALE.map((s) => `${s.value} ${s.label}`).join(" · ")}
+          {diagnosis.flagged.length > 0
+            ? " · El marco naranja es prioridad de trabajo, no un puntaje distinto."
+            : ""}
         </p>
         <div className="mt-4 space-y-5">
           {groups.map(({ group, items }) =>

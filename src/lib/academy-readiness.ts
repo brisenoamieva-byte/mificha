@@ -5,6 +5,7 @@ import type { Academy } from "@/types/database";
 export interface OnboardingProgress {
   profileReady: boolean;
   hasPlayers: boolean;
+  hasDiagnosis: boolean;
   hasScheduledMatch: boolean;
   hasCompletedMatch: boolean;
   hasGuardianEmails: boolean;
@@ -43,6 +44,15 @@ export function buildOnboardingSteps(progress: OnboardingProgress): OnboardingSt
       description: "Importa Excel una vez o agrega jugadores manualmente.",
       href: "/fut/dashboard/plantel",
       cta: "Ir a plantel",
+    },
+    {
+      id: "diagnostico",
+      done: progress.hasDiagnosis,
+      essential: true,
+      title: "Primera evaluación GPH",
+      description: "Elige un jugador del plantel. La ficha queda ligada a él.",
+      href: "/fut/dashboard/diagnostico/nuevo",
+      cta: "Nueva evaluación",
     },
     {
       id: "match",
@@ -147,10 +157,12 @@ export function computeOnboardingProgress(
   scheduledMatchCount: number,
   completedMatchCount: number,
   parentUniqueViews = 0,
+  diagnosisCount = 0,
 ): OnboardingProgress {
   return {
     profileReady: isAcademyProfileReady(academy),
     hasPlayers: players.length > 0,
+    hasDiagnosis: diagnosisCount > 0,
     hasScheduledMatch: scheduledMatchCount > 0,
     hasCompletedMatch: completedMatchCount > 0,
     hasGuardianEmails: players.some((player) =>

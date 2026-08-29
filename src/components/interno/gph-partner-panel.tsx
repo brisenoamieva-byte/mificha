@@ -6,7 +6,7 @@ import { toast } from "@/components/ui/toast";
 import { supabase } from "@/lib/supabase";
 
 export function GphPartnerPanel() {
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState("gkperformancehub@gmail.com");
   const [fullName, setFullName] = useState("Gustavo Reyes");
   const [academyName, setAcademyName] = useState("Academia GPH");
   const [city, setCity] = useState("Querétaro");

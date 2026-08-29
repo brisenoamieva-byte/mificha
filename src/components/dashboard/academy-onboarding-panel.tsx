@@ -46,7 +46,7 @@ export function AcademyOnboardingPanel() {
 
     setLoading(true);
 
-    const [playersResult, scheduledResult, completedResult, viewStatsResult] =
+    const [playersResult, scheduledResult, completedResult, viewStatsResult, diagnosesResult] =
       await Promise.all([
         supabase
           .from("players")
@@ -67,6 +67,10 @@ export function AcademyOnboardingPanel() {
         supabase.rpc("get_academy_profile_view_stats", {
           p_academy_id: academy.id,
         }),
+        supabase
+          .from("player_diagnoses")
+          .select("*", { count: "exact", head: true })
+          .eq("academy_id", academy.id),
       ]);
 
     const parsedViewStats = viewStatsResult.error
@@ -83,6 +87,7 @@ export function AcademyOnboardingPanel() {
         scheduledResult.count ?? 0,
         completedResult.count ?? 0,
         parsedViewStats.unique_visitors,
+        diagnosesResult.count ?? 0,
       ),
     );
 

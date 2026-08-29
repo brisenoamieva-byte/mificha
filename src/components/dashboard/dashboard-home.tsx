@@ -290,9 +290,25 @@ export function DashboardHome() {
           </h2>
 
           {recentPlayers.length === 0 ? (
-            <p className="mt-6 text-sm text-slate-500">
-              Aún no hay jugadores registrados en tu plantel.
-            </p>
+            <div className="mt-6 space-y-3">
+              <p className="text-sm text-slate-500">
+                Aún no hay jugadores. Cárgalos y ya puedes evaluarlos: la ficha GPH se liga a cada uno.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <Link
+                  href="/fut/dashboard/plantel"
+                  className="inline-flex items-center rounded-lg bg-mf-brand px-3 py-2 text-sm font-semibold text-white hover:bg-[#164278]"
+                >
+                  Cargar plantel
+                </Link>
+                <Link
+                  href="/fut/dashboard/diagnostico/nuevo"
+                  className="inline-flex items-center rounded-lg border border-mf-border px-3 py-2 text-sm font-semibold text-mf-brand hover:bg-mf-brand-soft"
+                >
+                  Nueva evaluación
+                </Link>
+              </div>
+            </div>
           ) : (
             <div className="mt-6 overflow-x-auto">
               <table className="min-w-full text-left text-sm">
