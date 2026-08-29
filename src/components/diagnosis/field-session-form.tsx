@@ -13,6 +13,7 @@ import {
   GPH_ROTATION_CAMPO,
   GPH_ROTATION_PORTERO,
   GPH_SESSION_TYPES,
+  GPH_STATION_TESTS,
   GPH_VENUE_CODES,
   averageAttempt,
   bestAttempt,
@@ -104,6 +105,12 @@ export function FieldSessionForm({ academyId, module, session, onChange }: Field
   );
   const progress = fieldSessionProgress(session, module);
   const closing = session.closing ?? emptyClosing();
+  const only360 = GPH_STATION_TESTS.filter(
+    (test) =>
+      test.module === module &&
+      test.stage === session.protocolStage &&
+      test.usage === "plus",
+  );
 
   function patch(partial: Partial<GphFieldSession>) {
     onChange({ ...session, ...partial });
@@ -132,6 +139,14 @@ export function FieldSessionForm({ academyId, module, session, onChange }: Field
               Montaje
             </Link>
           </p>
+          {session.sessionType === "esencial" && only360.length > 0 ? (
+            <p className="mt-1 text-[11px] text-mf-text-muted">
+              Numeración del manual. En Esencial no aparecen{" "}
+              {only360.map((test) => test.number).join(", ")} ({only360
+                .map((test) => test.label)
+                .join(", ")}): son solo de 360.
+            </p>
+          ) : null}
         </div>
         <p
           className={cn(
