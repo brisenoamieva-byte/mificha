@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { AcademyForm } from "@/components/dashboard/academy-form";
+import { AcademyTeamPanel } from "@/components/dashboard/academy-team-panel";
 
 export const metadata: Metadata = {
   title: "Configuración | MiFicha",
@@ -7,8 +8,8 @@ export const metadata: Metadata = {
 
 export default function ConfiguracionPage() {
   return (
-    <div className="mx-auto max-w-4xl">
-      <div className="mb-8">
+    <div className="mx-auto max-w-4xl space-y-6">
+      <div>
         <h1 className="text-2xl font-bold text-slate-900 sm:text-3xl">
           Configuración
         </h1>
@@ -20,6 +21,8 @@ export default function ConfiguracionPage() {
       <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
         <AcademyForm />
       </div>
+
+      <AcademyTeamPanel />
     </div>
   );
 }

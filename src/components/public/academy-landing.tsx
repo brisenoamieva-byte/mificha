@@ -5,6 +5,7 @@ import { AcademyScheduleSection } from "@/components/marketing/match-schedule-ca
 import { ProgressTierBadge } from "@/components/ui/passport-score-display";
 import { BrandLogoLink } from "@/components/ui/brand-logo";
 import { BrandWordmark } from "@/components/ui/brand-wordmark";
+import { GphEvaluationBadge } from "@/components/ui/gph-evaluation-badge";
 import { getPositionLabel } from "@/lib/dashboard-utils";
 import { isDemoAcademySlug } from "@/lib/explore-demo-data";
 import {
@@ -193,6 +194,11 @@ export function AcademyLanding({ data }: AcademyLandingProps) {
                       </div>
                     )}
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
+                    {player.has_gph_evaluation ? (
+                      <div className="absolute right-3 top-3">
+                        <GphEvaluationBadge variant="solid" asSpan />
+                      </div>
+                    ) : null}
                     <div className="absolute bottom-0 left-0 right-0 p-5">
                       <p className="text-2xl font-black uppercase tracking-tight">
                         {fullName}

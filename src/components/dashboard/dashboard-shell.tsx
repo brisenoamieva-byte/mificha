@@ -2,8 +2,6 @@
 
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState, type ReactNode } from "react";
-import { getCurrentUser } from "@/lib/auth";
-import { fetchAcademyForOwner } from "@/lib/academy-owner";
 import { supabase } from "@/lib/supabase";
 import type { Academy, Profile } from "@/types/database";
 import { DashboardContext } from "@/components/dashboard/dashboard-context";
@@ -21,6 +19,8 @@ export function DashboardShell({ children }: DashboardShellProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [academy, setAcademy] = useState<Academy | null>(null);
+  const [accessRole, setAccessRole] = useState<"owner" | "staff" | null>(null);
+  const [isGphEvaluator, setIsGphEvaluator] = useState(false);
 
   const loadDashboard = useCallback(async () => {
     setLoading(true);
@@ -32,27 +32,44 @@ export function DashboardShell({ children }: DashboardShellProps) {
       } = await supabase.auth.getSession();
 
       if (sessionError) throw sessionError;
-
-      const user = session?.user ?? (await getCurrentUser());
-      if (!user) {
+      if (!session?.user) {
         router.replace("/fut/login");
         return;
       }
 
-      const { data: profileData, error: profileError } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", user.id)
-        .single();
+      await fetch("/fut/api/academy/members/claim", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      }).catch(() => undefined);
 
-      if (profileError) throw profileError;
+      const response = await fetch("/fut/api/academy/session", {
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+      const payload = (await response.json()) as {
+        profile?: Profile | null;
+        academy?: Academy | null;
+        role?: "owner" | "staff" | null;
+        evaluator?: boolean;
+        error?: string;
+      };
 
-      const academyData = await fetchAcademyForOwner(user.id);
+      if (!response.ok) {
+        throw new Error(payload.error || "No se pudo cargar el panel.");
+      }
 
-      setProfile(profileData);
-      setAcademy(academyData);
-    } catch {
-      router.replace("/fut/login");
+      setProfile(payload.profile ?? null);
+      setAcademy(payload.academy ?? null);
+      setAccessRole(payload.role ?? null);
+      setIsGphEvaluator(Boolean(payload.evaluator));
+    } catch (loadError) {
+      console.error(
+        "dashboard load",
+        loadError instanceof Error ? loadError.message : loadError,
+      );
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session) router.replace("/fut/login");
     } finally {
       setLoading(false);
     }
@@ -93,6 +110,8 @@ export function DashboardShell({ children }: DashboardShellProps) {
         loading,
         profile,
         academy,
+        accessRole,
+        isGphEvaluator,
         refresh: loadDashboard,
       }}
     >

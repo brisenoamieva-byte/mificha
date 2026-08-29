@@ -1,3 +1,4 @@
+import { fetchGphPlayerIdSet } from "@/lib/gph-player-link";
 import type { PlayerPosition } from "@/types/database";
 
 export interface PublicAcademy {
@@ -17,12 +18,14 @@ export interface PublicAcademy {
 }
 
 export interface FeaturedPlayer {
+  id?: string;
   slug: string;
   first_name: string;
   last_name: string;
   position: PlayerPosition;
   passport_score: number;
   photo_url: string | null;
+  has_gph_evaluation?: boolean;
 }
 
 export interface PublicAcademyData {
@@ -127,7 +130,7 @@ export async function fetchPublicAcademyBySlug(
         `academy_id=eq.${academy.id}&select=id`,
       ),
       fetch(
-        `${url}/rest/v1/players?${publicPlayerFilter}&select=slug,first_name,last_name,position,passport_score,photo_url&order=passport_score.desc&limit=12`,
+        `${url}/rest/v1/players?${publicPlayerFilter}&select=id,slug,first_name,last_name,position,passport_score,photo_url&order=passport_score.desc&limit=12`,
         {
           headers: {
             apikey: key,
@@ -152,7 +155,14 @@ export async function fetchPublicAcademyBySlug(
   let upcomingMatches: PublicScheduledMatch[] = [];
 
   if (playersResponse.ok) {
-    featuredPlayers = (await playersResponse.json()) as FeaturedPlayer[];
+    const rows = (await playersResponse.json()) as FeaturedPlayer[];
+    const gphIds = await fetchGphPlayerIdSet(
+      rows.map((player) => player.id).filter((id): id is string => Boolean(id)),
+    );
+    featuredPlayers = rows.map((player) => ({
+      ...player,
+      has_gph_evaluation: Boolean(player.id && gphIds.has(player.id)),
+    }));
   }
 
   if (scheduleResponse.ok) {

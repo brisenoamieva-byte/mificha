@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowDown, BarChart3, MessageCircle, Printer } from "lucide-react";
+import { ArrowDown, BarChart3, ClipboardList, MessageCircle, Printer } from "lucide-react";
 import { HomeFichaPreview } from "@/components/marketing/home-ficha-preview";
 import { CURRENT_SEASON_LABEL } from "@/lib/marketing-season";
 import { WithBrandName } from "@/components/ui/brand-wordmark";
@@ -31,6 +31,7 @@ export function PadresPageHero() {
                 { icon: MessageCircle, label: "Aviso post-partido" },
                 { icon: BarChart3, label: "Stats del torneo" },
                 { icon: Printer, label: "Ficha imprimible" },
+                { icon: ClipboardList, label: "Diagnóstico GPH" },
               ].map(({ icon: Icon, label }) => (
                 <li
                   key={label}

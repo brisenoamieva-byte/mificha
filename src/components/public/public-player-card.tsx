@@ -5,10 +5,12 @@ import { Copy, Printer } from "lucide-react";
 import { useState } from "react";
 import { FichaDocument } from "@/components/ficha/ficha-document";
 import { BrandLogoLink } from "@/components/ui/brand-logo";
+import { GphPublicStrip } from "@/components/public/gph-public-strip";
 import { PlayerAchievementsShelf } from "@/components/public/player-achievements-shelf";
 import { PlayerVideoGallery } from "@/components/public/player-video-gallery";
 import { ProfileViewTracker } from "@/components/public/profile-view-tracker";
 import { buildPublicFichaDocument } from "@/lib/ficha-document-model";
+import { buildPublicGphEvaluationPath } from "@/lib/gph-player-link";
 import type { PublicPlayerData } from "@/lib/public-player";
 import { buildPublicPlayerUrl } from "@/lib/player-utils";
 
@@ -17,7 +19,7 @@ interface PublicPlayerCardProps {
 }
 
 export function PublicPlayerCard({ data }: PublicPlayerCardProps) {
-  const { player, history, achievements, promoVideos } = data;
+  const { player, history, achievements, promoVideos, gph } = data;
   const [copied, setCopied] = useState(false);
 
   const model = buildPublicFichaDocument(data);
@@ -46,6 +48,13 @@ export function PublicPlayerCard({ data }: PublicPlayerCardProps) {
         </div>
 
         <FichaDocument model={model} priorityPhoto />
+
+        {gph ? (
+          <GphPublicStrip
+            summary={gph}
+            href={buildPublicGphEvaluationPath(player.slug)}
+          />
+        ) : null}
 
         <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:justify-end print:hidden">
           <a

@@ -5,6 +5,7 @@ import { BadgeCheck, ShieldCheck } from "lucide-react";
 import QRCode from "react-qr-code";
 import { FichaCoachBlock, hasFichaCoachContent } from "@/components/ficha/ficha-coach-block";
 import { FichaSeasonBlock } from "@/components/ficha/ficha-season-block";
+import { GphEvaluationBadge } from "@/components/ui/gph-evaluation-badge";
 import { PlayerPortraitImage } from "@/components/ui/player-portrait-image";
 import { BrandWordmark } from "@/components/ui/brand-wordmark";
 import { FICHA_COPY, computeSeasonSummary } from "@/lib/ficha-content";
@@ -157,6 +158,9 @@ export function FichaDocument({
             <span className="rounded-md bg-mf-canvas px-2 py-0.5 text-[10px] font-medium text-mf-text-secondary ring-1 ring-mf-border-subtle">
               {FICHA_COPY.parentalConsent}
             </span>
+          ) : null}
+          {model.showGph ? (
+            <GphEvaluationBadge href={model.gphHref ?? undefined} />
           ) : null}
           {model.isDemo ? (
             <span className="rounded-md bg-mf-brand-soft px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-mf-brand">

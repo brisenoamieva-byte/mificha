@@ -58,12 +58,19 @@ export async function POST(request: Request) {
 
     const { data: academy, error: academyError } = await supabase
       .from("academies")
-      .select("id, name, owner_id, stripe_customer_id")
+      .select("id, name, owner_id, stripe_customer_id, billing_exempt")
       .eq("id", academy_id)
       .single();
 
     if (academyError || !academy) {
       return NextResponse.json({ error: "Academia no encontrada." }, { status: 404 });
+    }
+
+    if ("billing_exempt" in academy && academy.billing_exempt) {
+      return NextResponse.json(
+        { error: "Esta academia es socio GPH y no se cobra suscripción." },
+        { status: 403 },
+      );
     }
 
     if (academy.owner_id !== user.id && profile.role !== "admin") {

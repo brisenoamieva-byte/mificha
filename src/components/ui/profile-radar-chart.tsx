@@ -6,6 +6,8 @@ interface ProfileRadarChartProps {
   series: RadarSeries[];
   className?: string;
   size?: number;
+  /** Escala máxima del radar. Diagnóstico GPH usa 5; perfil visual usa 10. */
+  maxValue?: number;
   /** Etiquetas en el SVG; por defecto usa `axes`. */
   axisChartLabels?: readonly string[];
   /** Espacio reducido: tabla de valores debajo con nombres completos. */
@@ -20,9 +22,10 @@ function polarPoint(
   index: number,
   total: number,
   value: number,
+  maxValue: number,
 ) {
   const angle = (Math.PI * 2 * index) / total - Math.PI / 2;
-  const distance = (value / 10) * radius;
+  const distance = (value / maxValue) * radius;
   return {
     x: center + Math.cos(angle) * distance,
     y: center + Math.sin(angle) * distance,
@@ -34,10 +37,11 @@ function buildPolygonPoints(
   radius: number,
   values: number[],
   axes: readonly string[],
+  maxValue: number,
 ) {
   return values
     .map((value, index) => {
-      const point = polarPoint(center, radius, index, axes.length, value);
+      const point = polarPoint(center, radius, index, axes.length, value, maxValue);
       return `${point.x},${point.y}`;
     })
     .join(" ");
@@ -69,6 +73,7 @@ export function ProfileRadarChart({
   series,
   className,
   size = 220,
+  maxValue = 10,
   axisChartLabels,
   compact = false,
   showLegend = true,
@@ -79,7 +84,7 @@ export function ProfileRadarChart({
   const viewSize = size + pad * 2;
   const center = viewSize / 2;
   const labelRadius = chartRadius + (compact ? 13 : 17);
-  const rings = [2, 4, 6, 8, 10];
+  const rings = maxValue <= 5 ? [1, 2, 3, 4, 5] : [2, 4, 6, 8, 10];
   const primary = series[0];
   const chartLabels = axisChartLabels ?? axes;
   const showVertexValues = showValues && !compact;
@@ -100,17 +105,18 @@ export function ProfileRadarChart({
               chartRadius,
               Array.from({ length: axes.length }, () => ring),
               axes,
+              maxValue,
             )}
             fill="none"
             stroke="currentColor"
-            strokeOpacity={ring === 10 ? 0.14 : 0.07}
+            strokeOpacity={ring === maxValue ? 0.14 : 0.07}
             className="text-slate-400"
           />
         ))}
 
         {chartLabels.map((label, index) => {
-          const outer = polarPoint(center, chartRadius, index, axes.length, 10);
-          const labelPoint = polarPoint(center, labelRadius, index, axes.length, 10);
+          const outer = polarPoint(center, chartRadius, index, axes.length, maxValue, maxValue);
+          const labelPoint = polarPoint(center, labelRadius, index, axes.length, maxValue, maxValue);
           const align = axisLabelAlignment(index, axes.length);
 
           return (
@@ -145,7 +151,7 @@ export function ProfileRadarChart({
         {series.map((item) => (
           <g key={item.label}>
             <polygon
-              points={buildPolygonPoints(center, chartRadius, item.values, axes)}
+              points={buildPolygonPoints(center, chartRadius, item.values, axes, maxValue)}
               fill={item.color}
               fillOpacity={item.fillOpacity ?? 0.22}
               stroke={item.color}
@@ -154,7 +160,7 @@ export function ProfileRadarChart({
             />
             {showVertexValues
               ? item.values.map((value, index) => {
-                  const point = polarPoint(center, chartRadius, index, axes.length, value);
+                  const point = polarPoint(center, chartRadius, index, axes.length, value, maxValue);
                   return (
                     <g key={`${item.label}-${index}`}>
                       <circle

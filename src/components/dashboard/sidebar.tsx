@@ -6,6 +6,7 @@ import {
   LayoutDashboard,
   LineChart,
   Mail,
+  ClipboardList,
   Settings,
   Trophy,
   Users,
@@ -13,9 +14,11 @@ import {
 } from "lucide-react";
 import { BrandLogo } from "@/components/ui/brand-logo";
 import { PitchDeckNavLink } from "@/components/dashboard/pitch-deck-nav-link";
+import { useDashboard } from "@/components/dashboard/dashboard-context";
 
 const navItems = [
   { href: "/fut/dashboard", label: "Inicio", icon: LayoutDashboard },
+  { href: "/fut/dashboard/diagnostico", label: "Diagnósticos", icon: ClipboardList },
   { href: "/fut/dashboard/plantel", label: "Plantel", icon: Users },
   { href: "/fut/dashboard/plantel/tutores", label: "Avisos a tutores", icon: Mail },
   { href: "/fut/dashboard/partidos", label: "Partidos", icon: Trophy },
@@ -30,6 +33,7 @@ interface DashboardSidebarProps {
 
 export function DashboardSidebar({ open, onClose }: DashboardSidebarProps) {
   const pathname = usePathname();
+  const { isGphEvaluator } = useDashboard();
 
   const content = (
     <div className="flex h-full flex-col">
@@ -47,6 +51,10 @@ export function DashboardSidebar({ open, onClose }: DashboardSidebarProps) {
 
       <nav className="flex-1 space-y-1 px-3 py-4">
         {navItems.map(({ href, label, icon: Icon }) => {
+          const itemLabel =
+            href === "/fut/dashboard/diagnostico" && isGphEvaluator
+              ? "Diagnósticos GPH"
+              : label;
           const isActive =
             href === "/fut/dashboard"
               ? pathname === href
@@ -62,7 +70,7 @@ export function DashboardSidebar({ open, onClose }: DashboardSidebarProps) {
               className={isActive ? "mf-nav-link-active" : "mf-nav-link"}
             >
               <Icon className="h-[18px] w-[18px] shrink-0" />
-              {label}
+              {itemLabel}
             </Link>
           );
         })}

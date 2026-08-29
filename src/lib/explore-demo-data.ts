@@ -60,6 +60,7 @@ export const DEMO_EXPLORE_PLAYERS: ExploreDemoPlayer[] = [
     passport_score: 78,
     photo_url: MARKETING_IMAGES.demoPlayerHeadshot,
     example_href: "/#demo-ficha-documento",
+    has_gph_evaluation: true,
     season_stats: { matches: 14, goals: 11, assists: 5, minutes: 980 },
     academies: DEMO_ACADEMY_PLAYER_LINK,
   },
@@ -289,6 +290,7 @@ export function getDemoAcademyPublicData(): PublicAcademyData {
     position: player.position,
     passport_score: player.passport_score,
     photo_url: player.photo_url,
+    has_gph_evaluation: player.has_gph_evaluation,
   }));
 
   return {

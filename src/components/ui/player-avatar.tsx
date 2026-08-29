@@ -7,13 +7,14 @@ interface PlayerAvatarProps {
   firstName: string;
   lastName: string;
   photoUrl?: string | null;
-  size?: "sm" | "md" | "lg";
+  size?: "sm" | "md" | "lg" | "xl";
 }
 
 const sizeClasses = {
-  sm: "h-10 w-10 text-xs",
-  md: "h-12 w-12 text-sm",
-  lg: "h-16 w-16 text-base",
+  sm: "h-10 w-10 text-xs rounded-full",
+  md: "h-12 w-12 text-sm rounded-full",
+  lg: "h-16 w-16 text-base rounded-full",
+  xl: "h-28 w-28 text-xl rounded-2xl sm:h-32 sm:w-32",
 };
 
 export function PlayerAvatar({
@@ -28,7 +29,7 @@ export function PlayerAvatar({
       <img
         src={photoUrl}
         alt={`${firstName} ${lastName}`}
-        className={cn("rounded-full object-cover", sizeClasses[size])}
+        className={cn("object-cover", sizeClasses[size])}
       />
     );
   }
@@ -36,7 +37,7 @@ export function PlayerAvatar({
   return (
     <div
       className={cn(
-        "flex items-center justify-center rounded-full bg-slate-100 font-semibold text-slate-500",
+        "flex items-center justify-center bg-slate-100 font-semibold text-slate-500",
         sizeClasses[size],
       )}
     >

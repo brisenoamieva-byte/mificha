@@ -9,6 +9,7 @@ import {
   getPerformanceHighlights,
   normalizeMatchPerformanceRows,
 } from "@/lib/performance-analytics";
+import { fetchLatestGphSummary, type PublicGphSummary } from "@/lib/gph-player-link";
 
 export interface PublicPlayerAchievement {
   achievement_key: string;
@@ -44,6 +45,8 @@ export interface PublicPlayerData {
   seasonHighlights: ReturnType<typeof getPerformanceHighlights>;
   achievements: PublicPlayerAchievement[];
   promoVideos: PublicPlayerVideo[];
+  /** Misma fila `players.id` → `player_diagnoses.player_id`. */
+  gph: PublicGphSummary | null;
 }
 
 function getSupabaseHeaders() {
@@ -244,6 +247,7 @@ export async function fetchPublicPlayerBySlug(
     seasonHighlights,
     achievements,
     promoVideos,
+    gph: await fetchLatestGphSummary(player.id),
   };
 }
 

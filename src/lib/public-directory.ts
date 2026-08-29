@@ -1,5 +1,6 @@
 import type { PlayerPosition } from "@/types/database";
 import { locationMatches } from "@/lib/mexico-locations";
+import { fetchGphPlayerIdSet } from "@/lib/gph-player-link";
 import { signPlayerPhotoUrl } from "@/lib/supabase-admin";
 import {
   matchesCategoryFilter,
@@ -18,6 +19,7 @@ export interface DirectoryAcademy {
 }
 
 export interface DirectoryPlayer {
+  id?: string;
   slug: string;
   first_name: string;
   last_name: string;
@@ -26,6 +28,7 @@ export interface DirectoryPlayer {
   passport_score: number;
   photo_url: string | null;
   video_url?: string | null;
+  has_gph_evaluation?: boolean;
   academies: {
     name: string;
     city: string | null;
@@ -43,6 +46,14 @@ export interface PublicDirectoryData {
 /** Jugadores de demo local (`/fut/api/seed`) — no mezclar con perfiles de ejemplo en /explorar. */
 export function isDevSeedPlayer(player: Pick<DirectoryPlayer, "slug">) {
   return player.slug.endsWith("-seed");
+}
+
+function asAcademyEmbed(
+  value: DirectoryPlayer["academies"] | DirectoryPlayer["academies"][] | null | undefined,
+): DirectoryPlayer["academies"] {
+  if (!value) return null;
+  if (Array.isArray(value)) return value[0] ?? null;
+  return value;
 }
 
 function getSupabaseHeaders() {
@@ -72,7 +83,7 @@ export async function fetchPublicDirectory(): Promise<PublicDirectoryData> {
         },
       ),
       fetch(
-        `${url}/rest/v1/players?is_public=eq.true&is_discoverable=eq.true&public_consent_at=not.is.null&select=slug,first_name,last_name,birth_date,position,passport_score,photo_url,video_url,academies(name,city,state,slug,is_certified)&order=passport_score.desc&limit=500`,
+        `${url}/rest/v1/players?is_public=eq.true&is_discoverable=eq.true&public_consent_at=not.is.null&select=id,slug,first_name,last_name,birth_date,position,passport_score,photo_url,video_url,academies(name,city,state,slug,is_certified)&order=passport_score.desc&limit=500`,
         {
           headers: {
             apikey: key,
@@ -83,20 +94,42 @@ export async function fetchPublicDirectory(): Promise<PublicDirectoryData> {
       ),
     ]);
 
-    const academies = academiesResponse.ok
-      ? ((await academiesResponse.json()) as DirectoryAcademy[])
-      : [];
+    const academiesJson = academiesResponse.ok ? await academiesResponse.json() : [];
+    const academies = Array.isArray(academiesJson) ? (academiesJson as DirectoryAcademy[]) : [];
 
-    const players = playersResponse.ok
-      ? await Promise.all(
-          ((await playersResponse.json()) as DirectoryPlayer[])
-            .filter((player) => player.academies?.is_certified)
-            .map(async (player) => ({
-              ...player,
-              photo_url: await signPlayerPhotoUrl(player.photo_url),
-            })),
+    let playersJson: unknown = [];
+    if (playersResponse.ok) {
+      playersJson = await playersResponse.json();
+    } else if (playersResponse.status === 400) {
+      const retry = await fetch(
+        `${url}/rest/v1/players?is_public=eq.true&is_discoverable=eq.true&public_consent_at=not.is.null&select=id,slug,first_name,last_name,birth_date,position,passport_score,photo_url,academies(name,city,state,slug,is_certified)&order=passport_score.desc&limit=500`,
+        {
+          headers: {
+            apikey: key,
+            Authorization: `Bearer ${key}`,
+          },
+          next: { revalidate: 60 },
+        },
+      );
+      if (retry.ok) playersJson = await retry.json();
+    }
+
+    const certified = Array.isArray(playersJson)
+      ? (playersJson as DirectoryPlayer[]).filter((player) =>
+          asAcademyEmbed(player.academies)?.is_certified,
         )
       : [];
+    const gphIds = await fetchGphPlayerIdSet(
+      certified.map((player) => player.id).filter((id): id is string => Boolean(id)),
+    );
+    const players = await Promise.all(
+      certified.map(async (player) => ({
+        ...player,
+        academies: asAcademyEmbed(player.academies),
+        photo_url: await signPlayerPhotoUrl(player.photo_url),
+        has_gph_evaluation: Boolean(player.id && gphIds.has(player.id)),
+      })),
+    );
 
     return { academies, players };
   } catch (error) {
@@ -144,7 +177,7 @@ export function filterDirectory(
       ? parseCategoryFilter(categoryFilter)
       : categoryFilter;
 
-  const academies = data.academies.filter((academy) => {
+  const academies = (Array.isArray(data.academies) ? data.academies : []).filter((academy) => {
     if (state && !locationMatches(academy.state, state)) return false;
     if (city && !locationMatches(academy.city, city)) return false;
     if (!normalizedQuery) return true;
@@ -162,7 +195,7 @@ export function filterDirectory(
     return haystack.includes(normalizedQuery);
   });
 
-  const players = data.players.filter((player) => {
+  const players = (Array.isArray(data.players) ? data.players : []).filter((player) => {
     if (state && !locationMatches(player.academies?.state, state)) return false;
     if (city && !locationMatches(player.academies?.city, city)) return false;
     if (!matchesCategoryFilter(player.birth_date, category)) return false;

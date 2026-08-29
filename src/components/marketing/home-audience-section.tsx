@@ -4,7 +4,7 @@ import { AUDIENCE_VALUE_PROPS } from "@/lib/audience-value-props";
 import { cn } from "@/lib/utils";
 
 /** Perfiles principales en home — sin listas largas para reducir scroll en móvil. */
-const HOME_AUDIENCE_IDS = ["academia", "padres", "organizador", "scout"] as const;
+const HOME_AUDIENCE_IDS = ["academia", "padres", "evaluaciones", "organizador"] as const;
 
 export function HomeAudienceSection() {
   const items = AUDIENCE_VALUE_PROPS.filter((item) =>

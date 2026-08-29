@@ -13,6 +13,14 @@ export function DevServiceWorkerCleanup() {
         void registration.unregister();
       }
     });
+
+    if ("caches" in window) {
+      void caches.keys().then((keys) => {
+        for (const key of keys) {
+          void caches.delete(key);
+        }
+      });
+    }
   }, []);
 
   return null;

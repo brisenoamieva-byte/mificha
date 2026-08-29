@@ -31,7 +31,7 @@ const QUICK_LINKS: Array<{ href: string; label: string; primary?: boolean }> = [
   { href: "/fut/interno/pitch", label: "Presentación", primary: true },
   { href: "/fut/interno/demo-one-pager", label: "One-pager" },
   { href: "/fut/interno/fut/organizadores", label: "Organizador" },
-  { href: "/fut/interno/jornadas", label: "Jornadas / acta" },
+  { href: "/fut/interno/gph", label: "Socio GPH" },
   { href: "/fut/dashboard", label: "Dashboard" },
 ];
 

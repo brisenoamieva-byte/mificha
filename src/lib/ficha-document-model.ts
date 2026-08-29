@@ -7,6 +7,7 @@ import { formatPlayerCategory } from "@/lib/player-category";
 import type { PublicPlayerData } from "@/lib/public-player";
 import { CURRENT_SEASON_LABEL } from "@/lib/marketing-season";
 import type { MatchPerformanceRow } from "@/lib/performance-analytics";
+import { buildPublicGphEvaluationPath } from "@/lib/gph-player-link";
 import { buildPublicPlayerUrl, getDominantFootLabel } from "@/lib/player-utils";
 import type { PlayerPosition, PlayerSeasonStat } from "@/types/database";
 
@@ -65,6 +66,8 @@ export interface FichaDocumentModel {
   achievements: FichaDocumentAchievement[];
   showVerified: boolean;
   showConsent: boolean;
+  showGph?: boolean;
+  gphHref?: string | null;
   publicUrlDisplay: string;
   publicUrlQr: string;
   isDemo?: boolean;
@@ -137,6 +140,8 @@ export function buildDemoFichaDocument(): FichaDocumentModel {
     achievements: [...demo.achievements],
     showVerified: true,
     showConsent: true,
+    showGph: true,
+    gphHref: buildPublicGphEvaluationPath(demo.slug),
     publicUrlDisplay: demo.publicUrl,
     publicUrlQr: demo.publicUrl.startsWith("http")
       ? demo.publicUrl
@@ -214,6 +219,8 @@ export function buildPublicFichaDocument(data: PublicPlayerData): FichaDocumentM
       .filter((item): item is FichaDocumentAchievement => item != null),
     showVerified: player.is_public,
     showConsent: Boolean(player.public_consent_at),
+    showGph: Boolean(data.gph),
+    gphHref: data.gph ? buildPublicGphEvaluationPath(player.slug) : null,
     publicUrlDisplay: publicUrl.replace(/^https?:\/\//, ""),
     publicUrlQr: publicUrl,
     isDemo: false,

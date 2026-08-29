@@ -4,10 +4,20 @@ import Link from "next/link";
 import { ArrowRight, Printer } from "lucide-react";
 import { FichaDocument } from "@/components/ficha/ficha-document";
 import { BrandLogoLink } from "@/components/ui/brand-logo";
+import { GphPublicStrip } from "@/components/public/gph-public-strip";
+import { buildDemoDiagnosisReport } from "@/lib/demo-diagnosis";
 import { buildDemoFichaDocument } from "@/lib/ficha-document-model";
+import {
+  buildPublicGphEvaluationPath,
+  publicGphSummaryFromDiagnosis,
+} from "@/lib/gph-player-link";
 
 export function DemoPublicPlayerCard() {
   const model = buildDemoFichaDocument();
+  const demoGph = buildDemoDiagnosisReport();
+  const gphHref = buildPublicGphEvaluationPath(
+    demoGph.player.slug || "santiago-hernandez-demo",
+  );
 
   function handlePrint() {
     window.print();
@@ -25,6 +35,11 @@ export function DemoPublicPlayerCard() {
         </p>
 
         <FichaDocument model={model} priorityPhoto variant="full" />
+
+        <GphPublicStrip
+          summary={publicGphSummaryFromDiagnosis(demoGph.diagnosis)}
+          href={gphHref}
+        />
 
         <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:justify-end print:hidden">
           <button

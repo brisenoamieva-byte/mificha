@@ -40,6 +40,11 @@ export const MARKETING_NAV: NavSection[] = [
         label: "Padres",
         description: "Ficha post-partido por WhatsApp o email",
       },
+      {
+        href: "/fut/evaluaciones",
+        label: "Evaluaciones GPH",
+        description: "Evaluación GPH, seguimiento en la misma ficha",
+      },
     ],
   },
   {

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { signIn } from "@/lib/auth";
 
@@ -21,7 +21,6 @@ function getErrorMessage(error: unknown) {
 const inputClassName = "mf-input mt-1";
 
 export function LoginForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const nextPath = searchParams.get("next") || "/fut/dashboard";
   const [email, setEmail] = useState("");
@@ -35,12 +34,15 @@ export function LoginForm() {
     setLoading(true);
 
     try {
-      await signIn(email, password);
-      router.push(nextPath.startsWith("/") ? nextPath : "/fut/dashboard");
-      router.refresh();
+      const result = await signIn(email.trim().toLowerCase(), password);
+      if (!result.session) {
+        setError("Confirma tu correo antes de iniciar sesión.");
+        setLoading(false);
+        return;
+      }
+      window.location.assign(nextPath.startsWith("/") ? nextPath : "/fut/dashboard");
     } catch (submitError) {
       setError(getErrorMessage(submitError));
-    } finally {
       setLoading(false);
     }
   }
@@ -81,6 +83,12 @@ export function LoginForm() {
         />
       </div>
 
+      <p className="-mt-2 text-right text-sm">
+        <Link href="/fut/recuperar" className="font-medium text-[#1B4F8C] hover:underline">
+          Olvidé mi contraseña
+        </Link>
+      </p>
+
       {error ? (
         <p className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>
       ) : null}
@@ -95,7 +103,14 @@ export function LoginForm() {
 
       <p className="text-center text-sm text-gray-600">
         ¿No tienes cuenta?{" "}
-        <Link href="/fut/signup" className="font-medium text-[#1B4F8C] hover:underline">
+        <Link
+          href={
+            nextPath !== "/fut/dashboard"
+              ? `/fut/signup?next=${encodeURIComponent(nextPath)}`
+              : "/fut/signup"
+          }
+          className="font-medium text-[#1B4F8C] hover:underline"
+        >
           Regístrate
         </Link>
       </p>

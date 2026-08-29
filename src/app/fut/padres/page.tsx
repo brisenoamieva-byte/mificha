@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { PadresAcademyExample } from "@/components/marketing/padres-academy-example";
 import { PadresBenefitsSection } from "@/components/marketing/padres-benefits-section";
+import { PadresGphSection } from "@/components/marketing/evaluaciones-page-content";
 import { PadresPageHero } from "@/components/marketing/padres-page-hero";
 import { ParentLinkForm } from "@/components/marketing/parent-link-form";
 import { SiteFooter, SiteHeader } from "@/components/marketing/site-header";
@@ -21,6 +22,7 @@ export default function PadresPage() {
       <main className="flex-1">
         <PadresPageHero />
         <PadresBenefitsSection />
+        <PadresGphSection />
 
         <section
           id="abrir-ficha"

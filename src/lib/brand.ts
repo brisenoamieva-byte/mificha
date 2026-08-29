@@ -1,5 +1,6 @@
 export const BRAND_ICON = "/brand/mificha-icon.png";
 export const BRAND_OG_IMAGE = "/marketing/og-default.png";
+export { GPH_LOGO } from "@/lib/gph-alliance";
 
 /** @deprecated Usar BRAND_ICON + BrandWordmark. Mantenido para compatibilidad en emails. */
 export const BRAND_LOGO = BRAND_ICON;

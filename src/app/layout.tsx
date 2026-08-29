@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import { DevServiceWorkerCleanup } from "@/components/dev-service-worker-cleanup";
+import { AuthRecoveryRedirect } from "@/components/auth/auth-recovery-redirect";
 import { CookieNotice } from "@/components/marketing/cookie-notice";
 import { AppToaster } from "@/components/ui/toast";
 import { BRAND_ICON, BRAND_OG_IMAGE } from "@/lib/brand";
@@ -20,7 +21,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "MiFicha · Tu ficha deportiva",
   description:
-    "Fútbol y pádel bajo la misma marca. Elige el deporte y entra a tu ficha.",
+    "Ficha deportiva de fútbol: planteles, torneos escolares y evaluación GPH.",
   metadataBase: new URL(appUrl),
   icons: {
     icon: BRAND_ICON,
@@ -29,7 +30,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "MiFicha · Tu ficha deportiva",
     description:
-      "Fútbol y pádel bajo la misma marca. Elige el deporte y entra a tu ficha.",
+      "Ficha deportiva de fútbol: planteles, torneos escolares y evaluación GPH.",
     url: appUrl,
     siteName: "MiFicha",
     locale: "es_MX",
@@ -47,7 +48,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "MiFicha · Tu ficha deportiva",
     description:
-      "Fútbol y pádel bajo la misma marca. Elige el deporte y entra a tu ficha.",
+      "Ficha deportiva de fútbol: planteles, torneos escolares y evaluación GPH.",
     images: [BRAND_OG_IMAGE],
   },
 };
@@ -68,6 +69,7 @@ export default function RootLayout({
     <html lang="es" className={`${inter.variable} h-full antialiased`}>
       <body className="min-h-dvh bg-mf-canvas font-sans text-mf-text antialiased">
         <DevServiceWorkerCleanup />
+        <AuthRecoveryRedirect />
         {children}
         <CookieNotice />
         <AppToaster />

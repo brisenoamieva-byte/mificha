@@ -58,6 +58,32 @@ export const ORGANIZER_PRICING = {
   ] satisfies OrganizerPricingPlan[],
 } as const;
 
+/** Evaluaciones GPH — producto aparte de torneo y academia. Sin Stripe por ahora. */
+export const DIAGNOSIS_PRODUCT = {
+  title: "Evaluaciones",
+  subtitle:
+    "Se contratan por su cuenta. No forman parte de la cuota del torneo ni de la cuenta gratis de la academia.",
+  footnote: "Metodología GPH · ficha y seguimiento en mificha.mx · cotización por WhatsApp.",
+  plans: [
+    {
+      id: "individual",
+      label: "Jugador",
+      priceLabel: "A cotizar",
+      period: "por evaluación",
+      description:
+        "Diagnóstico de tu hijo: sesión GPH, ficha visual, lectura de entrenador y seguimiento de etapa en MiFicha.",
+    },
+    {
+      id: "grupo",
+      label: "Grupo o plantel",
+      priceLabel: "A cotizar",
+      period: "por jornada",
+      description:
+        "Varios jugadores en una misma sesión. Cada uno queda con su ficha y plan en la plataforma.",
+    },
+  ] satisfies OrganizerPricingPlan[],
+} as const;
+
 export const SCOUT_PRICING = {
   headline: "Explorar para visorías",
   basicLabel: "Directorio básico",

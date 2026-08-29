@@ -4,6 +4,7 @@ import {
   Download,
   ExternalLink,
   FileSpreadsheet,
+  ClipboardList,
   Mail,
   Pencil,
   Plus,
@@ -25,6 +26,7 @@ import { toast } from "@/components/ui/toast";
 import { MiniStatCard } from "@/components/ui/visual-stats";
 import { CategoryFilterSelect } from "@/components/ui/category-filter-select";
 import { PlayerCategoryBadge } from "@/components/ui/player-category-badge";
+import { GphEvaluationBadge } from "@/components/ui/gph-evaluation-badge";
 import { calculateAge } from "@/lib/dashboard-utils";
 import {
   matchesCategoryFilter,
@@ -57,18 +59,44 @@ export function PlantelContent() {
   );
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [page, setPage] = useState(1);
+  const [gphPlayerIds, setGphPlayerIds] = useState<Set<string>>(new Set());
 
   const loadPlayers = useCallback(async () => {
     if (!academy) return;
 
     setLoading(true);
-    const { data } = await supabase
-      .from("players")
-      .select("*")
-      .eq("academy_id", academy.id)
-      .order("last_name", { ascending: true });
+    const [{ data }, diagnosesResult] = await Promise.all([
+      supabase
+        .from("players")
+        .select("*")
+        .eq("academy_id", academy.id)
+        .order("last_name", { ascending: true }),
+      (supabase as unknown as {
+        from: (table: "player_diagnoses") => {
+          select: (columns: "player_id") => {
+            eq: (
+              column: "academy_id",
+              value: string,
+            ) => Promise<{
+              data: Array<{ player_id: string }> | null;
+              error: { message: string } | null;
+            }>;
+          };
+        };
+      })
+        .from("player_diagnoses")
+        .select("player_id")
+        .eq("academy_id", academy.id),
+    ]);
 
     setPlayers(data ?? []);
+    if (!diagnosesResult.error && diagnosesResult.data) {
+      setGphPlayerIds(
+        new Set(diagnosesResult.data.map((row) => String(row.player_id))),
+      );
+    } else {
+      setGphPlayerIds(new Set());
+    }
     setLoading(false);
   }, [academy]);
 
@@ -173,6 +201,13 @@ export function PlantelContent() {
           </div>
 
           <div className="flex flex-wrap gap-3">
+            <Link
+              href="/fut/dashboard/diagnostico/nuevo"
+              className="inline-flex items-center gap-2 rounded-lg border border-[#1B4F8C] bg-white px-4 py-3 text-sm font-semibold text-[#1B4F8C] hover:bg-[#1B4F8C]/5"
+            >
+              <ClipboardList className="h-4 w-4" />
+              Evaluar
+            </Link>
             <Link
               href="/fut/dashboard/plantel/tutores"
               className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50"
@@ -358,11 +393,16 @@ export function PlantelContent() {
                             <p className="font-medium text-slate-900">
                               {player.first_name} {player.last_name}
                             </p>
-                            {!isProfileComplete(player) ? (
-                              <p className="text-xs text-amber-600">Incompleto</p>
-                            ) : player.video_url ? (
-                              <p className="text-xs text-violet-700">Video publicado</p>
-                            ) : null}
+                            <div className="mt-0.5 flex flex-wrap items-center gap-1.5">
+                              {gphPlayerIds.has(player.id) ? (
+                                <GphEvaluationBadge asSpan />
+                              ) : null}
+                              {!isProfileComplete(player) ? (
+                                <p className="text-xs text-amber-600">Incompleto</p>
+                              ) : player.video_url ? (
+                                <p className="text-xs text-violet-700">Video publicado</p>
+                              ) : null}
+                            </div>
                           </div>
                         </div>
                       </td>
@@ -383,6 +423,13 @@ export function PlantelContent() {
                       </td>
                       <td className="px-4 py-4 sm:px-6">
                         <div className="flex items-center gap-2">
+                          <Link
+                            href={`/fut/dashboard/diagnostico/nuevo?player=${player.id}`}
+                            className="rounded-lg p-2 text-[#1B4F8C] hover:bg-slate-100"
+                            title="Diagnosticar"
+                          >
+                            <ClipboardList className="h-4 w-4" />
+                          </Link>
                           <SharePlayerButton
                             slug={player.slug}
                             firstName={player.first_name}

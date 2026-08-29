@@ -861,4 +861,7 @@ update storage.buckets
 set public = false
 where id in ('player-photos', 'player-videos');
 
+-- Después de este archivo: supabase/rls-public-recursion-fix.sql (#27)
+-- Rompe 42P17 academies ↔ players (explorar + historial de ficha).
+
 

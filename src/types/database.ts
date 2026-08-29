@@ -62,6 +62,7 @@ export type Database = {
           is_public: boolean;
           is_discoverable: boolean;
           public_consent_at: string | null;
+          billing_exempt?: boolean;
           created_at: string;
         };
         Insert: {
@@ -86,6 +87,7 @@ export type Database = {
           is_public?: boolean;
           is_discoverable?: boolean;
           public_consent_at?: string | null;
+          billing_exempt?: boolean;
           created_at?: string;
         };
         Update: {
@@ -110,6 +112,7 @@ export type Database = {
           is_public?: boolean;
           is_discoverable?: boolean;
           public_consent_at?: string | null;
+          billing_exempt?: boolean;
           created_at?: string;
         };
         Relationships: [
@@ -670,6 +673,51 @@ export type Database = {
             referencedColumns: ["id"];
           },
         ];
+      };
+      academy_members: {
+        Row: {
+          id: string;
+          academy_id: string;
+          user_id: string | null;
+          invited_email: string;
+          invited_name: string | null;
+          role: string;
+          status: string;
+          invite_token_hash: string | null;
+          invite_expires_at: string | null;
+          invited_by: string | null;
+          created_at: string;
+          accepted_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          academy_id: string;
+          user_id?: string | null;
+          invited_email: string;
+          invited_name?: string | null;
+          role?: string;
+          status?: string;
+          invite_token_hash?: string | null;
+          invite_expires_at?: string | null;
+          invited_by?: string | null;
+          created_at?: string;
+          accepted_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          academy_id?: string;
+          user_id?: string | null;
+          invited_email?: string;
+          invited_name?: string | null;
+          role?: string;
+          status?: string;
+          invite_token_hash?: string | null;
+          invite_expires_at?: string | null;
+          invited_by?: string | null;
+          created_at?: string;
+          accepted_at?: string | null;
+        };
+        Relationships: [];
       };
     };
     Views: {

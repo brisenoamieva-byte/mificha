@@ -1,0 +1,885 @@
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { Check, Loader2, Sparkles, Star } from "lucide-react";
+import { useDashboard } from "@/components/dashboard/dashboard-context";
+import { CoachBriefSection } from "@/components/diagnosis/coach-brief-section";
+import { FieldSessionForm } from "@/components/diagnosis/field-session-form";
+import { toast } from "@/components/ui/toast";
+import { calculateAge, getPositionLabel } from "@/lib/dashboard-utils";
+import {
+  emptyFieldSession,
+  fieldSessionProgress,
+  flaggedIndicatorsFromField,
+  scoresFromFieldSession,
+  suggestPrioritiesFromField,
+  GPH_VENUE_CODES,
+  protocolStageFromAge,
+} from "@/lib/gph-field-protocol";
+import { diagnosisAuthedFetch } from "@/lib/player-diagnosis-client";
+import {
+  computeDiagnosisResult,
+  DIAGNOSIS_GROUP_LABELS,
+  DIAGNOSIS_KIND_LABELS,
+  DIAGNOSIS_KINDS,
+  DIAGNOSIS_MONTH_META,
+  DIAGNOSIS_MONTHS,
+  DIAGNOSIS_SCALE,
+  DIAGNOSIS_STAGE_LABELS,
+  emptyMonthlyPlan,
+  indicatorsForModule,
+  moduleFromPosition,
+  suggestPriorities,
+  type DiagnosisCoachBrief,
+  type DiagnosisKind,
+  type DiagnosisModule,
+  type DiagnosisMonthlyPlan,
+  type DiagnosisNotes,
+  type DiagnosisPriorityItem,
+  type DiagnosisScores,
+} from "@/lib/player-diagnosis";
+import type { Player } from "@/types/database";
+import { positionOptions } from "@/lib/player-utils";
+import { cn } from "@/lib/utils";
+
+interface DiagnosisFormProps {
+  players: Player[];
+  initialPlayerId?: string;
+  academyId?: string;
+  onPlayerCreated?: (player: Player) => void;
+}
+
+function fieldSessionForPlayer(player: Player | null) {
+  const age = player?.birth_date ? calculateAge(player.birth_date) : null;
+  return emptyFieldSession(protocolStageFromAge(age));
+}
+
+export function DiagnosisForm({
+  players,
+  initialPlayerId,
+  academyId,
+  onPlayerCreated,
+}: DiagnosisFormProps) {
+  const { academy, profile, isGphEvaluator } = useDashboard();
+  const targetAcademyId = academyId || academy?.id || "";
+  const router = useRouter();
+  const [playerId, setPlayerId] = useState(initialPlayerId ?? players[0]?.id ?? "");
+  const player = players.find((item) => item.id === playerId) ?? null;
+  const module: DiagnosisModule = player
+    ? moduleFromPosition(player.position)
+    : "campo";
+
+  const [kind, setKind] = useState<DiagnosisKind>("inicial");
+  const [evaluatedAt, setEvaluatedAt] = useState(
+    new Date().toISOString().slice(0, 10),
+  );
+  const [evaluatorName, setEvaluatorName] = useState(
+    isGphEvaluator ? "Gustavo Reyes · GPH" : (profile?.full_name ?? ""),
+  );
+  const [sessionDays, setSessionDays] = useState("");
+  const [injuries, setInjuries] = useState("");
+  const [playerGoal, setPlayerGoal] = useState("");
+  const [familyGoal, setFamilyGoal] = useState("");
+  const [whyJoin, setWhyJoin] = useState("");
+  const [contextOpen, setContextOpen] = useState(false);
+  const [planOpen, setPlanOpen] = useState(false);
+  const [scores, setScores] = useState<DiagnosisScores>({});
+  const [notes, setNotes] = useState<DiagnosisNotes>({});
+  const [flagged, setFlagged] = useState<string[]>([]);
+  const [openNoteId, setOpenNoteId] = useState<string | null>(null);
+  const [priorities, setPriorities] = useState<DiagnosisPriorityItem[]>([]);
+  const [monthlyPlan, setMonthlyPlan] = useState<DiagnosisMonthlyPlan>(emptyMonthlyPlan());
+  const [fieldSession, setFieldSession] = useState(() =>
+    fieldSessionForPlayer(players.find((item) => item.id === (initialPlayerId ?? players[0]?.id)) ?? null),
+  );
+  const [adjustedIds, setAdjustedIds] = useState<string[]>([]);
+  const [coachBrief, setCoachBrief] = useState<DiagnosisCoachBrief | null>(null);
+  const [coachNotes, setCoachNotes] = useState("");
+  const [coachBusy, setCoachBusy] = useState(false);
+  const [aiReady, setAiReady] = useState(false);
+  const [aiFallback, setAiFallback] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [quickFirst, setQuickFirst] = useState("");
+  const [quickLast, setQuickLast] = useState("");
+  const [quickBirth, setQuickBirth] = useState("");
+  const [quickPosition, setQuickPosition] = useState<Player["position"]>("forward");
+  const [quickBusy, setQuickBusy] = useState(false);
+
+  useEffect(() => {
+    if (!targetAcademyId) return;
+    let cancelled = false;
+    void diagnosisAuthedFetch(
+      `/fut/api/diagnoses/coach-brief?academy_id=${encodeURIComponent(targetAcademyId)}`,
+    )
+      .then((payload) => {
+        if (!cancelled) setAiReady(payload.ai === true);
+      })
+      .catch(() => {
+        if (!cancelled) setAiReady(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [targetAcademyId]);
+
+  const required = useMemo(() => indicatorsForModule(module), [module]);
+  const fieldScores = useMemo(
+    () => scoresFromFieldSession(fieldSession, module),
+    [fieldSession, module],
+  );
+  const mergedScores = useMemo(
+    () => ({ ...fieldScores, ...scores }),
+    [fieldScores, scores],
+  );
+  const stationProgress = useMemo(
+    () => fieldSessionProgress(fieldSession, module),
+    [fieldSession, module],
+  );
+  const result = useMemo(
+    () => computeDiagnosisResult(mergedScores, module),
+    [mergedScores, module],
+  );
+
+  const groups = (["comun", module, "fisico", "mental"] as const).map((group) => ({
+    group,
+    items: required.filter((item) => item.group === group),
+  }));
+
+  function setScore(id: string, value: number) {
+    setScores((prev) => ({ ...prev, [id]: value }));
+  }
+
+  function toggleFlag(id: string) {
+    setFlagged((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id],
+    );
+  }
+
+  async function requestCoachBrief() {
+    if (!targetAcademyId || !player) return null;
+    return diagnosisAuthedFetch("/fut/api/diagnoses/coach-brief", {
+      method: "POST",
+      body: JSON.stringify({
+        academy_id: targetAcademyId,
+        player_id: player.id,
+        kind,
+        module,
+        scores: mergedScores,
+        notes,
+        flagged: [...new Set([...flagged, ...flaggedIndicatorsFromField(fieldSession, module)])],
+        injuries,
+        player_goal: playerGoal,
+        family_goal: familyGoal,
+        why_join: whyJoin,
+        field_session: fieldSession,
+      }),
+    });
+  }
+
+  function applyCoachPayload(payload: Record<string, unknown>) {
+    const brief = payload.brief as DiagnosisCoachBrief;
+    setCoachBrief(brief);
+    setFieldSession((prev) => ({ ...prev, coachBrief: brief }));
+    const nextPriorities = Array.isArray(payload.program_priorities)
+      ? (payload.program_priorities as DiagnosisPriorityItem[])
+      : null;
+    if (nextPriorities) setPriorities(nextPriorities);
+    if (payload.monthly_plan) {
+      setMonthlyPlan(payload.monthly_plan as DiagnosisMonthlyPlan);
+      setPlanOpen(true);
+    }
+    if (typeof payload.assignment_notes === "string") {
+      setCoachNotes(payload.assignment_notes);
+    }
+    setAiFallback(payload.ai_fallback === true);
+    if (payload.ai === true) setAiReady(true);
+    return {
+      brief,
+      priorities: nextPriorities,
+      monthlyPlan: payload.monthly_plan as DiagnosisMonthlyPlan | undefined,
+      assignmentNotes:
+        typeof payload.assignment_notes === "string" ? payload.assignment_notes : null,
+    };
+  }
+
+  async function generateCoach() {
+    if (!player) return;
+    if (result.scoredCount < 5) {
+      toast.error("Valora al menos 5 indicadores para la lectura de entrenador.");
+      return;
+    }
+    setCoachBusy(true);
+    try {
+      const payload = await requestCoachBrief();
+      if (!payload) return;
+      applyCoachPayload(payload);
+      toast.success(
+        payload.source === "ai"
+          ? "Lectura de entrenador con IA aplicada al plan."
+          : payload.ai_fallback
+            ? "La IA no respondió. Se aplicó el motor GPH."
+            : "Lectura GPH aplicada al plan. Revisa prioridades y ruta.",
+      );
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo generar la lectura.");
+    } finally {
+      setCoachBusy(false);
+    }
+  }
+
+  async function save() {
+    if (!targetAcademyId || !player) return;
+    const liveScores = { ...scoresFromFieldSession(fieldSession, module), ...scores };
+    const live = computeDiagnosisResult(liveScores, module);
+    if (!evaluatorName.trim()) {
+      toast.error("Escribe el nombre del evaluador.");
+      return;
+    }
+    const stations = fieldSessionProgress(fieldSession, module);
+    if (stations.filled < stations.total) {
+      toast.error(
+        `Faltan ${stations.total - stations.filled} pruebas de estación: ${stations.missing.map((test) => test.label).join(", ")}.`,
+      );
+      return;
+    }
+    if (!live.complete) {
+      toast.error(
+        `Faltan ${live.requiredCount - live.scoredCount} indicadores por valorar (físico, mental y lo que no midió la estación).`,
+      );
+      return;
+    }
+
+    const mergedFlags = [...new Set([...flagged, ...flaggedIndicatorsFromField(fieldSession, module)])];
+    const venueLabel =
+      GPH_VENUE_CODES.find((item) => item.id === fieldSession.venueCode)?.label || null;
+
+    setSaving(true);
+    try {
+      let brief = coachBrief;
+      let nextPriorities = priorities;
+      let nextPlan = monthlyPlan;
+      let nextNotes = coachNotes;
+      let nextSession = { ...fieldSession, coachBrief: brief };
+
+      if (!brief) {
+        const generated = await requestCoachBrief();
+        if (generated) {
+          const applied = applyCoachPayload(generated);
+          brief = applied.brief;
+          if (applied.priorities) nextPriorities = applied.priorities;
+          if (applied.monthlyPlan) nextPlan = applied.monthlyPlan;
+          if (applied.assignmentNotes) nextNotes = applied.assignmentNotes;
+          nextSession = { ...fieldSession, coachBrief: brief };
+        }
+      }
+
+      const payload = await diagnosisAuthedFetch("/fut/api/diagnoses", {
+        method: "POST",
+        body: JSON.stringify({
+          academy_id: targetAcademyId,
+          player_id: player.id,
+          kind,
+          module,
+          evaluated_at: evaluatedAt,
+          evaluator_name: evaluatorName,
+          venue: venueLabel,
+          session_days: sessionDays || null,
+          injuries: injuries || null,
+          why_join: whyJoin || null,
+          player_goal: playerGoal || null,
+          family_goal: familyGoal || null,
+          scores: liveScores,
+          notes,
+          flagged: mergedFlags,
+          assigned_stage: live.stage,
+          program_priorities: nextPriorities,
+          monthly_plan: nextPlan,
+          assignment_notes: nextNotes || null,
+          field_session: nextSession,
+        }),
+      });
+
+      const diagnosis = payload.diagnosis as { id: string };
+      const shareUrl = typeof payload.share_url === "string" ? payload.share_url : "";
+      if (shareUrl) {
+        sessionStorage.setItem(`diagnosis-share:${diagnosis.id}`, shareUrl);
+      }
+      toast.success("Ficha lista: dato, 1–5, lectura y plan.");
+      router.push(`/fut/dashboard/diagnostico/${diagnosis.id}`);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo guardar.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function createQuickPlayer() {
+    if (!targetAcademyId) return;
+    if (!quickFirst.trim() || !quickLast.trim() || !quickBirth) {
+      toast.error("Nombre, apellido y fecha de nacimiento.");
+      return;
+    }
+    setQuickBusy(true);
+    try {
+      const payload = await diagnosisAuthedFetch("/fut/api/diagnoses/players", {
+        method: "POST",
+        body: JSON.stringify({
+          academy_id: targetAcademyId,
+          first_name: quickFirst.trim(),
+          last_name: quickLast.trim(),
+          birth_date: quickBirth,
+          position: quickPosition,
+        }),
+      });
+      const created = payload.player as Player;
+      onPlayerCreated?.(created);
+      setPlayerId(created.id);
+      setFieldSession(fieldSessionForPlayer(created));
+      toast.success("Jugador listo. Sigue con las estaciones.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo crear el jugador.");
+    } finally {
+      setQuickBusy(false);
+    }
+  }
+
+  if (!targetAcademyId) return null;
+
+  if (players.length === 0) {
+    return (
+      <div className="rounded-2xl border border-mf-border bg-white p-6 sm:p-8">
+        <p className="font-semibold text-mf-text">Alta rápida para evaluar</p>
+        <p className="mt-1 text-sm text-mf-text-secondary">
+          Nombre, fecha y posición. El resto de la ficha se llena en cancha.
+        </p>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          <label className="text-xs font-medium text-mf-text-muted">
+            Nombre
+            <input
+              value={quickFirst}
+              onChange={(e) => setQuickFirst(e.target.value)}
+              className="mf-input mt-1"
+            />
+          </label>
+          <label className="text-xs font-medium text-mf-text-muted">
+            Apellido
+            <input
+              value={quickLast}
+              onChange={(e) => setQuickLast(e.target.value)}
+              className="mf-input mt-1"
+            />
+          </label>
+          <label className="text-xs font-medium text-mf-text-muted">
+            Fecha de nacimiento
+            <input
+              type="date"
+              value={quickBirth}
+              onChange={(e) => setQuickBirth(e.target.value)}
+              className="mf-input mt-1"
+            />
+          </label>
+          <label className="text-xs font-medium text-mf-text-muted">
+            Posición
+            <select
+              value={quickPosition}
+              onChange={(e) => setQuickPosition(e.target.value as Player["position"])}
+              className="mf-input mt-1"
+            >
+              {positionOptions.map((item) => (
+                <option key={item.value} value={item.value}>
+                  {item.label}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+        <button
+          type="button"
+          disabled={quickBusy}
+          onClick={() => void createQuickPlayer()}
+          className="mf-btn-primary mt-4"
+        >
+          {quickBusy ? "Creando…" : "Crear y evaluar"}
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <ol className="grid gap-2 sm:grid-cols-3">
+        <li className="rounded-xl border border-mf-border bg-white px-3 py-2.5">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-mf-brand">1 · Cancha</p>
+          <p className="mt-1 text-xs leading-5 text-mf-text-secondary">
+            Llena cada prueba en su unidad (contactos, segundos, aciertos/puntos, metros).
+            Acepta coma o punto.
+          </p>
+        </li>
+        <li className="rounded-xl border border-mf-border bg-white px-3 py-2.5">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-mf-brand">2 · Cierre 1–5</p>
+          <p className="mt-1 text-xs leading-5 text-mf-text-secondary">
+            Técnica y decisión se cargan solas desde las estaciones. Completa físico y mental.
+          </p>
+        </li>
+        <li className="rounded-xl border border-mf-border bg-white px-3 py-2.5">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-mf-brand">3 · Ficha</p>
+          <p className="mt-1 text-xs leading-5 text-mf-text-secondary">
+            Un clic arma lectura, prioridades y ruta, y publica la ficha.
+          </p>
+        </li>
+      </ol>
+
+      <div className="sticky top-0 z-20 -mx-1 rounded-xl border border-mf-border bg-white/95 px-4 py-3 backdrop-blur">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-mf-text-muted">
+              Resultado en vivo
+            </p>
+            <p className="text-lg font-semibold tabular-nums text-mf-brand">
+              {result.globalScore == null ? "—" : result.globalScore.toFixed(1)}
+              <span className="ml-2 text-sm font-medium text-mf-text-secondary">
+                {result.stage ? DIAGNOSIS_STAGE_LABELS[result.stage] : "Completa la escala"}
+              </span>
+            </p>
+            <p className="text-[11px] text-mf-text-muted">
+              Estaciones {stationProgress.filled}/{stationProgress.total} · Cierre {result.scoredCount}/
+              {result.requiredCount}
+            </p>
+          </div>
+          <p className="text-xs text-mf-text-muted">
+            {result.scoredCount}/{result.requiredCount} indicadores
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              disabled={coachBusy || saving || result.scoredCount < 5}
+              onClick={() => void generateCoach()}
+              className="mf-btn-accent"
+            >
+              {coachBusy ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Sparkles className="h-4 w-4" />
+              )}
+              Lectura de entrenador
+            </button>
+            <button
+              type="button"
+              disabled={saving}
+              onClick={() => void save()}
+              className="mf-btn-primary"
+            >
+              {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+              {saving ? "Armando ficha…" : "Generar ficha"}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <section className="grid gap-3 rounded-2xl border border-mf-border bg-white p-4 sm:grid-cols-2 lg:grid-cols-4">
+        <label className="text-xs font-medium text-mf-text-muted sm:col-span-2">
+          Jugador
+          <select
+            value={playerId}
+            onChange={(e) => {
+              const nextId = e.target.value;
+              const nextPlayer = players.find((item) => item.id === nextId) ?? null;
+              setPlayerId(nextId);
+              setScores({});
+              setNotes({});
+              setFlagged([]);
+              setAdjustedIds([]);
+              setFieldSession(fieldSessionForPlayer(nextPlayer));
+              setCoachBrief(null);
+              setCoachNotes("");
+              setAiFallback(false);
+              setPriorities([]);
+              setMonthlyPlan(emptyMonthlyPlan());
+            }}
+            className="mf-input mt-1"
+          >
+            {players.map((item) => (
+              <option key={item.id} value={item.id}>
+                {item.last_name}, {item.first_name} · {getPositionLabel(item.position)}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="text-xs font-medium text-mf-text-muted">
+          Tipo
+          <select
+            value={kind}
+            onChange={(e) => setKind(e.target.value as DiagnosisKind)}
+            className="mf-input mt-1"
+          >
+            {DIAGNOSIS_KINDS.map((item) => (
+              <option key={item} value={item}>
+                {DIAGNOSIS_KIND_LABELS[item]}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="text-xs font-medium text-mf-text-muted">
+          Fecha
+          <input
+            type="date"
+            value={evaluatedAt}
+            onChange={(e) => setEvaluatedAt(e.target.value)}
+            className="mf-input mt-1"
+          />
+        </label>
+        <label className="text-xs font-medium text-mf-text-muted sm:col-span-2">
+          Evaluador
+          <input
+            value={evaluatorName}
+            onChange={(e) => setEvaluatorName(e.target.value)}
+            className="mf-input mt-1"
+            placeholder="Nombre del evaluador"
+          />
+        </label>
+        <label className="text-xs font-medium text-mf-text-muted">
+          Días
+          <input
+            value={sessionDays}
+            onChange={(e) => setSessionDays(e.target.value)}
+            className="mf-input mt-1"
+            placeholder="L-Mi, Ma-J…"
+          />
+        </label>
+      </section>
+
+      <section className="rounded-2xl border border-mf-border bg-white">
+        <button
+          type="button"
+          onClick={() => setContextOpen((open) => !open)}
+          className="flex w-full items-center justify-between px-4 py-3 text-left text-sm font-semibold text-mf-text"
+        >
+          Motivo y contexto
+          <span className="text-xs font-medium text-mf-text-muted">
+            {contextOpen ? "Ocultar" : "Opcional"}
+          </span>
+        </button>
+        {contextOpen ? (
+          <div className="grid gap-3 border-t border-mf-border-subtle px-4 py-4 sm:grid-cols-2">
+            <label className="text-xs font-medium text-mf-text-muted sm:col-span-2">
+              ¿Por qué busca ingresar?
+              <textarea
+                value={whyJoin}
+                onChange={(e) => setWhyJoin(e.target.value)}
+                className="mf-input mt-1 min-h-20"
+              />
+            </label>
+            <label className="text-xs font-medium text-mf-text-muted">
+              Objetivo del jugador
+              <input
+                value={playerGoal}
+                onChange={(e) => setPlayerGoal(e.target.value)}
+                className="mf-input mt-1"
+              />
+            </label>
+            <label className="text-xs font-medium text-mf-text-muted">
+              Objetivo de la familia
+              <input
+                value={familyGoal}
+                onChange={(e) => setFamilyGoal(e.target.value)}
+                className="mf-input mt-1"
+              />
+            </label>
+            <label className="text-xs font-medium text-mf-text-muted sm:col-span-2">
+              Lesiones / restricciones
+              <input
+                value={injuries}
+                onChange={(e) => setInjuries(e.target.value)}
+                className="mf-input mt-1"
+              />
+            </label>
+          </div>
+        ) : null}
+      </section>
+
+      <FieldSessionForm
+        academyId={targetAcademyId}
+        module={module}
+        session={fieldSession}
+        onChange={setFieldSession}
+      />
+
+      <section className="rounded-2xl border border-mf-border bg-white p-4">
+        <div className="flex flex-wrap items-end justify-between gap-2">
+          <div>
+            <h2 className="text-base font-semibold text-mf-text">2. Calificación de cierre 1–5</h2>
+            <p className="mt-1 text-xs text-mf-text-muted">
+              Lo que ya midió la estación aparece cerrado. Completa físico, mental y lo que
+              falte. Toca «Ajustar» solo si el 1–5 de cancha no convence.{" "}
+              {DIAGNOSIS_SCALE.map((item) => `${item.value} ${item.label}`).join(" · ")}
+            </p>
+          </div>
+          <p className="text-xs text-mf-text-muted">
+            Módulo {module === "portero" ? "portero" : "jugador de campo"}
+          </p>
+        </div>
+
+        <div className="mt-5 space-y-6">
+          {groups.map(({ group, items }) => (
+            <div key={group}>
+              <p className="mb-2 text-xs font-semibold uppercase tracking-[0.12em] text-mf-text-muted">
+                {DIAGNOSIS_GROUP_LABELS[group]}
+              </p>
+              <div className="divide-y divide-mf-border-subtle rounded-xl border border-mf-border-subtle">
+                {items.map((item) => {
+                  const score = mergedScores[item.id];
+                  const fromStation = fieldScores[item.id];
+                  const manual = scores[item.id];
+                  const compact =
+                    fromStation != null &&
+                    manual == null &&
+                    !adjustedIds.includes(item.id);
+                  return (
+                    <div key={item.id} className="px-3 py-2.5">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <div className="min-w-[160px] flex-1">
+                          <p className="text-sm font-medium text-mf-text">
+                            {item.label}
+                            {fromStation != null && manual == null ? (
+                              <span className="ml-2 text-[10px] font-semibold uppercase tracking-wide text-mf-gph">
+                                estación
+                              </span>
+                            ) : null}
+                            {fromStation != null && manual != null && manual !== fromStation ? (
+                              <span className="ml-2 text-[10px] font-semibold uppercase tracking-wide text-mf-warning">
+                                ajustado
+                              </span>
+                            ) : null}
+                          </p>
+                          {compact ? null : (
+                            <p className="text-[11px] text-mf-text-muted">{item.criterion}</p>
+                          )}
+                        </div>
+                        {compact ? (
+                          <>
+                            <p className="text-sm font-semibold tabular-nums text-mf-gph">
+                              {fromStation}/5
+                            </p>
+                            <button
+                              type="button"
+                              onClick={() => setAdjustedIds((prev) => [...prev, item.id])}
+                              className="text-[11px] font-medium text-mf-text-muted hover:text-mf-brand"
+                            >
+                              Ajustar
+                            </button>
+                          </>
+                        ) : (
+                          <div className="flex gap-1">
+                            {DIAGNOSIS_SCALE.map((level) => (
+                              <button
+                                key={level.value}
+                                type="button"
+                                title={level.hint}
+                                onClick={() => setScore(item.id, level.value)}
+                                className={cn(
+                                  "h-9 w-9 rounded-lg text-sm font-semibold tabular-nums",
+                                  score === level.value
+                                    ? "bg-mf-brand text-white"
+                                    : "bg-mf-canvas text-mf-text-secondary hover:bg-mf-brand-soft",
+                                )}
+                              >
+                                {level.value}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => toggleFlag(item.id)}
+                          className={cn(
+                            "rounded-lg p-2",
+                            flagged.includes(item.id)
+                              ? "text-mf-brand"
+                              : "text-mf-text-muted hover:text-mf-brand",
+                          )}
+                          title="Marcar prioridad"
+                        >
+                          <Star
+                            className="h-4 w-4"
+                            fill={flagged.includes(item.id) ? "currentColor" : "none"}
+                          />
+                        </button>
+                        {compact ? null : (
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setOpenNoteId((current) => (current === item.id ? null : item.id))
+                            }
+                            className="text-[11px] font-medium text-mf-text-muted hover:text-mf-brand"
+                          >
+                            Nota
+                          </button>
+                        )}
+                      </div>
+                      {openNoteId === item.id ? (
+                        <input
+                          value={notes[item.id] ?? ""}
+                          onChange={(e) =>
+                            setNotes((prev) => ({ ...prev, [item.id]: e.target.value }))
+                          }
+                          placeholder="Observación breve"
+                          className="mf-input mt-2"
+                        />
+                      ) : null}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="rounded-2xl border border-mf-border bg-white p-4">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h2 className="text-base font-semibold text-mf-text">Lectura de entrenador</h2>
+            <p className="mt-1 text-xs text-mf-text-muted">
+              Traduce etapa, puntajes y estación a comentarios de staff, foco de sesión y
+              ruta. {aiReady
+                ? "IA activa: redacta como entrenador y preparador."
+                : "Motor GPH de staff activo. Si conectas IA en el servidor, la redacción se afinará."}
+            </p>
+          </div>
+          <button
+            type="button"
+            disabled={coachBusy || result.scoredCount < 5}
+            onClick={() => void generateCoach()}
+            className="inline-flex items-center gap-1.5 rounded-lg bg-mf-brand-soft px-3 py-2 text-xs font-semibold text-mf-brand hover:bg-mf-brand hover:text-white disabled:opacity-50"
+          >
+            {coachBusy ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Sparkles className="h-4 w-4" />
+            )}
+            {coachBrief ? "Regenerar lectura" : "Generar lectura"}
+          </button>
+        </div>
+        {aiFallback ? (
+          <p className="mt-2 text-xs text-mf-warning">
+            La IA no respondió; se usó el motor GPH.
+          </p>
+        ) : null}
+        {coachBrief ? (
+          <div className="mt-4 border-t border-mf-border-subtle pt-4">
+            <CoachBriefSection brief={coachBrief} />
+          </div>
+        ) : (
+          <p className="mt-3 text-sm text-mf-text-muted">
+            Opcional para revisar antes. Si no la generas aquí, se arma al pulsar Generar ficha.
+          </p>
+        )}
+      </section>
+
+      <section className="rounded-2xl border border-mf-border bg-white p-4">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h2 className="text-base font-semibold text-mf-text">Prioridades (3 a 5)</h2>
+          <button
+            type="button"
+            onClick={() =>
+              setPriorities(
+                suggestPrioritiesFromField(fieldSession, module).length
+                  ? suggestPrioritiesFromField(fieldSession, module)
+                  : suggestPriorities(mergedScores, module),
+              )
+            }
+            className="text-xs font-semibold text-mf-brand hover:underline"
+          >
+            Proponer desde puntajes bajos
+          </button>
+        </div>
+        <div className="mt-3 space-y-3">
+          {priorities.map((item, index) => (
+            <div key={`${item.title}-${index}`} className="grid gap-2 rounded-xl bg-mf-canvas p-3 sm:grid-cols-2">
+              <input
+                value={item.title}
+                onChange={(e) => {
+                  const next = [...priorities];
+                  next[index] = { ...item, title: e.target.value };
+                  setPriorities(next);
+                }}
+                className="mf-input"
+                placeholder="Prioridad"
+              />
+              <input
+                value={item.december_goal}
+                onChange={(e) => {
+                  const next = [...priorities];
+                  next[index] = { ...item, december_goal: e.target.value };
+                  setPriorities(next);
+                }}
+                className="mf-input"
+                placeholder="Meta a diciembre"
+              />
+              <input
+                value={item.main_action}
+                onChange={(e) => {
+                  const next = [...priorities];
+                  next[index] = { ...item, main_action: e.target.value };
+                  setPriorities(next);
+                }}
+                className="mf-input sm:col-span-2"
+                placeholder="Acción principal"
+              />
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="rounded-2xl border border-mf-border bg-white">
+        <button
+          type="button"
+          onClick={() => setPlanOpen((open) => !open)}
+          className="flex w-full items-center justify-between px-4 py-3 text-left text-sm font-semibold text-mf-text"
+        >
+          Ruta septiembre–diciembre
+          <span className="text-xs font-medium text-mf-text-muted">
+            {planOpen ? "Ocultar" : "Opcional"}
+          </span>
+        </button>
+        {planOpen ? (
+          <div className="grid gap-3 border-t border-mf-border-subtle p-4 sm:grid-cols-2">
+            {DIAGNOSIS_MONTHS.map((month) => (
+              <div key={month} className="rounded-xl bg-mf-canvas p-3">
+                <p className="text-sm font-semibold text-mf-brand">
+                  {DIAGNOSIS_MONTH_META[month].label}
+                </p>
+                <p className="text-[11px] text-mf-text-muted">
+                  {DIAGNOSIS_MONTH_META[month].focus}
+                </p>
+                <input
+                  value={monthlyPlan[month].objective}
+                  onChange={(e) =>
+                    setMonthlyPlan((prev) => ({
+                      ...prev,
+                      [month]: { ...prev[month], objective: e.target.value },
+                    }))
+                  }
+                  className="mf-input mt-2"
+                  placeholder="Objetivo"
+                />
+                <input
+                  value={monthlyPlan[month].actions}
+                  onChange={(e) =>
+                    setMonthlyPlan((prev) => ({
+                      ...prev,
+                      [month]: { ...prev[month], actions: e.target.value },
+                    }))
+                  }
+                  className="mf-input mt-2"
+                  placeholder="Acciones"
+                />
+              </div>
+            ))}
+          </div>
+        ) : null}
+      </section>
+    </div>
+  );
+}

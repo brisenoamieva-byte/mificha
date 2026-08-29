@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import {
   AlertCircle,
   Calendar,
+  ClipboardList,
   Sparkles,
   Trophy,
   Users,
@@ -67,6 +68,7 @@ interface LastMatch {
 
 export function DashboardHome() {
   const { academy } = useDashboard();
+  const complimentary = Boolean(academy?.billing_exempt);
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<DashboardStats | null>(null);
@@ -218,6 +220,22 @@ export function DashboardHome() {
         </p>
       </div>
 
+      <Link
+        href="/fut/dashboard/diagnostico"
+        className="flex flex-col gap-2 rounded-2xl border border-mf-brand/20 bg-mf-brand-soft px-5 py-4 transition hover:border-mf-brand sm:flex-row sm:items-center sm:justify-between"
+      >
+        <div>
+          <p className="inline-flex items-center gap-2 text-sm font-semibold text-mf-brand">
+            <ClipboardList className="h-4 w-4" />
+            Diagnóstico de jugadores
+          </p>
+          <p className="mt-1 text-sm text-mf-text-secondary">
+            Metodología GPH · ficha visual y seguimiento en MiFicha.
+          </p>
+        </div>
+        <span className="text-sm font-semibold text-mf-brand">Abrir →</span>
+      </Link>
+
       <AcademyOnboardingPanel />
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
@@ -239,12 +257,12 @@ export function DashboardHome() {
               icon={AlertCircle}
             />
             <MetricCard
-              title={isLaunchFreeMode() ? "Acceso" : "Suscripción"}
+              title={complimentary ? "Acceso" : isLaunchFreeMode() ? "Acceso" : "Suscripción"}
               value=""
               icon={Sparkles}
               badge={{
-                label: isLaunchFreeMode() ? "Lanzamiento" : "Suscripción",
-                active: isLaunchFreeMode(),
+                label: complimentary ? "Socio GPH" : isLaunchFreeMode() ? "Lanzamiento" : "Suscripción",
+                active: complimentary || isLaunchFreeMode(),
               }}
             />
           </>

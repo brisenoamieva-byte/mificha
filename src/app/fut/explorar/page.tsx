@@ -4,7 +4,10 @@ import { ExploreDirectory } from "@/components/marketing/explore-directory";
 import { PublicScheduleExploreSection } from "@/components/marketing/public-schedule-explore-section";
 import { SiteFooter, SiteHeader } from "@/components/marketing/site-header";
 import { countExploreDirectoryAcademies, countExploreDirectoryPlayers } from "@/lib/explore-demo-data";
-import { fetchWeeklyCompetitionData } from "@/lib/ideal-xi";
+import {
+  emptyWeeklyCompetitionData,
+  fetchWeeklyCompetitionData,
+} from "@/lib/ideal-xi";
 import {
   collectBirthDatesFromDirectory,
   getDefaultCategoryFilter,
@@ -20,9 +23,9 @@ export const metadata: Metadata = {
 
 export default async function ExplorarPage() {
   const [data, weeklyStats, upcomingMatches] = await Promise.all([
-    fetchPublicDirectory(),
-    fetchWeeklyCompetitionData(),
-    fetchPublicUpcomingMatches(),
+    fetchPublicDirectory().catch(() => ({ academies: [], players: [] })),
+    fetchWeeklyCompetitionData().catch(() => emptyWeeklyCompetitionData()),
+    fetchPublicUpcomingMatches().catch(() => []),
   ]);
 
   const playerCount = countExploreDirectoryPlayers(data);

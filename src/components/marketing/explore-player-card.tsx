@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Film, MapPin, ShieldCheck } from "lucide-react";
+import { GphEvaluationBadge } from "@/components/ui/gph-evaluation-badge";
 import { PlayerPortraitImage } from "@/components/ui/player-portrait-image";
 import { PlayerCategoryBadge } from "@/components/ui/player-category-badge";
 import { getPositionLabel } from "@/lib/dashboard-utils";
@@ -87,6 +88,7 @@ export function ExplorePlayerCard({ player, className }: ExplorePlayerCardProps)
             <ShieldCheck className="h-3 w-3 shrink-0" aria-hidden />
             Verificada
           </span>
+          {player.has_gph_evaluation ? <GphEvaluationBadge asSpan /> : null}
           {player.video_url ? (
             <span className="inline-flex items-center gap-1 font-medium text-violet-700">
               <Film className="h-3 w-3 shrink-0" aria-hidden />

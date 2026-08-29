@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { signUp } from "@/lib/auth";
 import { LEGAL_ROUTES, TERMS_ACCEPTANCE_LABEL } from "@/lib/legal";
@@ -38,6 +38,9 @@ const inputClassName = "mf-input mt-1";
 
 export function SignUpForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const nextPath = searchParams.get("next") || "/fut/dashboard";
+  const joiningTeam = nextPath.startsWith("/fut/unirse/");
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -62,13 +65,15 @@ export function SignUpForm() {
       const data = await signUp(email, password, "academy_admin", fullName);
 
       if (data.session) {
-        router.push("/fut/dashboard");
+        router.push(nextPath.startsWith("/") ? nextPath : "/fut/dashboard");
         router.refresh();
         return;
       }
 
       setSuccess(
-        "Cuenta creada. Si activaste confirmación por correo, revísalo y luego inicia sesión.",
+        joiningTeam
+          ? "Cuenta creada. Confirma tu correo si hace falta, inicia sesión y abre de nuevo el link de invitación."
+          : "Cuenta creada. Si activaste confirmación por correo, revísalo y luego inicia sesión.",
       );
     } catch (submitError) {
       setError(getErrorMessage(submitError));
@@ -166,12 +171,19 @@ export function SignUpForm() {
         disabled={loading}
         className="mf-btn-primary w-full disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {loading ? "Creando cuenta..." : "Crear cuenta de academia"}
+        {loading ? "Creando cuenta..." : joiningTeam ? "Crear cuenta y unirme" : "Crear cuenta de academia"}
       </button>
 
       <p className="text-center text-sm text-gray-600">
         ¿Ya tienes cuenta?{" "}
-        <Link href="/fut/login" className="font-medium text-[#1B4F8C] hover:underline">
+        <Link
+          href={
+            nextPath !== "/fut/dashboard"
+              ? `/fut/login?next=${encodeURIComponent(nextPath)}`
+              : "/fut/login"
+          }
+          className="font-medium text-[#1B4F8C] hover:underline"
+        >
           Inicia sesión
         </Link>
       </p>

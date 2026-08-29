@@ -53,6 +53,23 @@ export function SubscriptionPanel() {
 
   if (!academy) return null;
 
+  if (academy.billing_exempt) {
+    return (
+      <section className="rounded-xl border border-orange-200 bg-orange-50/70 p-6 shadow-sm">
+        <div className="flex items-start gap-3">
+          <Sparkles className="mt-0.5 h-5 w-5 shrink-0 text-[#f54200]" />
+          <div>
+            <h2 className="text-lg font-semibold text-slate-900">Socio GPH · sin costo</h2>
+            <p className="mt-2 text-sm leading-7 text-slate-700">
+              Esta academia no paga suscripción. Plantel, fichas y diagnósticos GPH
+              quedan abiertos. Las evaluaciones a familias se cotizan aparte.
+            </p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   if (isLaunchFreeMode() || !isAcademyBillingEnabled()) {
     return <AcademyFreePanel />;
   }

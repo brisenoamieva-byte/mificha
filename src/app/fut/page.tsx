@@ -3,6 +3,7 @@ import { HomeAudienceSection } from "@/components/marketing/home-audience-sectio
 import { HomeCtaBand } from "@/components/marketing/home-cta-band";
 import { HomeHero } from "@/components/marketing/home-hero";
 import { HomeHowItWorks } from "@/components/marketing/home-how-it-works";
+import { HomeGphAllianceBand } from "@/components/marketing/evaluaciones-page-content";
 import { VerifiedAcademiesShowcase } from "@/components/marketing/verified-academies-showcase";
 import {
   buildHomeShowcaseAcademies,
@@ -22,6 +23,7 @@ export default async function Home() {
       <main className="flex-1">
         <HomeHero />
         <HomeHowItWorks />
+        <HomeGphAllianceBand />
         <HomeAudienceSection />
         <VerifiedAcademiesShowcase
           academies={showcaseAcademies}

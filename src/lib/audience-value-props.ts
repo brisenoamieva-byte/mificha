@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import { Building2, MessageCircle, Search, Trophy, UserRound } from "lucide-react";
+import { Building2, ClipboardList, MessageCircle, Search, Trophy, UserRound } from "lucide-react";
 
 export interface AudienceValueProp {
   id: string;
@@ -41,11 +41,26 @@ export const AUDIENCE_VALUE_PROPS: AudienceValueProp[] = [
       "Link automático tras cada jornada.",
       "Goles, minutos e historial de temporada.",
       "Ficha imprimible con logo de la academia.",
+      "Evaluación GPH opcional, con seguimiento en MiFicha.",
       "Stats publicadas por el torneo — no editables por la escuela.",
     ],
     href: "/fut/padres",
     cta: "Abrir ficha",
     tone: "accent",
+  },
+  {
+    id: "evaluaciones",
+    icon: ClipboardList,
+    title: "Evaluaciones GPH",
+    headline: "Evaluación GPH, seguimiento en la misma ficha.",
+    reasons: [
+      "Metodología GPH: técnica, táctica, físico, mental y hábitos.",
+      "Ficha visual con etapa y plan de desarrollo.",
+      "La familia consulta y da seguimiento en mificha.mx.",
+    ],
+    href: "/fut/evaluaciones",
+    cta: "Contratar evaluación",
+    tone: "brand",
   },
   {
     id: "jugadores",

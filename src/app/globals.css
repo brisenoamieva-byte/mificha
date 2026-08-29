@@ -25,6 +25,12 @@
   --mf-warning-soft: #faf0e4;
   --mf-danger: #b24020;
   --mf-danger-soft: #fcecea;
+  /* Socio GPH — naranja del logo oficial (#f84000–#f84800) + negro de wordmark */
+  --mf-gph: #f54200;
+  --mf-gph-hot: #ff6a22;
+  --mf-gph-ink: #111111;
+  --mf-gph-soft: #fff3ed;
+  --mf-gph-muted: #fde4d6;
   --mf-radius: 8px;
   --mf-radius-sm: 6px;
   --mf-shadow: 0 0 0 1px rgba(0, 0, 0, 0.04), 0 2px 6px rgba(0, 0, 0, 0.06);
@@ -44,6 +50,15 @@
   --color-mf-accent-muted: var(--mf-accent-muted);
   --color-mf-success: var(--mf-success);
   --color-mf-success-soft: var(--mf-success-soft);
+  --color-mf-warning: var(--mf-warning);
+  --color-mf-warning-soft: var(--mf-warning-soft);
+  --color-mf-danger: var(--mf-danger);
+  --color-mf-danger-soft: var(--mf-danger-soft);
+  --color-mf-gph: var(--mf-gph);
+  --color-mf-gph-hot: var(--mf-gph-hot);
+  --color-mf-gph-ink: var(--mf-gph-ink);
+  --color-mf-gph-soft: var(--mf-gph-soft);
+  --color-mf-gph-muted: var(--mf-gph-muted);
   --color-mf-canvas: var(--mf-canvas);
   --color-mf-surface: var(--mf-surface);
   --color-mf-border: var(--mf-border);
@@ -180,6 +195,14 @@ body {
     @apply inline-flex items-center justify-center gap-2 rounded-full bg-mf-accent-dark px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#047857];
   }
 
+  .mf-btn-gph {
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-mf-gph px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#d63a00];
+  }
+
+  .mf-btn-gph-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-mf-gph/40 bg-white px-5 py-2.5 text-sm font-semibold text-mf-gph-ink transition hover:border-mf-gph hover:bg-mf-gph-soft;
+  }
+
   .mf-btn-ghost {
     @apply inline-flex items-center justify-center gap-2 rounded-full px-4 py-2 text-sm font-semibold text-mf-text-secondary transition hover:bg-black/[0.04];
   }
@@ -264,7 +287,9 @@ body {
   }
 
   .demo-ficha-document,
-  .demo-ficha-document * {
+  .demo-ficha-document *,
+  .diagnosis-report,
+  .diagnosis-report * {
     visibility: visible;
   }
 
@@ -284,6 +309,22 @@ body {
     page-break-inside: avoid;
     width: 100%;
     max-height: none;
+  }
+
+  .diagnosis-report {
+    position: absolute;
+    inset: 0;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    width: 100%;
+    max-width: none !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .diagnosis-report-toolbar,
+  .gph-public-cta {
+    display: none !important;
   }
 
   .demo-ficha-actions,

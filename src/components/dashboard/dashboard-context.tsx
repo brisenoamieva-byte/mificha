@@ -5,6 +5,8 @@ interface DashboardContextValue {
   loading: boolean;
   profile: Profile | null;
   academy: Academy | null;
+  accessRole: "owner" | "staff" | null;
+  isGphEvaluator: boolean;
   refresh: () => Promise<void>;
 }
 

@@ -132,58 +132,80 @@ function aggregateWeeklyRows(rows: RawWeeklyStatRow[]) {
 }
 
 async function fetchPerformancesForRange(start: string, end: string) {
-  const { url, key } = getSupabaseHeaders();
+  try {
+    const { url, key } = getSupabaseHeaders();
 
-  const query = [
-    "select=goals,assists,minutes_played,player_id,players!inner(slug,first_name,last_name,birth_date,position,photo_url,passport_score,is_public,is_discoverable,public_consent_at,academies(name,city,state,is_public)),matches!inner(match_date,academy_id)",
-    "players.is_public=eq.true",
-    "players.is_discoverable=eq.true",
-    "players.public_consent_at=not.is.null",
-    `matches.match_date=gte.${start}`,
-    `matches.match_date=lte.${end}`,
-  ].join("&");
+    const query = [
+      "select=goals,assists,minutes_played,player_id,players!inner(slug,first_name,last_name,birth_date,position,photo_url,passport_score,is_public,is_discoverable,public_consent_at,academies(name,city,state,is_public)),matches!inner(match_date,academy_id)",
+      "players.is_public=eq.true",
+      "players.is_discoverable=eq.true",
+      "players.public_consent_at=not.is.null",
+      `matches.match_date=gte.${start}`,
+      `matches.match_date=lte.${end}`,
+    ].join("&");
 
-  const response = await fetch(`${url}/rest/v1/match_stats?${query}`, {
-    headers: {
-      apikey: key,
-      Authorization: `Bearer ${key}`,
-    },
-    next: { revalidate: 300 },
-  });
+    const response = await fetch(`${url}/rest/v1/match_stats?${query}`, {
+      headers: {
+        apikey: key,
+        Authorization: `Bearer ${key}`,
+      },
+      next: { revalidate: 300 },
+    });
 
-  if (!response.ok) return [];
+    if (!response.ok) return [];
 
-  const rows = (await response.json()) as RawWeeklyStatRow[];
-  const performances = aggregateWeeklyRows(rows);
+    const rowsJson: unknown = await response.json();
+    const rows = Array.isArray(rowsJson) ? (rowsJson as RawWeeklyStatRow[]) : [];
+    const performances = aggregateWeeklyRows(rows);
 
-  return Promise.all(
-    performances.map(async (player) => ({
-      ...player,
-      photo_url: await signPlayerPhotoUrl(player.photo_url),
-    })),
-  );
+    return Promise.all(
+      performances.map(async (player) => ({
+        ...player,
+        photo_url: await signPlayerPhotoUrl(player.photo_url),
+      })),
+    );
+  } catch {
+    return [];
+  }
 }
 
-export async function fetchWeeklyCompetitionData() {
-  const week = getCurrentWeekRange();
-  const previousWeek = getPreviousWeekRange();
-
-  const [current, previous] = await Promise.all([
-    fetchPerformancesForRange(week.start, week.end),
-    fetchPerformancesForRange(previousWeek.start, previousWeek.end),
-  ]);
-
-  const ranked = attachPerformanceTrends(current, previous);
-
+export function emptyWeeklyCompetitionData(reference = new Date()) {
+  const week = getCurrentWeekRange(reference);
   return {
-    performances: current,
-    ranked,
-    rising: getRisingPerformances(ranked),
-    leaderboard: getWeeklyLeaderboard(ranked),
+    performances: [] as WeeklyPlayerPerformance[],
+    ranked: [] as RankedWeeklyPerformance[],
+    rising: [] as RankedWeeklyPerformance[],
+    leaderboard: [] as RankedWeeklyPerformance[],
     weekLabel: week.label,
     weekStart: week.start,
     weekEnd: week.end,
   };
+}
+
+export async function fetchWeeklyCompetitionData() {
+  try {
+    const week = getCurrentWeekRange();
+    const previousWeek = getPreviousWeekRange();
+
+    const [current, previous] = await Promise.all([
+      fetchPerformancesForRange(week.start, week.end),
+      fetchPerformancesForRange(previousWeek.start, previousWeek.end),
+    ]);
+
+    const ranked = attachPerformanceTrends(current, previous);
+
+    return {
+      performances: current,
+      ranked,
+      rising: getRisingPerformances(ranked),
+      leaderboard: getWeeklyLeaderboard(ranked),
+      weekLabel: week.label,
+      weekStart: week.start,
+      weekEnd: week.end,
+    };
+  } catch {
+    return emptyWeeklyCompetitionData();
+  }
 }
 
 export async function fetchWeeklyPlayerPerformances() {

@@ -48,7 +48,7 @@ function getErrorMessage(error: unknown) {
 
 export function AcademyForm() {
   const router = useRouter();
-  const { academy, refresh } = useDashboard();
+  const { academy, refresh, accessRole } = useDashboard();
   const logoInputRef = useRef<HTMLInputElement>(null);
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
@@ -134,6 +134,10 @@ export function AcademyForm() {
     setLoading(true);
 
     try {
+      if (accessRole === "staff") {
+        throw new Error("Solo el dueño puede editar los datos de la academia.");
+      }
+
       const user = await getCurrentUser();
       if (!user) throw new Error("Sesión expirada. Vuelve a iniciar sesión.");
 
@@ -207,6 +211,12 @@ export function AcademyForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      {accessRole === "staff" ? (
+        <p className="rounded-lg bg-mf-brand-soft px-4 py-3 text-sm text-mf-brand">
+          Eres parte del equipo. Puedes capturar diagnósticos y ver el plantel.
+          Los datos de la academia solo los edita el dueño.
+        </p>
+      ) : null}
       <div>
         <label htmlFor="name" className="block text-sm font-medium text-slate-700">
           Nombre de la academia *
@@ -472,7 +482,7 @@ export function AcademyForm() {
 
       <button
         type="submit"
-        disabled={loading}
+        disabled={loading || accessRole === "staff"}
         className="rounded-lg bg-[#1B4F8C] px-5 py-3 text-sm font-semibold text-white hover:bg-[#164278] disabled:cursor-not-allowed disabled:opacity-60"
       >
         {loading
