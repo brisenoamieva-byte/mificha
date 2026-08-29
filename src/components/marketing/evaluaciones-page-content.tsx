@@ -86,7 +86,7 @@ export function EvaluacionesPageContent() {
             </h2>
             <p className="mt-2 text-sm leading-7 text-mf-text-secondary">
               La ficha de partido sigue saliendo con el acta. Esta evaluación es otro
-              servicio: se pide, se paga y se consulta por su cuenta.
+              servicio: se contrata y se consulta por su cuenta.
             </p>
           </div>
           <ol className="mt-8 grid gap-3 sm:grid-cols-3 sm:gap-4">
