@@ -12,7 +12,6 @@ import { NoSeasonState } from "@/components/dashboard/no-season-state";
 import { Skeleton } from "@/components/dashboard/skeletons";
 import {
   formatKickoffDateTime,
-  formatMatchDate,
   getMatchResultLabel,
   getMatchStatusLabel,
   isCompletedMatch,

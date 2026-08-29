@@ -25,7 +25,9 @@ export function DiagnosisNewContent() {
       .then((payload) => {
         const list = (payload.academies as Array<{ id: string; name: string }>) ?? [];
         setAcademies(list);
-        if (!academyId && list[0]) setAcademyId(list[0].id);
+        const fallback = list[0];
+        // Updater funcional: preselecciona sin re-disparar la carga al cambiar de academia.
+        if (fallback) setAcademyId((current) => current || fallback.id);
       })
       .catch(() => setAcademies([]));
   }, [isGphEvaluator]);

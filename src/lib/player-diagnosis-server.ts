@@ -224,12 +224,12 @@ export async function createPlayerDiagnosis(
   input: DiagnosisWriteInput,
 ) {
   const player = await assertAcademyOwnsPlayer(admin, academyId, input.player_id);
-  const module = normalizeModule(
+  const diagnosisModule = normalizeModule(
     input.module,
     moduleFromPosition(player.position),
   );
   const scores = input.scores ?? {};
-  const result = computeDiagnosisResult(scores, module);
+  const result = computeDiagnosisResult(scores, diagnosisModule);
   const shareToken = createDiagnosisShareToken();
   const assignedStage = normalizeStage(input.assigned_stage) ?? result.stage;
   let fieldSession = parseFieldSession(input.field_session);
@@ -247,7 +247,7 @@ export async function createPlayerDiagnosis(
         firstName: player.first_name,
         age: player.birth_date ? calculateAge(player.birth_date) : null,
         position: player.position,
-        module,
+        module: diagnosisModule,
         kind: normalizeKind(input.kind),
         scores,
         notes: input.notes ?? {},
@@ -271,7 +271,7 @@ export async function createPlayerDiagnosis(
       academy_id: academyId,
       player_id: player.id,
       kind: normalizeKind(input.kind),
-      module,
+      module: diagnosisModule,
       evaluated_at: input.evaluated_at || new Date().toISOString().slice(0, 10),
       evaluator_name: input.evaluator_name.trim(),
       years_experience: input.years_experience ?? null,

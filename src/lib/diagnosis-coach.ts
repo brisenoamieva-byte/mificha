@@ -3,11 +3,10 @@
  * La etapa 1–5 la calcula GPH; la IA (si hay clave) solo redacta con criterio de staff.
  */
 
-import { calculateAge, getPositionLabel } from "@/lib/dashboard-utils";
+import { getPositionLabel } from "@/lib/dashboard-utils";
 import {
   GPH_PHYSICAL_TESTS,
   GPH_PRINCIPLE,
-  GPH_STATION_TESTS,
   suggestedScore,
   testsForBattery,
   type GphFieldSession,

@@ -50,8 +50,6 @@ export function QuickGoalPicker({
   );
 }
 
-const MINUTE_PRESETS = DETAILED_MINUTE_PRESETS;
-
 export function MinuteRolePresets({
   value,
   disabled = false,

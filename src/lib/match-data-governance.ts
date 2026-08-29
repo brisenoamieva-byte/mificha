@@ -1,4 +1,4 @@
-import type { Match, MatchResult } from "@/types/database";
+import type { Match } from "@/types/database";
 import { getMatchResultLabel } from "@/lib/match-utils";
 
 export type MatchActor = "organizer" | "academy" | "mificha" | "parent";

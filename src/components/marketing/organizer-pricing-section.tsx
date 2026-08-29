@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { ACADEMY_ACCESS, ORGANIZER_PRICING } from "@/lib/pricing";
 import { cn } from "@/lib/utils";

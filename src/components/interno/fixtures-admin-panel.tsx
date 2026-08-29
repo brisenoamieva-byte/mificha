@@ -120,11 +120,6 @@ export function FixturesAdminPanel() {
     }
   }, [selectedAcademyId, loadFixtures]);
 
-  const selectedAcademy = useMemo(
-    () => academies.find((academy) => academy.id === selectedAcademyId) ?? null,
-    [academies, selectedAcademyId],
-  );
-
   const pendingFixtures = useMemo(
     () =>
       fixtures.filter((fixture) =>

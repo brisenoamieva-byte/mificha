@@ -518,7 +518,7 @@ export function PartidosNuevoContent() {
         });
       }
 
-      let notificationByPlayer = new Map<
+      const notificationByPlayer = new Map<
         string,
         SavedPlayerSummary["notification"]
       >();

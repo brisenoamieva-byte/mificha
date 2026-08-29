@@ -13,7 +13,7 @@ import {
   getMatchStatusLabel,
   isCompletedMatch,
 } from "@/lib/match-utils";
-import { buildOfficialStatsSyncNotice, getMatchGovernance } from "@/lib/match-data-governance";
+import { buildOfficialStatsSyncNotice } from "@/lib/match-data-governance";
 import { supabase } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
 import type { Match, MatchResult, MatchStat, Player } from "@/types/database";

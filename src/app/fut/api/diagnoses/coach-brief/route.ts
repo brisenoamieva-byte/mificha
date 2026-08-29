@@ -111,7 +111,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const module = DIAGNOSIS_MODULES.includes(body.module as DiagnosisModule)
+    const diagnosisModule = DIAGNOSIS_MODULES.includes(body.module as DiagnosisModule)
       ? (body.module as DiagnosisModule)
       : position === "goalkeeper"
         ? "portero"
@@ -124,7 +124,7 @@ export async function POST(request: Request) {
       firstName,
       age,
       position,
-      module,
+      module: diagnosisModule,
       kind,
       scores: parseScores(body.scores),
       notes: parseNotes(body.notes),

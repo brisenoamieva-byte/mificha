@@ -72,7 +72,7 @@ export function DiagnosisForm({
   const router = useRouter();
   const [playerId, setPlayerId] = useState(initialPlayerId ?? players[0]?.id ?? "");
   const player = players.find((item) => item.id === playerId) ?? null;
-  const module: DiagnosisModule = player
+  const diagnosisModule: DiagnosisModule = player
     ? moduleFromPosition(player.position)
     : "campo";
 
@@ -136,25 +136,25 @@ export function DiagnosisForm({
     };
   }, [targetAcademyId]);
 
-  const required = useMemo(() => indicatorsForModule(module), [module]);
+  const required = useMemo(() => indicatorsForModule(diagnosisModule), [diagnosisModule]);
   const fieldScores = useMemo(
-    () => scoresFromFieldSession(fieldSession, module),
-    [fieldSession, module],
+    () => scoresFromFieldSession(fieldSession, diagnosisModule),
+    [fieldSession, diagnosisModule],
   );
   const mergedScores = useMemo(
     () => ({ ...fieldScores, ...scores }),
     [fieldScores, scores],
   );
   const stationProgress = useMemo(
-    () => fieldSessionProgress(fieldSession, module),
-    [fieldSession, module],
+    () => fieldSessionProgress(fieldSession, diagnosisModule),
+    [fieldSession, diagnosisModule],
   );
   const result = useMemo(
-    () => computeDiagnosisResult(mergedScores, module),
-    [mergedScores, module],
+    () => computeDiagnosisResult(mergedScores, diagnosisModule),
+    [mergedScores, diagnosisModule],
   );
 
-  const groups = (["comun", module, "fisico", "mental"] as const).map((group) => ({
+  const groups = (["comun", diagnosisModule, "fisico", "mental"] as const).map((group) => ({
     group,
     items: required.filter((item) => item.group === group),
   }));
@@ -188,10 +188,12 @@ export function DiagnosisForm({
         academy_id: targetAcademyId,
         player_id: player.id,
         kind,
-        module,
+        module: diagnosisModule,
         scores: mergedScores,
         notes,
-        flagged: [...new Set([...flagged, ...flaggedIndicatorsFromField(fieldSession, module)])],
+        flagged: [
+          ...new Set([...flagged, ...flaggedIndicatorsFromField(fieldSession, diagnosisModule)]),
+        ],
         injuries,
         player_goal: playerGoal,
         family_goal: familyGoal,
@@ -254,13 +256,13 @@ export function DiagnosisForm({
 
   async function save() {
     if (!targetAcademyId || !player) return;
-    const liveScores = { ...scoresFromFieldSession(fieldSession, module), ...scores };
-    const live = computeDiagnosisResult(liveScores, module);
+    const liveScores = { ...scoresFromFieldSession(fieldSession, diagnosisModule), ...scores };
+    const live = computeDiagnosisResult(liveScores, diagnosisModule);
     if (!evaluatorName.trim()) {
       toast.error("Escribe el nombre del evaluador.");
       return;
     }
-    const stations = fieldSessionProgress(fieldSession, module);
+    const stations = fieldSessionProgress(fieldSession, diagnosisModule);
     if (stations.filled < stations.total) {
       toast.error(
         `Faltan ${stations.total - stations.filled} pruebas de estación: ${stations.missing.map((test) => test.label).join(", ")}.`,
@@ -274,7 +276,9 @@ export function DiagnosisForm({
       return;
     }
 
-    const mergedFlags = [...new Set([...flagged, ...flaggedIndicatorsFromField(fieldSession, module)])];
+    const mergedFlags = [
+      ...new Set([...flagged, ...flaggedIndicatorsFromField(fieldSession, diagnosisModule)]),
+    ];
     const venueLabel =
       GPH_VENUE_CODES.find((item) => item.id === fieldSession.venueCode)?.label || null;
 
@@ -304,7 +308,7 @@ export function DiagnosisForm({
           academy_id: targetAcademyId,
           player_id: player.id,
           kind,
-          module,
+          module: diagnosisModule,
           evaluated_at: evaluatedAt,
           evaluator_name: evaluatorName,
           venue: venueLabel,
@@ -715,7 +719,7 @@ export function DiagnosisForm({
 
       <FieldSessionForm
         academyId={targetAcademyId}
-        module={module}
+        module={diagnosisModule}
         session={fieldSession}
         onChange={setFieldSession}
       />
@@ -731,7 +735,7 @@ export function DiagnosisForm({
             </p>
           </div>
           <p className="text-xs text-mf-text-muted">
-            Módulo {module === "portero" ? "portero" : "jugador de campo"}
+            Módulo {diagnosisModule === "portero" ? "portero" : "jugador de campo"}
           </p>
         </div>
 
@@ -956,9 +960,9 @@ export function DiagnosisForm({
             type="button"
             onClick={() =>
               setPriorities(
-                suggestPrioritiesFromField(fieldSession, module).length
-                  ? suggestPrioritiesFromField(fieldSession, module)
-                  : suggestPriorities(mergedScores, module),
+                suggestPrioritiesFromField(fieldSession, diagnosisModule).length
+                  ? suggestPrioritiesFromField(fieldSession, diagnosisModule)
+                  : suggestPriorities(mergedScores, diagnosisModule),
               )
             }
             className="text-xs font-semibold text-mf-brand hover:underline"

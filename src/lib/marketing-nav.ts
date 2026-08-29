@@ -1,9 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import {
-  Search,
-  Trophy,
-  Users,
-} from "lucide-react";
+import { Trophy, Users } from "lucide-react";
 
 export interface NavLink {
   href: string;
