@@ -4,7 +4,7 @@ import { DevServiceWorkerCleanup } from "@/components/dev-service-worker-cleanup
 import { AuthRecoveryRedirect } from "@/components/auth/auth-recovery-redirect";
 import { CookieNotice } from "@/components/marketing/cookie-notice";
 import { AppToaster } from "@/components/ui/toast";
-import { BRAND_ICON, BRAND_OG_IMAGE } from "@/lib/brand";
+import { BRAND_OG_IMAGE } from "@/lib/brand";
 import "./globals.css";
 
 const appUrl =
@@ -23,10 +23,6 @@ export const metadata: Metadata = {
   description:
     "Ficha deportiva de fútbol: planteles, torneos escolares y evaluación GPH.",
   metadataBase: new URL(appUrl),
-  icons: {
-    icon: BRAND_ICON,
-    apple: BRAND_ICON,
-  },
   openGraph: {
     title: "MiFicha · Tu ficha deportiva",
     description:

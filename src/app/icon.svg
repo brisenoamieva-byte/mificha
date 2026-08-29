@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="MiFicha">
+  <rect width="64" height="64" rx="14" fill="#1b4f8c" />
+  <path
+    d="M15 47V23l16 15 16-15v24"
+    fill="none"
+    stroke="#ffffff"
+    stroke-width="7"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <circle cx="53" cy="15" r="5.5" fill="#34d399" />
+</svg>
