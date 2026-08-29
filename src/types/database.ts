@@ -719,6 +719,27 @@ export type Database = {
         };
         Relationships: [];
       };
+      player_diagnoses: {
+        Row: {
+          id: string;
+          academy_id: string;
+          player_id: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          academy_id: string;
+          player_id: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          academy_id?: string;
+          player_id?: string;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: {
       [_ in never]: never;
