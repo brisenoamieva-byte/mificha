@@ -1,5 +1,5 @@
 import { DEMO_FICHA_PREVIEW } from "@/lib/demo-ficha-preview";
-import { emptyFieldSession } from "@/lib/gph-field-protocol";
+import { emptyFieldSession, type GphTestCapture } from "@/lib/gph-field-protocol";
 import { MARKETING_IMAGES } from "@/lib/marketing-assets";
 import {
   computeDiagnosisResult,
@@ -42,6 +42,18 @@ const DEMO_SCORES: DiagnosisScores = {
   comunicacion: 3,
   compromiso: 4,
 };
+
+function demoTest(
+  capture: Omit<GphTestCapture, "leftHits" | "rightHits" | "radarKmh"> &
+    Partial<Pick<GphTestCapture, "leftHits" | "rightHits" | "radarKmh">>,
+): GphTestCapture {
+  return {
+    leftHits: null,
+    rightHits: null,
+    radarKmh: null,
+    ...capture,
+  };
+}
 
 export function isDemoDiagnosisToken(token: string) {
   return token === "demo";
@@ -209,7 +221,7 @@ export function buildDemoDiagnosisReport(): {
           ],
         },
         tests: {
-          des_c_dominadas: {
+          des_c_dominadas: demoTest({
             attempts: [18, 21, 19, 22, 20],
             hits: null,
             opportunities: null,
@@ -218,8 +230,8 @@ export function buildDemoDiagnosisReport(): {
             relevance: 3,
             flagged: false,
             note: "",
-          },
-          des_c_slalom: {
+          }),
+          des_c_slalom: demoTest({
             attempts: [11.4, 10.8],
             hits: null,
             opportunities: null,
@@ -228,18 +240,20 @@ export function buildDemoDiagnosisReport(): {
             relevance: 2,
             flagged: false,
             note: "+1 s en el segundo intento (cono).",
-          },
-          des_c_pase: {
+          }),
+          des_c_pase: demoTest({
             attempts: [],
             hits: 7,
             opportunities: 12,
             errors: null,
+            leftHits: 3,
+            rightHits: 4,
             score: 3,
             relevance: 3,
             flagged: false,
             note: "4/6 derecho · 3/6 izquierdo",
-          },
-          des_c_control: {
+          }),
+          des_c_control: demoTest({
             attempts: [],
             hits: 16,
             opportunities: 24,
@@ -248,8 +262,8 @@ export function buildDemoDiagnosisReport(): {
             relevance: 3,
             flagged: false,
             note: "",
-          },
-          des_c_tiro: {
+          }),
+          des_c_tiro: demoTest({
             attempts: [],
             hits: 16,
             opportunities: 24,
@@ -258,8 +272,8 @@ export function buildDemoDiagnosisReport(): {
             relevance: 3,
             flagged: false,
             note: "",
-          },
-          des_c_largo: {
+          }),
+          des_c_largo: demoTest({
             attempts: [],
             hits: 10,
             opportunities: 18,
@@ -268,8 +282,8 @@ export function buildDemoDiagnosisReport(): {
             relevance: 2,
             flagged: false,
             note: "Primer bote; 1 fuera de corredor.",
-          },
-          des_c_juego: {
+          }),
+          des_c_juego: demoTest({
             attempts: [],
             hits: 8,
             opportunities: 18,
@@ -278,7 +292,7 @@ export function buildDemoDiagnosisReport(): {
             relevance: 3,
             flagged: true,
             note: "",
-          },
+          }),
         },
       },
       share_token_hash: "demo",
