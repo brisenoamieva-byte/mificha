@@ -64,7 +64,7 @@ export function EvaluacionesPageContent() {
           <div className="mf-card p-6 sm:p-8">
             <AllianceLockup size="lg" showCaption />
             <ul className="mt-5 space-y-2 text-sm text-mf-text-secondary">
-              {["Sesión presencial", "Ficha visual 1–5", "Lectura de entrenador y plan"].map(
+              {["Sesión presencial", "Ficha visual", "Lectura de entrenador y plan"].map(
                 (item) => (
                   <li key={item} className="flex gap-2">
                     <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-mf-gph" />
