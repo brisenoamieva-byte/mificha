@@ -8,6 +8,7 @@ import { BrandWordmark } from "@/components/ui/brand-wordmark";
 import {
   GPH_MANUAL_VERSION,
   GPH_PENALTIES,
+  GPH_PERCENTILE_NOTE,
   GPH_PHYSICAL_TESTS,
   GPH_PRINCIPLE,
   GPH_PROTOCOL_STAGES,
@@ -163,6 +164,12 @@ export function GphProtocolContent() {
               <li key={item}>{item}</li>
             ))}
           </ul>
+          <p className="text-xs text-mf-text-secondary">{GPH_PERCENTILE_NOTE}</p>
+          <p className="text-xs text-mf-text-muted">
+            Cierre: pruebas completas, videos identificados, datos cargados, incidencias,
+            reporte programado y fecha de retroalimentación. Nutrición se anota aparte; no
+            entra al 1–5 de fútbol.
+          </p>
         </div>
       </article>
     </div>

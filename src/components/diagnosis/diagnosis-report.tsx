@@ -135,7 +135,12 @@ export function DiagnosisReport({
       diagnosis.player_goal ||
       showFamilyGoal ||
       diagnosis.injuries ||
-      diagnosis.medical_notes,
+      diagnosis.medical_notes ||
+      diagnosis.years_experience != null ||
+      diagnosis.sessions_per_week != null ||
+      diagnosis.session_days ||
+      diagnosis.assigned_group ||
+      diagnosis.field_session.currentClub,
   );
   const age = calculateAge(player.birth_date);
 
@@ -234,6 +239,16 @@ export function DiagnosisReport({
             {stage ? (
               <p className="mt-3 text-sm font-medium text-mf-gph-ink">
                 Etapa {DIAGNOSIS_STAGE_LABELS[stage]}
+                {diagnosis.assigned_group ? ` · ${diagnosis.assigned_group}` : ""}
+                {diagnosis.session_days ? ` · ${diagnosis.session_days}` : ""}
+              </p>
+            ) : null}
+            {diagnosis.assigned_stage &&
+            diagnosis.computed_stage &&
+            diagnosis.assigned_stage !== diagnosis.computed_stage ? (
+              <p className="mt-1 text-[11px] text-mf-text-muted">
+                Promedio sugería {DIAGNOSIS_STAGE_LABELS[diagnosis.computed_stage]}; se asignó
+                por contexto.
               </p>
             ) : null}
             <p className="mt-2 text-[11px] uppercase tracking-[0.12em] text-mf-text-muted">
@@ -402,6 +417,12 @@ export function DiagnosisReport({
                         <dd>{item.december_goal}</dd>
                       </div>
                     ) : null}
+                    {item.progress_indicator ? (
+                      <div>
+                        <dt className="text-[11px] text-mf-text-muted">Indicador de avance</dt>
+                        <dd>{item.progress_indicator}</dd>
+                      </div>
+                    ) : null}
                     {item.main_action ? (
                       <div className="sm:col-span-2">
                         <dt className="text-[11px] text-mf-text-muted">Acción</dt>
@@ -456,6 +477,30 @@ export function DiagnosisReport({
             Contexto
           </p>
           <dl className="mt-3 grid gap-3 text-sm sm:grid-cols-2">
+            {diagnosis.field_session.currentClub ? (
+              <div>
+                <dt className="text-[11px] text-mf-text-muted">Equipo / escuela actual</dt>
+                <dd className="mt-0.5">{diagnosis.field_session.currentClub}</dd>
+              </div>
+            ) : null}
+            {diagnosis.years_experience != null ? (
+              <div>
+                <dt className="text-[11px] text-mf-text-muted">Años de experiencia</dt>
+                <dd className="mt-0.5">{diagnosis.years_experience}</dd>
+              </div>
+            ) : null}
+            {diagnosis.sessions_per_week != null ? (
+              <div>
+                <dt className="text-[11px] text-mf-text-muted">Sesiones por semana</dt>
+                <dd className="mt-0.5">{diagnosis.sessions_per_week}</dd>
+              </div>
+            ) : null}
+            {diagnosis.session_days ? (
+              <div>
+                <dt className="text-[11px] text-mf-text-muted">Días</dt>
+                <dd className="mt-0.5">{diagnosis.session_days}</dd>
+              </div>
+            ) : null}
             {diagnosis.player_goal ? (
               <div>
                 <dt className="text-[11px] text-mf-text-muted">Objetivo del jugador</dt>
@@ -493,6 +538,31 @@ export function DiagnosisReport({
       <footer className="border-t border-mf-border-subtle bg-mf-canvas px-5 py-4 text-[11px] leading-relaxed text-mf-text-muted">
         <p className="font-medium text-mf-text-secondary">{GPH_ALLIANCE.methodology}</p>
         <p className="mt-1.5">{GPH_ALLIANCE.reportDisclaimer}</p>
+        <p className="mt-1.5">
+          Nutrición y hábitos se reportan aparte; no se integran como una sola calificación
+          futbolística.
+        </p>
+        {diagnosis.field_session.closing?.feedbackDate ? (
+          <p className="mt-1.5">
+            Retroalimentación: {formatDiagnosisDate(diagnosis.field_session.closing.feedbackDate)}
+          </p>
+        ) : null}
+        <div className="mt-6 hidden grid-cols-2 gap-8 print:grid">
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.12em]">
+              Firma del evaluador
+            </p>
+            <div className="mt-10 border-t border-mf-border-subtle pt-2">
+              {diagnosis.evaluator_name}
+            </div>
+          </div>
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.12em]">
+              Enterado padre, madre o tutor
+            </p>
+            <div className="mt-10 border-t border-mf-border-subtle pt-2">Nombre y firma</div>
+          </div>
+        </div>
       </footer>
     </article>
   );

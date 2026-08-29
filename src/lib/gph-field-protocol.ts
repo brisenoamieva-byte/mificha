@@ -58,6 +58,9 @@ export interface GphTestCapture {
   hits: number | null;
   opportunities: number | null;
   errors: number | null;
+  leftHits: number | null;
+  rightHits: number | null;
+  radarKmh: number | null;
   score: number | null;
   relevance: 1 | 2 | 3;
   flagged: boolean;
@@ -83,6 +86,26 @@ export interface GphEvidenceItem {
   createdAt: string;
 }
 
+export interface GphSessionClosing {
+  testsComplete: boolean | null;
+  videosIdentified: boolean | null;
+  dataLoaded: boolean | null;
+  incidentsLogged: boolean | null;
+  reportScheduled: boolean | null;
+  feedbackDate: string;
+}
+
+export const GPH_CLOSING_CHECKS = [
+  { id: "testsComplete", label: "Pruebas completas" },
+  { id: "videosIdentified", label: "Videos identificados" },
+  { id: "dataLoaded", label: "Datos cargados" },
+  { id: "incidentsLogged", label: "Incidencias registradas" },
+  { id: "reportScheduled", label: "Reporte programado" },
+] as const;
+
+export const GPH_PERCENTILE_NOTE =
+  "Tiempo y distancia: guardar siempre el dato crudo. Hasta reunir 30 resultados por grupo de edad, comparar contra el propio jugador; después, percentiles P1–20 = 1 … P81–100 = 5.";
+
 export interface GphFieldSession {
   protocolStage: GphProtocolStage;
   sessionType: GphSessionType;
@@ -91,11 +114,15 @@ export interface GphFieldSession {
   ballSize: string;
   ballPsi: string;
   venueCode: string;
+  bibNumber: string;
+  currentClub: string;
+  familiarizationDone: boolean | null;
   regulationDistance: boolean | null;
   ballSurfaceLogged: boolean | null;
   keyTestsVideo: boolean | null;
   observation: string;
   incident: string;
+  closing: GphSessionClosing;
   tests: Record<string, GphTestCapture>;
   physical: Record<string, GphPhysicalCapture>;
   evidence: GphEvidenceItem[];
@@ -965,12 +992,26 @@ export function testsForBattery(
   });
 }
 
+export function emptyClosing(): GphSessionClosing {
+  return {
+    testsComplete: null,
+    videosIdentified: null,
+    dataLoaded: null,
+    incidentsLogged: null,
+    reportScheduled: null,
+    feedbackDate: "",
+  };
+}
+
 export function emptyTestCapture(test: GphStationTest): GphTestCapture {
   return {
     attempts: Array.from({ length: test.attempts }, () => null),
     hits: null,
     opportunities: test.maxPoints ?? null,
     errors: null,
+    leftHits: null,
+    rightHits: null,
+    radarKmh: null,
     score: null,
     relevance: test.relevanceDefault,
     flagged: false,
@@ -990,16 +1031,41 @@ export function emptyFieldSession(
     ballSize: "",
     ballPsi: "",
     venueCode: "",
+    bibNumber: "",
+    currentClub: "",
+    familiarizationDone: null,
     regulationDistance: null,
     ballSurfaceLogged: null,
     keyTestsVideo: null,
     observation: "",
     incident: "",
+    closing: emptyClosing(),
     tests: {},
     physical: {},
     evidence: [],
     coachBrief: null,
   };
+}
+
+export function testNeedsBilateral(test: GphStationTest) {
+  const text = `${test.record} ${test.execution} ${test.unit}`.toLowerCase();
+  return (
+    text.includes("bilateral") ||
+    text.includes("por pie") ||
+    text.includes("pie menos") ||
+    text.includes("pie menor")
+  );
+}
+
+export function testNeedsRadar(test: GphStationTest) {
+  return /km\/h|radar/i.test(`${test.unit} ${test.execution} ${test.record}`);
+}
+
+export function weakerFootPercent(left: number | null, right: number | null) {
+  if (left == null || right == null) return null;
+  const total = left + right;
+  if (total <= 0) return null;
+  return (Math.min(left, right) / total) * 100;
 }
 
 export function scoreFromAccuracyPercent(percent: number) {
@@ -1166,6 +1232,14 @@ export function formatTestRaw(test: GphStationTest, capture: GphTestCapture | un
     if (capture.errors != null) parts.push(`${formatMeasure(capture.errors, true)} err.`);
     const percent = derivedPercent(test, capture);
     if (percent != null) parts.push(`${Math.round(percent)}%`);
+    if (capture.leftHits != null || capture.rightHits != null) {
+      parts.push(
+        `Der ${capture.rightHits ?? "—"} · Izq ${capture.leftHits ?? "—"}`,
+      );
+      const weak = weakerFootPercent(capture.leftHits, capture.rightHits);
+      if (weak != null) parts.push(`pie menor ${Math.round(weak)}%`);
+    }
+    if (capture.radarKmh != null) parts.push(`${formatMeasure(capture.radarKmh)} km/h`);
     return parts.length ? parts.join(" · ") : "—";
   }
   const values = numericAttempts(capture);
@@ -1177,6 +1251,12 @@ export function formatTestRaw(test: GphStationTest, capture: GphTestCapture | un
   const bits = [listed];
   if (best != null) bits.push(`mejor ${formatMeasure(best, integer)}`);
   if (avg != null && values.length > 1) bits.push(`prom. ${avg.toFixed(1)}`);
+  if (capture.leftHits != null || capture.rightHits != null) {
+    bits.push(`Der ${capture.rightHits ?? "—"} · Izq ${capture.leftHits ?? "—"}`);
+    const weak = weakerFootPercent(capture.leftHits, capture.rightHits);
+    if (weak != null) bits.push(`pie menor ${Math.round(weak)}%`);
+  }
+  if (capture.radarKmh != null) bits.push(`${formatMeasure(capture.radarKmh)} km/h`);
   return bits.join(" · ");
 }
 
@@ -1202,6 +1282,9 @@ export function parseFieldSession(value: unknown): GphFieldSession {
         hits: parseNum(raw.hits),
         opportunities: parseNum(raw.opportunities),
         errors: parseNum(raw.errors),
+        leftHits: parseNum(raw.leftHits),
+        rightHits: parseNum(raw.rightHits),
+        radarKmh: parseNum(raw.radarKmh),
         score: parseNum(raw.score),
         relevance: relevanceRaw === 1 || relevanceRaw === 3 ? relevanceRaw : 2,
         flagged: Boolean(raw.flagged),
@@ -1221,6 +1304,7 @@ export function parseFieldSession(value: unknown): GphFieldSession {
     }
   }
   const tri = (raw: unknown) => (raw === true ? true : raw === false ? false : null);
+  const closingRaw = isRecord(value.closing) ? value.closing : {};
   return {
     protocolStage: stage,
     sessionType,
@@ -1229,11 +1313,23 @@ export function parseFieldSession(value: unknown): GphFieldSession {
     ballSize: typeof value.ballSize === "string" ? value.ballSize : "",
     ballPsi: typeof value.ballPsi === "string" ? value.ballPsi : "",
     venueCode: typeof value.venueCode === "string" ? value.venueCode : "",
+    bibNumber: typeof value.bibNumber === "string" ? value.bibNumber : "",
+    currentClub: typeof value.currentClub === "string" ? value.currentClub : "",
+    familiarizationDone: tri(value.familiarizationDone),
     regulationDistance: tri(value.regulationDistance),
     ballSurfaceLogged: tri(value.ballSurfaceLogged),
     keyTestsVideo: tri(value.keyTestsVideo),
     observation: typeof value.observation === "string" ? value.observation : "",
     incident: typeof value.incident === "string" ? value.incident : "",
+    closing: {
+      testsComplete: tri(closingRaw.testsComplete),
+      videosIdentified: tri(closingRaw.videosIdentified),
+      dataLoaded: tri(closingRaw.dataLoaded),
+      incidentsLogged: tri(closingRaw.incidentsLogged),
+      reportScheduled: tri(closingRaw.reportScheduled),
+      feedbackDate:
+        typeof closingRaw.feedbackDate === "string" ? closingRaw.feedbackDate : "",
+    },
     tests,
     physical,
     evidence: parseEvidence(value.evidence),

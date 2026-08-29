@@ -3,9 +3,10 @@ import { requireDiagnosisAccess } from "@/lib/player-diagnosis-server";
 import { createSupabaseAdminClient } from "@/lib/supabase-admin";
 import { getAuthedSupabaseClient } from "@/lib/supabase-server";
 import { buildPlayerSlug, buildPublicPlayerUrl } from "@/lib/player-utils";
-import type { PlayerPosition } from "@/types/database";
+import type { DominantFoot, PlayerPosition } from "@/types/database";
 
 const POSITIONS: PlayerPosition[] = ["goalkeeper", "defender", "midfielder", "forward"];
+const FEET: DominantFoot[] = ["left", "right", "both"];
 
 export async function GET(request: Request) {
   const supabase = await getAuthedSupabaseClient(request);
@@ -28,7 +29,7 @@ export async function GET(request: Request) {
     const { data, error } = await admin
       .from("players")
       .select(
-        "id, first_name, last_name, birth_date, position, photo_url, jersey_number, academy_id",
+        "id, first_name, last_name, birth_date, position, photo_url, jersey_number, dominant_foot, academy_id",
       )
       .eq("academy_id", academyId)
       .order("last_name", { ascending: true });
@@ -57,6 +58,11 @@ export async function POST(request: Request) {
   const lastName = String(body.last_name ?? "").trim();
   const birthDate = String(body.birth_date ?? "").trim();
   const position = body.position as PlayerPosition;
+  const footRaw = body.dominant_foot as DominantFoot;
+  const dominantFoot = FEET.includes(footRaw) ? footRaw : "right";
+  const jerseyRaw = Number(body.jersey_number);
+  const jerseyNumber =
+    Number.isFinite(jerseyRaw) && jerseyRaw >= 0 && jerseyRaw <= 99 ? jerseyRaw : null;
 
   if (!academyId || !firstName || !lastName || !birthDate) {
     return NextResponse.json(
@@ -80,13 +86,14 @@ export async function POST(request: Request) {
         last_name: lastName,
         birth_date: birthDate,
         position,
-        dominant_foot: "right",
+        dominant_foot: dominantFoot,
+        jersey_number: jerseyNumber,
         slug,
         qr_code: buildPublicPlayerUrl(slug),
         is_public: false,
       })
       .select(
-        "id, first_name, last_name, birth_date, position, photo_url, jersey_number, academy_id",
+        "id, first_name, last_name, birth_date, position, photo_url, jersey_number, dominant_foot, academy_id",
       )
       .single();
 

@@ -147,6 +147,9 @@ export function buildDemoDiagnosisReport(): {
       field_session: {
         ...emptyFieldSession("desarrollo", "esencial"),
         venueCode: "CJ",
+        bibNumber: "9",
+        currentClub: "Escuela Gallos",
+        familiarizationDone: true,
         surface: "Pasto",
         weather: "Despejado",
         ballSize: "5",

@@ -63,10 +63,13 @@ export function FieldSessionReport({ session, module }: FieldSessionReportProps)
             {session.weather ? ` · ${session.weather}` : ""}
             {session.ballSize ? ` · talla ${session.ballSize}` : ""}
             {session.ballPsi ? ` · ${session.ballPsi} PSI` : ""}
+            {session.bibNumber ? ` · #${session.bibNumber}` : ""}
+            {session.currentClub ? ` · ${session.currentClub}` : ""}
           </p>
           <p className="mt-1 text-[11px] text-mf-text-muted">
             Distancia reglamentaria: {tri(session.regulationDistance)} · Balón/superficie:{" "}
-            {tri(session.ballSurfaceLogged)}
+            {tri(session.ballSurfaceLogged)} · Video: {tri(session.keyTestsVideo)} · Ensayo:{" "}
+            {tri(session.familiarizationDone)}
             {session.evidence.length ? ` · Evidencia: ${session.evidence.length}` : ""}
           </p>
 

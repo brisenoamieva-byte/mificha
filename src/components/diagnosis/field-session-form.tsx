@@ -5,7 +5,9 @@ import { Star } from "lucide-react";
 import { DiagnosisEvidenceCapture } from "@/components/diagnosis/diagnosis-evidence-capture";
 import { MeasureField } from "@/components/diagnosis/measure-field";
 import {
+  GPH_CLOSING_CHECKS,
   GPH_PENALTIES,
+  GPH_PERCENTILE_NOTE,
   GPH_PHYSICAL_TESTS,
   GPH_PROTOCOL_STAGES,
   GPH_ROTATION_CAMPO,
@@ -21,7 +23,11 @@ import {
   isRatioKind,
   isTestCaptureComplete,
   suggestedScore,
+  testNeedsBilateral,
+  testNeedsRadar,
   testsForBattery,
+  weakerFootPercent,
+  emptyClosing,
   type GphFieldSession,
   type GphPhysicalCapture,
   type GphProtocolStage,
@@ -58,6 +64,7 @@ function captureFor(session: GphFieldSession, test: GphStationTest): GphTestCapt
       ? base.attempts
       : [...base.attempts, ...Array.from({ length: test.attempts - base.attempts.length }, () => null)];
   return {
+    ...emptyTestCapture(test),
     ...base,
     attempts,
     opportunities: base.opportunities ?? test.maxPoints ?? null,
@@ -96,6 +103,7 @@ export function FieldSessionForm({ academyId, module, session, onChange }: Field
     (item) => !item.desarrolloOnly || session.protocolStage === "desarrollo",
   );
   const progress = fieldSessionProgress(session, module);
+  const closing = session.closing ?? emptyClosing();
 
   function patch(partial: Partial<GphFieldSession>) {
     onChange({ ...session, ...partial });
@@ -182,6 +190,24 @@ export function FieldSessionForm({ academyId, module, session, onChange }: Field
           </select>
         </label>
         <label className="text-xs font-medium text-mf-text-muted">
+          Dorsal / número
+          <input
+            value={session.bibNumber ?? ""}
+            onChange={(e) => patch({ bibNumber: e.target.value })}
+            className="mf-input mt-1"
+            placeholder="En todos los registros"
+          />
+        </label>
+        <label className="text-xs font-medium text-mf-text-muted sm:col-span-2">
+          Equipo / escuela actual
+          <input
+            value={session.currentClub ?? ""}
+            onChange={(e) => patch({ currentClub: e.target.value })}
+            className="mf-input mt-1"
+            placeholder="Club o colegio"
+          />
+        </label>
+        <label className="text-xs font-medium text-mf-text-muted">
           Superficie
           <input
             value={session.surface}
@@ -222,8 +248,10 @@ export function FieldSessionForm({ academyId, module, session, onChange }: Field
       <div className="flex flex-wrap gap-2">
         {(
           [
+            ["familiarizationDone", "Ensayo de familiarización (no cuenta)"],
             ["regulationDistance", "Distancia reglamentaria"],
             ["ballSurfaceLogged", "Balón y superficie anotados"],
+            ["keyTestsVideo", "Pruebas clave en video"],
           ] as const
         ).map(([key, label]) => (
           <button
@@ -327,6 +355,31 @@ export function FieldSessionForm({ academyId, module, session, onChange }: Field
                       onChange={(errors) => patchTest(test, { ...capture, errors })}
                     />
                   ) : null}
+                  {testNeedsBilateral(test) ? (
+                    <>
+                      <MeasureField
+                        label="Der"
+                        value={capture.rightHits}
+                        integer
+                        onChange={(rightHits) => patchTest(test, { ...capture, rightHits })}
+                      />
+                      <MeasureField
+                        label="Izq"
+                        value={capture.leftHits}
+                        integer
+                        onChange={(leftHits) => patchTest(test, { ...capture, leftHits })}
+                      />
+                    </>
+                  ) : null}
+                  {testNeedsRadar(test) ? (
+                    <MeasureField
+                      label="Radar"
+                      unit="km/h"
+                      value={capture.radarKmh}
+                      integer={false}
+                      onChange={(radarKmh) => patchTest(test, { ...capture, radarKmh })}
+                    />
+                  ) : null}
                 </div>
               ) : (
                 <div className="mt-3">
@@ -348,6 +401,33 @@ export function FieldSessionForm({ academyId, module, session, onChange }: Field
                       />
                     ))}
                   </div>
+                  {testNeedsBilateral(test) ? (
+                    <div className="mt-2 grid grid-cols-2 gap-2 sm:max-w-xs">
+                      <MeasureField
+                        label="Contactos Der"
+                        value={capture.rightHits}
+                        integer
+                        onChange={(rightHits) => patchTest(test, { ...capture, rightHits })}
+                      />
+                      <MeasureField
+                        label="Contactos Izq"
+                        value={capture.leftHits}
+                        integer
+                        onChange={(leftHits) => patchTest(test, { ...capture, leftHits })}
+                      />
+                    </div>
+                  ) : null}
+                  {testNeedsRadar(test) ? (
+                    <div className="mt-2 max-w-[8rem]">
+                      <MeasureField
+                        label="Radar"
+                        unit="km/h"
+                        value={capture.radarKmh}
+                        integer={false}
+                        onChange={(radarKmh) => patchTest(test, { ...capture, radarKmh })}
+                      />
+                    </div>
+                  ) : null}
                 </div>
               )}
 
@@ -360,6 +440,11 @@ export function FieldSessionForm({ academyId, module, session, onChange }: Field
                 ) : null}
                 {avg != null && capture.attempts.filter((item) => item != null).length > 1 ? (
                   <span>Prom. {avg.toFixed(1)}</span>
+                ) : null}
+                {weakerFootPercent(capture.leftHits, capture.rightHits) != null ? (
+                  <span>
+                    Pie menor {Math.round(weakerFootPercent(capture.leftHits, capture.rightHits) ?? 0)}%
+                  </span>
                 ) : null}
                 <label className="inline-flex items-center gap-1">
                   Relevancia
@@ -428,7 +513,8 @@ export function FieldSessionForm({ academyId, module, session, onChange }: Field
         <div className="rounded-xl border border-mf-border-subtle p-3">
           <p className="text-sm font-semibold text-mf-text">Físico y funcional · 360</p>
           <p className="mt-1 text-[11px] text-mf-text-muted">
-            Anota cada intento en su unidad. Supervisión de fisioterapia. Detener ante dolor.
+            Anota cada intento en su unidad. Supervisión de fisioterapia. Detener ante dolor,
+            mareo o restricción conocida. {GPH_PERCENTILE_NOTE}
           </p>
           <div className="mt-3 space-y-4">
             {physicalTests.map((test) => {
@@ -543,6 +629,48 @@ export function FieldSessionForm({ academyId, module, session, onChange }: Field
             value={session.incident}
             onChange={(e) => patch({ incident: e.target.value })}
             className="mf-input mt-1 min-h-20"
+            placeholder="Servicio inválido repetido, dolor, intento anulado…"
+          />
+        </label>
+      </div>
+
+      <div className="rounded-xl border border-mf-border-subtle p-3">
+        <p className="text-sm font-semibold text-mf-text">Cierre operativo</p>
+        <div className="mt-2 flex flex-wrap gap-2">
+          {GPH_CLOSING_CHECKS.map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() =>
+                patch({
+                  closing: {
+                    ...closing,
+                    [item.id]: cycleTri(closing[item.id]),
+                  },
+                })
+              }
+              className={cn(
+                "rounded-full border px-3 py-1.5 text-xs font-medium",
+                session.closing?.[item.id] === true
+                  ? "border-mf-brand bg-mf-brand-soft text-mf-brand"
+                  : "border-mf-border text-mf-text-secondary",
+              )}
+            >
+              {item.label}: {triLabel(closing[item.id])}
+            </button>
+          ))}
+        </div>
+        <label className="mt-3 block text-xs font-medium text-mf-text-muted">
+          Fecha de retroalimentación
+          <input
+            type="date"
+            value={closing.feedbackDate}
+            onChange={(e) =>
+              patch({
+                closing: { ...closing, feedbackDate: e.target.value },
+              })
+            }
+            className="mf-input mt-1 max-w-xs"
           />
         </label>
       </div>

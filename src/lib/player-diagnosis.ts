@@ -97,6 +97,11 @@ export const DIAGNOSIS_DOMAIN_WEIGHTS: Record<DiagnosisDomain, number> = {
   compromiso: 0.1,
 };
 
+export const DIAGNOSIS_ASSIGNED_GROUPS = ["Iniciación", "Avanzado"] as const;
+export type DiagnosisAssignedGroup = (typeof DIAGNOSIS_ASSIGNED_GROUPS)[number];
+
+export const DIAGNOSIS_SESSION_DAYS = ["L-Mi", "Ma-J"] as const;
+
 export const DIAGNOSIS_MONTHS = [
   "september",
   "october",

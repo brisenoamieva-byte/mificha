@@ -8,6 +8,7 @@ import { CoachBriefSection } from "@/components/diagnosis/coach-brief-section";
 import { FieldSessionForm } from "@/components/diagnosis/field-session-form";
 import { toast } from "@/components/ui/toast";
 import { calculateAge, getPositionLabel } from "@/lib/dashboard-utils";
+import { formatPlayerCategory } from "@/lib/player-category";
 import {
   emptyFieldSession,
   fieldSessionProgress,
@@ -20,13 +21,17 @@ import {
 import { diagnosisAuthedFetch } from "@/lib/player-diagnosis-client";
 import {
   computeDiagnosisResult,
+  DIAGNOSIS_ASSIGNED_GROUPS,
   DIAGNOSIS_GROUP_LABELS,
   DIAGNOSIS_KIND_LABELS,
   DIAGNOSIS_KINDS,
   DIAGNOSIS_MONTH_META,
   DIAGNOSIS_MONTHS,
   DIAGNOSIS_SCALE,
+  DIAGNOSIS_SESSION_DAYS,
+  DIAGNOSIS_STAGE_COPY,
   DIAGNOSIS_STAGE_LABELS,
+  DIAGNOSIS_STAGES,
   emptyMonthlyPlan,
   indicatorsForModule,
   moduleFromPosition,
@@ -38,9 +43,10 @@ import {
   type DiagnosisNotes,
   type DiagnosisPriorityItem,
   type DiagnosisScores,
+  type DiagnosisStage,
 } from "@/lib/player-diagnosis";
-import type { Player } from "@/types/database";
-import { positionOptions } from "@/lib/player-utils";
+import type { DominantFoot, Player } from "@/types/database";
+import { dominantFootOptions, getDominantFootLabel, positionOptions } from "@/lib/player-utils";
 import { cn } from "@/lib/utils";
 
 interface DiagnosisFormProps {
@@ -78,10 +84,15 @@ export function DiagnosisForm({
     isGphEvaluator ? "Gustavo Reyes · GPH" : (profile?.full_name ?? ""),
   );
   const [sessionDays, setSessionDays] = useState("");
+  const [yearsExperience, setYearsExperience] = useState("");
+  const [sessionsPerWeek, setSessionsPerWeek] = useState("");
   const [injuries, setInjuries] = useState("");
   const [playerGoal, setPlayerGoal] = useState("");
   const [familyGoal, setFamilyGoal] = useState("");
   const [whyJoin, setWhyJoin] = useState("");
+  const [medicalNotes, setMedicalNotes] = useState("");
+  const [assignedStage, setAssignedStage] = useState<DiagnosisStage | "">("");
+  const [assignedGroup, setAssignedGroup] = useState("");
   const [contextOpen, setContextOpen] = useState(false);
   const [planOpen, setPlanOpen] = useState(false);
   const [scores, setScores] = useState<DiagnosisScores>({});
@@ -104,6 +115,8 @@ export function DiagnosisForm({
   const [quickLast, setQuickLast] = useState("");
   const [quickBirth, setQuickBirth] = useState("");
   const [quickPosition, setQuickPosition] = useState<Player["position"]>("forward");
+  const [quickJersey, setQuickJersey] = useState("");
+  const [quickFoot, setQuickFoot] = useState<DominantFoot>("right");
   const [quickBusy, setQuickBusy] = useState(false);
 
   useEffect(() => {
@@ -154,6 +167,17 @@ export function DiagnosisForm({
     setFlagged((prev) =>
       prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id],
     );
+  }
+
+  function toggleSessionDay(code: string) {
+    const parts = sessionDays
+      .split(/[,·]/)
+      .map((item) => item.trim())
+      .filter(Boolean);
+    const next = parts.includes(code)
+      ? parts.filter((item) => item !== code)
+      : [...parts, code];
+    setSessionDays(next.join(", "));
   }
 
   async function requestCoachBrief() {
@@ -285,14 +309,24 @@ export function DiagnosisForm({
           evaluator_name: evaluatorName,
           venue: venueLabel,
           session_days: sessionDays || null,
+          years_experience:
+            yearsExperience.trim() === "" || !Number.isFinite(Number(yearsExperience))
+              ? null
+              : Number(yearsExperience),
+          sessions_per_week:
+            sessionsPerWeek.trim() === "" || !Number.isFinite(Number(sessionsPerWeek))
+              ? null
+              : Number(sessionsPerWeek),
           injuries: injuries || null,
           why_join: whyJoin || null,
           player_goal: playerGoal || null,
           family_goal: familyGoal || null,
+          medical_notes: medicalNotes || null,
           scores: liveScores,
           notes,
           flagged: mergedFlags,
-          assigned_stage: live.stage,
+          assigned_stage: assignedStage || live.stage,
+          assigned_group: assignedGroup || null,
           program_priorities: nextPriorities,
           monthly_plan: nextPlan,
           assignment_notes: nextNotes || null,
@@ -330,6 +364,8 @@ export function DiagnosisForm({
           last_name: quickLast.trim(),
           birth_date: quickBirth,
           position: quickPosition,
+          jersey_number: quickJersey ? Number(quickJersey) : null,
+          dominant_foot: quickFoot,
         }),
       });
       const created = payload.player as Player;
@@ -392,6 +428,30 @@ export function DiagnosisForm({
                 </option>
               ))}
             </select>
+          </label>
+          <label className="text-xs font-medium text-mf-text-muted">
+            Perfil
+            <select
+              value={quickFoot}
+              onChange={(e) => setQuickFoot(e.target.value as DominantFoot)}
+              className="mf-input mt-1"
+            >
+              {dominantFootOptions.map((item) => (
+                <option key={item.value} value={item.value}>
+                  {item.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="text-xs font-medium text-mf-text-muted">
+            Dorsal
+            <input
+              value={quickJersey}
+              onChange={(e) => setQuickJersey(e.target.value)}
+              className="mf-input mt-1"
+              inputMode="numeric"
+              placeholder="Opcional"
+            />
           </label>
         </div>
         <button
@@ -496,6 +556,8 @@ export function DiagnosisForm({
               setAiFallback(false);
               setPriorities([]);
               setMonthlyPlan(emptyMonthlyPlan());
+              setAssignedStage("");
+              setAssignedGroup("");
             }}
             className="mf-input mt-1"
           >
@@ -505,6 +567,16 @@ export function DiagnosisForm({
               </option>
             ))}
           </select>
+          {player ? (
+            <p className="mt-1.5 text-[11px] text-mf-text-secondary">
+              {formatPlayerCategory(player.birth_date)} ·{" "}
+              {player.birth_date ? `${calculateAge(player.birth_date)} años` : "edad —"}
+              {player.dominant_foot
+                ? ` · ${getDominantFootLabel(player.dominant_foot)}`
+                : ""}
+              {player.jersey_number != null ? ` · #${player.jersey_number}` : ""}
+            </p>
+          ) : null}
         </label>
         <label className="text-xs font-medium text-mf-text-muted">
           Tipo
@@ -538,13 +610,47 @@ export function DiagnosisForm({
             placeholder="Nombre del evaluador"
           />
         </label>
-        <label className="text-xs font-medium text-mf-text-muted">
+        <div className="text-xs font-medium text-mf-text-muted">
           Días
+          <div className="mt-1 flex flex-wrap gap-2">
+            {DIAGNOSIS_SESSION_DAYS.map((day) => {
+              const active = sessionDays.split(/[,·]/).map((item) => item.trim()).includes(day);
+              return (
+                <button
+                  key={day}
+                  type="button"
+                  onClick={() => toggleSessionDay(day)}
+                  className={cn(
+                    "rounded-full border px-3 py-1.5 text-xs font-medium",
+                    active
+                      ? "border-mf-brand bg-mf-brand-soft text-mf-brand"
+                      : "border-mf-border text-mf-text-secondary",
+                  )}
+                >
+                  {day}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+        <label className="text-xs font-medium text-mf-text-muted">
+          Años de experiencia
           <input
-            value={sessionDays}
-            onChange={(e) => setSessionDays(e.target.value)}
+            value={yearsExperience}
+            onChange={(e) => setYearsExperience(e.target.value)}
             className="mf-input mt-1"
-            placeholder="L-Mi, Ma-J…"
+            inputMode="decimal"
+            placeholder="4"
+          />
+        </label>
+        <label className="text-xs font-medium text-mf-text-muted">
+          Sesiones / semana
+          <input
+            value={sessionsPerWeek}
+            onChange={(e) => setSessionsPerWeek(e.target.value)}
+            className="mf-input mt-1"
+            inputMode="numeric"
+            placeholder="2"
           />
         </label>
       </section>
@@ -592,6 +698,15 @@ export function DiagnosisForm({
                 value={injuries}
                 onChange={(e) => setInjuries(e.target.value)}
                 className="mf-input mt-1"
+              />
+            </label>
+            <label className="text-xs font-medium text-mf-text-muted sm:col-span-2">
+              Antecedentes médicos, físicos, nutricionales o emocionales
+              <textarea
+                value={medicalNotes}
+                onChange={(e) => setMedicalNotes(e.target.value)}
+                className="mf-input mt-1 min-h-20"
+                placeholder="Se reportan aparte; no entran al puntaje de fútbol."
               />
             </label>
           </div>
@@ -737,6 +852,63 @@ export function DiagnosisForm({
       </section>
 
       <section className="rounded-2xl border border-mf-border bg-white p-4">
+        <h2 className="text-base font-semibold text-mf-text">Asignación recomendada</h2>
+        <p className="mt-1 text-xs text-mf-text-muted">
+          La etapa no depende solo del promedio: edad, experiencia, seguridad, posición y
+          contexto también cuentan. Calculada:{" "}
+          {result.stage ? DIAGNOSIS_STAGE_LABELS[result.stage] : "completa la escala"}.
+        </p>
+        <div className="mt-3 grid gap-3 sm:grid-cols-2">
+          <label className="text-xs font-medium text-mf-text-muted">
+            Etapa asignada
+            <select
+              value={assignedStage}
+              onChange={(e) => setAssignedStage(e.target.value as DiagnosisStage | "")}
+              className="mf-input mt-1"
+            >
+              <option value="">Usar la calculada</option>
+              {DIAGNOSIS_STAGES.map((stage) => (
+                <option key={stage} value={stage}>
+                  {DIAGNOSIS_STAGE_LABELS[stage]}
+                  {result.stage === stage ? " · calculada" : ""}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="text-xs font-medium text-mf-text-muted">
+            Subcategoría / grupo
+            <select
+              value={assignedGroup}
+              onChange={(e) => setAssignedGroup(e.target.value)}
+              className="mf-input mt-1"
+            >
+              <option value="">Sin grupo</option>
+              {DIAGNOSIS_ASSIGNED_GROUPS.map((group) => (
+                <option key={group} value={group}>
+                  {group}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="text-xs font-medium text-mf-text-muted sm:col-span-2">
+            Observaciones de asignación
+            <input
+              value={coachNotes}
+              onChange={(e) => setCoachNotes(e.target.value)}
+              className="mf-input mt-1"
+              placeholder="Sede, días, rol, seguridad…"
+            />
+          </label>
+        </div>
+        {assignedStage && result.stage && assignedStage !== result.stage ? (
+          <p className="mt-2 text-[11px] text-mf-warning">
+            {DIAGNOSIS_STAGE_COPY[assignedStage]} Distinto al promedio (
+            {DIAGNOSIS_STAGE_LABELS[result.stage]}).
+          </p>
+        ) : null}
+      </section>
+
+      <section className="rounded-2xl border border-mf-border bg-white p-4">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <h2 className="text-base font-semibold text-mf-text">Lectura de entrenador</h2>
@@ -816,6 +988,26 @@ export function DiagnosisForm({
                 }}
                 className="mf-input"
                 placeholder="Meta a diciembre"
+              />
+              <input
+                value={item.baseline}
+                onChange={(e) => {
+                  const next = [...priorities];
+                  next[index] = { ...item, baseline: e.target.value };
+                  setPriorities(next);
+                }}
+                className="mf-input"
+                placeholder="Línea base"
+              />
+              <input
+                value={item.progress_indicator}
+                onChange={(e) => {
+                  const next = [...priorities];
+                  next[index] = { ...item, progress_indicator: e.target.value };
+                  setPriorities(next);
+                }}
+                className="mf-input"
+                placeholder="Indicador de avance"
               />
               <input
                 value={item.main_action}
