@@ -39,9 +39,9 @@ export function EvaluacionesPageContent() {
         title="Evalúa a tu hijo. Sigue el avance en MiFicha."
         description={
           <WithBrandName>
-            GPH y MiFicha son el mismo equipo: el diagnóstico, la ficha y el plan
-            viven juntos. No necesitas que la academia esté inscrita para contratar
-            una evaluación.
+            GPH evalúa y el resultado queda en MiFicha: el diagnóstico, la ficha y
+            el plan viven en un mismo lugar. No necesitas que la academia esté
+            inscrita para contratar una evaluación.
           </WithBrandName>
         }
         actions={
