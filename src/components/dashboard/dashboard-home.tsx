@@ -48,7 +48,7 @@ interface RecentPlayer {
   first_name: string;
   last_name: string;
   position: PlayerPosition;
-  birth_date: string;
+  birth_date: string | null;
   passport_score: number;
   photo_url: string | null;
 }
@@ -347,7 +347,9 @@ export function DashboardHome() {
                         {getPositionLabel(player.position)}
                       </td>
                       <td className="py-4 pr-4 text-slate-600">
-                        {calculateAge(player.birth_date)} años
+                        {calculateAge(player.birth_date) != null
+                          ? `${calculateAge(player.birth_date)} años`
+                          : "—"}
                       </td>
                       <td className="py-4">
                         <ProgressTierBadge score={player.passport_score} />

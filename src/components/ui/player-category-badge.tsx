@@ -4,11 +4,12 @@ import {
   getPlayerAge,
   getPlayerGeneration,
   getSubCategoryLabel,
+  isUnknownBirthDate,
 } from "@/lib/player-category";
 import { cn } from "@/lib/utils";
 
 interface PlayerCategoryBadgeProps {
-  birthDate: string;
+  birthDate: string | null | undefined;
   className?: string;
   compact?: boolean;
 }
@@ -18,8 +19,21 @@ export function PlayerCategoryBadge({
   className,
   compact = false,
 }: PlayerCategoryBadgeProps) {
-  const age = getPlayerAge(birthDate);
-  const generation = getPlayerGeneration(birthDate);
+  if (isUnknownBirthDate(birthDate)) {
+    return (
+      <span
+        className={cn(
+          "inline-flex rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-700",
+          className,
+        )}
+      >
+        Sin fecha
+      </span>
+    );
+  }
+
+  const age = getPlayerAge(birthDate!);
+  const generation = getPlayerGeneration(birthDate!);
 
   if (compact) {
     return (

@@ -86,7 +86,7 @@ export function PlayerModal({
     if (player) {
       setFirstName(player.first_name);
       setLastName(player.last_name);
-      setBirthDate(player.birth_date);
+      setBirthDate(player.birth_date ?? "");
       setPosition(player.position);
       setDominantFoot(player.dominant_foot);
       setJerseyNumber(player.jersey_number?.toString() ?? "");
@@ -160,7 +160,7 @@ export function PlayerModal({
       const payload = {
         first_name: firstName.trim(),
         last_name: lastName.trim(),
-        birth_date: birthDate,
+        birth_date: birthDate.trim() || null,
         position,
         dominant_foot: dominantFoot,
         jersey_number: jerseyNumber ? Number(jerseyNumber) : null,
@@ -261,11 +261,11 @@ export function PlayerModal({
             <div className="grid gap-5 sm:grid-cols-2">
               <div>
                 <label className="block text-sm font-medium text-slate-700">
-                  Fecha de nacimiento *
+                  Fecha de nacimiento
+                  <span className="font-normal text-slate-400"> (opcional)</span>
                 </label>
                 <input
                   type="date"
-                  required
                   value={birthDate}
                   onChange={(event) => setBirthDate(event.target.value)}
                   className={inputClassName}

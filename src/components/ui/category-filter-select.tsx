@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 interface CategoryFilterSelectProps {
   value: string;
   onChange: (value: string) => void;
-  birthDates: string[];
+  birthDates: Array<string | null | undefined>;
   className?: string;
   selectClassName?: string;
   label?: string;

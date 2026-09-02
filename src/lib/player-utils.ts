@@ -1,4 +1,5 @@
 import type { DominantFoot, Player, PlayerPosition } from "@/types/database";
+import { isUnknownBirthDate } from "@/lib/player-category";
 
 export const positionOptions: {
   value: PlayerPosition;
@@ -65,7 +66,11 @@ export function getPositionBadgeClass(position: PlayerPosition) {
 export { getPassportBarClass } from "@/lib/passport-score";
 
 export function isProfileComplete(player: Player) {
-  return Boolean(player.photo_url && player.video_url);
+  return Boolean(
+    !isUnknownBirthDate(player.birth_date) &&
+      player.photo_url &&
+      player.video_url,
+  );
 }
 
 export function getPlayerInitials(firstName: string, lastName: string) {

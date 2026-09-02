@@ -32,7 +32,7 @@ export interface FichaDocumentModel {
   documentId?: string;
   seasonLabel: string;
   fullName: string;
-  age: number;
+  age: number | null;
   categoryLabel: string;
   positionLabel: string;
   secondaryPositionLabel?: string | null;

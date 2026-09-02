@@ -131,7 +131,7 @@ export type Database = {
           slug: string;
           first_name: string;
           last_name: string;
-          birth_date: string;
+          birth_date: string | null;
           position: Database["public"]["Enums"]["player_position"];
           dominant_foot: Database["public"]["Enums"]["dominant_foot"];
           height_cm: number | null;
@@ -162,7 +162,7 @@ export type Database = {
           slug: string;
           first_name: string;
           last_name: string;
-          birth_date: string;
+          birth_date?: string | null;
           position: Database["public"]["Enums"]["player_position"];
           dominant_foot: Database["public"]["Enums"]["dominant_foot"];
           height_cm?: number | null;
@@ -193,7 +193,7 @@ export type Database = {
           slug?: string;
           first_name?: string;
           last_name?: string;
-          birth_date?: string;
+          birth_date?: string | null;
           position?: Database["public"]["Enums"]["player_position"];
           dominant_foot?: Database["public"]["Enums"]["dominant_foot"];
           height_cm?: number | null;

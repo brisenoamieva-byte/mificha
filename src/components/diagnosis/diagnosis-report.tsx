@@ -231,7 +231,8 @@ export function DiagnosisReport({
               {player.first_name} {player.last_name}
             </h1>
             <p className="mt-2 text-sm text-mf-text-secondary">
-              {formatPlayerCategory(player.birth_date)} · {age} años ·{" "}
+              {formatPlayerCategory(player.birth_date)}
+              {age != null ? ` · ${age} años` : ""} ·{" "}
               {getPositionLabel(player.position)} ·{" "}
               {getDominantFootLabel(player.dominant_foot as "left" | "right" | "both")}
               {player.jersey_number != null ? ` · #${player.jersey_number}` : ""}

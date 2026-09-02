@@ -7,24 +7,45 @@ import {
 } from "@/lib/player-utils";
 import { supabase } from "@/lib/supabase";
 import type { DominantFoot, PlayerPosition } from "@/types/database";
+import { UNKNOWN_BIRTH_DATE, isUnknownBirthDate } from "@/lib/player-category";
 
 const positionMap: Record<string, PlayerPosition> = {
   portero: "goalkeeper",
+  porteros: "goalkeeper",
   goalkeeper: "goalkeeper",
+  gk: "goalkeeper",
   defensa: "defender",
+  defensas: "defender",
   defender: "defender",
+  lateral: "defender",
+  centrales: "defender",
+  central: "defender",
   mediocampista: "midfielder",
+  mediocampistas: "midfielder",
   midfielder: "midfielder",
+  medio: "midfielder",
+  medios: "midfielder",
+  volante: "midfielder",
+  mid: "midfielder",
   delantero: "forward",
+  delantera: "forward",
+  delanteros: "forward",
+  delanteras: "forward",
   forward: "forward",
+  atacante: "forward",
 };
 
 const footMap: Record<string, DominantFoot> = {
   derecho: "right",
+  derecha: "right",
+  diestro: "right",
   right: "right",
   izquierdo: "left",
+  izquierda: "left",
+  zurdo: "left",
   left: "left",
   ambos: "both",
+  ambidiestro: "both",
   both: "both",
 };
 
@@ -40,6 +61,7 @@ export interface ParsedPlayerRow {
   weightKg: number | null;
   guardianName: string | null;
   guardianEmail: string | null;
+  warnings: string[];
 }
 
 export interface InvalidPlayerRow {
@@ -52,6 +74,7 @@ export interface PlayerImportPreview {
   valid: ParsedPlayerRow[];
   invalid: InvalidPlayerRow[];
   totalRows: number;
+  missingBirthDateCount: number;
 }
 
 export interface PlayerImportInsert {
@@ -81,19 +104,64 @@ function normalizeKey(key: string) {
     .trim();
 }
 
-function getCell(row: Record<string, unknown>, keys: string[]) {
-  for (const [rawKey, value] of Object.entries(row)) {
-    const key = normalizeKey(rawKey);
-    if (keys.some((candidate) => key.includes(candidate))) {
-      return String(value ?? "").trim();
-    }
+function cleanText(value: string) {
+  return value.replace(/\s+/g, " ").trim();
+}
+
+function getCell(
+  row: Record<string, unknown>,
+  keys: string[],
+  mode: "exact" | "includes" = "includes",
+) {
+  const entries = Object.entries(row).map(([rawKey, value]) => ({
+    key: normalizeKey(rawKey),
+    value: cleanText(String(value ?? "")),
+  }));
+
+  for (const candidate of keys) {
+    const exact = entries.find((entry) => entry.key === candidate);
+    if (exact) return exact.value;
   }
+
+  if (mode === "exact") return "";
+
+  for (const candidate of keys) {
+    const partial = entries.find(
+      (entry) =>
+        entry.key.includes(candidate) &&
+        !entry.key.includes("tutor") &&
+        !entry.key.includes("padre") &&
+        !entry.key.includes("madre") &&
+        !entry.key.includes("guardian"),
+    );
+    if (partial) return partial.value;
+  }
+
+  return "";
+}
+
+function getGuardianCell(row: Record<string, unknown>, keys: string[]) {
+  const entries = Object.entries(row).map(([rawKey, value]) => ({
+    key: normalizeKey(rawKey),
+    value: cleanText(String(value ?? "")),
+  }));
+
+  for (const candidate of keys) {
+    const exact = entries.find((entry) => entry.key === candidate);
+    if (exact) return exact.value;
+  }
+
+  for (const candidate of keys) {
+    const partial = entries.find((entry) => entry.key.includes(candidate));
+    if (partial) return partial.value;
+  }
+
   return "";
 }
 
 function parseOptionalNumber(value: string, min: number, max: number) {
   if (!value) return null;
-  const parsed = Number(value);
+  const parsed = Number(value.replace(",", "."));
   if (!Number.isFinite(parsed) || parsed < min || parsed > max) return null;
   return Math.round(parsed);
 }
@@ -112,7 +180,7 @@ function parseBirthDate(raw: string): string | null {
     return raw;
   }
 
-  const parts = raw.split(/[\/\-]/).map((part) => part.trim());
+  const parts = raw.split(/[\/\-.]/).map((part) => part.trim());
   if (parts.length === 3) {
     const [a, b, c] = parts.map(Number);
     if (parts[2].length === 4) {
@@ -144,6 +212,18 @@ function parseBirthDate(raw: string): string | null {
   return null;
 }
 
+function normalizeLookup(value: string) {
+  return normalizeKey(value).replace(/\s+/g, " ");
+}
+
+function resolvePosition(raw: string): PlayerPosition {
+  return positionMap[normalizeLookup(raw)] ?? "midfielder";
+}
+
+function resolveFoot(raw: string): DominantFoot {
+  return footMap[normalizeLookup(raw)] ?? "right";
+}
+
 function buildPreviewLabel(firstName: string, lastName: string) {
   const label = `${firstName} ${lastName}`.trim();
   return label || "Fila sin nombre";
@@ -161,16 +241,31 @@ export function parsePlayerImportFile(buffer: ArrayBuffer): PlayerImportPreview 
 
   rows.forEach((row, index) => {
     const rowNumber = index + 2;
-    const firstName = getCell(row, ["nombre", "first"]);
-    const lastName = getCell(row, ["apellido", "last"]);
-    const birthRaw = getCell(row, ["fecha", "birth", "nacimiento"]);
-    const positionRaw = getCell(row, ["posicion", "position"]).toLowerCase();
-    const footRaw = getCell(row, ["pierna", "foot", "dominant"]).toLowerCase();
-    const jerseyRaw = getCell(row, ["numero", "playera", "jersey"]);
+    const firstName = getCell(row, ["nombre", "first name", "firstname", "first"], "exact")
+      || getCell(row, ["nombre", "first"]);
+    const lastName = getCell(row, ["apellido", "apellidos", "last name", "lastname", "last"]);
+    const birthRaw = getCell(row, [
+      "fecha nacimiento",
+      "fecha de nacimiento",
+      "nacimiento",
+      "birth date",
+      "birthdate",
+      "birth",
+    ]);
+    const positionRaw = getCell(row, ["posicion", "position"]);
+    const footRaw = getCell(row, ["pierna", "foot", "dominant"]);
+    const jerseyRaw = getCell(row, ["numero", "playera", "jersey", "dorsal"]);
     const heightRaw = getCell(row, ["estatura", "height", "altura"]);
     const weightRaw = getCell(row, ["peso", "weight"]);
-    const guardianName = getCell(row, ["tutor", "padre", "madre", "guardian name"]);
-    const guardianEmailRaw = getCell(row, [
+    const guardianName = getGuardianCell(row, [
+      "nombre tutor",
+      "tutor",
+      "padre",
+      "madre",
+      "guardian name",
+      "guardian",
+    ]);
+    const guardianEmailRaw = getGuardianCell(row, [
       "email tutor",
       "email padre",
       "correo tutor",
@@ -193,14 +288,23 @@ export function parsePlayerImportFile(buffer: ArrayBuffer): PlayerImportPreview 
       return;
     }
 
-    const birthDate = parseBirthDate(birthRaw);
+    const warnings: string[] = [];
+    let birthDate = parseBirthDate(birthRaw);
     if (!birthDate) {
-      invalid.push({
-        rowNumber,
-        reason: "Fecha de nacimiento inválida. Usa AAAA-MM-DD o DD/MM/AAAA.",
-        preview,
-      });
-      return;
+      birthDate = UNKNOWN_BIRTH_DATE;
+      warnings.push("Sin fecha de nacimiento: categoría pendiente.");
+    }
+
+    const normalizedPosition = normalizeLookup(positionRaw);
+    if (positionRaw && !positionMap[normalizedPosition]) {
+      warnings.push(
+        `Posición «${positionRaw}» no reconocida; se usó mediocampista.`,
+      );
+    }
+
+    const normalizedFoot = normalizeLookup(footRaw);
+    if (footRaw && !footMap[normalizedFoot]) {
+      warnings.push(`Pierna «${footRaw}» no reconocida; se usó derecha.`);
     }
 
     valid.push({
@@ -208,13 +312,14 @@ export function parsePlayerImportFile(buffer: ArrayBuffer): PlayerImportPreview 
       firstName,
       lastName,
       birthDate,
-      position: positionMap[positionRaw] ?? "midfielder",
-      dominantFoot: footMap[footRaw] ?? "right",
+      position: resolvePosition(positionRaw),
+      dominantFoot: resolveFoot(footRaw),
       jerseyNumber: parseOptionalNumber(jerseyRaw, 1, 99),
       heightCm: parseOptionalNumber(heightRaw, 100, 220),
-      weightKg: parseOptionalNumber(weightRaw, 30, 120),
+      weightKg: parseOptionalNumber(weightRaw, 20, 120),
       guardianName: guardianName || null,
       guardianEmail: parseOptionalEmail(guardianEmailRaw),
+      warnings,
     });
   });
 
@@ -226,6 +331,8 @@ export function parsePlayerImportFile(buffer: ArrayBuffer): PlayerImportPreview 
     valid,
     invalid,
     totalRows: rows.length,
+    missingBirthDateCount: valid.filter((row) => isUnknownBirthDate(row.birthDate))
+      .length,
   };
 }
 
@@ -282,7 +389,7 @@ export async function importPlayersFromExcel(file: File, academyId: string) {
   if (preview.valid.length === 0) {
     throw new Error(
       preview.invalid.length > 0
-        ? "Ninguna fila es válida. Revisa nombre, apellido y fecha."
+        ? "Ninguna fila es válida. Revisa nombre y apellido."
         : "No se encontraron filas válidas.",
     );
   }
@@ -297,7 +404,7 @@ export function downloadPlayerImportTemplate() {
       apellido: "Hernández",
       "fecha nacimiento": "2012-05-15",
       posicion: "delantero",
-      pierna: "derecho",
+      pierna: "derecha",
       numero: 9,
       estatura: 155,
       peso: 45,
@@ -308,8 +415,8 @@ export function downloadPlayerImportTemplate() {
       nombre: "Mateo",
       apellido: "López",
       "fecha nacimiento": "2011-08-22",
-      posicion: "mediocampista",
-      pierna: "izquierdo",
+      posicion: "medio",
+      pierna: "izquierda",
       numero: 8,
       estatura: 162,
       peso: 48,

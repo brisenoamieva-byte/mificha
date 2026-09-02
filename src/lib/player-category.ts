@@ -9,6 +9,13 @@ export interface CategoryFilterOption {
   group?: "age" | "generation";
 }
 
+/** Fecha provisional al importar sin natalicio; la UI la trata como «sin fecha». */
+export const UNKNOWN_BIRTH_DATE = "1900-01-01";
+
+export function isUnknownBirthDate(birthDate: string | null | undefined) {
+  return !birthDate || birthDate === UNKNOWN_BIRTH_DATE;
+}
+
 const MEXICO_TIMEZONE = "America/Mexico_City";
 
 export function getPlayerAge(birthDate: string, reference = new Date()): number {
@@ -50,9 +57,10 @@ export function getGenerationLabel(year: number): string {
   return `Generación ${year}`;
 }
 
-export function formatPlayerCategory(birthDate: string): string {
-  const age = getPlayerAge(birthDate);
-  return `${getSubCategoryLabel(age)} · ${getGenerationLabel(getPlayerGeneration(birthDate))}`;
+export function formatPlayerCategory(birthDate: string | null | undefined): string {
+  if (isUnknownBirthDate(birthDate)) return "Sin categoría";
+  const age = getPlayerAge(birthDate!);
+  return `${getSubCategoryLabel(age)} · ${getGenerationLabel(getPlayerGeneration(birthDate!))}`;
 }
 
 export function parseCategoryFilter(value: string): PlayerCategoryFilter {
@@ -103,9 +111,9 @@ export function buildCategoryFilterOptions(
   const generations = new Set<number>();
 
   for (const birthDate of birthDates) {
-    if (!birthDate) continue;
-    ages.add(getPlayerAge(birthDate));
-    generations.add(getPlayerGeneration(birthDate));
+    if (isUnknownBirthDate(birthDate)) continue;
+    ages.add(getPlayerAge(birthDate!));
+    generations.add(getPlayerGeneration(birthDate!));
   }
 
   const filterOptions: CategoryFilterOption[] = [];

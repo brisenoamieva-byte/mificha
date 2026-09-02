@@ -1,4 +1,4 @@
-import { getPlayerAge } from "@/lib/player-category";
+import { getPlayerAge, isUnknownBirthDate } from "@/lib/player-category";
 
 export const MINOR_AGE_THRESHOLD = 18;
 
@@ -17,8 +17,9 @@ export const PRIVACY_COPY = {
     "MiFicha trata datos de menores con fines deportivos. La academia es responsable de obtener y documentar el consentimiento parental.",
 } as const;
 
-export function isMinor(birthDate: string): boolean {
-  return getPlayerAge(birthDate) < MINOR_AGE_THRESHOLD;
+export function isMinor(birthDate: string | null | undefined): boolean {
+  if (isUnknownBirthDate(birthDate)) return true;
+  return getPlayerAge(birthDate!) < MINOR_AGE_THRESHOLD;
 }
 
 export function hasPublicConsent(player: {
@@ -43,9 +44,9 @@ export function isDiscoverablePlayer(player: {
 export function getProtectedProfileTitle(
   firstName: string,
   lastName: string,
-  birthDate: string,
+  birthDate: string | null | undefined,
 ): string {
-  if (isMinor(birthDate)) {
+  if (isUnknownBirthDate(birthDate) || isMinor(birthDate)) {
     return `${firstName} ${lastName.charAt(0)}. · Ficha verificada`;
   }
 
@@ -54,11 +55,15 @@ export function getProtectedProfileTitle(
 
 export function getProtectedProfileDescription(
   firstName: string,
-  birthDate: string,
+  birthDate: string | null | undefined,
   positionLabel: string,
   academyName: string,
 ): string {
-  const age = getPlayerAge(birthDate);
+  if (isUnknownBirthDate(birthDate)) {
+    return `${firstName}, ${positionLabel.toLowerCase()} de ${academyName}. Ficha verificada en MiFicha.`;
+  }
+
+  const age = getPlayerAge(birthDate!);
 
   if (isMinor(birthDate)) {
     return `Ficha deportiva verificada · ${positionLabel} · categoría ${age} años · ${academyName}.`;

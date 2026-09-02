@@ -252,7 +252,7 @@ export function PlantelContent() {
             </p>
             <ol className="mt-3 list-decimal space-y-2 pl-5 text-sm text-slate-600">
               <li>Descarga la plantilla Excel (incluye columnas opcionales de tutor).</li>
-              <li>Importa todo el roster (ideal al inicio de temporada).</li>
+              <li>Importa todo el roster (ideal al inicio de temporada). La fecha de nacimiento puede ir después.</li>
               <li>Filtra por generación o Sub-X y completa foto, perfil visual y consentimiento.</li>
               <li>Registra contacto del tutor y sube video highlight desde el jugador.</li>
             </ol>
@@ -410,7 +410,9 @@ export function PlantelContent() {
                         <PlayerCategoryBadge birthDate={player.birth_date} compact />
                       </td>
                       <td className="px-4 py-4 text-slate-600 sm:px-6">
-                        {calculateAge(player.birth_date)} años
+                        {calculateAge(player.birth_date) != null
+                          ? `${calculateAge(player.birth_date)} años`
+                          : "—"}
                       </td>
                       <td className="px-4 py-4 sm:px-6">
                         <PositionBadge position={player.position} />

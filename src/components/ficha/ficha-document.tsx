@@ -132,7 +132,8 @@ export function FichaDocument({
               {model.fullName}
             </h1>
             <p className="mt-1 text-sm text-mf-text-secondary">
-              {model.age} años · {model.categoryLabel}
+              {model.age != null ? `${model.age} años · ` : ""}
+              {model.categoryLabel}
             </p>
             <p className="mt-0.5 text-sm text-mf-text-secondary">
               {model.positionLabel}

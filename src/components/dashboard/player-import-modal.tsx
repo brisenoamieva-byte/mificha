@@ -121,8 +121,8 @@ export function PlayerImportModal({
                   {loading ? "Leyendo archivo..." : "Selecciona Excel o CSV"}
                 </p>
                 <p className="mt-1 text-xs text-slate-500">
-                  Columnas: nombre, apellido, fecha nacimiento, posición, pierna
-                  (opcional: número, estatura, peso)
+                  Columnas: nombre, apellido, posición, pierna. Fecha de nacimiento
+                  recomendada (opcional: número, estatura, peso, tutor).
                 </p>
               </div>
               <span className="rounded-lg bg-white px-4 py-2 text-sm font-medium text-[#1B4F8C] ring-1 ring-slate-200">
@@ -169,6 +169,15 @@ export function PlayerImportModal({
                   </p>
                 </div>
               </div>
+
+              {preview.missingBirthDateCount > 0 ? (
+                <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+                  {preview.missingBirthDateCount} jugador
+                  {preview.missingBirthDateCount === 1 ? "" : "es"} sin fecha de
+                  nacimiento. Se importan igual; la categoría Sub/Gen queda pendiente
+                  hasta completar el dato en el perfil.
+                </div>
+              ) : null}
 
               {preview.valid.length > 0 ? (
                 <div>
