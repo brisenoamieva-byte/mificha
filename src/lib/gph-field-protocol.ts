@@ -898,12 +898,54 @@ export const GPH_PHYSICAL_TESTS = [
     indicatorId: "fuerza_estabilidad" as const,
   },
   {
+    id: "sprint_5m",
+    label: "Sprint 5 m",
+    protocol: "2 intentos. Salida fija; cronometrar 5 m. Mejor marca; 60 s de recuperación.",
+    unit: "s",
+    attempts: 2,
+    desarrolloOnly: false,
+    group: "sprint" as const,
+    indicatorId: "velocidad" as const,
+  },
+  {
+    id: "sprint_10m",
+    label: "Sprint 10 m",
+    protocol: "2 intentos. Salida fija; cronometrar 10 m. Mejor marca; 60 s de recuperación.",
+    unit: "s",
+    attempts: 2,
+    desarrolloOnly: false,
+    group: "sprint" as const,
+    indicatorId: "velocidad" as const,
+  },
+  {
+    id: "sprint_20m",
+    label: "Sprint 20 m",
+    protocol: "2 intentos. Salida fija; cronometrar 20 m. Mejor marca; 60 s de recuperación.",
+    unit: "s",
+    attempts: 2,
+    desarrolloOnly: false,
+    group: "sprint" as const,
+    indicatorId: "velocidad" as const,
+  },
+  {
+    id: "sprint_30m",
+    label: "Sprint 30 m",
+    protocol: "2 intentos. Salida fija; cronometrar 30 m. Mejor marca; 60 s de recuperación.",
+    unit: "s",
+    attempts: 2,
+    desarrolloOnly: false,
+    group: "sprint" as const,
+    indicatorId: "velocidad" as const,
+  },
+  {
+    /** Capturas antiguas con Sprint 10/20 combinado. No se ofrece en formularios nuevos. */
     id: "sprint",
     label: "Sprint 10 / 20 m",
     protocol: "2 × 10 m y 2 × 20 m. Mejor marca; 60 s de recuperación.",
     unit: "s",
     attempts: 4,
     desarrolloOnly: false,
+    legacy: true,
     indicatorId: "velocidad" as const,
   },
   {
@@ -961,7 +1003,7 @@ export const GPH_ROTATION_PORTERO = [
 
 export const GPH_WEEK_360 = [
   { day: 1, title: "Técnica base", tests: "Dominio, conducción, pase, recepción, blocaje.", deliverable: "Resultados técnicos crudos." },
-  { day: 2, title: "Físico y funcional", tests: "Velocidad, salto, equilibrio, movilidad y fisioterapia.", deliverable: "Perfil físico y alertas." },
+  { day: 2, title: "Físico y funcional", tests: "Sprint 5/10/20/30 m, salto, equilibrio, movilidad y fisioterapia.", deliverable: "Perfil físico y alertas." },
   { day: 3, title: "Decisión y mental", tests: "Duelo, juego aplicado, reacción al error y concentración.", deliverable: "Conductas observadas." },
   { day: 4, title: "Aplicación y cierre", tests: "Tiro, golpeo, distribución, competencia y nutrición.", deliverable: "3–5 prioridades y plan." },
 ] as const;

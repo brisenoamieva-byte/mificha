@@ -101,7 +101,9 @@ export function FieldSessionForm({ academyId, module, session, onChange }: Field
   const tests = testsForBattery(module, session.protocolStage, session.sessionType);
   const rotation = module === "portero" ? GPH_ROTATION_PORTERO : GPH_ROTATION_CAMPO;
   const physicalTests = GPH_PHYSICAL_TESTS.filter(
-    (item) => !item.desarrolloOnly || session.protocolStage === "desarrollo",
+    (item) =>
+      !("legacy" in item && item.legacy) &&
+      (!item.desarrolloOnly || session.protocolStage === "desarrollo"),
   );
   const progress = fieldSessionProgress(session, module);
   const closing = session.closing ?? emptyClosing();
@@ -532,7 +534,12 @@ export function FieldSessionForm({ academyId, module, session, onChange }: Field
             mareo o restricción conocida. {GPH_PERCENTILE_NOTE}
           </p>
           <div className="mt-3 space-y-4">
-            {physicalTests.map((test) => {
+            {physicalTests.map((test, index) => {
+              const prev = physicalTests[index - 1];
+              const showSprintHeader =
+                "group" in test &&
+                test.group === "sprint" &&
+                (!prev || !("group" in prev) || prev.group !== "sprint");
               const capture: GphPhysicalCapture = session.physical[test.id] ?? {
                 attempts: Array.from({ length: test.attempts }, () => null),
                 note: "",
@@ -547,6 +554,17 @@ export function FieldSessionForm({ academyId, module, session, onChange }: Field
                     ];
               return (
                 <div key={test.id}>
+                  {showSprintHeader ? (
+                    <div className="mb-3 rounded-lg bg-mf-canvas px-3 py-2">
+                      <p className="text-xs font-semibold uppercase tracking-[0.12em] text-mf-text">
+                        Sprint
+                      </p>
+                      <p className="mt-0.5 text-[11px] text-mf-text-muted">
+                        Pruebas 5, 10, 20 y 30 m. Dos intentos por distancia; conservar el mejor.
+                        Recuperación ~60 s entre intentos.
+                      </p>
+                    </div>
+                  ) : null}
                   <p className="text-xs font-medium text-mf-text">{test.label}</p>
                   <p className="text-[11px] text-mf-text-muted">{test.protocol}</p>
                   <div className="mt-1.5 flex flex-wrap gap-2">
