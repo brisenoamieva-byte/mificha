@@ -9,6 +9,7 @@ import { NoAcademyState } from "@/components/dashboard/no-academy-state";
 import { Skeleton } from "@/components/dashboard/skeletons";
 import { toast } from "@/components/ui/toast";
 import { diagnosisAuthedFetch } from "@/lib/player-diagnosis-client";
+import { isFieldSessionDraft } from "@/lib/gph-field-protocol";
 import type { PlayerDiagnosisRecord, DiagnosisAcademySnapshot, DiagnosisPlayerSnapshot } from "@/lib/player-diagnosis";
 
 export function DiagnosisViewContent({ diagnosisId }: { diagnosisId: string }) {
@@ -77,62 +78,84 @@ export function DiagnosisViewContent({ diagnosisId }: { diagnosisId: string }) {
           <ArrowLeft className="h-4 w-4" />
           Diagnósticos
         </Link>
-        <button
-          type="button"
-          disabled={coachBusy}
-          onClick={() => {
-            setCoachBusy(true);
-            void diagnosisAuthedFetch(`/fut/api/diagnoses/${diagnosisId}/coach-brief`, {
-              method: "POST",
-              body: JSON.stringify({ academy_id: diagnosis.academy_id }),
-            })
-              .then((payload) => {
-                setDiagnosis(payload.diagnosis as PlayerDiagnosisRecord);
-                if (payload.ai_fallback) {
-                  toast.success("La IA no respondió; se aplicó el motor GPH.");
-                } else {
-                  toast.success(
-                    payload.source === "ai"
-                      ? "Lectura de entrenador actualizada con IA."
-                      : "Lectura GPH actualizada.",
-                  );
-                }
+        <div className="flex flex-wrap gap-2">
+          <Link
+            href={`/fut/dashboard/diagnostico/${diagnosisId}/editar`}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-mf-border bg-white px-3 py-2 text-xs font-semibold text-mf-text hover:bg-mf-canvas"
+          >
+            {isFieldSessionDraft(diagnosis.field_session)
+              ? "Continuar captura"
+              : "Editar captura"}
+          </Link>
+          <button
+            type="button"
+            disabled={coachBusy || isFieldSessionDraft(diagnosis.field_session)}
+            onClick={() => {
+              setCoachBusy(true);
+              void diagnosisAuthedFetch(`/fut/api/diagnoses/${diagnosisId}/coach-brief`, {
+                method: "POST",
+                body: JSON.stringify({ academy_id: diagnosis.academy_id }),
               })
-              .catch((err: unknown) => {
-                toast.error(err instanceof Error ? err.message : "No se pudo generar.");
-              })
-              .finally(() => setCoachBusy(false));
-          }}
-          className="inline-flex items-center gap-1.5 rounded-lg bg-mf-brand-soft px-3 py-2 text-xs font-semibold text-mf-brand hover:bg-mf-brand hover:text-white disabled:opacity-50"
-        >
-          {coachBusy ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <Sparkles className="h-4 w-4" />
-          )}
-          {diagnosis.field_session.coachBrief ? "Regenerar lectura" : "Lectura de entrenador"}
-        </button>
+                .then((payload) => {
+                  setDiagnosis(payload.diagnosis as PlayerDiagnosisRecord);
+                  if (payload.ai_fallback) {
+                    toast.success("La IA no respondió; se aplicó el motor GPH.");
+                  } else {
+                    toast.success(
+                      payload.source === "ai"
+                        ? "Lectura de entrenador actualizada con IA."
+                        : "Lectura GPH actualizada.",
+                    );
+                  }
+                })
+                .catch((err: unknown) => {
+                  toast.error(err instanceof Error ? err.message : "No se pudo generar.");
+                })
+                .finally(() => setCoachBusy(false));
+            }}
+            className="inline-flex items-center gap-1.5 rounded-lg bg-mf-brand-soft px-3 py-2 text-xs font-semibold text-mf-brand hover:bg-mf-brand hover:text-white disabled:opacity-50"
+          >
+            {coachBusy ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Sparkles className="h-4 w-4" />
+            )}
+            {diagnosis.field_session.coachBrief ? "Regenerar lectura" : "Lectura de entrenador"}
+          </button>
+        </div>
       </div>
+
+      {isFieldSessionDraft(diagnosis.field_session) ? (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">
+          Borrador: todavía no es la ficha final. Continúa la captura cuando tengas más pruebas;
+          el link público no se entrega hasta generar la ficha.
+        </div>
+      ) : null}
+
       <DiagnosisReport
         diagnosis={diagnosis}
         player={player}
         academy={academySnap}
-        shareUrl={shareUrl}
-        onCreateShareLink={async () => {
-          const payload = await diagnosisAuthedFetch(
-            `/fut/api/diagnoses/${diagnosisId}/share`,
-            {
-              method: "POST",
-              body: JSON.stringify({ academy_id: diagnosis.academy_id }),
-            },
-          );
-          const url = typeof payload.share_url === "string" ? payload.share_url : null;
-          if (url) {
-            sessionStorage.setItem(`diagnosis-share:${diagnosisId}`, url);
-            setShareUrl(url);
-          }
-          return url;
-        }}
+        shareUrl={isFieldSessionDraft(diagnosis.field_session) ? null : shareUrl}
+        onCreateShareLink={
+          isFieldSessionDraft(diagnosis.field_session)
+            ? undefined
+            : async () => {
+                const payload = await diagnosisAuthedFetch(
+                  `/fut/api/diagnoses/${diagnosisId}/share`,
+                  {
+                    method: "POST",
+                    body: JSON.stringify({ academy_id: diagnosis.academy_id }),
+                  },
+                );
+                const url = typeof payload.share_url === "string" ? payload.share_url : null;
+                if (url) {
+                  sessionStorage.setItem(`diagnosis-share:${diagnosisId}`, url);
+                  setShareUrl(url);
+                }
+                return url;
+              }
+        }
       />
     </div>
   );

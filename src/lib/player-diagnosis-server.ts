@@ -241,7 +241,7 @@ export async function createPlayerDiagnosis(
     (month) => !monthlyPlan[month]?.objective && !monthlyPlan[month]?.actions,
   );
 
-  if (!fieldSession.coachBrief) {
+  if (!fieldSession.coachBrief && fieldSession.status !== "draft") {
     try {
       const coach = await generateCoachBrief({
         firstName: player.first_name,
@@ -416,36 +416,81 @@ export async function updatePlayerDiagnosis(
   admin: SupabaseClient,
   academyId: string,
   diagnosisId: string,
-  patch: Partial<
-    Pick<
-      DiagnosisWriteInput,
-      | "program_priorities"
-      | "monthly_plan"
-      | "assignment_notes"
-      | "field_session"
-      | "assigned_stage"
-      | "assigned_group"
-    >
-  >,
+  patch: Partial<DiagnosisWriteInput>,
 ) {
   const current = await getDiagnosisForAcademy(admin, academyId, diagnosisId);
   if (!current) throw new Error("Diagnóstico no encontrado.");
 
+  const diagnosisModule = normalizeModule(
+    patch.module ?? current.module,
+    current.module,
+  );
+  const scores = patch.scores ?? current.scores;
+  const result = computeDiagnosisResult(scores, diagnosisModule);
+  const fieldSession = patch.field_session
+    ? parseFieldSession(patch.field_session)
+    : current.field_session;
+
   const payload: Record<string, unknown> = {
     updated_at: new Date().toISOString(),
   };
-  if (patch.program_priorities) payload.program_priorities = patch.program_priorities;
-  if (patch.monthly_plan) payload.monthly_plan = patch.monthly_plan;
-  if (patch.assignment_notes !== undefined) {
-    payload.assignment_notes = patch.assignment_notes?.trim() || null;
+
+  if (patch.kind !== undefined) payload.kind = normalizeKind(patch.kind);
+  if (patch.module !== undefined) payload.module = diagnosisModule;
+  if (patch.evaluated_at !== undefined) {
+    payload.evaluated_at = patch.evaluated_at || current.evaluated_at;
   }
-  if (patch.field_session) payload.field_session = parseFieldSession(patch.field_session);
+  if (patch.evaluator_name !== undefined) {
+    const name = patch.evaluator_name.trim();
+    if (!name) throw new Error("Escribe el nombre del evaluador.");
+    payload.evaluator_name = name;
+  }
+  if (patch.years_experience !== undefined) {
+    payload.years_experience = patch.years_experience ?? null;
+  }
+  if (patch.venue !== undefined) payload.venue = patch.venue?.trim() || null;
+  if (patch.session_days !== undefined) {
+    payload.session_days = patch.session_days?.trim() || null;
+  }
+  if (patch.sessions_per_week !== undefined) {
+    payload.sessions_per_week = patch.sessions_per_week ?? null;
+  }
+  if (patch.injuries !== undefined) payload.injuries = patch.injuries?.trim() || null;
+  if (patch.why_join !== undefined) payload.why_join = patch.why_join?.trim() || null;
+  if (patch.player_goal !== undefined) {
+    payload.player_goal = patch.player_goal?.trim() || null;
+  }
+  if (patch.family_goal !== undefined) {
+    payload.family_goal = patch.family_goal?.trim() || null;
+  }
+  if (patch.medical_notes !== undefined) {
+    payload.medical_notes = patch.medical_notes?.trim() || null;
+  }
+  if (patch.scores !== undefined) {
+    payload.scores = scores;
+    payload.domain_averages = result.domainAverages;
+    payload.global_score = result.globalScore;
+    payload.computed_stage = result.stage;
+  }
+  if (patch.notes !== undefined) payload.notes = patch.notes ?? {};
+  if (patch.flagged !== undefined) payload.flagged = patch.flagged ?? [];
   if (patch.assigned_stage !== undefined) {
-    payload.assigned_stage = normalizeStage(patch.assigned_stage);
+    payload.assigned_stage =
+      normalizeStage(patch.assigned_stage) ?? result.stage;
+  } else if (patch.scores !== undefined && !current.assigned_stage) {
+    payload.assigned_stage = result.stage;
   }
   if (patch.assigned_group !== undefined) {
     payload.assigned_group = patch.assigned_group?.trim() || null;
   }
+  if (patch.assignment_notes !== undefined) {
+    payload.assignment_notes = patch.assignment_notes?.trim() || null;
+  }
+  if (patch.program_priorities !== undefined) {
+    payload.program_priorities = patch.program_priorities;
+  }
+  if (patch.monthly_plan !== undefined) payload.monthly_plan = patch.monthly_plan;
+  if (patch.field_session !== undefined) payload.field_session = fieldSession;
 
   let { data, error } = await admin
     .from("player_diagnoses")

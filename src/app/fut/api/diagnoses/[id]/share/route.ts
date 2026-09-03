@@ -38,6 +38,13 @@ export async function POST(request: Request, context: RouteContext) {
     }
     await requireDiagnosisAccess(supabase, user, diagnosis.academy_id);
 
+    if (diagnosis.field_session.status === "draft") {
+      return NextResponse.json(
+        { error: "Termina y genera la ficha antes de compartir el link." },
+        { status: 400 },
+      );
+    }
+
     const shareToken = createDiagnosisShareToken();
     const { error } = await admin
       .from("player_diagnoses")

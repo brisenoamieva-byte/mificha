@@ -16,6 +16,7 @@ import {
   scoreTone,
   type PlayerDiagnosisRecord,
 } from "@/lib/player-diagnosis";
+import { isFieldSessionDraft } from "@/lib/gph-field-protocol";
 import { supabase } from "@/lib/supabase";
 import type { Player } from "@/types/database";
 import { cn } from "@/lib/utils";
@@ -207,9 +208,21 @@ export function DiagnosisList() {
                       </div>
                     </td>
                     <td className="px-4 py-3 text-mf-text-secondary">
-                      {latest
-                        ? `${DIAGNOSIS_KIND_LABELS[latest.kind]} · ${formatDiagnosisDate(latest.evaluated_at)}`
-                        : "Sin evaluar"}
+                      {latest ? (
+                        <span className="inline-flex flex-wrap items-center gap-1.5">
+                          <span>
+                            {DIAGNOSIS_KIND_LABELS[latest.kind]} ·{" "}
+                            {formatDiagnosisDate(latest.evaluated_at)}
+                          </span>
+                          {isFieldSessionDraft(latest.field_session) ? (
+                            <span className="rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-800">
+                              Borrador
+                            </span>
+                          ) : null}
+                        </span>
+                      ) : (
+                        "Sin evaluar"
+                      )}
                     </td>
                     <td className="px-4 py-3">
                       {latest?.global_score != null ? (
@@ -231,12 +244,21 @@ export function DiagnosisList() {
                     <td className="px-4 py-3 text-right">
                       <div className="flex justify-end gap-2">
                         {latest ? (
-                          <Link
-                            href={`/fut/dashboard/diagnostico/${latest.id}`}
-                            className="text-xs font-semibold text-mf-brand hover:underline"
-                          >
-                            Ver ficha
-                          </Link>
+                          isFieldSessionDraft(latest.field_session) ? (
+                            <Link
+                              href={`/fut/dashboard/diagnostico/${latest.id}/editar`}
+                              className="text-xs font-semibold text-mf-brand hover:underline"
+                            >
+                              Continuar
+                            </Link>
+                          ) : (
+                            <Link
+                              href={`/fut/dashboard/diagnostico/${latest.id}`}
+                              className="text-xs font-semibold text-mf-brand hover:underline"
+                            >
+                              Ver ficha
+                            </Link>
+                          )
                         ) : null}
                         <Link
                           href={`/fut/dashboard/diagnostico/nuevo?player=${player.id}${academyId ? `&academy=${encodeURIComponent(academyId)}` : ""}`}

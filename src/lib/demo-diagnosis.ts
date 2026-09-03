@@ -158,6 +158,7 @@ export function buildDemoDiagnosisReport(): {
       },
       field_session: {
         ...emptyFieldSession("desarrollo", "esencial"),
+        status: "ready",
         venueCode: "CJ",
         bibNumber: "9",
         currentClub: "Escuela Gallos",

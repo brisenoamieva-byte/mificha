@@ -16,7 +16,9 @@ import {
   scoresFromFieldSession,
   suggestPrioritiesFromField,
   GPH_VENUE_CODES,
+  isFieldSessionDraft,
   protocolStageFromAge,
+  type GphFieldSession,
 } from "@/lib/gph-field-protocol";
 import { diagnosisAuthedFetch } from "@/lib/player-diagnosis-client";
 import {
@@ -44,6 +46,7 @@ import {
   type DiagnosisPriorityItem,
   type DiagnosisScores,
   type DiagnosisStage,
+  type PlayerDiagnosisRecord,
 } from "@/lib/player-diagnosis";
 import type { DominantFoot, Player } from "@/types/database";
 import { dominantFootOptions, getDominantFootLabel, positionOptions } from "@/lib/player-utils";
@@ -53,10 +56,12 @@ interface DiagnosisFormProps {
   players: Player[];
   initialPlayerId?: string;
   academyId?: string;
+  /** Continuar un avance guardado (borrador o ficha). */
+  initialDiagnosis?: PlayerDiagnosisRecord;
   onPlayerCreated?: (player: Player) => void;
 }
 
-function fieldSessionForPlayer(player: Player | null) {
+function fieldSessionForPlayer(player: Player | null): GphFieldSession {
   const age = player?.birth_date ? calculateAge(player.birth_date) : null;
   return emptyFieldSession(protocolStageFromAge(age));
 }
@@ -65,48 +70,83 @@ export function DiagnosisForm({
   players,
   initialPlayerId,
   academyId,
+  initialDiagnosis,
   onPlayerCreated,
 }: DiagnosisFormProps) {
   const { academy, profile, isGphEvaluator } = useDashboard();
-  const targetAcademyId = academyId || academy?.id || "";
+  const targetAcademyId =
+    academyId || initialDiagnosis?.academy_id || academy?.id || "";
   const router = useRouter();
-  const [playerId, setPlayerId] = useState(initialPlayerId ?? players[0]?.id ?? "");
+  const [diagnosisId, setDiagnosisId] = useState(initialDiagnosis?.id ?? "");
+  const [playerId, setPlayerId] = useState(
+    initialDiagnosis?.player_id ?? initialPlayerId ?? players[0]?.id ?? "",
+  );
   const player = players.find((item) => item.id === playerId) ?? null;
   const diagnosisModule: DiagnosisModule = player
     ? moduleFromPosition(player.position)
     : "campo";
+  const editingLockedPlayer = Boolean(initialDiagnosis);
 
-  const [kind, setKind] = useState<DiagnosisKind>("inicial");
+  const [kind, setKind] = useState<DiagnosisKind>(initialDiagnosis?.kind ?? "inicial");
   const [evaluatedAt, setEvaluatedAt] = useState(
-    new Date().toISOString().slice(0, 10),
+    initialDiagnosis?.evaluated_at ?? new Date().toISOString().slice(0, 10),
   );
   const [evaluatorName, setEvaluatorName] = useState(
-    isGphEvaluator ? "Gustavo Reyes · GPH" : (profile?.full_name ?? ""),
+    initialDiagnosis?.evaluator_name ||
+      (isGphEvaluator ? "Gustavo Reyes · GPH" : (profile?.full_name ?? "")),
   );
-  const [sessionDays, setSessionDays] = useState("");
-  const [yearsExperience, setYearsExperience] = useState("");
-  const [sessionsPerWeek, setSessionsPerWeek] = useState("");
-  const [injuries, setInjuries] = useState("");
-  const [playerGoal, setPlayerGoal] = useState("");
-  const [familyGoal, setFamilyGoal] = useState("");
-  const [whyJoin, setWhyJoin] = useState("");
-  const [medicalNotes, setMedicalNotes] = useState("");
-  const [assignedStage, setAssignedStage] = useState<DiagnosisStage | "">("");
-  const [assignedGroup, setAssignedGroup] = useState("");
+  const [sessionDays, setSessionDays] = useState(initialDiagnosis?.session_days ?? "");
+  const [yearsExperience, setYearsExperience] = useState(
+    initialDiagnosis?.years_experience != null
+      ? String(initialDiagnosis.years_experience)
+      : "",
+  );
+  const [sessionsPerWeek, setSessionsPerWeek] = useState(
+    initialDiagnosis?.sessions_per_week != null
+      ? String(initialDiagnosis.sessions_per_week)
+      : "",
+  );
+  const [injuries, setInjuries] = useState(initialDiagnosis?.injuries ?? "");
+  const [playerGoal, setPlayerGoal] = useState(initialDiagnosis?.player_goal ?? "");
+  const [familyGoal, setFamilyGoal] = useState(initialDiagnosis?.family_goal ?? "");
+  const [whyJoin, setWhyJoin] = useState(initialDiagnosis?.why_join ?? "");
+  const [medicalNotes, setMedicalNotes] = useState(initialDiagnosis?.medical_notes ?? "");
+  const [assignedStage, setAssignedStage] = useState<DiagnosisStage | "">(
+    initialDiagnosis?.assigned_stage ?? "",
+  );
+  const [assignedGroup, setAssignedGroup] = useState(
+    initialDiagnosis?.assigned_group ?? "",
+  );
   const [contextOpen, setContextOpen] = useState(false);
   const [planOpen, setPlanOpen] = useState(false);
-  const [scores, setScores] = useState<DiagnosisScores>({});
-  const [notes, setNotes] = useState<DiagnosisNotes>({});
-  const [flagged, setFlagged] = useState<string[]>([]);
+  const [scores, setScores] = useState<DiagnosisScores>(initialDiagnosis?.scores ?? {});
+  const [notes, setNotes] = useState<DiagnosisNotes>(initialDiagnosis?.notes ?? {});
+  const [flagged, setFlagged] = useState<string[]>(initialDiagnosis?.flagged ?? []);
   const [openNoteId, setOpenNoteId] = useState<string | null>(null);
-  const [priorities, setPriorities] = useState<DiagnosisPriorityItem[]>([]);
-  const [monthlyPlan, setMonthlyPlan] = useState<DiagnosisMonthlyPlan>(emptyMonthlyPlan());
-  const [fieldSession, setFieldSession] = useState(() =>
-    fieldSessionForPlayer(players.find((item) => item.id === (initialPlayerId ?? players[0]?.id)) ?? null),
+  const [priorities, setPriorities] = useState<DiagnosisPriorityItem[]>(
+    initialDiagnosis?.program_priorities ?? [],
+  );
+  const [monthlyPlan, setMonthlyPlan] = useState<DiagnosisMonthlyPlan>(
+    initialDiagnosis?.monthly_plan ?? emptyMonthlyPlan(),
+  );
+  const [fieldSession, setFieldSession] = useState<GphFieldSession>(() =>
+    initialDiagnosis?.field_session
+      ? initialDiagnosis.field_session
+      : fieldSessionForPlayer(
+          players.find(
+            (item) =>
+              item.id ===
+              (initialDiagnosis?.player_id ?? initialPlayerId ?? players[0]?.id),
+          ) ?? null,
+        ),
   );
   const [adjustedIds, setAdjustedIds] = useState<string[]>([]);
-  const [coachBrief, setCoachBrief] = useState<DiagnosisCoachBrief | null>(null);
-  const [coachNotes, setCoachNotes] = useState("");
+  const [coachBrief, setCoachBrief] = useState<DiagnosisCoachBrief | null>(
+    initialDiagnosis?.field_session.coachBrief ?? null,
+  );
+  const [coachNotes, setCoachNotes] = useState(
+    initialDiagnosis?.assignment_notes ?? "",
+  );
   const [coachBusy, setCoachBusy] = useState(false);
   const [aiReady, setAiReady] = useState(false);
   const [aiFallback, setAiFallback] = useState(false);
@@ -254,7 +294,7 @@ export function DiagnosisForm({
     }
   }
 
-  async function save() {
+  async function save(mode: "draft" | "ready") {
     if (!targetAcademyId || !player) return;
     const liveScores = { ...scoresFromFieldSession(fieldSession, diagnosisModule), ...scores };
     const live = computeDiagnosisResult(liveScores, diagnosisModule);
@@ -262,18 +302,21 @@ export function DiagnosisForm({
       toast.error("Escribe el nombre del evaluador.");
       return;
     }
-    const stations = fieldSessionProgress(fieldSession, diagnosisModule);
-    if (stations.filled < stations.total) {
-      toast.error(
-        `Faltan ${stations.total - stations.filled} pruebas de estación: ${stations.missing.map((test) => test.label).join(", ")}.`,
-      );
-      return;
-    }
-    if (!live.complete) {
-      toast.error(
-        `Faltan ${live.requiredCount - live.scoredCount} indicadores por valorar (físico, mental y lo que no midió la estación).`,
-      );
-      return;
+
+    if (mode === "ready") {
+      const stations = fieldSessionProgress(fieldSession, diagnosisModule);
+      if (stations.filled < stations.total) {
+        toast.error(
+          `Faltan ${stations.total - stations.filled} pruebas de estación: ${stations.missing.map((test) => test.label).join(", ")}.`,
+        );
+        return;
+      }
+      if (!live.complete) {
+        toast.error(
+          `Faltan ${live.requiredCount - live.scoredCount} indicadores por valorar (físico, mental y lo que no midió la estación).`,
+        );
+        return;
+      }
     }
 
     const mergedFlags = [
@@ -288,9 +331,13 @@ export function DiagnosisForm({
       let nextPriorities = priorities;
       let nextPlan = monthlyPlan;
       let nextNotes = coachNotes;
-      let nextSession = { ...fieldSession, coachBrief: brief };
+      let nextSession: GphFieldSession = {
+        ...fieldSession,
+        status: mode,
+        coachBrief: brief,
+      };
 
-      if (!brief) {
+      if (mode === "ready" && !brief) {
         const generated = await requestCoachBrief();
         if (generated) {
           const applied = applyCoachPayload(generated);
@@ -298,53 +345,70 @@ export function DiagnosisForm({
           if (applied.priorities) nextPriorities = applied.priorities;
           if (applied.monthlyPlan) nextPlan = applied.monthlyPlan;
           if (applied.assignmentNotes) nextNotes = applied.assignmentNotes;
-          nextSession = { ...fieldSession, coachBrief: brief };
+          nextSession = { ...fieldSession, status: mode, coachBrief: brief };
         }
       }
 
-      const payload = await diagnosisAuthedFetch("/fut/api/diagnoses", {
-        method: "POST",
-        body: JSON.stringify({
-          academy_id: targetAcademyId,
-          player_id: player.id,
-          kind,
-          module: diagnosisModule,
-          evaluated_at: evaluatedAt,
-          evaluator_name: evaluatorName,
-          venue: venueLabel,
-          session_days: sessionDays || null,
-          years_experience:
-            yearsExperience.trim() === "" || !Number.isFinite(Number(yearsExperience))
-              ? null
-              : Number(yearsExperience),
-          sessions_per_week:
-            sessionsPerWeek.trim() === "" || !Number.isFinite(Number(sessionsPerWeek))
-              ? null
-              : Number(sessionsPerWeek),
-          injuries: injuries || null,
-          why_join: whyJoin || null,
-          player_goal: playerGoal || null,
-          family_goal: familyGoal || null,
-          medical_notes: medicalNotes || null,
-          scores: liveScores,
-          notes,
-          flagged: mergedFlags,
-          assigned_stage: assignedStage || live.stage,
-          assigned_group: assignedGroup || null,
-          program_priorities: nextPriorities,
-          monthly_plan: nextPlan,
-          assignment_notes: nextNotes || null,
-          field_session: nextSession,
-        }),
-      });
+      const body = {
+        academy_id: targetAcademyId,
+        player_id: player.id,
+        kind,
+        module: diagnosisModule,
+        evaluated_at: evaluatedAt,
+        evaluator_name: evaluatorName,
+        venue: venueLabel,
+        session_days: sessionDays || null,
+        years_experience:
+          yearsExperience.trim() === "" || !Number.isFinite(Number(yearsExperience))
+            ? null
+            : Number(yearsExperience),
+        sessions_per_week:
+          sessionsPerWeek.trim() === "" || !Number.isFinite(Number(sessionsPerWeek))
+            ? null
+            : Number(sessionsPerWeek),
+        injuries: injuries || null,
+        why_join: whyJoin || null,
+        player_goal: playerGoal || null,
+        family_goal: familyGoal || null,
+        medical_notes: medicalNotes || null,
+        scores: liveScores,
+        notes,
+        flagged: mergedFlags,
+        assigned_stage: assignedStage || live.stage,
+        assigned_group: assignedGroup || null,
+        program_priorities: nextPriorities,
+        monthly_plan: nextPlan,
+        assignment_notes: nextNotes || null,
+        field_session: nextSession,
+      };
+
+      const payload = diagnosisId
+        ? await diagnosisAuthedFetch(`/fut/api/diagnoses/${diagnosisId}`, {
+            method: "PUT",
+            body: JSON.stringify(body),
+          })
+        : await diagnosisAuthedFetch("/fut/api/diagnoses", {
+            method: "POST",
+            body: JSON.stringify(body),
+          });
 
       const diagnosis = payload.diagnosis as { id: string };
+      setDiagnosisId(diagnosis.id);
+      setFieldSession(nextSession);
       const shareUrl = typeof payload.share_url === "string" ? payload.share_url : "";
       if (shareUrl) {
         sessionStorage.setItem(`diagnosis-share:${diagnosis.id}`, shareUrl);
       }
-      toast.success("Ficha lista: dato, 1–5, lectura y plan.");
-      router.push(`/fut/dashboard/diagnostico/${diagnosis.id}`);
+
+      if (mode === "draft") {
+        toast.success(
+          "Avance guardado. Puedes cerrar y continuar después desde Diagnósticos.",
+        );
+        router.push(`/fut/dashboard/diagnostico/${diagnosis.id}`);
+      } else {
+        toast.success("Ficha lista: dato, 1–5, lectura y plan.");
+        router.push(`/fut/dashboard/diagnostico/${diagnosis.id}`);
+      }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "No se pudo guardar.");
     } finally {
@@ -472,6 +536,19 @@ export function DiagnosisForm({
 
   return (
     <div className="space-y-6">
+      {diagnosisId ? (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">
+          {isFieldSessionDraft(fieldSession)
+            ? "Avance en captura. Guarda cuando quieras y continúa después; Generar ficha cierra el diagnóstico completo."
+            : "Editando una ficha ya generada. Guardar avance la marca otra vez como borrador; Generar ficha la vuelve a cerrar."}
+        </div>
+      ) : (
+        <p className="text-sm text-mf-text-secondary">
+          Si no terminas hoy: <span className="font-semibold text-mf-text">Guardar avance</span>{" "}
+          y sigue en otra sesión. No hace falta apuntar todo en Excel.
+        </p>
+      )}
+
       <ol className="grid gap-2 sm:grid-cols-3">
         <li className="rounded-xl border border-mf-border bg-white px-3 py-2.5">
           <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-mf-brand">1 · Cancha</p>
@@ -489,7 +566,7 @@ export function DiagnosisForm({
         <li className="rounded-xl border border-mf-border bg-white px-3 py-2.5">
           <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-mf-brand">3 · Ficha</p>
           <p className="mt-1 text-xs leading-5 text-mf-text-secondary">
-            Un clic arma lectura, prioridades y ruta, y publica la ficha.
+            Guarda avance a medias, o genera la ficha completa con lectura y plan.
           </p>
         </li>
       </ol>
@@ -509,6 +586,9 @@ export function DiagnosisForm({
             <p className="text-[11px] text-mf-text-muted">
               Estaciones {stationProgress.filled}/{stationProgress.total} · Cierre {result.scoredCount}/
               {result.requiredCount}
+              {isFieldSessionDraft(fieldSession) || !diagnosisId
+                ? " · Puedes guardar avance sin terminar"
+                : ""}
             </p>
           </div>
           <p className="text-xs text-mf-text-muted">
@@ -531,7 +611,16 @@ export function DiagnosisForm({
             <button
               type="button"
               disabled={saving}
-              onClick={() => void save()}
+              onClick={() => void save("draft")}
+              className="rounded-lg border border-mf-border bg-white px-4 py-2.5 text-sm font-semibold text-mf-text hover:bg-mf-canvas disabled:opacity-50"
+            >
+              {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+              Guardar avance
+            </button>
+            <button
+              type="button"
+              disabled={saving}
+              onClick={() => void save("ready")}
               className="mf-btn-primary"
             >
               {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
@@ -546,6 +635,7 @@ export function DiagnosisForm({
           Jugador
           <select
             value={playerId}
+            disabled={editingLockedPlayer}
             onChange={(e) => {
               const nextId = e.target.value;
               const nextPlayer = players.find((item) => item.id === nextId) ?? null;
@@ -563,7 +653,7 @@ export function DiagnosisForm({
               setAssignedStage("");
               setAssignedGroup("");
             }}
-            className="mf-input mt-1"
+            className="mf-input mt-1 disabled:opacity-70"
           >
             {players.map((item) => (
               <option key={item.id} value={item.id}>

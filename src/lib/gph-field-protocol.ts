@@ -109,6 +109,8 @@ export const GPH_PERCENTILE_NOTE =
 export interface GphFieldSession {
   protocolStage: GphProtocolStage;
   sessionType: GphSessionType;
+  /** draft = avance parcial; ready = ficha cerrada para entregar. */
+  status: "draft" | "ready";
   surface: string;
   weather: string;
   ballSize: string;
@@ -1068,6 +1070,7 @@ export function emptyFieldSession(
   return {
     protocolStage: stage,
     sessionType,
+    status: "draft",
     surface: "",
     weather: "",
     ballSize: "",
@@ -1087,6 +1090,10 @@ export function emptyFieldSession(
     evidence: [],
     coachBrief: null,
   };
+}
+
+export function isFieldSessionDraft(session: GphFieldSession | null | undefined) {
+  return session?.status === "draft";
 }
 
 export function testNeedsBilateral(test: GphStationTest) {
@@ -1347,9 +1354,11 @@ export function parseFieldSession(value: unknown): GphFieldSession {
   }
   const tri = (raw: unknown) => (raw === true ? true : raw === false ? false : null);
   const closingRaw = isRecord(value.closing) ? value.closing : {};
+  const status = value.status === "draft" ? "draft" : "ready";
   return {
     protocolStage: stage,
     sessionType,
+    status,
     surface: typeof value.surface === "string" ? value.surface : "",
     weather: typeof value.weather === "string" ? value.weather : "",
     ballSize: typeof value.ballSize === "string" ? value.ballSize : "",

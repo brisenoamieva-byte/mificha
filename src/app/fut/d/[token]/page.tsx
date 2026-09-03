@@ -8,6 +8,7 @@ import {
 } from "@/lib/player-diagnosis-server";
 import { createSupabaseAdminClient } from "@/lib/supabase-admin";
 import { DIAGNOSIS_KIND_LABELS } from "@/lib/player-diagnosis";
+import { isFieldSessionDraft } from "@/lib/gph-field-protocol";
 import { diagnosisWhatsAppHref } from "@/lib/gph-alliance";
 
 interface PageProps {
@@ -78,7 +79,7 @@ export default async function PublicDiagnosisPage({ params }: PageProps) {
 
   const admin = createSupabaseAdminClient();
   const diagnosis = await findDiagnosisByShareToken(admin, token);
-  if (!diagnosis) notFound();
+  if (!diagnosis || isFieldSessionDraft(diagnosis.field_session)) notFound();
   const bundle = await loadDiagnosisReportBundle(admin, diagnosis);
   if (!bundle) notFound();
 
