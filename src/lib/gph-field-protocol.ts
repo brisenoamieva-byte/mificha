@@ -60,6 +60,10 @@ export interface GphTestCapture {
   errors: number | null;
   leftHits: number | null;
   rightHits: number | null;
+  /** Aciertos de pase a 5 / 10 / 20 m (Pase de precisión). */
+  hits5m: number | null;
+  hits10m: number | null;
+  hits20m: number | null;
   radarKmh: number | null;
   score: number | null;
   relevance: 1 | 2 | 3;
@@ -204,9 +208,10 @@ export const GPH_STATION_TESTS: readonly GphStationTest[] = [
     conversion: "accuracy",
     attempts: 10,
     maxPoints: 10,
-    setup: "Puerta de 1.5 m a 6 m; línea de golpeo.",
-    execution: "10 pases: 5 con cada pie. Balón detenido.",
-    record: "Aciertos totales; aciertos por pie; porcentaje bilateral.",
+    setup: "Puerta de 1.5 m; líneas de golpeo a 5 m, 10 m y 20 m.",
+    execution:
+      "En cada distancia: 10 pases (5 con cada pie), balón detenido. Registrar aciertos a 5, 10 y 20 m.",
+    record: "Aciertos a 5 m, 10 m y 20 m; aciertos por pie; porcentaje bilateral.",
     indicatorId: "pase",
     relevanceDefault: 3,
   }),
@@ -377,9 +382,10 @@ export const GPH_STATION_TESTS: readonly GphStationTest[] = [
     conversion: "accuracy",
     attempts: 12,
     maxPoints: 12,
-    setup: "Puerta de 1 m a 10 m.",
-    execution: "12 pases: 6 por pie; balón detenido.",
-    record: "Aciertos; % por pie; diferencia bilateral.",
+    setup: "Puerta de 1 m; líneas de golpeo a 5 m, 10 m y 20 m.",
+    execution:
+      "En cada distancia: 12 pases (6 por pie), balón detenido. Registrar aciertos a 5, 10 y 20 m.",
+    record: "Aciertos a 5 m, 10 m y 20 m; % por pie; diferencia bilateral.",
     indicatorId: "pase",
     relevanceDefault: 3,
   }),
@@ -1055,6 +1061,9 @@ export function emptyTestCapture(test: GphStationTest): GphTestCapture {
     errors: null,
     leftHits: null,
     rightHits: null,
+    hits5m: null,
+    hits10m: null,
+    hits20m: null,
     radarKmh: null,
     score: null,
     relevance: test.relevanceDefault,
@@ -1108,6 +1117,19 @@ export function testNeedsBilateral(test: GphStationTest) {
 
 export function testNeedsRadar(test: GphStationTest) {
   return /km\/h|radar/i.test(`${test.unit} ${test.execution} ${test.record}`);
+}
+
+/** Pase de precisión: captura aciertos por distancia 5 / 10 / 20 m. */
+export function testNeedsPassDistances(test: GphStationTest) {
+  return test.id === "ini_c_pase" || test.id === "des_c_pase";
+}
+
+export function passDistanceHitsTotal(capture: GphTestCapture) {
+  const values = [capture.hits5m, capture.hits10m, capture.hits20m].filter(
+    (value): value is number => value != null && Number.isFinite(value),
+  );
+  if (values.length === 0) return null;
+  return values.reduce((sum, value) => sum + value, 0);
 }
 
 export function weakerFootPercent(left: number | null, right: number | null) {
@@ -1165,6 +1187,15 @@ export function derivedPercent(test: GphStationTest, capture: GphTestCapture) {
     return (capture.hits / capture.opportunities) * 100;
   }
   if (test.kind === "accuracy" || test.kind === "points") {
+    const distanceTotal = passDistanceHitsTotal(capture);
+    const distanceCount = [capture.hits5m, capture.hits10m, capture.hits20m].filter(
+      (value) => value != null && Number.isFinite(value),
+    ).length;
+    if (distanceTotal != null && distanceCount > 0) {
+      const maxPerDistance = capture.opportunities ?? test.maxPoints ?? test.attempts;
+      if (!maxPerDistance) return null;
+      return (distanceTotal / (distanceCount * maxPerDistance)) * 100;
+    }
     const values = numericAttempts(capture);
     const total =
       capture.hits != null
@@ -1203,6 +1234,9 @@ export function isFieldSessionPopulated(session: GphFieldSession | null | undefi
     return (
       numericAttempts(capture).length > 0 ||
       capture.hits != null ||
+      capture.hits5m != null ||
+      capture.hits10m != null ||
+      capture.hits20m != null ||
       capture.score != null
     );
   });
@@ -1247,9 +1281,15 @@ export function isTestCaptureComplete(test: GphStationTest, capture: GphTestCapt
   if (!capture) return false;
   const score = capture.score ?? suggestedScore(test, capture);
   if (isRatioKind(test.kind)) {
-    const hits = capture.hits;
     const max = capture.opportunities ?? test.maxPoints;
-    if (hits == null || max == null || max <= 0) return false;
+    if (max == null || max <= 0) return false;
+    if (testNeedsPassDistances(test)) {
+      const hasDistances =
+        capture.hits5m != null && capture.hits10m != null && capture.hits20m != null;
+      if (!hasDistances && capture.hits == null) return false;
+    } else if (capture.hits == null) {
+      return false;
+    }
   } else if (numericAttempts(capture).length === 0) {
     return false;
   }
@@ -1271,13 +1311,34 @@ export function formatTestRaw(test: GphStationTest, capture: GphTestCapture | un
   if (isRatioKind(test.kind)) {
     const hits = capture.hits;
     const max = capture.opportunities ?? test.maxPoints;
-    if (hits == null && max == null && capture.errors == null) {
+    const distanceTotal = passDistanceHitsTotal(capture);
+    const hasDistances =
+      capture.hits5m != null || capture.hits10m != null || capture.hits20m != null;
+    if (
+      hits == null &&
+      !hasDistances &&
+      max == null &&
+      capture.errors == null
+    ) {
       const values = numericAttempts(capture);
       if (values.length === 0) return "—";
     }
     const parts: string[] = [];
-    if (hits != null && max != null) parts.push(`${formatMeasure(hits, true)}/${formatMeasure(max, true)}`);
-    else if (hits != null) parts.push(formatMeasure(hits, true));
+    if (hasDistances) {
+      parts.push(
+        `5m ${capture.hits5m ?? "—"} · 10m ${capture.hits10m ?? "—"} · 20m ${capture.hits20m ?? "—"}`,
+      );
+      if (distanceTotal != null && max != null) {
+        const filled = [capture.hits5m, capture.hits10m, capture.hits20m].filter(
+          (value) => value != null,
+        ).length;
+        parts.push(`${formatMeasure(distanceTotal, true)}/${formatMeasure(filled * max, true)}`);
+      }
+    } else if (hits != null && max != null) {
+      parts.push(`${formatMeasure(hits, true)}/${formatMeasure(max, true)}`);
+    } else if (hits != null) {
+      parts.push(formatMeasure(hits, true));
+    }
     if (capture.errors != null) parts.push(`${formatMeasure(capture.errors, true)} err.`);
     const percent = derivedPercent(test, capture);
     if (percent != null) parts.push(`${Math.round(percent)}%`);
@@ -1333,6 +1394,9 @@ export function parseFieldSession(value: unknown): GphFieldSession {
         errors: parseNum(raw.errors),
         leftHits: parseNum(raw.leftHits),
         rightHits: parseNum(raw.rightHits),
+        hits5m: parseNum(raw.hits5m),
+        hits10m: parseNum(raw.hits10m),
+        hits20m: parseNum(raw.hits20m),
         radarKmh: parseNum(raw.radarKmh),
         score: parseNum(raw.score),
         relevance: relevanceRaw === 1 || relevanceRaw === 3 ? relevanceRaw : 2,

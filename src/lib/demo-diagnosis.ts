@@ -44,12 +44,15 @@ const DEMO_SCORES: DiagnosisScores = {
 };
 
 function demoTest(
-  capture: Omit<GphTestCapture, "leftHits" | "rightHits" | "radarKmh"> &
-    Partial<Pick<GphTestCapture, "leftHits" | "rightHits" | "radarKmh">>,
+  capture: Omit<GphTestCapture, "leftHits" | "rightHits" | "radarKmh" | "hits5m" | "hits10m" | "hits20m"> &
+    Partial<Pick<GphTestCapture, "leftHits" | "rightHits" | "radarKmh" | "hits5m" | "hits10m" | "hits20m">>,
 ): GphTestCapture {
   return {
     leftHits: null,
     rightHits: null,
+    hits5m: null,
+    hits10m: null,
+    hits20m: null,
     radarKmh: null,
     ...capture,
   };
@@ -244,15 +247,18 @@ export function buildDemoDiagnosisReport(): {
           }),
           des_c_pase: demoTest({
             attempts: [],
-            hits: 7,
+            hits: 20,
             opportunities: 12,
             errors: null,
-            leftHits: 3,
-            rightHits: 4,
+            leftHits: 9,
+            rightHits: 11,
+            hits5m: 9,
+            hits10m: 7,
+            hits20m: 4,
             score: 3,
             relevance: 3,
             flagged: false,
-            note: "4/6 derecho · 3/6 izquierdo",
+            note: "5 m fuerte; cae a 20 m. 11/18 der · 9/18 izq",
           }),
           des_c_control: demoTest({
             attempts: [],

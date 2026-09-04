@@ -24,7 +24,9 @@ import {
   isRatioKind,
   isTestCaptureComplete,
   suggestedScore,
+  passDistanceHitsTotal,
   testNeedsBilateral,
+  testNeedsPassDistances,
   testNeedsRadar,
   testsForBattery,
   weakerFootPercent,
@@ -350,20 +352,71 @@ export function FieldSessionForm({ academyId, module, session, onChange }: Field
 
               {isRatioKind(test.kind) ? (
                 <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
-                  <MeasureField
-                    label={test.kind === "points" ? "Puntos" : "Aciertos"}
-                    value={capture.hits}
-                    integer
-                    max={test.maxPoints ? test.maxPoints * 2 : undefined}
-                    onChange={(hits) => patchTest(test, { ...capture, hits })}
-                  />
-                  <MeasureField
-                    label={test.kind === "points" ? "Máximo" : "Sobre"}
-                    value={capture.opportunities}
-                    integer
-                    min={1}
-                    onChange={(opportunities) => patchTest(test, { ...capture, opportunities })}
-                  />
+                  {testNeedsPassDistances(test) ? (
+                    <>
+                      <MeasureField
+                        label="Aciertos 5 m"
+                        value={capture.hits5m}
+                        integer
+                        max={test.maxPoints ?? undefined}
+                        onChange={(hits5m) => {
+                          const next = { ...capture, hits5m };
+                          next.hits = passDistanceHitsTotal(next);
+                          patchTest(test, next);
+                        }}
+                      />
+                      <MeasureField
+                        label="Aciertos 10 m"
+                        value={capture.hits10m}
+                        integer
+                        max={test.maxPoints ?? undefined}
+                        onChange={(hits10m) => {
+                          const next = { ...capture, hits10m };
+                          next.hits = passDistanceHitsTotal(next);
+                          patchTest(test, next);
+                        }}
+                      />
+                      <MeasureField
+                        label="Aciertos 20 m"
+                        value={capture.hits20m}
+                        integer
+                        max={test.maxPoints ?? undefined}
+                        onChange={(hits20m) => {
+                          const next = { ...capture, hits20m };
+                          next.hits = passDistanceHitsTotal(next);
+                          patchTest(test, next);
+                        }}
+                      />
+                      <MeasureField
+                        label="Sobre (por distancia)"
+                        value={capture.opportunities}
+                        integer
+                        min={1}
+                        onChange={(opportunities) =>
+                          patchTest(test, { ...capture, opportunities })
+                        }
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <MeasureField
+                        label={test.kind === "points" ? "Puntos" : "Aciertos"}
+                        value={capture.hits}
+                        integer
+                        max={test.maxPoints ? test.maxPoints * 2 : undefined}
+                        onChange={(hits) => patchTest(test, { ...capture, hits })}
+                      />
+                      <MeasureField
+                        label={test.kind === "points" ? "Máximo" : "Sobre"}
+                        value={capture.opportunities}
+                        integer
+                        min={1}
+                        onChange={(opportunities) =>
+                          patchTest(test, { ...capture, opportunities })
+                        }
+                      />
+                    </>
+                  )}
                   {test.kind === "ratio" ? (
                     <MeasureField
                       label="Errores"
