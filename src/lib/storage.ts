@@ -1,49 +1,60 @@
 import { supabase } from "@/lib/supabase";
 
+async function uploadViaApi(
+  academyId: string,
+  file: File,
+  kind: "photo" | "video" | "logo" | "diagnosis-photo" | "diagnosis-video",
+) {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  if (!session?.access_token) {
+    throw new Error("Inicia sesión para subir archivos.");
+  }
+
+  const form = new FormData();
+  form.append("file", file);
+  form.append("academy_id", academyId);
+  form.append("kind", kind);
+
+  const response = await fetch("/fut/api/media/upload", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${session.access_token}`,
+    },
+    body: form,
+  });
+
+  const payload = (await response.json().catch(() => ({}))) as {
+    error?: string;
+    url?: string;
+    previewUrl?: string;
+    kind?: "photo" | "video";
+  };
+
+  if (!response.ok || !payload.url) {
+    throw new Error(payload.error || "No se pudo subir el archivo.");
+  }
+
+  return payload;
+}
+
 export async function uploadPlayerPhoto(academyId: string, file: File) {
-  const extension = file.name.split(".").pop() ?? "jpg";
-  const path = `${academyId}/${crypto.randomUUID()}.${extension}`;
-
-  const { error } = await supabase.storage
-    .from("player-photos")
-    .upload(path, file, { upsert: false });
-
-  if (error) throw error;
-
-  const { data } = supabase.storage.from("player-photos").getPublicUrl(path);
-  return data.publicUrl;
+  const payload = await uploadViaApi(academyId, file, "photo");
+  return payload.url!;
 }
 
 export async function uploadPlayerVideo(academyId: string, file: File) {
   if (file.size > 50 * 1024 * 1024) {
     throw new Error("El video debe pesar máximo 50 MB.");
   }
-
-  const extension = file.name.split(".").pop() ?? "mp4";
-  const path = `${academyId}/${crypto.randomUUID()}.${extension}`;
-
-  const { error } = await supabase.storage
-    .from("player-videos")
-    .upload(path, file, { upsert: false });
-
-  if (error) throw error;
-
-  const { data } = supabase.storage.from("player-videos").getPublicUrl(path);
-  return data.publicUrl;
+  const payload = await uploadViaApi(academyId, file, "video");
+  return payload.url!;
 }
 
 export async function uploadAcademyLogo(academyId: string, file: File) {
-  const extension = file.name.split(".").pop() ?? "png";
-  const path = `${academyId}/${crypto.randomUUID()}.${extension}`;
-
-  const { error } = await supabase.storage
-    .from("academy-logos")
-    .upload(path, file, { upsert: false });
-
-  if (error) throw error;
-
-  const { data } = supabase.storage.from("academy-logos").getPublicUrl(path);
-  return data.publicUrl;
+  const payload = await uploadViaApi(academyId, file, "logo");
+  return payload.url!;
 }
 
 const DIAGNOSIS_PHOTO_MAX_BYTES = 12 * 1024 * 1024;
@@ -72,22 +83,15 @@ export async function uploadDiagnosisEvidence(academyId: string, file: File) {
     );
   }
 
-  const bucket = kind === "video" ? "player-videos" : "player-photos";
-  const extension = (file.name.split(".").pop() || (kind === "video" ? "mp4" : "jpg")).toLowerCase();
-  const path = `${academyId}/diagnosis/${crypto.randomUUID()}.${extension}`;
-
-  const { error } = await supabase.storage.from(bucket).upload(path, file, {
-    upsert: false,
-    contentType: file.type || undefined,
-  });
-  if (error) throw error;
-
-  const { data } = supabase.storage.from(bucket).getPublicUrl(path);
-  const { data: signed } = await supabase.storage.from(bucket).createSignedUrl(path, 60 * 60 * 24);
+  const payload = await uploadViaApi(
+    academyId,
+    file,
+    kind === "video" ? "diagnosis-video" : "diagnosis-photo",
+  );
 
   return {
     kind,
-    url: data.publicUrl,
-    previewUrl: signed?.signedUrl || data.publicUrl,
+    url: payload.url!,
+    previewUrl: payload.previewUrl || payload.url!,
   };
 }
