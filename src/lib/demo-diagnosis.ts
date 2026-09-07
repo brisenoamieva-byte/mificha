@@ -44,8 +44,16 @@ const DEMO_SCORES: DiagnosisScores = {
 };
 
 function demoTest(
-  capture: Omit<GphTestCapture, "leftHits" | "rightHits" | "radarKmh" | "hits5m" | "hits10m" | "hits20m"> &
-    Partial<Pick<GphTestCapture, "leftHits" | "rightHits" | "radarKmh" | "hits5m" | "hits10m" | "hits20m">>,
+  capture: Omit<
+    GphTestCapture,
+    "leftHits" | "rightHits" | "radarKmh" | "hits5m" | "hits10m" | "hits20m" | "shotDistances"
+  > &
+    Partial<
+      Pick<
+        GphTestCapture,
+        "leftHits" | "rightHits" | "radarKmh" | "hits5m" | "hits10m" | "hits20m" | "shotDistances"
+      >
+    >,
 ): GphTestCapture {
   return {
     leftHits: null,
@@ -53,6 +61,7 @@ function demoTest(
     hits5m: null,
     hits10m: null,
     hits20m: null,
+    shotDistances: {},
     radarKmh: null,
     ...capture,
   };
@@ -272,13 +281,35 @@ export function buildDemoDiagnosisReport(): {
           }),
           des_c_tiro: demoTest({
             attempts: [],
-            hits: 16,
-            opportunities: 24,
+            hits: 18,
+            opportunities: 8,
             errors: null,
+            shotDistances: {
+              "5m": { precision: 7, powerKmh: 72 },
+              "10m": { precision: 6, powerKmh: 78 },
+              "20m": { precision: 5, powerKmh: 84 },
+            },
+            radarKmh: 84,
             score: 4,
             relevance: 3,
             flagged: false,
-            note: "",
+            note: "Buena potencia a 20 m; precisión cae con distancia.",
+          }),
+          des_c_tiro_gol: demoTest({
+            attempts: [],
+            hits: 17,
+            opportunities: 8,
+            errors: null,
+            shotDistances: {
+              "11m": { precision: 7, powerKmh: 88 },
+              "16_5m": { precision: 5, powerKmh: 86 },
+              "20m": { precision: 5, powerKmh: 90 },
+            },
+            radarKmh: 90,
+            score: 4,
+            relevance: 3,
+            flagged: false,
+            note: "Penal sólido; fuera de área menos preciso.",
           }),
           des_c_largo: demoTest({
             attempts: [],

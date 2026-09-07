@@ -25,9 +25,14 @@ import {
   isTestCaptureComplete,
   suggestedScore,
   passDistanceHitsTotal,
+  shotDistanceEntry,
+  shotDistanceSpecs,
+  shotPowerBest,
+  shotPrecisionTotal,
   testNeedsBilateral,
   testNeedsPassDistances,
   testNeedsRadar,
+  testNeedsShotDistances,
   testsForBattery,
   weakerFootPercent,
   emptyClosing,
@@ -352,7 +357,66 @@ export function FieldSessionForm({ academyId, module, session, onChange }: Field
 
               {isRatioKind(test.kind) ? (
                 <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
-                  {testNeedsPassDistances(test) ? (
+                  {testNeedsShotDistances(test) ? (
+                    <>
+                      {(shotDistanceSpecs(test) ?? []).map((spec) => {
+                        const entry = shotDistanceEntry(capture, spec.key);
+                        return (
+                          <div key={spec.key} className="col-span-2 contents sm:contents">
+                            <MeasureField
+                              label={`${spec.label} · precisión`}
+                              value={entry.precision}
+                              integer
+                              max={test.maxPoints ?? undefined}
+                              onChange={(precision) => {
+                                const specs = shotDistanceSpecs(test) ?? [];
+                                const keys = specs.map((item) => item.key);
+                                const next: GphTestCapture = {
+                                  ...capture,
+                                  shotDistances: {
+                                    ...capture.shotDistances,
+                                    [spec.key]: { ...entry, precision },
+                                  },
+                                };
+                                next.hits = shotPrecisionTotal(next, keys);
+                                next.radarKmh = shotPowerBest(next, keys);
+                                patchTest(test, next);
+                              }}
+                            />
+                            <MeasureField
+                              label={`${spec.label} · potencia`}
+                              unit="km/h"
+                              value={entry.powerKmh}
+                              integer={false}
+                              onChange={(powerKmh) => {
+                                const specs = shotDistanceSpecs(test) ?? [];
+                                const keys = specs.map((item) => item.key);
+                                const next: GphTestCapture = {
+                                  ...capture,
+                                  shotDistances: {
+                                    ...capture.shotDistances,
+                                    [spec.key]: { ...entry, powerKmh },
+                                  },
+                                };
+                                next.hits = shotPrecisionTotal(next, keys);
+                                next.radarKmh = shotPowerBest(next, keys);
+                                patchTest(test, next);
+                              }}
+                            />
+                          </div>
+                        );
+                      })}
+                      <MeasureField
+                        label="Máx. precisión / distancia"
+                        value={capture.opportunities}
+                        integer
+                        min={1}
+                        onChange={(opportunities) =>
+                          patchTest(test, { ...capture, opportunities })
+                        }
+                      />
+                    </>
+                  ) : testNeedsPassDistances(test) ? (
                     <>
                       <MeasureField
                         label="Aciertos 5 m"
@@ -425,7 +489,7 @@ export function FieldSessionForm({ academyId, module, session, onChange }: Field
                       onChange={(errors) => patchTest(test, { ...capture, errors })}
                     />
                   ) : null}
-                  {testNeedsBilateral(test) ? (
+                  {testNeedsBilateral(test) && !testNeedsShotDistances(test) ? (
                     <>
                       <MeasureField
                         label="Der"
@@ -441,7 +505,7 @@ export function FieldSessionForm({ academyId, module, session, onChange }: Field
                       />
                     </>
                   ) : null}
-                  {testNeedsRadar(test) ? (
+                  {testNeedsRadar(test) && !testNeedsShotDistances(test) ? (
                     <MeasureField
                       label="Radar"
                       unit="km/h"

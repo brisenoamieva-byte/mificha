@@ -53,6 +53,13 @@ export interface GphStationTest {
   relevanceDefault: 1 | 2 | 3;
 }
 
+export interface GphShotDistanceCapture {
+  /** Puntos o aciertos en esa distancia. */
+  precision: number | null;
+  /** Potencia (radar) en km/h. */
+  powerKmh: number | null;
+}
+
 export interface GphTestCapture {
   attempts: Array<number | null>;
   hits: number | null;
@@ -64,6 +71,8 @@ export interface GphTestCapture {
   hits5m: number | null;
   hits10m: number | null;
   hits20m: number | null;
+  /** Precisión + potencia por distancia (tiros). */
+  shotDistances: Record<string, GphShotDistanceCapture>;
   radarKmh: number | null;
   score: number | null;
   relevance: 1 | 2 | 3;
@@ -414,20 +423,41 @@ export const GPH_STATION_TESTS: readonly GphStationTest[] = [
     stage: "desarrollo",
     usage: "esencial",
     label: "Tiro en movimiento",
-    unit: "puntos / 24",
+    unit: "precisión + potencia · 5/10/20 m",
     kind: "points",
     conversion: "accuracy",
-    attempts: 12,
-    maxPoints: 24,
-    setup: "Conducción 3 m; tiro desde 12–14 m; cuatro objetivos.",
-    execution: "12 tiros: 6 por pie. Radar opcional.",
-    record: "2 objetivo; 1 portería; 0 fuera.",
+    attempts: 0,
+    maxPoints: 8,
+    setup: "Conducción corta; líneas de tiro a 5 m, 10 m y 20 m; objetivos en portería.",
+    execution:
+      "En cada distancia: tiros en movimiento. Registrar precisión (puntos) y potencia (km/h).",
+    record: "Precisión y potencia a 5, 10 y 20 m.",
+    indicatorId: "finalizacion",
+    relevanceDefault: 3,
+  }),
+  t({
+    id: "des_c_tiro_gol",
+    number: 7,
+    module: "campo",
+    stage: "desarrollo",
+    usage: "esencial",
+    label: "Tiro a gol",
+    unit: "precisión + potencia · 11 / 16.5 / 20 m",
+    kind: "points",
+    conversion: "accuracy",
+    attempts: 0,
+    maxPoints: 8,
+    setup:
+      "Balón detenido; distancias 11 m (penal), 16.5 m (fuera de área) y 20 m; radar opcional.",
+    execution:
+      "En cada distancia: tiros a gol. Registrar precisión (puntos) y potencia (km/h).",
+    record: "Precisión y potencia a 11 m, 16.5 m y 20 m.",
     indicatorId: "finalizacion",
     relevanceDefault: 3,
   }),
   t({
     id: "des_c_largo",
-    number: 7,
+    number: 8,
     module: "campo",
     stage: "desarrollo",
     usage: "esencial",
@@ -445,11 +475,11 @@ export const GPH_STATION_TESTS: readonly GphStationTest[] = [
   }),
   t({
     id: "des_c_5105",
-    number: 8,
+    number: 9,
     module: "campo",
     stage: "desarrollo",
     usage: "plus",
-    label: "Velocidad + 5-0-5",
+    label: "Cambio 5-0-5",
     unit: "s",
     kind: "time",
     conversion: "manual",
@@ -461,8 +491,25 @@ export const GPH_STATION_TESTS: readonly GphStationTest[] = [
     relevanceDefault: 2,
   }),
   t({
+    id: "des_c_illinois",
+    number: 10,
+    module: "campo",
+    stage: "desarrollo",
+    usage: "plus",
+    label: "Prueba de Illinois",
+    unit: "s",
+    kind: "time",
+    conversion: "manual",
+    attempts: 2,
+    setup: "Circuito Illinois marcado.",
+    execution: "Dos intentos; recuperación completa entre marcas.",
+    record: "Tiempos; conservar el mejor.",
+    indicatorId: "velocidad",
+    relevanceDefault: 2,
+  }),
+  t({
     id: "des_c_duelo",
-    number: 9,
+    number: 11,
     module: "campo",
     stage: "desarrollo",
     usage: "plus",
@@ -479,7 +526,7 @@ export const GPH_STATION_TESTS: readonly GphStationTest[] = [
   }),
   t({
     id: "des_c_juego",
-    number: 10,
+    number: 12,
     module: "campo",
     stage: "desarrollo",
     usage: "esencial",
@@ -1073,6 +1120,7 @@ export function emptyTestCapture(test: GphStationTest): GphTestCapture {
     hits5m: null,
     hits10m: null,
     hits20m: null,
+    shotDistances: {},
     radarKmh: null,
     score: null,
     relevance: test.relevanceDefault,
@@ -1131,6 +1179,58 @@ export function testNeedsRadar(test: GphStationTest) {
 /** Pase de precisión: captura aciertos por distancia 5 / 10 / 20 m. */
 export function testNeedsPassDistances(test: GphStationTest) {
   return test.id === "ini_c_pase" || test.id === "des_c_pase";
+}
+
+export type GphShotDistanceSpec = { key: string; label: string; shortLabel: string };
+
+/** Tiros con precisión + potencia por distancia. */
+export function shotDistanceSpecs(test: GphStationTest): GphShotDistanceSpec[] | null {
+  if (test.id === "des_c_tiro") {
+    return [
+      { key: "5m", label: "5 m", shortLabel: "5m" },
+      { key: "10m", label: "10 m", shortLabel: "10m" },
+      { key: "20m", label: "20 m", shortLabel: "20m" },
+    ];
+  }
+  if (test.id === "des_c_tiro_gol") {
+    return [
+      { key: "11m", label: "11 m (penal)", shortLabel: "11m" },
+      { key: "16_5m", label: "16.5 m (fuera de área)", shortLabel: "16.5m" },
+      { key: "20m", label: "20 m", shortLabel: "20m" },
+    ];
+  }
+  return null;
+}
+
+export function testNeedsShotDistances(test: GphStationTest) {
+  return shotDistanceSpecs(test) != null;
+}
+
+export function emptyShotDistance(): GphShotDistanceCapture {
+  return { precision: null, powerKmh: null };
+}
+
+export function shotDistanceEntry(
+  capture: GphTestCapture,
+  key: string,
+): GphShotDistanceCapture {
+  return capture.shotDistances?.[key] ?? emptyShotDistance();
+}
+
+export function shotPrecisionTotal(capture: GphTestCapture, keys: string[]) {
+  const values = keys
+    .map((key) => shotDistanceEntry(capture, key).precision)
+    .filter((value): value is number => value != null && Number.isFinite(value));
+  if (values.length === 0) return null;
+  return values.reduce((sum, value) => sum + value, 0);
+}
+
+export function shotPowerBest(capture: GphTestCapture, keys: string[]) {
+  const values = keys
+    .map((key) => shotDistanceEntry(capture, key).powerKmh)
+    .filter((value): value is number => value != null && Number.isFinite(value));
+  if (values.length === 0) return null;
+  return Math.max(...values);
 }
 
 export function passDistanceHitsTotal(capture: GphTestCapture) {
@@ -1196,6 +1296,18 @@ export function derivedPercent(test: GphStationTest, capture: GphTestCapture) {
     return (capture.hits / capture.opportunities) * 100;
   }
   if (test.kind === "accuracy" || test.kind === "points") {
+    const shotSpecs = shotDistanceSpecs(test);
+    if (shotSpecs) {
+      const keys = shotSpecs.map((spec) => spec.key);
+      const total = shotPrecisionTotal(capture, keys);
+      const filled = keys.filter(
+        (key) => shotDistanceEntry(capture, key).precision != null,
+      ).length;
+      if (total == null || filled === 0) return null;
+      const maxPerDistance = capture.opportunities ?? test.maxPoints ?? 0;
+      if (!maxPerDistance) return null;
+      return (total / (filled * maxPerDistance)) * 100;
+    }
     const distanceTotal = passDistanceHitsTotal(capture);
     const distanceCount = [capture.hits5m, capture.hits10m, capture.hits20m].filter(
       (value) => value != null && Number.isFinite(value),
@@ -1240,12 +1352,16 @@ export function isFieldSessionPopulated(session: GphFieldSession | null | undefi
   if (session.evidence.length > 0) return true;
   return Object.values(session.tests).some((capture) => {
     if (!capture) return false;
+    const hasShot = Object.values(capture.shotDistances ?? {}).some(
+      (entry) => entry.precision != null || entry.powerKmh != null,
+    );
     return (
       numericAttempts(capture).length > 0 ||
       capture.hits != null ||
       capture.hits5m != null ||
       capture.hits10m != null ||
       capture.hits20m != null ||
+      hasShot ||
       capture.score != null
     );
   });
@@ -1291,12 +1407,19 @@ export function isTestCaptureComplete(test: GphStationTest, capture: GphTestCapt
   const score = capture.score ?? suggestedScore(test, capture);
   if (isRatioKind(test.kind)) {
     const max = capture.opportunities ?? test.maxPoints;
-    if (max == null || max <= 0) return false;
-    if (testNeedsPassDistances(test)) {
+    if (testNeedsShotDistances(test)) {
+      const specs = shotDistanceSpecs(test) ?? [];
+      const allPrecision = specs.every(
+        (spec) => shotDistanceEntry(capture, spec.key).precision != null,
+      );
+      if (!allPrecision && capture.hits == null) return false;
+      if (max == null || max <= 0) return false;
+    } else if (testNeedsPassDistances(test)) {
+      if (max == null || max <= 0) return false;
       const hasDistances =
         capture.hits5m != null && capture.hits10m != null && capture.hits20m != null;
       if (!hasDistances && capture.hits == null) return false;
-    } else if (capture.hits == null) {
+    } else if (capture.hits == null || max == null || max <= 0) {
       return false;
     }
   } else if (numericAttempts(capture).length === 0) {
@@ -1320,12 +1443,34 @@ export function formatTestRaw(test: GphStationTest, capture: GphTestCapture | un
   if (isRatioKind(test.kind)) {
     const hits = capture.hits;
     const max = capture.opportunities ?? test.maxPoints;
+    const shotSpecs = shotDistanceSpecs(test);
     const distanceTotal = passDistanceHitsTotal(capture);
-    const hasDistances =
+    const hasPassDistances =
       capture.hits5m != null || capture.hits10m != null || capture.hits20m != null;
+    if (shotSpecs) {
+      const parts: string[] = [];
+      for (const spec of shotSpecs) {
+        const entry = shotDistanceEntry(capture, spec.key);
+        if (entry.precision == null && entry.powerKmh == null) continue;
+        const bits: string[] = [];
+        if (entry.precision != null) bits.push(`P ${formatMeasure(entry.precision, true)}`);
+        if (entry.powerKmh != null) bits.push(`${formatMeasure(entry.powerKmh)} km/h`);
+        parts.push(`${spec.shortLabel} ${bits.join(" / ")}`);
+      }
+      const percent = derivedPercent(test, capture);
+      if (percent != null) parts.push(`${Math.round(percent)}%`);
+      const bestPower = shotPowerBest(
+        capture,
+        shotSpecs.map((spec) => spec.key),
+      );
+      if (bestPower != null && !parts.some((part) => part.includes("km/h"))) {
+        parts.push(`mejor ${formatMeasure(bestPower)} km/h`);
+      }
+      return parts.length ? parts.join(" · ") : "—";
+    }
     if (
       hits == null &&
-      !hasDistances &&
+      !hasPassDistances &&
       max == null &&
       capture.errors == null
     ) {
@@ -1333,7 +1478,7 @@ export function formatTestRaw(test: GphStationTest, capture: GphTestCapture | un
       if (values.length === 0) return "—";
     }
     const parts: string[] = [];
-    if (hasDistances) {
+    if (hasPassDistances) {
       parts.push(
         `5m ${capture.hits5m ?? "—"} · 10m ${capture.hits10m ?? "—"} · 20m ${capture.hits20m ?? "—"}`,
       );
@@ -1396,6 +1541,16 @@ export function parseFieldSession(value: unknown): GphFieldSession {
         ? raw.attempts.map((item) => parseNum(item))
         : [];
       const relevanceRaw = Number(raw.relevance);
+      const shotDistances: Record<string, GphShotDistanceCapture> = {};
+      if (isRecord(raw.shotDistances)) {
+        for (const [key, entry] of Object.entries(raw.shotDistances)) {
+          if (!isRecord(entry)) continue;
+          shotDistances[key] = {
+            precision: parseNum(entry.precision),
+            powerKmh: parseNum(entry.powerKmh),
+          };
+        }
+      }
       tests[id] = {
         attempts,
         hits: parseNum(raw.hits),
@@ -1406,6 +1561,7 @@ export function parseFieldSession(value: unknown): GphFieldSession {
         hits5m: parseNum(raw.hits5m),
         hits10m: parseNum(raw.hits10m),
         hits20m: parseNum(raw.hits20m),
+        shotDistances,
         radarKmh: parseNum(raw.radarKmh),
         score: parseNum(raw.score),
         relevance: relevanceRaw === 1 || relevanceRaw === 3 ? relevanceRaw : 2,
