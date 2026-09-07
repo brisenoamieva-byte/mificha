@@ -449,13 +449,13 @@ export const GPH_STATION_TESTS: readonly GphStationTest[] = [
     module: "campo",
     stage: "desarrollo",
     usage: "plus",
-    label: "Velocidad + 5-10-5",
+    label: "Velocidad + 5-0-5",
     unit: "s",
     kind: "time",
     conversion: "manual",
-    attempts: 4,
-    setup: "Líneas a 10 y 20 m; circuito 5-10-5.",
-    execution: "Dos sprints y dos cambios de dirección por lado.",
+    attempts: 2,
+    setup: "Líneas a 5 m; circuito 5-0-5.",
+    execution: "Dos cambios de dirección (un intento por lado).",
     record: "Tiempos; mejor marca; diferencia derecha/izquierda.",
     indicatorId: "velocidad",
     relevanceDefault: 2,
@@ -958,10 +958,19 @@ export const GPH_PHYSICAL_TESTS = [
   },
   {
     id: "cambio_5105",
-    label: "Cambio 5-10-5",
-    protocol: "2 por lado. Registrar diferencia derecha/izquierda.",
+    label: "Cambio 5-0-5",
+    protocol: "2 intentos. Registrar diferencia derecha/izquierda.",
     unit: "s",
-    attempts: 4,
+    attempts: 2,
+    desarrolloOnly: false,
+    indicatorId: "velocidad" as const,
+  },
+  {
+    id: "illinois",
+    label: "Prueba de Illinois",
+    protocol: "2 intentos. Circuito Illinois; mejor marca.",
+    unit: "s",
+    attempts: 2,
     desarrolloOnly: false,
     indicatorId: "velocidad" as const,
   },
@@ -976,10 +985,10 @@ export const GPH_PHYSICAL_TESTS = [
   },
   {
     id: "resistencia_20",
-    label: "Resistencia de velocidad",
-    protocol: "6 × 20 m. Solo Desarrollo; controlar recuperación.",
-    unit: "% fatiga",
-    attempts: 6,
+    label: "Course Navette",
+    protocol: "1 intento. Registrar el resultado del Course Navette.",
+    unit: "nivel",
+    attempts: 1,
     desarrolloOnly: true,
     indicatorId: "resistencia" as const,
   },
@@ -1415,6 +1424,37 @@ export function parseFieldSession(value: unknown): GphFieldSession {
         score: parseNum(raw.score),
       };
     }
+  }
+  // Capturas viejas: Cambio 5-10-5 con 4 intentos → 5-0-5 (1–2) + Illinois (3–4).
+  const legacyCambio = physical.cambio_5105;
+  if (legacyCambio && legacyCambio.attempts.length > 2) {
+    const illinoisAttempts = [
+      legacyCambio.attempts[2] ?? null,
+      legacyCambio.attempts[3] ?? null,
+    ];
+    const hasIllinoisData = illinoisAttempts.some((v) => v != null);
+    const existingIllinois = physical.illinois;
+    const illinoisEmpty =
+      !existingIllinois ||
+      existingIllinois.attempts.every((v) => v == null);
+    if (hasIllinoisData && illinoisEmpty) {
+      physical.illinois = {
+        attempts: illinoisAttempts,
+        note: existingIllinois?.note ?? "",
+        score: existingIllinois?.score ?? null,
+      };
+    }
+    physical.cambio_5105 = {
+      ...legacyCambio,
+      attempts: legacyCambio.attempts.slice(0, 2),
+    };
+  }
+  const legacyNavette = physical.resistencia_20;
+  if (legacyNavette && legacyNavette.attempts.length > 1) {
+    physical.resistencia_20 = {
+      ...legacyNavette,
+      attempts: legacyNavette.attempts.slice(0, 1),
+    };
   }
   const tri = (raw: unknown) => (raw === true ? true : raw === false ? false : null);
   const closingRaw = isRecord(value.closing) ? value.closing : {};

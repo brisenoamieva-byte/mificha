@@ -598,13 +598,10 @@ export function FieldSessionForm({ academyId, module, session, onChange }: Field
                 note: "",
                 score: null,
               };
-              const attempts =
-                capture.attempts.length >= test.attempts
-                  ? capture.attempts
-                  : [
-                      ...capture.attempts,
-                      ...Array.from({ length: test.attempts - capture.attempts.length }, () => null),
-                    ];
+              const attempts = Array.from(
+                { length: test.attempts },
+                (_, i) => capture.attempts[i] ?? null,
+              );
               return (
                 <div key={test.id}>
                   {showSprintHeader ? (

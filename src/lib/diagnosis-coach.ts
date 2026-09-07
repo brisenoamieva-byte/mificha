@@ -211,7 +211,7 @@ const DRILLS: Record<string, DrillPack> = {
     cue: "Talón pegado; no armar con la lumbar.",
   },
   velocidad: {
-    drill: "Aceleraciones 10 m + cambio 5-10-5. 4 reps. Recuperación completa.",
+    drill: "Aceleraciones 10 m + cambio 5-0-5. 2 reps. Recuperación completa.",
     goal: "Mejorar el primer paso y el cambio de dirección sin perder técnica.",
     cue: "Inclinación, brazos, frecuencia en los primeros 5 m.",
   },
