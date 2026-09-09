@@ -79,7 +79,22 @@ function captureFor(session: GphFieldSession, test: GphStationTest): GphTestCapt
   };
 }
 
-function attemptMeta(test: GphStationTest) {
+function attemptMeta(test: GphStationTest): {
+  label: string;
+  unit: string;
+  integer: boolean;
+  hint: string;
+  attemptLabels?: readonly string[];
+} {
+  if (test.id === "des_c_patrones") {
+    return {
+      label: "Tiempo",
+      unit: "s",
+      integer: false,
+      hint: test.execution,
+      attemptLabels: ["Der 5 m", "Izq 5 m", "Der 10 m", "Izq 10 m"],
+    };
+  }
   if (test.kind === "time") {
     return {
       label: "Tiempo",
@@ -522,7 +537,7 @@ export function FieldSessionForm({ academyId, module, session, onChange }: Field
                     {capture.attempts.map((value, index) => (
                       <MeasureField
                         key={index}
-                        label={`${meta.label} ${index + 1}`}
+                        label={meta.attemptLabels?.[index] ?? `${meta.label} ${index + 1}`}
                         unit={index === 0 ? meta.unit : undefined}
                         value={value}
                         integer={meta.integer}
