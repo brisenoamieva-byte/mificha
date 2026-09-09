@@ -31,7 +31,7 @@ export type GphTestKind =
   | "distance"
   | "ratio";
 
-export type GphConversion = "accuracy" | "contacts_ini" | "contacts_des" | "manual";
+export type GphConversion = "accuracy" | "contacts_ini" | "contacts_des" | "rubric_06" | "manual";
 
 export interface GphStationTest {
   id: string;
@@ -352,14 +352,15 @@ export const GPH_STATION_TESTS: readonly GphStationTest[] = [
     stage: "desarrollo",
     usage: "plus",
     label: "Conducción a velocidad",
-    unit: "s",
-    kind: "time",
-    conversion: "manual",
+    unit: "rúbrica 0–6",
+    kind: "contacts",
+    conversion: "rubric_06",
     attempts: 4,
-    setup: "Líneas a 5 m y 10 m.",
+    maxPoints: 6,
+    setup: "Líneas a 5 m y 10 m. 2 repeticiones por distancia (1 por perfil).",
     execution:
       "Intento 1 derecha 5 m; 2 izquierda 5 m; 3 derecha 10 m; 4 izquierda 10 m.",
-    record: "Tiempo por intento; mejor marca; diferencia por pie y distancia.",
+    record: "Rúbrica por intento: 0 deficiente · 2 regular · 4 bueno · 6 óptimo.",
     indicatorId: "conduccion",
     relevanceDefault: 3,
   }),
@@ -1249,12 +1250,28 @@ export function weakerFootPercent(left: number | null, right: number | null) {
   return (Math.min(left, right) / total) * 100;
 }
 
+export const GPH_RUBRIC_06 = [
+  { value: 0, label: "Deficiente" },
+  { value: 2, label: "Regular" },
+  { value: 4, label: "Bueno" },
+  { value: 6, label: "Óptimo" },
+] as const;
+
+export function testNeedsRubric06(test: GphStationTest) {
+  return test.conversion === "rubric_06";
+}
+
 export function scoreFromAccuracyPercent(percent: number) {
   if (percent <= 20) return 1;
   if (percent <= 40) return 2;
   if (percent <= 60) return 3;
   if (percent <= 80) return 4;
   return 5;
+}
+
+export function scoreFromRubric06(average: number) {
+  // 0 → 1 · 2 → 2 · 4 → 4 · 6 → 5
+  return Math.max(1, Math.min(5, Math.round(1 + (average / 6) * 4)));
 }
 
 export function scoreFromContacts(value: number, conversion: GphConversion) {
@@ -1336,6 +1353,12 @@ export function suggestedScore(test: GphStationTest, capture: GphTestCapture) {
   if (test.conversion === "accuracy") {
     const percent = derivedPercent(test, capture);
     return percent == null ? null : scoreFromAccuracyPercent(percent);
+  }
+  if (test.conversion === "rubric_06") {
+    const values = numericAttempts(capture);
+    if (values.length === 0) return null;
+    const avg = values.reduce((sum, value) => sum + value, 0) / values.length;
+    return scoreFromRubric06(avg);
   }
   if (test.conversion === "contacts_ini" || test.conversion === "contacts_des") {
     const best = bestAttempt(capture, test.kind);
@@ -1424,6 +1447,8 @@ export function isTestCaptureComplete(test: GphStationTest, capture: GphTestCapt
       return false;
     }
   } else if (numericAttempts(capture).length === 0) {
+    return false;
+  } else if (testNeedsRubric06(test) && numericAttempts(capture).length < test.attempts) {
     return false;
   }
   if (test.conversion === "manual" && score == null) return false;

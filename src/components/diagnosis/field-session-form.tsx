@@ -12,6 +12,7 @@ import {
   GPH_PROTOCOL_STAGES,
   GPH_ROTATION_CAMPO,
   GPH_ROTATION_PORTERO,
+  GPH_RUBRIC_06,
   GPH_SESSION_TYPES,
   GPH_STATION_TESTS,
   GPH_VENUE_CODES,
@@ -32,6 +33,7 @@ import {
   testNeedsBilateral,
   testNeedsPassDistances,
   testNeedsRadar,
+  testNeedsRubric06,
   testNeedsShotDistances,
   testsForBattery,
   weakerFootPercent,
@@ -88,10 +90,10 @@ function attemptMeta(test: GphStationTest): {
 } {
   if (test.id === "des_c_patrones") {
     return {
-      label: "Tiempo",
-      unit: "s",
-      integer: false,
-      hint: test.execution,
+      label: "Rúbrica",
+      unit: "",
+      integer: true,
+      hint: "2 rep. · 1 por perfil. 0 deficiente · 2 regular · 4 bueno · 6 óptimo.",
       attemptLabels: ["Der 5 m", "Izq 5 m", "Der 10 m", "Izq 10 m"],
     };
   }
@@ -533,23 +535,65 @@ export function FieldSessionForm({ academyId, module, session, onChange }: Field
               ) : (
                 <div className="mt-3">
                   <p className="text-[11px] text-mf-text-muted">{meta.hint}</p>
-                  <div className="mt-1.5 flex flex-wrap gap-2">
-                    {capture.attempts.map((value, index) => (
-                      <MeasureField
-                        key={index}
-                        label={meta.attemptLabels?.[index] ?? `${meta.label} ${index + 1}`}
-                        unit={index === 0 ? meta.unit : undefined}
-                        value={value}
-                        integer={meta.integer}
-                        className="w-[4.75rem]"
-                        onChange={(nextValue) => {
-                          const next = [...capture.attempts];
-                          next[index] = nextValue;
-                          patchTest(test, { ...capture, attempts: next });
-                        }}
-                      />
-                    ))}
-                  </div>
+                  {testNeedsRubric06(test) ? (
+                    <div className="mt-2 space-y-2">
+                      {capture.attempts.map((value, index) => (
+                        <div
+                          key={index}
+                          className="flex flex-wrap items-center gap-2"
+                        >
+                          <span className="w-20 text-[11px] font-medium text-mf-text-secondary">
+                            {meta.attemptLabels?.[index] ?? `Intento ${index + 1}`}
+                          </span>
+                          <div className="flex flex-wrap gap-1">
+                            {GPH_RUBRIC_06.map((level) => (
+                              <button
+                                key={level.value}
+                                type="button"
+                                title={level.label}
+                                onClick={() => {
+                                  const next = [...capture.attempts];
+                                  next[index] = level.value;
+                                  patchTest(test, { ...capture, attempts: next });
+                                }}
+                                className={cn(
+                                  "h-9 min-w-9 rounded-lg px-2 text-sm font-semibold tabular-nums",
+                                  value === level.value
+                                    ? "bg-mf-brand text-white"
+                                    : "bg-mf-canvas text-mf-text-secondary hover:bg-mf-brand-soft",
+                                )}
+                              >
+                                {level.value}
+                              </button>
+                            ))}
+                          </div>
+                          {value != null ? (
+                            <span className="text-[11px] text-mf-text-muted">
+                              {GPH_RUBRIC_06.find((level) => level.value === value)?.label}
+                            </span>
+                          ) : null}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="mt-1.5 flex flex-wrap gap-2">
+                      {capture.attempts.map((value, index) => (
+                        <MeasureField
+                          key={index}
+                          label={meta.attemptLabels?.[index] ?? `${meta.label} ${index + 1}`}
+                          unit={index === 0 ? meta.unit : undefined}
+                          value={value}
+                          integer={meta.integer}
+                          className="w-[4.75rem]"
+                          onChange={(nextValue) => {
+                            const next = [...capture.attempts];
+                            next[index] = nextValue;
+                            patchTest(test, { ...capture, attempts: next });
+                          }}
+                        />
+                      ))}
+                    </div>
+                  )}
                   {testNeedsBilateral(test) ? (
                     <div className="mt-2 grid grid-cols-2 gap-2 sm:max-w-xs">
                       <MeasureField
