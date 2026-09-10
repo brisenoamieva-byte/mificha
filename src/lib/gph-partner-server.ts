@@ -120,14 +120,15 @@ export async function provisionGphPartner(input: ProvisionGphPartnerInput) {
       city,
       state: "Querétaro",
       description: "Academia GPH. Diagnósticos y plantel propio.",
-      is_public: false,
+      is_public: true,
+      is_certified: true,
       plan_status: "pro" as const,
       primary_color: "#f54200",
     };
 
     let inserted = await admin
       .from("academies")
-      .insert({ ...baseAcademy, billing_exempt: true, is_discoverable: false })
+      .insert({ ...baseAcademy, billing_exempt: true })
       .select("id, name, slug, billing_exempt")
       .single();
 
