@@ -952,6 +952,42 @@ export const GPH_STATION_TESTS: readonly GphStationTest[] = [
     indicatorId: "conduccion",
     relevanceDefault: 3,
   }),
+  t({
+    id: "des_p_dominadas",
+    number: 14,
+    module: "portero",
+    stage: "desarrollo",
+    usage: "esencial",
+    label: "Dominadas alternadas",
+    unit: "contactos / % pie menor",
+    kind: "contacts",
+    conversion: "contacts_des",
+    attempts: 5,
+    setup: "Zona 3 × 3 m; cronómetro.",
+    execution: "5 intentos de 45 s; alternar derecho e izquierdo.",
+    record: "Contactos; mejor; promedio; % de pie menos usado.",
+    indicatorId: "conduccion",
+    relevanceDefault: 3,
+  }),
+  t({
+    id: "des_p_pase",
+    number: 15,
+    module: "portero",
+    stage: "desarrollo",
+    usage: "esencial",
+    label: "Pase de precisión",
+    unit: "aciertos / 12",
+    kind: "accuracy",
+    conversion: "accuracy",
+    attempts: 12,
+    maxPoints: 12,
+    setup: "Puerta de 1 m; líneas de golpeo a 5 m, 10 m y 20 m.",
+    execution:
+      "En cada distancia: 12 pases (6 por pie), balón detenido. Registrar aciertos a 5, 10 y 20 m.",
+    record: "Aciertos a 5 m, 10 m y 20 m; % por pie; diferencia bilateral.",
+    indicatorId: "pase",
+    relevanceDefault: 3,
+  }),
 ];
 
 export const GPH_PHYSICAL_TESTS = [
@@ -1199,7 +1235,11 @@ export function testNeedsRadar(test: GphStationTest) {
 
 /** Pase de precisión: captura aciertos por distancia 5 / 10 / 20 m. */
 export function testNeedsPassDistances(test: GphStationTest) {
-  return test.id === "ini_c_pase" || test.id === "des_c_pase";
+  return (
+    test.id === "ini_c_pase" ||
+    test.id === "des_c_pase" ||
+    test.id === "des_p_pase"
+  );
 }
 
 export type GphShotDistanceSpec = { key: string; label: string; shortLabel: string };
