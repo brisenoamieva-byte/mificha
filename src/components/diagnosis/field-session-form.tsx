@@ -14,6 +14,7 @@ import {
   GPH_ROTATION_PORTERO,
   GPH_RUBRIC_06,
   GPH_SESSION_TYPES,
+  GPH_SPEED_DRIBBLE_LABELS,
   GPH_STATION_TESTS,
   GPH_VENUE_CODES,
   averageAttempt,
@@ -35,6 +36,7 @@ import {
   testNeedsRadar,
   testNeedsRubric06,
   testNeedsShotDistances,
+  testNeedsSpeedDribbleRubric,
   testsForBattery,
   weakerFootPercent,
   emptyClosing,
@@ -88,13 +90,13 @@ function attemptMeta(test: GphStationTest): {
   hint: string;
   attemptLabels?: readonly string[];
 } {
-  if (test.id === "des_c_patrones") {
+  if (testNeedsSpeedDribbleRubric(test)) {
     return {
       label: "Rúbrica",
       unit: "",
       integer: true,
       hint: "2 rep. · 1 por perfil. 0 deficiente · 2 regular · 4 bueno · 6 óptimo.",
-      attemptLabels: ["Der 5 m", "Izq 5 m", "Der 10 m", "Izq 10 m"],
+      attemptLabels: [...GPH_SPEED_DRIBBLE_LABELS],
     };
   }
   if (test.kind === "time") {

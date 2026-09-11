@@ -355,11 +355,11 @@ export const GPH_STATION_TESTS: readonly GphStationTest[] = [
     unit: "rúbrica 0–6",
     kind: "contacts",
     conversion: "rubric_06",
-    attempts: 4,
+    attempts: 8,
     maxPoints: 6,
-    setup: "Líneas a 5 m y 10 m. 2 repeticiones por distancia (1 por perfil).",
+    setup: "Líneas a 5, 10, 20 y 30 m. 2 repeticiones por distancia (1 por perfil).",
     execution:
-      "Intento 1 derecha 5 m; 2 izquierda 5 m; 3 derecha 10 m; 4 izquierda 10 m.",
+      "Por distancia (5, 10, 20, 30 m): un intento derecha y uno izquierda.",
     record: "Rúbrica por intento: 0 deficiente · 2 regular · 4 bueno · 6 óptimo.",
     indicatorId: "conduccion",
     relevanceDefault: 3,
@@ -933,6 +933,25 @@ export const GPH_STATION_TESTS: readonly GphStationTest[] = [
     indicatorId: "lectura_mando",
     relevanceDefault: 3,
   }),
+  t({
+    id: "des_p_conduccion",
+    number: 13,
+    module: "portero",
+    stage: "desarrollo",
+    usage: "plus",
+    label: "Conducción a velocidad",
+    unit: "rúbrica 0–6",
+    kind: "contacts",
+    conversion: "rubric_06",
+    attempts: 8,
+    maxPoints: 6,
+    setup: "Líneas a 5, 10, 20 y 30 m. 2 repeticiones por distancia (1 por perfil).",
+    execution:
+      "Por distancia (5, 10, 20, 30 m): un intento derecha y uno izquierda.",
+    record: "Rúbrica por intento: 0 deficiente · 2 regular · 4 bueno · 6 óptimo.",
+    indicatorId: "conduccion",
+    relevanceDefault: 3,
+  }),
 ];
 
 export const GPH_PHYSICAL_TESTS = [
@@ -1248,6 +1267,21 @@ export function weakerFootPercent(left: number | null, right: number | null) {
   const total = left + right;
   if (total <= 0) return null;
   return (Math.min(left, right) / total) * 100;
+}
+
+export const GPH_SPEED_DRIBBLE_LABELS = [
+  "Der 5 m",
+  "Izq 5 m",
+  "Der 10 m",
+  "Izq 10 m",
+  "Der 20 m",
+  "Izq 20 m",
+  "Der 30 m",
+  "Izq 30 m",
+] as const;
+
+export function testNeedsSpeedDribbleRubric(test: GphStationTest) {
+  return test.id === "des_c_patrones" || test.id === "des_p_conduccion";
 }
 
 export const GPH_RUBRIC_06 = [
