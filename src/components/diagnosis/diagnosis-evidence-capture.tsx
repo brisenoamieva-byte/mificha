@@ -5,6 +5,7 @@ import { Camera, Film, ImagePlus, Loader2, Trash2 } from "lucide-react";
 import { toast } from "@/components/ui/toast";
 import {
   DIAGNOSIS_EVIDENCE_MAX,
+  testHeading,
   testsForBattery,
   type GphEvidenceItem,
   type GphFieldSession,
@@ -201,7 +202,7 @@ export function DiagnosisEvidenceCapture({
                     <option value="">Proceso general</option>
                     {stations.map((test) => (
                       <option key={test.id} value={test.id}>
-                        {test.number}. {test.label}
+                        {testHeading(test)}
                       </option>
                     ))}
                   </select>

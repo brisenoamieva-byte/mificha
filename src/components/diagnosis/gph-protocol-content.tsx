@@ -6,6 +6,7 @@ import { ArrowLeft } from "lucide-react";
 import { GphLogo } from "@/components/ui/gph-logo";
 import { BrandWordmark } from "@/components/ui/brand-wordmark";
 import {
+  GPH_BATTERY_SECTIONS,
   GPH_MANUAL_VERSION,
   GPH_PENALTIES,
   GPH_PERCENTILE_NOTE,
@@ -15,6 +16,7 @@ import {
   GPH_ROTATION_CAMPO,
   GPH_ROTATION_PORTERO,
   GPH_WEEK_360,
+  testHeading,
   testsForBattery,
   type GphProtocolStage,
 } from "@/lib/gph-field-protocol";
@@ -102,39 +104,108 @@ export function GphProtocolContent() {
             ))}
           </ol>
 
-          <div className="space-y-3">
-            {tests.map((test) => (
-              <article key={test.id} className="rounded-xl border border-mf-border-subtle p-3">
-                <p className="text-sm font-semibold text-mf-text">
-                  {test.number}. {test.label}
-                  {test.usage === "plus" ? (
-                    <span className="ml-2 text-[10px] uppercase text-mf-gph">360</span>
-                  ) : (
-                    <span className="ml-2 text-[10px] uppercase text-mf-text-muted">E / 360</span>
-                  )}
-                </p>
-                <dl className="mt-2 grid gap-2 text-[13px] text-mf-text-secondary sm:grid-cols-3">
-                  <div>
-                    <dt className="text-[10px] font-semibold uppercase tracking-wide text-mf-text-muted">
-                      Montaje
-                    </dt>
-                    <dd className="mt-0.5">{test.setup}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-[10px] font-semibold uppercase tracking-wide text-mf-text-muted">
-                      Ejecución
-                    </dt>
-                    <dd className="mt-0.5">{test.execution}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-[10px] font-semibold uppercase tracking-wide text-mf-text-muted">
-                      Registrar
-                    </dt>
-                    <dd className="mt-0.5">{test.record}</dd>
-                  </div>
-                </dl>
-              </article>
-            ))}
+          <div className="space-y-5">
+            {GPH_BATTERY_SECTIONS.map((section) => {
+              const sectionTests = tests.filter((test) => test.section === section.id);
+              if (section.id === "fisicas") {
+                return (
+                  <section key={section.id}>
+                    <p className="text-sm font-semibold text-mf-text">
+                      {section.number}. {section.label}
+                    </p>
+                    <ul className="mt-2 space-y-1 text-xs text-mf-text-secondary">
+                      {GPH_PHYSICAL_TESTS.filter((item) => !("legacy" in item && item.legacy)).map(
+                        (item) => (
+                          <li key={item.id}>
+                            {"code" in item && item.code ? `${item.code}) ` : ""}
+                            {item.label}: {item.protocol}
+                          </li>
+                        ),
+                      )}
+                    </ul>
+                  </section>
+                );
+              }
+              if (sectionTests.length === 0) return null;
+              return (
+                <section key={section.id} className="space-y-3">
+                  <p className="text-sm font-semibold text-mf-text">
+                    {section.number}. {section.label}
+                  </p>
+                  {sectionTests.map((test) => (
+                    <article key={test.id} className="rounded-xl border border-mf-border-subtle p-3">
+                      <p className="text-sm font-semibold text-mf-text">
+                        {testHeading(test)}
+                        {test.usage === "plus" ? (
+                          <span className="ml-2 text-[10px] uppercase text-mf-gph">360</span>
+                        ) : (
+                          <span className="ml-2 text-[10px] uppercase text-mf-text-muted">E / 360</span>
+                        )}
+                      </p>
+                      <dl className="mt-2 grid gap-2 text-[13px] text-mf-text-secondary sm:grid-cols-3">
+                        <div>
+                          <dt className="text-[10px] font-semibold uppercase tracking-wide text-mf-text-muted">
+                            Montaje
+                          </dt>
+                          <dd className="mt-0.5">{test.setup}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-[10px] font-semibold uppercase tracking-wide text-mf-text-muted">
+                            Ejecución
+                          </dt>
+                          <dd className="mt-0.5">{test.execution}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-[10px] font-semibold uppercase tracking-wide text-mf-text-muted">
+                            Registrar
+                          </dt>
+                          <dd className="mt-0.5">{test.record}</dd>
+                        </div>
+                      </dl>
+                    </article>
+                  ))}
+                </section>
+              );
+            })}
+            {tests.filter((test) => !test.section).length > 0 ? (
+              <section className="space-y-3">
+                <p className="text-sm font-semibold text-mf-text">Estaciones</p>
+                {tests
+                  .filter((test) => !test.section)
+                  .map((test) => (
+                    <article key={test.id} className="rounded-xl border border-mf-border-subtle p-3">
+                      <p className="text-sm font-semibold text-mf-text">
+                        {testHeading(test)}
+                        {test.usage === "plus" ? (
+                          <span className="ml-2 text-[10px] uppercase text-mf-gph">360</span>
+                        ) : (
+                          <span className="ml-2 text-[10px] uppercase text-mf-text-muted">E / 360</span>
+                        )}
+                      </p>
+                      <dl className="mt-2 grid gap-2 text-[13px] text-mf-text-secondary sm:grid-cols-3">
+                        <div>
+                          <dt className="text-[10px] font-semibold uppercase tracking-wide text-mf-text-muted">
+                            Montaje
+                          </dt>
+                          <dd className="mt-0.5">{test.setup}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-[10px] font-semibold uppercase tracking-wide text-mf-text-muted">
+                            Ejecución
+                          </dt>
+                          <dd className="mt-0.5">{test.execution}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-[10px] font-semibold uppercase tracking-wide text-mf-text-muted">
+                            Registrar
+                          </dt>
+                          <dd className="mt-0.5">{test.record}</dd>
+                        </div>
+                      </dl>
+                    </article>
+                  ))}
+              </section>
+            ) : null}
           </div>
 
           {stage === "desarrollo" || module === "campo" ? (
@@ -145,14 +216,6 @@ export function GphProtocolContent() {
                   <li key={day.day} className="rounded-xl bg-mf-canvas px-3 py-2 text-sm">
                     <span className="font-semibold">Día {day.day}. {day.title}.</span>{" "}
                     <span className="text-mf-text-secondary">{day.tests} Entregable: {day.deliverable}</span>
-                  </li>
-                ))}
-              </ul>
-              <p className="mt-3 text-xs font-medium text-mf-text">Físico (día 2, con fisioterapia)</p>
-              <ul className="mt-1 space-y-1 text-xs text-mf-text-secondary">
-                {GPH_PHYSICAL_TESTS.map((item) => (
-                  <li key={item.id}>
-                    {item.label}: {item.protocol}
                   </li>
                 ))}
               </ul>

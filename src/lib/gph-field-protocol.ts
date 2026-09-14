@@ -33,24 +33,80 @@ export type GphTestKind =
 
 export type GphConversion = "accuracy" | "contacts_ini" | "contacts_des" | "rubric_06" | "manual";
 
+export const GPH_BATTERY_SECTIONS = [
+  { id: "fisicas", number: 1, label: "Físicas" },
+  { id: "tecnicas", number: 2, label: "Técnicas" },
+  { id: "coordinativas", number: 3, label: "Coordinativas" },
+  { id: "cognitivas", number: 4, label: "Cognitivas" },
+  { id: "reglamentarias", number: 5, label: "Reglamentarias" },
+] as const;
+
+export type GphBatterySectionId = (typeof GPH_BATTERY_SECTIONS)[number]["id"];
+
+export const GPH_REGULATION_RULE_COUNT = 17;
+
+/** Orden IFAB. Clave para el evaluador; el jugador las dicta en los 17 espacios. */
+export const GPH_REGULATION_RULES = [
+  { title: "El terreno de juego", aliases: ["campo", "cancha", "terreno"] },
+  { title: "El balón", aliases: ["balon", "pelota"] },
+  { title: "Los jugadores", aliases: ["jugadores", "numero de jugadores"] },
+  {
+    title: "El equipamiento de los jugadores",
+    aliases: ["equipamiento", "equipo de los jugadores", "indumentaria"],
+  },
+  { title: "El árbitro", aliases: ["arbitro", "referee"] },
+  {
+    title: "Los otros miembros del equipo arbitral",
+    aliases: ["asistentes", "jueces de linea", "equipo arbitral"],
+  },
+  { title: "La duración del partido", aliases: ["duracion", "tiempo de juego"] },
+  {
+    title: "El inicio y la reanudación del juego",
+    aliases: ["saque inicial", "inicio del juego", "reanudacion"],
+  },
+  {
+    title: "El balón en juego y fuera de juego",
+    aliases: ["balon en juego", "fuera de juego del balon"],
+  },
+  {
+    title: "El resultado de un partido",
+    aliases: ["gol", "resultado", "tanto"],
+  },
+  { title: "El fuera de juego", aliases: ["fuera de lugar", "offside"] },
+  { title: "Faltas e incorrecciones", aliases: ["faltas", "infracciones", "conducta"] },
+  { title: "Tiros libres", aliases: ["tiro libre", "faltas indirectas"] },
+  { title: "El penal", aliases: ["penalti", "penalty", "penal"] },
+  { title: "El saque de banda", aliases: ["lateral", "saque de banda"] },
+  { title: "El saque de meta", aliases: ["saque de puerta", "goal kick"] },
+  { title: "El saque de esquina", aliases: ["corner", "tiro de esquina"] },
+] as const;
+
 export interface GphStationTest {
   id: string;
   number: number;
+  /** Código de batería, p. ej. 2C. */
+  code?: string;
+  section?: GphBatterySectionId;
   label: string;
   unit: string;
   module: DiagnosisModule;
-  stage: GphProtocolStage;
+  stage: GphProtocolStage | "ambos";
+  /** Si existe, la prueba aplica a esos módulos (p. ej. cognitivas para campo y portero). */
+  appliesTo?: readonly DiagnosisModule[];
   /** esencial = E/360; plus = solo 360 */
   usage: "esencial" | "plus";
   kind: GphTestKind;
   conversion: GphConversion;
   attempts: number;
+  attemptLabels?: readonly string[];
   maxPoints?: number;
   setup: string;
   execution: string;
   record: string;
   indicatorId?: string;
   relevanceDefault: 1 | 2 | 3;
+  /** Sigue en el catálogo para reportes viejos; no sale en la batería nueva. */
+  retired?: boolean;
 }
 
 export interface GphShotDistanceCapture {
@@ -73,6 +129,8 @@ export interface GphTestCapture {
   hits20m: number | null;
   /** Precisión + potencia por distancia (tiros). */
   shotDistances: Record<string, GphShotDistanceCapture>;
+  /** Las 17 reglas en orden (prueba reglamentaria). */
+  ruleSlots: string[];
   radarKmh: number | null;
   score: number | null;
   relevance: 1 | 2 | 3;
@@ -147,7 +205,7 @@ export interface GphFieldSession {
 function t(
   partial: Omit<GphStationTest, "module" | "stage"> & {
     module: DiagnosisModule;
-    stage: GphProtocolStage;
+    stage: GphProtocolStage | "ambos";
   },
 ): GphStationTest {
   return partial;
@@ -157,6 +215,8 @@ export const GPH_STATION_TESTS: readonly GphStationTest[] = [
   t({
     id: "ini_c_dominadas",
     number: 1,
+    code: "2A",
+    section: "tecnicas",
     module: "campo",
     stage: "iniciacion",
     usage: "esencial",
@@ -174,40 +234,50 @@ export const GPH_STATION_TESTS: readonly GphStationTest[] = [
   t({
     id: "ini_c_control",
     number: 2,
+    code: "2E",
+    section: "tecnicas",
     module: "campo",
     stage: "iniciacion",
-    usage: "plus",
-    label: "Control reducido",
-    unit: "contactos / salidas",
+    usage: "esencial",
+    label: "Control fijo y orientado raso",
+    unit: "rúbrica 0–6",
     kind: "contacts",
-    conversion: "manual",
+    conversion: "rubric_06",
     attempts: 2,
-    setup: "Cuadro 3 × 3 m; cuatro conos.",
-    execution: "30 s de contactos libres sin que el balón salga. Dos rondas.",
-    record: "Contactos correctos; salidas; pérdidas de control.",
+    attemptLabels: ["5 m", "10 m"],
+    maxPoints: 6,
+    setup: "Servicio raso; zonas de control a 5 m y 10 m.",
+    execution: "Un intento por distancia (5 m y 10 m). Control fijo y orientado raso.",
+    record: "Rúbrica 0–6 a 5 m y a 10 m (1 intento cada distancia).",
     indicatorId: "control_orientado",
     relevanceDefault: 3,
   }),
   t({
     id: "ini_c_slalom",
     number: 3,
+    code: "2C",
+    section: "tecnicas",
     module: "campo",
     stage: "iniciacion",
     usage: "esencial",
-    label: "Slalom",
+    label: "Zig Zag",
     unit: "s + penalización",
     kind: "time",
     conversion: "manual",
-    attempts: 2,
-    setup: "6 conos cada 1.5 m; recorrido ida y vuelta.",
-    execution: "Conducir, girar en el último cono y regresar. Dos intentos.",
-    record: "Tiempo; +1 s por cono; +2 s si pierde el balón a más de 1 m.",
+    attempts: 4,
+    attemptLabels: ["Izq 1", "Izq 2", "Der 1", "Der 2"],
+    setup: "Conos en zig zag; 10 m de ida y 10 m de vuelta.",
+    execution:
+      "Dos intentos por lado (izquierda y derecha). Conducir 10 m de ida y 10 m de vuelta.",
+    record: "Tiempo de cada intento; +1 s por cono; +2 s si pierde el balón a más de 1 m.",
     indicatorId: "conduccion",
     relevanceDefault: 2,
   }),
   t({
     id: "ini_c_pase",
     number: 4,
+    code: "2D",
+    section: "tecnicas",
     module: "campo",
     stage: "iniciacion",
     usage: "esencial",
@@ -227,36 +297,42 @@ export const GPH_STATION_TESTS: readonly GphStationTest[] = [
   t({
     id: "ini_c_recepcion",
     number: 5,
+    code: "2E",
+    section: "tecnicas",
     module: "campo",
     stage: "iniciacion",
     usage: "esencial",
-    label: "Recepción + pase",
-    unit: "puntos / 20",
-    kind: "points",
-    conversion: "accuracy",
-    attempts: 10,
-    maxPoints: 20,
-    setup: "Cuadro 1.5 × 1.5 m; servicio a 5 m; puerta a 6 m.",
-    execution: "Recibir dentro del cuadro y pasar por la puerta. 10 servicios.",
-    record: "1 punto control + 1 punto pase. Máximo 20.",
+    label: "Control fijo y orientado elevado",
+    unit: "rúbrica 0–6",
+    kind: "contacts",
+    conversion: "rubric_06",
+    attempts: 3,
+    attemptLabels: ["Muslo 20 m", "Pecho 20 m", "Pie 20 m"],
+    maxPoints: 6,
+    setup: "Servicio elevado a 20 m; muslo, pecho y pie.",
+    execution: "Un intento por superficie (muslo, pecho y pie) a 20 m.",
+    record: "Rúbrica 0–6 por superficie (muslo, pecho y pie).",
     indicatorId: "recepcion",
     relevanceDefault: 3,
   }),
   t({
     id: "ini_c_tiro",
     number: 6,
+    code: "2G",
+    section: "tecnicas",
     module: "campo",
     stage: "iniciacion",
     usage: "esencial",
-    label: "Tiro de precisión",
-    unit: "puntos / 20",
+    label: "Tiro a gol en movimiento",
+    unit: "precisión + potencia · 11 / 16.5 / 20 m · izq y der",
     kind: "points",
     conversion: "accuracy",
-    attempts: 10,
-    maxPoints: 20,
-    setup: "Línea a 8 m; cuatro objetivos de 1 × 1 m.",
-    execution: "10 tiros con balón detenido: 5 por pie.",
-    record: "2 objetivo; 1 portería; 0 fuera. Máximo 20.",
+    attempts: 0,
+    maxPoints: 8,
+    setup: "Conducción corta; líneas a 11 m, 16.5 m y 20 m; ambos perfiles.",
+    execution:
+      "En cada distancia: tiro en movimiento con derecha y con izquierda. Precisión y potencia.",
+    record: "Precisión y potencia a 11 m, 16.5 m y 20 m, izquierda y derecha.",
     indicatorId: "finalizacion",
     relevanceDefault: 3,
   }),
@@ -266,6 +342,7 @@ export const GPH_STATION_TESTS: readonly GphStationTest[] = [
     module: "campo",
     stage: "iniciacion",
     usage: "esencial",
+    retired: true,
     label: "Golpeo largo",
     unit: "m + corredor",
     kind: "distance",
@@ -283,6 +360,7 @@ export const GPH_STATION_TESTS: readonly GphStationTest[] = [
     module: "campo",
     stage: "iniciacion",
     usage: "plus",
+    retired: true,
     label: "Sprint 10 m",
     unit: "s",
     kind: "time",
@@ -300,6 +378,7 @@ export const GPH_STATION_TESTS: readonly GphStationTest[] = [
     module: "campo",
     stage: "iniciacion",
     usage: "plus",
+    retired: true,
     label: "Duelo 1 contra 1",
     unit: "éxitos / oportunidades",
     kind: "ratio",
@@ -317,6 +396,7 @@ export const GPH_STATION_TESTS: readonly GphStationTest[] = [
     module: "campo",
     stage: "iniciacion",
     usage: "esencial",
+    retired: true,
     label: "Juego aplicado",
     unit: "decisiones correctas / oportunidades",
     kind: "ratio",
@@ -331,6 +411,8 @@ export const GPH_STATION_TESTS: readonly GphStationTest[] = [
   t({
     id: "des_c_dominadas",
     number: 1,
+    code: "2A",
+    section: "tecnicas",
     module: "campo",
     stage: "desarrollo",
     usage: "esencial",
@@ -348,9 +430,11 @@ export const GPH_STATION_TESTS: readonly GphStationTest[] = [
   t({
     id: "des_c_patrones",
     number: 2,
+    code: "2B",
+    section: "tecnicas",
     module: "campo",
     stage: "desarrollo",
-    usage: "plus",
+    usage: "esencial",
     label: "Conducción a velocidad",
     unit: "rúbrica 0–6",
     kind: "contacts",
@@ -367,23 +451,29 @@ export const GPH_STATION_TESTS: readonly GphStationTest[] = [
   t({
     id: "des_c_slalom",
     number: 3,
+    code: "2C",
+    section: "tecnicas",
     module: "campo",
     stage: "desarrollo",
     usage: "esencial",
-    label: "Slalom a velocidad",
+    label: "Zig Zag",
     unit: "s + penalización",
     kind: "time",
     conversion: "manual",
-    attempts: 2,
-    setup: "8 conos cada 1.2 m; giro de 180 grados.",
-    execution: "Ida y vuelta a máxima velocidad controlada. Dos intentos.",
-    record: "Tiempo; +1 s por cono; +2 s por pérdida a más de 1 m.",
+    attempts: 4,
+    attemptLabels: ["Izq 1", "Izq 2", "Der 1", "Der 2"],
+    setup: "Conos en zig zag; 10 m de ida y 10 m de vuelta.",
+    execution:
+      "Dos intentos por lado (izquierda y derecha). Conducir 10 m de ida y 10 m de vuelta a máxima velocidad controlada.",
+    record: "Tiempo de cada intento; +1 s por cono; +2 s por pérdida a más de 1 m.",
     indicatorId: "conduccion",
     relevanceDefault: 2,
   }),
   t({
     id: "des_c_pase",
     number: 4,
+    code: "2D",
+    section: "tecnicas",
     module: "campo",
     stage: "desarrollo",
     usage: "esencial",
@@ -403,57 +493,64 @@ export const GPH_STATION_TESTS: readonly GphStationTest[] = [
   t({
     id: "des_c_control",
     number: 5,
+    code: "2E",
+    section: "tecnicas",
     module: "campo",
     stage: "desarrollo",
     usage: "esencial",
-    label: "Control orientado",
-    unit: "puntos / 24",
-    kind: "points",
-    conversion: "accuracy",
-    attempts: 12,
-    maxPoints: 24,
-    setup: "Servicio a 8 m; dos zonas de 1.5 × 1.5 m.",
-    execution: "Tras salir el balón se indica izquierda/derecha; controlar y pasar. 12 repeticiones.",
-    record: "1 punto zona + 1 pase; tiempo de ejecución. Máximo 24.",
+    label: "Control fijo y orientado raso",
+    unit: "rúbrica 0–6",
+    kind: "contacts",
+    conversion: "rubric_06",
+    attempts: 2,
+    attemptLabels: ["5 m", "10 m"],
+    maxPoints: 6,
+    setup: "Servicio raso; zonas de control a 5 m y 10 m.",
+    execution: "Un intento por distancia (5 m y 10 m). Control fijo y orientado raso.",
+    record: "Rúbrica 0–6 a 5 m y a 10 m (1 intento cada distancia).",
     indicatorId: "control_orientado",
     relevanceDefault: 3,
   }),
   t({
     id: "des_c_tiro",
     number: 6,
+    code: "2G",
+    section: "tecnicas",
     module: "campo",
     stage: "desarrollo",
     usage: "esencial",
-    label: "Tiro en movimiento",
-    unit: "precisión + potencia · 5/10/20 m",
+    label: "Tiro a gol en movimiento",
+    unit: "precisión + potencia · 11 / 16.5 / 20 m · izq y der",
     kind: "points",
     conversion: "accuracy",
     attempts: 0,
     maxPoints: 8,
-    setup: "Conducción corta; líneas de tiro a 5 m, 10 m y 20 m; objetivos en portería.",
+    setup: "Conducción corta; líneas a 11 m, 16.5 m y 20 m; ambos perfiles.",
     execution:
-      "En cada distancia: tiros en movimiento. Registrar precisión (puntos) y potencia (km/h).",
-    record: "Precisión y potencia a 5, 10 y 20 m.",
+      "En cada distancia: tiro en movimiento con derecha y con izquierda. Precisión y potencia.",
+    record: "Precisión y potencia a 11 m, 16.5 m y 20 m, izquierda y derecha.",
     indicatorId: "finalizacion",
     relevanceDefault: 3,
   }),
   t({
     id: "des_c_tiro_gol",
     number: 7,
+    code: "2G",
+    section: "tecnicas",
     module: "campo",
     stage: "desarrollo",
     usage: "esencial",
-    label: "Tiro a gol",
-    unit: "precisión + potencia · 11 / 16.5 / 20 m",
+    label: "Tiro a gol fijo",
+    unit: "precisión + potencia · 11 / 16.5 / 20 m · izq y der",
     kind: "points",
     conversion: "accuracy",
     attempts: 0,
     maxPoints: 8,
     setup:
-      "Balón detenido; distancias 11 m (penal), 16.5 m (fuera de área) y 20 m; radar opcional.",
+      "Balón detenido; distancias 11 m (penal), 16.5 m (fuera de área) y 20 m; ambos perfiles; radar opcional.",
     execution:
-      "En cada distancia: tiros a gol. Registrar precisión (puntos) y potencia (km/h).",
-    record: "Precisión y potencia a 11 m, 16.5 m y 20 m.",
+      "En cada distancia: tiro a gol fijo con derecha y con izquierda. Precisión y potencia.",
+    record: "Precisión y potencia a 11 m, 16.5 m y 20 m, izquierda y derecha.",
     indicatorId: "finalizacion",
     relevanceDefault: 3,
   }),
@@ -463,6 +560,7 @@ export const GPH_STATION_TESTS: readonly GphStationTest[] = [
     module: "campo",
     stage: "desarrollo",
     usage: "esencial",
+    retired: true,
     label: "Pase largo",
     unit: "puntos / 18",
     kind: "points",
@@ -481,6 +579,7 @@ export const GPH_STATION_TESTS: readonly GphStationTest[] = [
     module: "campo",
     stage: "desarrollo",
     usage: "plus",
+    retired: true,
     label: "Cambio 5-0-5",
     unit: "s",
     kind: "time",
@@ -498,6 +597,7 @@ export const GPH_STATION_TESTS: readonly GphStationTest[] = [
     module: "campo",
     stage: "desarrollo",
     usage: "plus",
+    retired: true,
     label: "Prueba de Illinois",
     unit: "s",
     kind: "time",
@@ -515,6 +615,7 @@ export const GPH_STATION_TESTS: readonly GphStationTest[] = [
     module: "campo",
     stage: "desarrollo",
     usage: "plus",
+    retired: true,
     label: "Duelo por función",
     unit: "% éxito ataque / defensa",
     kind: "ratio",
@@ -532,6 +633,7 @@ export const GPH_STATION_TESTS: readonly GphStationTest[] = [
     module: "campo",
     stage: "desarrollo",
     usage: "esencial",
+    retired: true,
     label: "Juego aplicado",
     unit: "decisiones correctas / oportunidades",
     kind: "ratio",
@@ -988,6 +1090,381 @@ export const GPH_STATION_TESTS: readonly GphStationTest[] = [
     indicatorId: "pase",
     relevanceDefault: 3,
   }),
+  t({
+    id: "ini_c_patrones",
+    number: 2,
+    code: "2B",
+    section: "tecnicas",
+    module: "campo",
+    stage: "iniciacion",
+    usage: "esencial",
+    label: "Conducción a velocidad",
+    unit: "rúbrica 0–6",
+    kind: "contacts",
+    conversion: "rubric_06",
+    attempts: 8,
+    maxPoints: 6,
+    setup: "Líneas a 5, 10, 20 y 30 m. 2 repeticiones por distancia (1 por perfil).",
+    execution: "Por distancia (5, 10, 20, 30 m): un intento derecha y uno izquierda.",
+    record: "Rúbrica por intento: 0 deficiente · 2 regular · 4 bueno · 6 óptimo.",
+    indicatorId: "conduccion",
+    relevanceDefault: 3,
+  }),
+  t({
+    id: "ini_c_tiro_gol",
+    number: 7,
+    code: "2G",
+    section: "tecnicas",
+    module: "campo",
+    stage: "iniciacion",
+    usage: "esencial",
+    label: "Tiro a gol fijo",
+    unit: "precisión + potencia · 11 / 16.5 / 20 m · izq y der",
+    kind: "points",
+    conversion: "accuracy",
+    attempts: 0,
+    maxPoints: 8,
+    setup:
+      "Balón detenido; distancias 11 m (penal), 16.5 m (fuera de área) y 20 m; ambos perfiles; radar opcional.",
+    execution:
+      "En cada distancia: tiro a gol fijo con derecha y con izquierda. Precisión y potencia.",
+    record: "Precisión y potencia a 11 m, 16.5 m y 20 m, izquierda y derecha.",
+    indicatorId: "finalizacion",
+    relevanceDefault: 3,
+  }),
+  t({
+    id: "ini_c_dribling",
+    number: 8,
+    code: "2F",
+    section: "tecnicas",
+    module: "campo",
+    stage: "iniciacion",
+    usage: "esencial",
+    label: "Dribling 5 m",
+    unit: "s",
+    kind: "time",
+    conversion: "manual",
+    attempts: 8,
+    attemptLabels: [
+      "Dinámica der 1",
+      "Dinámica der 2",
+      "Dinámica izq 1",
+      "Dinámica izq 2",
+      "Estática der 1",
+      "Estática der 2",
+      "Estática izq 1",
+      "Estática izq 2",
+    ],
+    setup: "Línea de 5 m; dribling dinámica y estática, ambos perfiles.",
+    execution: "Dos intentos de cada variante: dinámica e izquierda/derecha; estática e izquierda/derecha.",
+    record: "Tiempo de cada intento (2 por variante).",
+    indicatorId: "uno_contra_uno",
+    relevanceDefault: 3,
+  }),
+  t({
+    id: "des_c_dribling",
+    number: 8,
+    code: "2F",
+    section: "tecnicas",
+    module: "campo",
+    stage: "desarrollo",
+    usage: "esencial",
+    label: "Dribling 5 m",
+    unit: "s",
+    kind: "time",
+    conversion: "manual",
+    attempts: 8,
+    attemptLabels: [
+      "Dinámica der 1",
+      "Dinámica der 2",
+      "Dinámica izq 1",
+      "Dinámica izq 2",
+      "Estática der 1",
+      "Estática der 2",
+      "Estática izq 1",
+      "Estática izq 2",
+    ],
+    setup: "Línea de 5 m; dribling dinámica y estática, ambos perfiles.",
+    execution: "Dos intentos de cada variante: dinámica e izquierda/derecha; estática e izquierda/derecha.",
+    record: "Tiempo de cada intento (2 por variante).",
+    indicatorId: "uno_contra_uno",
+    relevanceDefault: 3,
+  }),
+  t({
+    id: "des_c_control_elevado",
+    number: 5,
+    code: "2E",
+    section: "tecnicas",
+    module: "campo",
+    stage: "desarrollo",
+    usage: "esencial",
+    label: "Control fijo y orientado elevado",
+    unit: "rúbrica 0–6",
+    kind: "contacts",
+    conversion: "rubric_06",
+    attempts: 3,
+    attemptLabels: ["Muslo 20 m", "Pecho 20 m", "Pie 20 m"],
+    maxPoints: 6,
+    setup: "Servicio elevado a 20 m; muslo, pecho y pie.",
+    execution: "Un intento por superficie (muslo, pecho y pie) a 20 m.",
+    record: "Rúbrica 0–6 por superficie (muslo, pecho y pie).",
+    indicatorId: "recepcion",
+    relevanceDefault: 3,
+  }),
+  t({
+    id: "ini_c_fildeo",
+    number: 9,
+    code: "2H",
+    section: "tecnicas",
+    module: "campo",
+    stage: "iniciacion",
+    usage: "esencial",
+    label: "Fildeo",
+    unit: "rúbrica 0–6",
+    kind: "contacts",
+    conversion: "rubric_06",
+    attempts: 4,
+    attemptLabels: ["Pie izq", "Pie der", "Cabeza izq", "Cabeza der"],
+    maxPoints: 6,
+    setup: "Servicios a pie y de cabeza, ambos lados.",
+    execution: "Un intento de fildeo con pie izquierdo, pie derecho, cabeza izquierda y cabeza derecha.",
+    record: "Rúbrica 0–6 de cada fildeo (1 intento).",
+    indicatorId: "recepcion",
+    relevanceDefault: 2,
+  }),
+  t({
+    id: "des_c_fildeo",
+    number: 9,
+    code: "2H",
+    section: "tecnicas",
+    module: "campo",
+    stage: "desarrollo",
+    usage: "esencial",
+    label: "Fildeo",
+    unit: "rúbrica 0–6",
+    kind: "contacts",
+    conversion: "rubric_06",
+    attempts: 4,
+    attemptLabels: ["Pie izq", "Pie der", "Cabeza izq", "Cabeza der"],
+    maxPoints: 6,
+    setup: "Servicios a pie y de cabeza, ambos lados.",
+    execution: "Un intento de fildeo con pie izquierdo, pie derecho, cabeza izquierda y cabeza derecha.",
+    record: "Rúbrica 0–6 de cada fildeo (1 intento).",
+    indicatorId: "recepcion",
+    relevanceDefault: 2,
+  }),
+  t({
+    id: "gph_semaforo",
+    number: 1,
+    code: "3A",
+    section: "coordinativas",
+    module: "campo",
+    appliesTo: ["campo", "portero"],
+    stage: "ambos",
+    usage: "esencial",
+    label: "Prueba del semáforo",
+    unit: "rúbrica 0–6",
+    kind: "contacts",
+    conversion: "rubric_06",
+    attempts: 1,
+    maxPoints: 6,
+    setup: "Tres estímulos de color (rojo / amarillo / verde) visibles de frente. Distancia de 8–10 m.",
+    execution:
+      "Un intento. Rojo = frenar; amarillo = cambiar de dirección; verde = acelerar. El estímulo sale sin aviso.",
+    record: "Rúbrica 0–6: reacción, elección y control del cuerpo. 1 intento.",
+    indicatorId: "coordinacion",
+    relevanceDefault: 2,
+  }),
+  t({
+    id: "gph_perfiles",
+    number: 2,
+    code: "3B",
+    section: "coordinativas",
+    module: "campo",
+    appliesTo: ["campo", "portero"],
+    stage: "ambos",
+    usage: "esencial",
+    label: "Perfiles condicionados",
+    unit: "rúbrica 0–6",
+    kind: "contacts",
+    conversion: "rubric_06",
+    attempts: 1,
+    maxPoints: 6,
+    setup: "Señal de mano o color para abrir, cerrar o cambiar de perfil. Espacio 6 × 6 m.",
+    execution:
+      "Un intento. El jugador recibe el estímulo y adopta el perfil pedido antes del siguiente contacto.",
+    record: "Rúbrica 0–6: velocidad de orientación y perfil útil. 1 intento.",
+    indicatorId: "coordinacion",
+    relevanceDefault: 2,
+  }),
+  t({
+    id: "gph_marcha",
+    number: 3,
+    code: "3C",
+    section: "coordinativas",
+    module: "campo",
+    appliesTo: ["campo", "portero"],
+    stage: "ambos",
+    usage: "esencial",
+    label: "Marcha",
+    unit: "s",
+    kind: "time",
+    conversion: "manual",
+    attempts: 6,
+    attemptLabels: [
+      "Unipodal der 1",
+      "Unipodal der 2",
+      "Unipodal izq 1",
+      "Unipodal izq 2",
+      "Bipodal 1",
+      "Bipodal 2",
+    ],
+    setup: "Línea de 10 m. Unipodal: apoyos de una pierna. Bipodal: ambos pies.",
+    execution:
+      "Dos intentos de unipodal derecha, unipodal izquierda y bipodal. Recorrer la línea sin perder el patrón.",
+    record: "Tiempo en segundos de cada intento (mejor = más bajo). Anotar tropiezos en la nota.",
+    indicatorId: "coordinacion",
+    relevanceDefault: 2,
+  }),
+  t({
+    id: "gph_giros",
+    number: 4,
+    code: "3D",
+    section: "coordinativas",
+    module: "campo",
+    appliesTo: ["campo", "portero"],
+    stage: "ambos",
+    usage: "esencial",
+    label: "Giros",
+    unit: "rúbrica 0–6",
+    kind: "contacts",
+    conversion: "rubric_06",
+    attempts: 6,
+    maxPoints: 6,
+    attemptLabels: [
+      "Marometa frente 1",
+      "Marometa frente 2",
+      "Marometa atrás 1",
+      "Marometa atrás 2",
+      "Pérdida de orientación 1",
+      "Pérdida de orientación 2",
+    ],
+    setup: "Colchoneta o zona segura. Pérdida de orientación: giro 360° y reorientar a un estímulo.",
+    execution:
+      "Dos intentos de marometa al frente, marometa atrás y pérdida de orientación (giro y reencontrar el frente).",
+    record: "Rúbrica 0–6 por intento: control, alineación y reorientación.",
+    indicatorId: "coordinacion",
+    relevanceDefault: 2,
+  }),
+  t({
+    id: "gph_memoria_corto",
+    number: 1,
+    code: "4A",
+    section: "cognitivas",
+    module: "campo",
+    appliesTo: ["campo", "portero"],
+    stage: "ambos",
+    usage: "esencial",
+    label: "Memoria de corto plazo",
+    unit: "aciertos / 6",
+    kind: "contacts",
+    conversion: "manual",
+    attempts: 2,
+    setup: "Secuencia de 6 elementos (colores, números o acciones) mostrada 8 s. Recuerdo inmediato.",
+    execution: "Dos intentos con secuencias distintas. El jugador reproduce en orden.",
+    record: "Aciertos en orden (0–6) de cada intento.",
+    indicatorId: "atencion",
+    relevanceDefault: 2,
+  }),
+  t({
+    id: "gph_percepcion",
+    number: 2,
+    code: "4B",
+    section: "cognitivas",
+    module: "campo",
+    appliesTo: ["campo", "portero"],
+    stage: "ambos",
+    usage: "esencial",
+    label: "Percepción",
+    unit: "aciertos / 5",
+    kind: "contacts",
+    conversion: "manual",
+    attempts: 1,
+    setup: "Escena de 5 s: compañeros, conos o puertas. Preguntar cantidad, lado o espacio libre.",
+    execution: "Un intento. El jugador responde de memoria lo que vio.",
+    record: "Aciertos (0–5) del intento.",
+    indicatorId: "escaneo",
+    relevanceDefault: 2,
+  }),
+  t({
+    id: "gph_decisiones",
+    number: 3,
+    code: "4C",
+    section: "cognitivas",
+    module: "campo",
+    appliesTo: ["campo", "portero"],
+    stage: "ambos",
+    usage: "esencial",
+    label: "Toma de decisiones 5, 6 y 7",
+    unit: "aciertos 0–1",
+    kind: "contacts",
+    conversion: "manual",
+    attempts: 6,
+    attemptLabels: [
+      "Decisión 5 · 1",
+      "Decisión 5 · 2",
+      "Decisión 6 · 1",
+      "Decisión 6 · 2",
+      "Decisión 7 · 1",
+      "Decisión 7 · 2",
+    ],
+    setup: "Tres escenarios GPH (5, 6 y 7): diagrama o video con 2–3 opciones de pase/desborde/retención.",
+    execution: "Dos intentos por escenario. 1 = decisión correcta y a tiempo; 0 = incorrecta o tardía.",
+    record: "0 o 1 en cada intento (2 por escenario 5, 6 y 7).",
+    indicatorId: "toma_decisiones",
+    relevanceDefault: 3,
+  }),
+  t({
+    id: "gph_memoria_largo",
+    number: 4,
+    code: "4D",
+    section: "cognitivas",
+    module: "campo",
+    appliesTo: ["campo", "portero"],
+    stage: "ambos",
+    usage: "esencial",
+    label: "Memoria de largo plazo",
+    unit: "aciertos / 6",
+    kind: "contacts",
+    conversion: "manual",
+    attempts: 1,
+    setup: "Misma secuencia de 4A, o consignas dadas al inicio de la sesión. Recuerdo al cierre (≥20 min).",
+    execution: "Un intento de recuerdo diferido, sin volver a mostrar la secuencia.",
+    record: "Aciertos en orden (0–6) del intento.",
+    indicatorId: "atencion",
+    relevanceDefault: 2,
+  }),
+  t({
+    id: "gph_reglas",
+    number: 1,
+    code: "5A",
+    section: "reglamentarias",
+    module: "campo",
+    appliesTo: ["campo", "portero"],
+    stage: "ambos",
+    usage: "esencial",
+    label: "Las 17 reglas",
+    unit: "reglas en orden",
+    kind: "contacts",
+    conversion: "accuracy",
+    attempts: 0,
+    maxPoints: 17,
+    setup: "Sin material a la vista. El jugador enuncia las 17 reglas del juego en orden.",
+    execution: "Anotar lo que dice en cada espacio. La clave del evaluador está debajo de cada campo.",
+    record: "Las 17 reglas en orden. El 1–5 sale del acierto de secuencia; se puede ajustar a mano.",
+    indicatorId: "ubicacion",
+    relevanceDefault: 2,
+  }),
 ];
 
 export const GPH_PHYSICAL_TESTS = [
@@ -998,6 +1475,7 @@ export const GPH_PHYSICAL_TESTS = [
     unit: "cm",
     attempts: 3,
     desarrolloOnly: false,
+    legacy: true,
     indicatorId: "fuerza_estabilidad" as const,
   },
   {
@@ -1007,6 +1485,7 @@ export const GPH_PHYSICAL_TESTS = [
     unit: "errores",
     attempts: 3,
     desarrolloOnly: false,
+    legacy: true,
     indicatorId: "fuerza_estabilidad" as const,
   },
   {
@@ -1016,6 +1495,7 @@ export const GPH_PHYSICAL_TESTS = [
     unit: "s",
     attempts: 2,
     desarrolloOnly: false,
+    code: "1A",
     group: "sprint" as const,
     indicatorId: "velocidad" as const,
   },
@@ -1026,6 +1506,7 @@ export const GPH_PHYSICAL_TESTS = [
     unit: "s",
     attempts: 2,
     desarrolloOnly: false,
+    code: "1A",
     group: "sprint" as const,
     indicatorId: "velocidad" as const,
   },
@@ -1036,6 +1517,7 @@ export const GPH_PHYSICAL_TESTS = [
     unit: "s",
     attempts: 2,
     desarrolloOnly: false,
+    code: "1A",
     group: "sprint" as const,
     indicatorId: "velocidad" as const,
   },
@@ -1046,6 +1528,7 @@ export const GPH_PHYSICAL_TESTS = [
     unit: "s",
     attempts: 2,
     desarrolloOnly: false,
+    code: "1A",
     group: "sprint" as const,
     indicatorId: "velocidad" as const,
   },
@@ -1067,6 +1550,7 @@ export const GPH_PHYSICAL_TESTS = [
     unit: "s",
     attempts: 2,
     desarrolloOnly: false,
+    code: "1B",
     indicatorId: "velocidad" as const,
   },
   {
@@ -1076,6 +1560,7 @@ export const GPH_PHYSICAL_TESTS = [
     unit: "s",
     attempts: 2,
     desarrolloOnly: false,
+    code: "1C",
     indicatorId: "velocidad" as const,
   },
   {
@@ -1085,6 +1570,7 @@ export const GPH_PHYSICAL_TESTS = [
     unit: "cm",
     attempts: 2,
     desarrolloOnly: false,
+    legacy: true,
     indicatorId: "movilidad" as const,
   },
   {
@@ -1093,8 +1579,53 @@ export const GPH_PHYSICAL_TESTS = [
     protocol: "1 intento. Registrar el resultado del Course Navette.",
     unit: "nivel",
     attempts: 1,
-    desarrolloOnly: true,
+    desarrolloOnly: false,
+    code: "1D",
     indicatorId: "resistencia" as const,
+  },
+  {
+    id: "fuerza_lagartijas",
+    label: "Lagartijas",
+    protocol: "1 intento. En 1 minuto, cuántas lagartijas.",
+    unit: "rep",
+    attempts: 1,
+    desarrolloOnly: false,
+    code: "1E",
+    group: "fuerza" as const,
+    indicatorId: "fuerza_estabilidad" as const,
+  },
+  {
+    id: "fuerza_abdominales",
+    label: "Abdominales",
+    protocol: "1 intento. En 1 minuto, cuántos abdominales.",
+    unit: "rep",
+    attempts: 1,
+    desarrolloOnly: false,
+    code: "1E",
+    group: "fuerza" as const,
+    indicatorId: "fuerza_estabilidad" as const,
+  },
+  {
+    id: "fuerza_espalda_baja",
+    label: "Espalda baja",
+    protocol: "1 intento. En 1 minuto, cuántas repeticiones de espalda baja.",
+    unit: "rep",
+    attempts: 1,
+    desarrolloOnly: false,
+    code: "1E",
+    group: "fuerza" as const,
+    indicatorId: "fuerza_estabilidad" as const,
+  },
+  {
+    id: "fuerza_sentadillas",
+    label: "Sentadillas",
+    protocol: "1 intento. En 1 minuto, cuántas sentadillas.",
+    unit: "rep",
+    attempts: 1,
+    desarrolloOnly: false,
+    code: "1E",
+    group: "fuerza" as const,
+    indicatorId: "fuerza_estabilidad" as const,
   },
 ] as const;
 
@@ -1107,11 +1638,11 @@ export const GPH_PENALTIES = [
 ] as const;
 
 export const GPH_ROTATION_CAMPO = [
-  { minutes: "0–10", title: "Activación", detail: "Registro, número y ensayo que no cuenta." },
-  { minutes: "10–55", title: "Técnica", detail: "Tres bloques de 15 min; dos pruebas relacionadas." },
-  { minutes: "55–70", title: "Velocidad / golpeo", detail: "Recuperación y orden fijo." },
-  { minutes: "70–85", title: "Duelo / juego", detail: "Grabar oportunidades, no impresiones." },
-  { minutes: "85–90", title: "Cierre", detail: "Revisar vacíos y guardar videos." },
+  { minutes: "1", title: "Físicas", detail: "Sprint, 505, Illinois, Navette y fuerza." },
+  { minutes: "2", title: "Técnicas", detail: "Dominadas, conducción, zig zag, pase, control, dribling, tiro y fildeo." },
+  { minutes: "3", title: "Coordinativas", detail: "Semáforo, perfiles, marcha y giros." },
+  { minutes: "4", title: "Cognitivas", detail: "Memoria, percepción y toma de decisiones." },
+  { minutes: "5", title: "Reglamentarias", detail: "Las 17 reglas en orden." },
 ] as const;
 
 export const GPH_ROTATION_PORTERO = [
@@ -1123,10 +1654,10 @@ export const GPH_ROTATION_PORTERO = [
 ] as const;
 
 export const GPH_WEEK_360 = [
-  { day: 1, title: "Técnica base", tests: "Dominio, conducción, pase, recepción, blocaje.", deliverable: "Resultados técnicos crudos." },
-  { day: 2, title: "Físico y funcional", tests: "Sprint 5/10/20/30 m, salto, equilibrio, movilidad y fisioterapia.", deliverable: "Perfil físico y alertas." },
-  { day: 3, title: "Decisión y mental", tests: "Duelo, juego aplicado, reacción al error y concentración.", deliverable: "Conductas observadas." },
-  { day: 4, title: "Aplicación y cierre", tests: "Tiro, golpeo, distribución, competencia y nutrición.", deliverable: "3–5 prioridades y plan." },
+  { day: 1, title: "Físicas", tests: "Sprint, cambio 505, Illinois, Course Navette y fuerza (1 min).", deliverable: "Marcas crudas." },
+  { day: 2, title: "Técnicas", tests: "Dominadas, conducción, zig zag, pase, control, dribling, tiro a gol y fildeo.", deliverable: "Resultados técnicos." },
+  { day: 3, title: "Coordinativas y cognitivas", tests: "Semáforo, perfiles, marcha, giros, memoria, percepción y decisiones 5-6-7.", deliverable: "Perfil coordinativo y mental." },
+  { day: 4, title: "Reglamentarias y cierre", tests: "Las 17 reglas en orden; videos y reporte.", deliverable: "3–5 prioridades y plan." },
 ] as const;
 
 export function protocolStageFromAssigned(
@@ -1149,10 +1680,71 @@ export function testsForBattery(
   sessionType: GphSessionType,
 ) {
   return GPH_STATION_TESTS.filter((test) => {
-    if (test.module !== module || test.stage !== stage) return false;
+    if (test.retired) return false;
+    const modules = test.appliesTo ?? [test.module];
+    if (!modules.includes(module)) return false;
+    if (test.stage !== "ambos" && test.stage !== stage) return false;
     if (sessionType === "esencial") return test.usage === "esencial";
     return true;
   });
+}
+
+export function testHeading(test: GphStationTest) {
+  return test.code ? `${test.code}) ${test.label}` : `${test.number}. ${test.label}`;
+}
+
+export function emptyRuleSlots() {
+  return Array.from({ length: GPH_REGULATION_RULE_COUNT }, () => "");
+}
+
+function normalizeRuleText(value: string) {
+  return value
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+export function regulationSlotMatches(slotIndex: number, spoken: string) {
+  const rule = GPH_REGULATION_RULES[slotIndex];
+  if (!rule) return false;
+  const got = normalizeRuleText(spoken);
+  if (got.length < 3) return false;
+  const needles = [rule.title, ...rule.aliases].map(normalizeRuleText);
+  return needles.some((needle) => {
+    if (!needle) return false;
+    if (got === needle) return true;
+    if (got.includes(needle) && needle.length >= 4) return true;
+    if (needle.includes(got) && got.length >= 8) return true;
+    return false;
+  });
+}
+
+export function regulationOrderHits(slots: string[] | undefined) {
+  const values = slots ?? [];
+  let hits = 0;
+  for (let index = 0; index < GPH_REGULATION_RULE_COUNT; index += 1) {
+    if (regulationSlotMatches(index, values[index] ?? "")) hits += 1;
+  }
+  return hits;
+}
+
+export function physicalTestsForSession(session: GphFieldSession) {
+  return GPH_PHYSICAL_TESTS.filter(
+    (item) =>
+      !("legacy" in item && item.legacy) &&
+      (!item.desarrolloOnly || session.protocolStage === "desarrollo"),
+  );
+}
+
+export function isPhysicalCaptureComplete(
+  test: (typeof GPH_PHYSICAL_TESTS)[number],
+  capture: GphPhysicalCapture | undefined,
+) {
+  if (!capture) return false;
+  const hasAttempt = capture.attempts.some((value) => value != null && Number.isFinite(value));
+  return hasAttempt || capture.score != null;
 }
 
 export function emptyClosing(): GphSessionClosing {
@@ -1178,6 +1770,7 @@ export function emptyTestCapture(test: GphStationTest): GphTestCapture {
     hits10m: null,
     hits20m: null,
     shotDistances: {},
+    ruleSlots: test.id === "gph_reglas" ? emptyRuleSlots() : [],
     radarKmh: null,
     score: null,
     relevance: test.relevanceDefault,
@@ -1244,22 +1837,27 @@ export function testNeedsPassDistances(test: GphStationTest) {
 
 export type GphShotDistanceSpec = { key: string; label: string; shortLabel: string };
 
+export const GPH_SHOT_GOL_SPECS: GphShotDistanceSpec[] = [
+  { key: "11m_der", label: "11 m · der", shortLabel: "11m der" },
+  { key: "11m_izq", label: "11 m · izq", shortLabel: "11m izq" },
+  { key: "16_5m_der", label: "16.5 m · der", shortLabel: "16.5m der" },
+  { key: "16_5m_izq", label: "16.5 m · izq", shortLabel: "16.5m izq" },
+  { key: "20m_der", label: "20 m · der", shortLabel: "20m der" },
+  { key: "20m_izq", label: "20 m · izq", shortLabel: "20m izq" },
+];
+
+function isShotGolTest(test: GphStationTest) {
+  return (
+    test.id === "des_c_tiro" ||
+    test.id === "des_c_tiro_gol" ||
+    test.id === "ini_c_tiro" ||
+    test.id === "ini_c_tiro_gol"
+  );
+}
+
 /** Tiros con precisión + potencia por distancia. */
 export function shotDistanceSpecs(test: GphStationTest): GphShotDistanceSpec[] | null {
-  if (test.id === "des_c_tiro") {
-    return [
-      { key: "5m", label: "5 m", shortLabel: "5m" },
-      { key: "10m", label: "10 m", shortLabel: "10m" },
-      { key: "20m", label: "20 m", shortLabel: "20m" },
-    ];
-  }
-  if (test.id === "des_c_tiro_gol") {
-    return [
-      { key: "11m", label: "11 m (penal)", shortLabel: "11m" },
-      { key: "16_5m", label: "16.5 m (fuera de área)", shortLabel: "16.5m" },
-      { key: "20m", label: "20 m", shortLabel: "20m" },
-    ];
-  }
+  if (isShotGolTest(test)) return GPH_SHOT_GOL_SPECS;
   return null;
 }
 
@@ -1321,7 +1919,11 @@ export const GPH_SPEED_DRIBBLE_LABELS = [
 ] as const;
 
 export function testNeedsSpeedDribbleRubric(test: GphStationTest) {
-  return test.id === "des_c_patrones" || test.id === "des_p_conduccion";
+  return (
+    test.id === "des_c_patrones" ||
+    test.id === "ini_c_patrones" ||
+    test.id === "des_p_conduccion"
+  );
 }
 
 export const GPH_RUBRIC_06 = [
@@ -1424,6 +2026,12 @@ export function derivedPercent(test: GphStationTest, capture: GphTestCapture) {
 }
 
 export function suggestedScore(test: GphStationTest, capture: GphTestCapture) {
+  if (test.id === "gph_reglas") {
+    const filled = (capture.ruleSlots ?? []).filter((item) => item.trim()).length;
+    if (filled === 0) return capture.score;
+    const hits = regulationOrderHits(capture.ruleSlots);
+    return scoreFromAccuracyPercent((hits / GPH_REGULATION_RULE_COUNT) * 100);
+  }
   if (test.conversion === "accuracy") {
     const percent = derivedPercent(test, capture);
     return percent == null ? null : scoreFromAccuracyPercent(percent);
@@ -1460,6 +2068,7 @@ export function isFieldSessionPopulated(session: GphFieldSession | null | undefi
       capture.hits10m != null ||
       capture.hits20m != null ||
       hasShot ||
+      (capture.ruleSlots ?? []).some((item) => item.trim()) ||
       capture.score != null
     );
   });
@@ -1503,6 +2112,10 @@ export function isRatioKind(kind: GphTestKind) {
 export function isTestCaptureComplete(test: GphStationTest, capture: GphTestCapture | undefined) {
   if (!capture) return false;
   const score = capture.score ?? suggestedScore(test, capture);
+  if (test.id === "gph_reglas") {
+    const filled = (capture.ruleSlots ?? []).filter((item) => item.trim()).length;
+    return filled >= GPH_REGULATION_RULE_COUNT;
+  }
   if (isRatioKind(test.kind)) {
     const max = capture.opportunities ?? test.maxPoints;
     if (testNeedsShotDistances(test)) {
@@ -1534,12 +2147,29 @@ export function fieldSessionProgress(
   module: DiagnosisModule,
 ) {
   const tests = testsForBattery(module, session.protocolStage, session.sessionType);
-  const filled = tests.filter((test) => isTestCaptureComplete(test, session.tests[test.id]));
-  return { filled: filled.length, total: tests.length, missing: tests.filter((test) => !isTestCaptureComplete(test, session.tests[test.id])) };
+  const physical = physicalTestsForSession(session);
+  const stationFilled = tests.filter((test) => isTestCaptureComplete(test, session.tests[test.id]));
+  const physicalFilled = physical.filter((test) =>
+    isPhysicalCaptureComplete(test, session.physical[test.id]),
+  );
+  const missing = [
+    ...tests.filter((test) => !isTestCaptureComplete(test, session.tests[test.id])),
+    ...physical.filter((test) => !isPhysicalCaptureComplete(test, session.physical[test.id])),
+  ];
+  return {
+    filled: stationFilled.length + physicalFilled.length,
+    total: tests.length + physical.length,
+    missing,
+  };
 }
 
 export function formatTestRaw(test: GphStationTest, capture: GphTestCapture | undefined) {
   if (!capture) return "—";
+  if (test.id === "gph_reglas") {
+    const filled = (capture.ruleSlots ?? []).filter((item) => item.trim()).length;
+    const hits = regulationOrderHits(capture.ruleSlots);
+    return `${hits}/${GPH_REGULATION_RULE_COUNT} en orden · ${filled} escritas`;
+  }
   if (isRatioKind(test.kind)) {
     const hits = capture.hits;
     const max = capture.opportunities ?? test.maxPoints;
@@ -1624,6 +2254,35 @@ export function formatTestRaw(test: GphStationTest, capture: GphTestCapture | un
   return bits.join(" · ");
 }
 
+function copyShotIfEmpty(
+  shotDistances: Record<string, GphShotDistanceCapture>,
+  fromKey: string,
+  toKey: string,
+) {
+  const from = shotDistances[fromKey];
+  if (!from) return;
+  const to = shotDistances[toKey];
+  if (to && (to.precision != null || to.powerKmh != null)) return;
+  if (from.precision == null && from.powerKmh == null) return;
+  shotDistances[toKey] = { ...from };
+}
+
+function migrateLegacyShotDistances(
+  testId: string,
+  shotDistances: Record<string, GphShotDistanceCapture>,
+) {
+  if (testId === "des_c_tiro" || testId === "ini_c_tiro") {
+    copyShotIfEmpty(shotDistances, "5m", "11m_der");
+    copyShotIfEmpty(shotDistances, "10m", "16_5m_der");
+    copyShotIfEmpty(shotDistances, "20m", "20m_der");
+  }
+  if (testId === "des_c_tiro_gol" || testId === "ini_c_tiro_gol") {
+    copyShotIfEmpty(shotDistances, "11m", "11m_der");
+    copyShotIfEmpty(shotDistances, "16_5m", "16_5m_der");
+    copyShotIfEmpty(shotDistances, "20m", "20m_der");
+  }
+}
+
 export function parseFieldSession(value: unknown): GphFieldSession {
   const empty = emptyFieldSession();
   if (!isRecord(value)) return empty;
@@ -1651,6 +2310,13 @@ export function parseFieldSession(value: unknown): GphFieldSession {
           };
         }
       }
+      migrateLegacyShotDistances(id, shotDistances);
+      const ruleSlots = Array.isArray(raw.ruleSlots)
+        ? raw.ruleSlots.map((item) => (typeof item === "string" ? item : ""))
+        : [];
+      while (ruleSlots.length < GPH_REGULATION_RULE_COUNT && id === "gph_reglas") {
+        ruleSlots.push("");
+      }
       tests[id] = {
         attempts,
         hits: parseNum(raw.hits),
@@ -1662,6 +2328,7 @@ export function parseFieldSession(value: unknown): GphFieldSession {
         hits10m: parseNum(raw.hits10m),
         hits20m: parseNum(raw.hits20m),
         shotDistances,
+        ruleSlots,
         radarKmh: parseNum(raw.radarKmh),
         score: parseNum(raw.score),
         relevance: relevanceRaw === 1 || relevanceRaw === 3 ? relevanceRaw : 2,
@@ -1785,15 +2452,14 @@ export function scoresFromFieldSession(session: GphFieldSession, module: Diagnos
     list.push(score);
     buckets.set(test.indicatorId, list);
   }
-  if (session.sessionType === "360") {
-    for (const test of GPH_PHYSICAL_TESTS) {
-      if (test.desarrolloOnly && session.protocolStage !== "desarrollo") continue;
-      const capture = session.physical[test.id];
-      if (capture?.score == null) continue;
-      const list = buckets.get(test.indicatorId) ?? [];
-      list.push(capture.score);
-      buckets.set(test.indicatorId, list);
-    }
+  for (const test of GPH_PHYSICAL_TESTS) {
+    if ("legacy" in test && test.legacy) continue;
+    if (test.desarrolloOnly && session.protocolStage !== "desarrollo") continue;
+    const capture = session.physical[test.id];
+    if (capture?.score == null) continue;
+    const list = buckets.get(test.indicatorId) ?? [];
+    list.push(capture.score);
+    buckets.set(test.indicatorId, list);
   }
   const scores: Record<string, number> = {};
   for (const [id, values] of buckets) {

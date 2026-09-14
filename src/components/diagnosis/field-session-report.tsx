@@ -5,6 +5,7 @@ import {
   fieldSessionProgress,
   formatTestRaw,
   suggestedScore,
+  testHeading,
   testsForBattery,
   type GphEvidenceItem,
   type GphFieldSession,
@@ -29,7 +30,7 @@ function hasRawTests(session: GphFieldSession) {
 function evidenceLabel(item: GphEvidenceItem) {
   const station = GPH_STATION_TESTS.find((test) => test.id === item.stationId);
   const bits = [
-    station ? `${station.number}. ${station.label}` : "",
+    station ? testHeading(station) : "",
     item.caption,
   ].filter(Boolean);
   return bits.join(" · ");
@@ -91,7 +92,7 @@ export function FieldSessionReport({ session, module }: FieldSessionReportProps)
                     <tr key={test.id} className="border-t border-mf-border-subtle align-top">
                       <td className="py-2 pr-3">
                         <p className="font-medium text-mf-text">
-                          {test.number}. {test.label}
+                          {testHeading(test)}
                         </p>
                         <p className="text-[11px] text-mf-text-muted">
                           {test.unit}
@@ -100,6 +101,19 @@ export function FieldSessionReport({ session, module }: FieldSessionReportProps)
                         </p>
                         {capture?.note ? (
                           <p className="mt-0.5 text-[11px] text-mf-text-secondary">{capture.note}</p>
+                        ) : null}
+                        {test.id === "gph_reglas" && capture?.ruleSlots?.some((item) => item.trim()) ? (
+                          <ol className="mt-1 list-decimal space-y-0.5 pl-4 text-[11px] text-mf-text-secondary">
+                            {capture.ruleSlots.map((item, index) =>
+                              item.trim() ? (
+                                <li key={index}>{item.trim()}</li>
+                              ) : (
+                                <li key={index} className="text-mf-text-muted">
+                                  —
+                                </li>
+                              ),
+                            )}
+                          </ol>
                         ) : null}
                       </td>
                       <td className="py-2 pr-3 tabular-nums text-mf-text-secondary">
@@ -118,7 +132,7 @@ export function FieldSessionReport({ session, module }: FieldSessionReportProps)
           {physical.length > 0 ? (
             <div className="mt-4">
               <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-mf-text-muted">
-                Físico 360
+                Físicas
               </p>
               <ul className="mt-2 space-y-1 text-sm text-mf-text-secondary">
                 {physical.map((test) => {

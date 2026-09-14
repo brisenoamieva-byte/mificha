@@ -365,6 +365,7 @@ function fieldHighlights(session: GphFieldSession, module: DiagnosisModule) {
 
 function physicalLogged(session: GphFieldSession) {
   return GPH_PHYSICAL_TESTS.filter((test) => {
+    if ("legacy" in test && test.legacy) return false;
     const capture = session.physical[test.id];
     return capture?.attempts.some((item) => item != null);
   }).map((test) => test.label);

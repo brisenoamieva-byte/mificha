@@ -46,12 +46,26 @@ const DEMO_SCORES: DiagnosisScores = {
 function demoTest(
   capture: Omit<
     GphTestCapture,
-    "leftHits" | "rightHits" | "radarKmh" | "hits5m" | "hits10m" | "hits20m" | "shotDistances"
+    | "leftHits"
+    | "rightHits"
+    | "radarKmh"
+    | "hits5m"
+    | "hits10m"
+    | "hits20m"
+    | "shotDistances"
+    | "ruleSlots"
   > &
     Partial<
       Pick<
         GphTestCapture,
-        "leftHits" | "rightHits" | "radarKmh" | "hits5m" | "hits10m" | "hits20m" | "shotDistances"
+        | "leftHits"
+        | "rightHits"
+        | "radarKmh"
+        | "hits5m"
+        | "hits10m"
+        | "hits20m"
+        | "shotDistances"
+        | "ruleSlots"
       >
     >,
 ): GphTestCapture {
@@ -62,6 +76,7 @@ function demoTest(
     hits10m: null,
     hits20m: null,
     shotDistances: {},
+    ruleSlots: [],
     radarKmh: null,
     ...capture,
   };
@@ -187,7 +202,7 @@ export function buildDemoDiagnosisReport(): {
             id: "demo-ev-1",
             kind: "photo",
             url: MARKETING_IMAGES.featureCaptura,
-            caption: "Slalom · dato crudo",
+            caption: "Zig Zag · dato crudo",
             stationId: "des_c_slalom",
             createdAt: "2026-09-06T12:00:00.000Z",
           },
@@ -245,7 +260,7 @@ export function buildDemoDiagnosisReport(): {
             note: "",
           }),
           des_c_slalom: demoTest({
-            attempts: [11.4, 10.8],
+            attempts: [11.4, 10.8, 11.1, 10.6],
             hits: null,
             opportunities: null,
             errors: null,
@@ -270,9 +285,9 @@ export function buildDemoDiagnosisReport(): {
             note: "5 m fuerte; cae a 20 m. 11/18 der · 9/18 izq",
           }),
           des_c_control: demoTest({
-            attempts: [],
-            hits: 16,
-            opportunities: 24,
+            attempts: [4, 6],
+            hits: null,
+            opportunities: null,
             errors: null,
             score: 4,
             relevance: 3,
@@ -285,9 +300,12 @@ export function buildDemoDiagnosisReport(): {
             opportunities: 8,
             errors: null,
             shotDistances: {
-              "5m": { precision: 7, powerKmh: 72 },
-              "10m": { precision: 6, powerKmh: 78 },
-              "20m": { precision: 5, powerKmh: 84 },
+              "11m_der": { precision: 7, powerKmh: 72 },
+              "11m_izq": { precision: 6, powerKmh: 70 },
+              "16_5m_der": { precision: 6, powerKmh: 78 },
+              "16_5m_izq": { precision: 5, powerKmh: 74 },
+              "20m_der": { precision: 5, powerKmh: 84 },
+              "20m_izq": { precision: 4, powerKmh: 80 },
             },
             radarKmh: 84,
             score: 4,
@@ -301,9 +319,12 @@ export function buildDemoDiagnosisReport(): {
             opportunities: 8,
             errors: null,
             shotDistances: {
-              "11m": { precision: 7, powerKmh: 88 },
-              "16_5m": { precision: 5, powerKmh: 86 },
-              "20m": { precision: 5, powerKmh: 90 },
+              "11m_der": { precision: 7, powerKmh: 88 },
+              "11m_izq": { precision: 6, powerKmh: 84 },
+              "16_5m_der": { precision: 5, powerKmh: 86 },
+              "16_5m_izq": { precision: 5, powerKmh: 82 },
+              "20m_der": { precision: 5, powerKmh: 90 },
+              "20m_izq": { precision: 4, powerKmh: 86 },
             },
             radarKmh: 90,
             score: 4,

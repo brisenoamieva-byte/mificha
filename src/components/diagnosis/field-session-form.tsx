@@ -5,11 +5,13 @@ import { Star } from "lucide-react";
 import { DiagnosisEvidenceCapture } from "@/components/diagnosis/diagnosis-evidence-capture";
 import { MeasureField } from "@/components/diagnosis/measure-field";
 import {
+  GPH_BATTERY_SECTIONS,
   GPH_CLOSING_CHECKS,
   GPH_PENALTIES,
   GPH_PERCENTILE_NOTE,
-  GPH_PHYSICAL_TESTS,
   GPH_PROTOCOL_STAGES,
+  GPH_REGULATION_RULE_COUNT,
+  GPH_REGULATION_RULES,
   GPH_ROTATION_CAMPO,
   GPH_ROTATION_PORTERO,
   GPH_RUBRIC_06,
@@ -27,6 +29,7 @@ import {
   isTestCaptureComplete,
   suggestedScore,
   passDistanceHitsTotal,
+  physicalTestsForSession,
   shotDistanceEntry,
   shotDistanceSpecs,
   shotPowerBest,
@@ -37,8 +40,11 @@ import {
   testNeedsRubric06,
   testNeedsShotDistances,
   testNeedsSpeedDribbleRubric,
+  testHeading,
   testsForBattery,
   weakerFootPercent,
+  regulationOrderHits,
+  regulationSlotMatches,
   emptyClosing,
   type GphFieldSession,
   type GphPhysicalCapture,
@@ -75,10 +81,15 @@ function captureFor(session: GphFieldSession, test: GphStationTest): GphTestCapt
     base.attempts.length >= test.attempts
       ? base.attempts
       : [...base.attempts, ...Array.from({ length: test.attempts - base.attempts.length }, () => null)];
+  const ruleSlots =
+    test.id === "gph_reglas"
+      ? Array.from({ length: GPH_REGULATION_RULE_COUNT }, (_, index) => base.ruleSlots?.[index] ?? "")
+      : (base.ruleSlots ?? []);
   return {
     ...emptyTestCapture(test),
     ...base,
     attempts,
+    ruleSlots,
     opportunities: base.opportunities ?? test.maxPoints ?? null,
   };
 }
@@ -90,6 +101,15 @@ function attemptMeta(test: GphStationTest): {
   hint: string;
   attemptLabels?: readonly string[];
 } {
+  if (test.attemptLabels?.length) {
+    return {
+      label: "Intento",
+      unit: test.unit,
+      integer: test.kind !== "time" && test.kind !== "distance",
+      hint: test.record,
+      attemptLabels: test.attemptLabels,
+    };
+  }
   if (testNeedsSpeedDribbleRubric(test)) {
     return {
       label: "Rúbrica",
@@ -126,19 +146,23 @@ function attemptMeta(test: GphStationTest): {
 export function FieldSessionForm({ academyId, module, session, onChange }: FieldSessionFormProps) {
   const tests = testsForBattery(module, session.protocolStage, session.sessionType);
   const rotation = module === "portero" ? GPH_ROTATION_PORTERO : GPH_ROTATION_CAMPO;
-  const physicalTests = GPH_PHYSICAL_TESTS.filter(
-    (item) =>
-      !("legacy" in item && item.legacy) &&
-      (!item.desarrolloOnly || session.protocolStage === "desarrollo"),
-  );
+  const physicalTests = physicalTestsForSession(session);
   const progress = fieldSessionProgress(session, module);
   const closing = session.closing ?? emptyClosing();
-  const only360 = GPH_STATION_TESTS.filter(
+      const only360 = GPH_STATION_TESTS.filter(
     (test) =>
-      test.module === module &&
-      test.stage === session.protocolStage &&
+      !test.retired &&
+      (test.appliesTo ?? [test.module]).includes(module) &&
+      (test.stage === "ambos" || test.stage === session.protocolStage) &&
       test.usage === "plus",
   );
+  const unsectionedTests = tests.filter((test) => !test.section);
+  const orderedStationTests = [
+    ...GPH_BATTERY_SECTIONS.flatMap((section) =>
+      tests.filter((test) => test.section === section.id),
+    ),
+    ...unsectionedTests,
+  ];
 
   function patch(partial: Partial<GphFieldSession>) {
     onChange({ ...session, ...partial });
@@ -160,7 +184,7 @@ export function FieldSessionForm({ academyId, module, session, onChange }: Field
     <section className="space-y-4 rounded-2xl border border-mf-border bg-white p-4">
       <div className="flex flex-wrap items-end justify-between gap-2">
         <div>
-          <h2 className="text-base font-semibold text-mf-text">1. Estaciones en cancha</h2>
+          <h2 className="text-base font-semibold text-mf-text">1–5. Batería GPH</h2>
           <p className="mt-1 text-xs text-mf-text-muted">
             Captura el dato de cada prueba en su unidad. El 1–5 y la ficha salen de aquí.{" "}
             <Link href="/fut/dashboard/diagnostico/protocolo" className="font-semibold text-mf-brand hover:underline">
@@ -324,8 +348,136 @@ export function FieldSessionForm({ academyId, module, session, onChange }: Field
         ))}
       </ol>
 
+      <div className="rounded-xl border border-mf-border-subtle p-3">
+          <p className="text-sm font-semibold text-mf-text">1. Físicas</p>
+          <p className="mt-1 text-[11px] text-mf-text-muted">
+            Anota cada intento en su unidad. Supervisión de fisioterapia. Detener ante dolor,
+            mareo o restricción conocida. {GPH_PERCENTILE_NOTE}
+          </p>
+          <div className="mt-3 space-y-4">
+            {physicalTests.map((test, index) => {
+              const prev = physicalTests[index - 1];
+              const showSprintHeader =
+                "group" in test &&
+                test.group === "sprint" &&
+                (!prev || !("group" in prev) || prev.group !== "sprint");
+              const showFuerzaHeader =
+                "group" in test &&
+                test.group === "fuerza" &&
+                (!prev || !("group" in prev) || prev.group !== "fuerza");
+              const capture: GphPhysicalCapture = session.physical[test.id] ?? {
+                attempts: Array.from({ length: test.attempts }, () => null),
+                note: "",
+                score: null,
+              };
+              const attempts = Array.from(
+                { length: test.attempts },
+                (_, i) => capture.attempts[i] ?? null,
+              );
+              return (
+                <div key={test.id}>
+                  {showSprintHeader ? (
+                    <div className="mb-3 rounded-lg bg-mf-canvas px-3 py-2">
+                      <p className="text-xs font-semibold uppercase tracking-[0.12em] text-mf-text">
+                        1A) Sprint
+                      </p>
+                      <p className="mt-0.5 text-[11px] text-mf-text-muted">
+                        Pruebas 5, 10, 20 y 30 m. Dos intentos por distancia; conservar el mejor.
+                        Recuperación ~60 s entre intentos.
+                      </p>
+                    </div>
+                  ) : null}
+                  {showFuerzaHeader ? (
+                    <div className="mb-3 rounded-lg bg-mf-canvas px-3 py-2">
+                      <p className="text-xs font-semibold uppercase tracking-[0.12em] text-mf-text">
+                        1E) Fuerza
+                      </p>
+                      <p className="mt-0.5 text-[11px] text-mf-text-muted">
+                        1 intento de cada una. En 1 minuto, cuántas repeticiones.
+                      </p>
+                    </div>
+                  ) : null}
+                  <p className="text-xs font-medium text-mf-text">
+                    {"code" in test && test.code ? `${test.code}) ${test.label}` : test.label}
+                  </p>
+                  <p className="text-[11px] text-mf-text-muted">{test.protocol}</p>
+                  <div className="mt-1.5 flex flex-wrap gap-2">
+                    {attempts.map((value, index) => (
+                      <MeasureField
+                        key={index}
+                        label={`Intento ${index + 1}`}
+                        unit={index === 0 ? test.unit : undefined}
+                        value={value}
+                        integer={test.unit === "rep"}
+                        className="w-[4.75rem]"
+                        onChange={(nextValue) => {
+                          const next = [...attempts];
+                          next[index] = nextValue;
+                          patch({
+                            physical: {
+                              ...session.physical,
+                              [test.id]: { ...capture, attempts: next },
+                            },
+                          });
+                        }}
+                      />
+                    ))}
+                  </div>
+                  <input
+                    value={capture.note}
+                    onChange={(e) =>
+                      patch({
+                        physical: {
+                          ...session.physical,
+                          [test.id]: { ...capture, attempts, note: e.target.value },
+                        },
+                      })
+                    }
+                    placeholder="Nota (asimetría, dolor, no realizó…)"
+                    className="mf-input mt-2"
+                  />
+                  <div className="mt-2">
+                    <p className="text-[11px] font-medium text-mf-text-muted">
+                      1–5 · {indicatorById(test.indicatorId)?.label ?? "físico"}
+                    </p>
+                    <div className="mt-1.5 flex flex-wrap gap-1">
+                      {DIAGNOSIS_SCALE.map((level) => (
+                        <button
+                          key={level.value}
+                          type="button"
+                          title={level.hint}
+                          onClick={() =>
+                            patch({
+                              physical: {
+                                ...session.physical,
+                                [test.id]: { ...capture, attempts, score: level.value },
+                              },
+                            })
+                          }
+                          className={cn(
+                            "h-9 w-9 rounded-lg text-sm font-semibold tabular-nums",
+                            capture.score === level.value
+                              ? "bg-mf-brand text-white"
+                              : "bg-mf-canvas text-mf-text-secondary hover:bg-mf-brand-soft",
+                          )}
+                        >
+                          {level.value}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
       <div className="space-y-3">
-        {tests.map((test) => {
+        {orderedStationTests.map((test, index) => {
+          const prev = orderedStationTests[index - 1];
+          const sectionMeta = GPH_BATTERY_SECTIONS.find((item) => item.id === test.section);
+          const showSectionHeader = Boolean(test.section && test.section !== prev?.section);
+          const showUnsectionedHeader = !test.section && Boolean(prev?.section || index === 0);
           const capture = captureFor(session, test);
           const auto = suggestedScore(test, capture);
           const complete = isTestCaptureComplete(test, session.tests[test.id] ?? capture);
@@ -334,6 +486,21 @@ export function FieldSessionForm({ academyId, module, session, onChange }: Field
           const best = bestAttempt(capture, test.kind);
           const avg = averageAttempt(capture);
           return (
+            <div key={test.id} className="space-y-3">
+              {showSectionHeader && sectionMeta ? (
+                <div className="rounded-lg bg-mf-canvas px-3 py-2">
+                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-mf-text">
+                    {sectionMeta.number}. {sectionMeta.label}
+                  </p>
+                </div>
+              ) : null}
+              {showUnsectionedHeader ? (
+                <div className="rounded-lg bg-mf-canvas px-3 py-2">
+                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-mf-text">
+                    Estaciones
+                  </p>
+                </div>
+              ) : null}
             <article
               key={test.id}
               className={cn(
@@ -344,7 +511,7 @@ export function FieldSessionForm({ academyId, module, session, onChange }: Field
               <div className="flex flex-wrap items-start justify-between gap-2">
                 <div className="min-w-0">
                   <p className="text-sm font-semibold text-mf-text">
-                    {test.number}. {test.label}
+                    {testHeading(test)}
                     {test.usage === "plus" ? (
                       <span className="ml-2 text-[10px] font-medium uppercase tracking-wide text-mf-gph">
                         360
@@ -374,7 +541,49 @@ export function FieldSessionForm({ academyId, module, session, onChange }: Field
                 </button>
               </div>
 
-              {isRatioKind(test.kind) ? (
+              {test.id === "gph_reglas" ? (
+                <div className="mt-3 space-y-2">
+                  <p className="text-[11px] text-mf-text-muted">
+                    {regulationOrderHits(capture.ruleSlots)}/{GPH_REGULATION_RULE_COUNT} en el
+                    orden correcto · el jugador dicta; la clave es solo para el evaluador.
+                  </p>
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    {capture.ruleSlots.map((value, slotIndex) => {
+                      const key = GPH_REGULATION_RULES[slotIndex];
+                      const spoken = value.trim();
+                      const match = spoken ? regulationSlotMatches(slotIndex, spoken) : null;
+                      return (
+                        <label key={slotIndex} className="text-[11px] font-medium text-mf-text-muted">
+                          Regla {slotIndex + 1}
+                          {match === true ? " · ok" : match === false ? " · revisar" : ""}
+                          <input
+                            value={value}
+                            onChange={(e) => {
+                              const next = [...capture.ruleSlots];
+                              next[slotIndex] = e.target.value;
+                              patchTest(test, { ...capture, ruleSlots: next });
+                            }}
+                            className={cn(
+                              "mf-input mt-1",
+                              match === true
+                                ? "border-mf-accent"
+                                : match === false
+                                  ? "border-mf-warning"
+                                  : "",
+                            )}
+                            placeholder="Lo que dijo el jugador"
+                          />
+                          {key ? (
+                            <span className="mt-0.5 block text-[10px] font-normal text-mf-text-muted">
+                              Clave: {key.title}
+                            </span>
+                          ) : null}
+                        </label>
+                      );
+                    })}
+                  </div>
+                </div>
+              ) : isRatioKind(test.kind) ? (
                 <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
                   {testNeedsShotDistances(test) ? (
                     <>
@@ -692,6 +901,7 @@ export function FieldSessionForm({ academyId, module, session, onChange }: Field
                 className="mf-input mt-3"
               />
             </article>
+            </div>
           );
         })}
       </div>
@@ -703,116 +913,6 @@ export function FieldSessionForm({ academyId, module, session, onChange }: Field
       ) : (
         <p className="text-xs text-mf-accent-dark">Estaciones completas. El dato ya alimenta la ficha.</p>
       )}
-
-      {session.sessionType === "360" ? (
-        <div className="rounded-xl border border-mf-border-subtle p-3">
-          <p className="text-sm font-semibold text-mf-text">Físico y funcional · 360</p>
-          <p className="mt-1 text-[11px] text-mf-text-muted">
-            Anota cada intento en su unidad. Supervisión de fisioterapia. Detener ante dolor,
-            mareo o restricción conocida. {GPH_PERCENTILE_NOTE}
-          </p>
-          <div className="mt-3 space-y-4">
-            {physicalTests.map((test, index) => {
-              const prev = physicalTests[index - 1];
-              const showSprintHeader =
-                "group" in test &&
-                test.group === "sprint" &&
-                (!prev || !("group" in prev) || prev.group !== "sprint");
-              const capture: GphPhysicalCapture = session.physical[test.id] ?? {
-                attempts: Array.from({ length: test.attempts }, () => null),
-                note: "",
-                score: null,
-              };
-              const attempts = Array.from(
-                { length: test.attempts },
-                (_, i) => capture.attempts[i] ?? null,
-              );
-              return (
-                <div key={test.id}>
-                  {showSprintHeader ? (
-                    <div className="mb-3 rounded-lg bg-mf-canvas px-3 py-2">
-                      <p className="text-xs font-semibold uppercase tracking-[0.12em] text-mf-text">
-                        Sprint
-                      </p>
-                      <p className="mt-0.5 text-[11px] text-mf-text-muted">
-                        Pruebas 5, 10, 20 y 30 m. Dos intentos por distancia; conservar el mejor.
-                        Recuperación ~60 s entre intentos.
-                      </p>
-                    </div>
-                  ) : null}
-                  <p className="text-xs font-medium text-mf-text">{test.label}</p>
-                  <p className="text-[11px] text-mf-text-muted">{test.protocol}</p>
-                  <div className="mt-1.5 flex flex-wrap gap-2">
-                    {attempts.map((value, index) => (
-                      <MeasureField
-                        key={index}
-                        label={`Intento ${index + 1}`}
-                        unit={index === 0 ? test.unit : undefined}
-                        value={value}
-                        integer={false}
-                        className="w-[4.75rem]"
-                        onChange={(nextValue) => {
-                          const next = [...attempts];
-                          next[index] = nextValue;
-                          patch({
-                            physical: {
-                              ...session.physical,
-                              [test.id]: { ...capture, attempts: next },
-                            },
-                          });
-                        }}
-                      />
-                    ))}
-                  </div>
-                  <input
-                    value={capture.note}
-                    onChange={(e) =>
-                      patch({
-                        physical: {
-                          ...session.physical,
-                          [test.id]: { ...capture, attempts, note: e.target.value },
-                        },
-                      })
-                    }
-                    placeholder="Nota (asimetría, dolor, no realizó…)"
-                    className="mf-input mt-2"
-                  />
-                  <div className="mt-2">
-                    <p className="text-[11px] font-medium text-mf-text-muted">
-                      1–5 · {indicatorById(test.indicatorId)?.label ?? "físico"}
-                    </p>
-                    <div className="mt-1.5 flex flex-wrap gap-1">
-                      {DIAGNOSIS_SCALE.map((level) => (
-                        <button
-                          key={level.value}
-                          type="button"
-                          title={level.hint}
-                          onClick={() =>
-                            patch({
-                              physical: {
-                                ...session.physical,
-                                [test.id]: { ...capture, attempts, score: level.value },
-                              },
-                            })
-                          }
-                          className={cn(
-                            "h-9 w-9 rounded-lg text-sm font-semibold tabular-nums",
-                            capture.score === level.value
-                              ? "bg-mf-brand text-white"
-                              : "bg-mf-canvas text-mf-text-secondary hover:bg-mf-brand-soft",
-                          )}
-                        >
-                          {level.value}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      ) : null}
 
       <DiagnosisEvidenceCapture
         academyId={academyId}
