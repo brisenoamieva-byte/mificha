@@ -478,6 +478,9 @@ export function FieldSessionForm({ academyId, module, session, onChange }: Field
           const sectionMeta = GPH_BATTERY_SECTIONS.find((item) => item.id === test.section);
           const showSectionHeader = Boolean(test.section && test.section !== prev?.section);
           const showUnsectionedHeader = !test.section && Boolean(prev?.section || index === 0);
+          const showSubsectionHeader = Boolean(
+            test.subsection && test.subsection.id !== prev?.subsection?.id,
+          );
           const capture = captureFor(session, test);
           const auto = suggestedScore(test, capture);
           const complete = isTestCaptureComplete(test, session.tests[test.id] ?? capture);
@@ -492,6 +495,12 @@ export function FieldSessionForm({ academyId, module, session, onChange }: Field
                   <p className="text-xs font-semibold uppercase tracking-[0.12em] text-mf-text">
                     {sectionMeta.number}. {sectionMeta.label}
                   </p>
+                </div>
+              ) : null}
+              {showSubsectionHeader && test.subsection ? (
+                <div className="rounded-lg border border-mf-border-subtle bg-white px-3 py-2">
+                  <p className="text-xs font-semibold text-mf-text">{test.subsection.label}</p>
+                  <p className="mt-0.5 text-[11px] text-mf-text-muted">{test.subsection.protocol}</p>
                 </div>
               ) : null}
               {showUnsectionedHeader ? (
@@ -692,10 +701,16 @@ export function FieldSessionForm({ academyId, module, session, onChange }: Field
                   ) : (
                     <>
                       <MeasureField
-                        label={test.kind === "points" ? "Puntos" : "Aciertos"}
+                        label={
+                          test.unit === "1–10"
+                            ? "Calificación 1–10"
+                            : test.kind === "points"
+                              ? "Puntos"
+                              : "Aciertos"
+                        }
                         value={capture.hits}
                         integer
-                        max={test.maxPoints ? test.maxPoints * 2 : undefined}
+                        max={test.maxPoints ?? undefined}
                         onChange={(hits) => patchTest(test, { ...capture, hits })}
                       />
                       <MeasureField

@@ -43,6 +43,29 @@ export const GPH_BATTERY_SECTIONS = [
 
 export type GphBatterySectionId = (typeof GPH_BATTERY_SECTIONS)[number]["id"];
 
+export const GPH_GK_TECH_GROUPS = [
+  {
+    id: "bloqueo",
+    label: "1. Técnica de bloqueo",
+    protocol: "1 bloque de 10 repeticiones. Calificación 1–10.",
+  },
+  {
+    id: "recueste",
+    label: "2. Técnica de recueste",
+    protocol: "5 izquierdo y 5 derechos.",
+  },
+  {
+    id: "aereo",
+    label: "3. Juego aéreo",
+    protocol: "10 repeticiones de cada uno.",
+  },
+  {
+    id: "pies",
+    label: "4. Juego de pies",
+    protocol: "10 acciones, 5 con cada pie.",
+  },
+] as const;
+
 export const GPH_REGULATION_RULE_COUNT = 17;
 
 /** Orden IFAB. Clave para el evaluador; el jugador las dicta en los 17 espacios. */
@@ -105,6 +128,8 @@ export interface GphStationTest {
   record: string;
   indicatorId?: string;
   relevanceDefault: 1 | 2 | 3;
+  /** Subgrupo dentro de Técnicas (porteros). */
+  subsection?: { id: string; label: string; protocol: string };
   /** Sigue en el catálogo para reportes viejos; no sale en la batería nueva. */
   retired?: boolean;
 }
@@ -209,6 +234,12 @@ function t(
   },
 ): GphStationTest {
   return partial;
+}
+
+function gkSub(id: (typeof GPH_GK_TECH_GROUPS)[number]["id"]) {
+  const group = GPH_GK_TECH_GROUPS.find((item) => item.id === id);
+  if (!group) throw new Error(`Unknown GK tech group: ${id}`);
+  return { id: group.id, label: group.label, protocol: group.protocol };
 }
 
 export const GPH_STATION_TESTS: readonly GphStationTest[] = [
@@ -657,6 +688,7 @@ export const GPH_STATION_TESTS: readonly GphStationTest[] = [
   }),
   t({
     id: "ini_p_posicion",
+    retired: true,
     number: 1,
     module: "portero",
     stage: "iniciacion",
@@ -675,6 +707,7 @@ export const GPH_STATION_TESTS: readonly GphStationTest[] = [
   }),
   t({
     id: "ini_p_desplaza",
+    retired: true,
     number: 2,
     module: "portero",
     stage: "iniciacion",
@@ -692,6 +725,7 @@ export const GPH_STATION_TESTS: readonly GphStationTest[] = [
   }),
   t({
     id: "ini_p_blocaje",
+    retired: true,
     number: 3,
     module: "portero",
     stage: "iniciacion",
@@ -710,6 +744,7 @@ export const GPH_STATION_TESTS: readonly GphStationTest[] = [
   }),
   t({
     id: "ini_p_raso",
+    retired: true,
     number: 4,
     module: "portero",
     stage: "iniciacion",
@@ -728,6 +763,7 @@ export const GPH_STATION_TESTS: readonly GphStationTest[] = [
   }),
   t({
     id: "ini_p_colocacion",
+    retired: true,
     number: 5,
     module: "portero",
     stage: "iniciacion",
@@ -746,6 +782,7 @@ export const GPH_STATION_TESTS: readonly GphStationTest[] = [
   }),
   t({
     id: "ini_p_1v1",
+    retired: true,
     number: 6,
     module: "portero",
     stage: "iniciacion",
@@ -764,6 +801,7 @@ export const GPH_STATION_TESTS: readonly GphStationTest[] = [
   }),
   t({
     id: "ini_p_reaccion",
+    retired: true,
     number: 7,
     module: "portero",
     stage: "iniciacion",
@@ -782,6 +820,7 @@ export const GPH_STATION_TESTS: readonly GphStationTest[] = [
   }),
   t({
     id: "ini_p_mano",
+    retired: true,
     number: 8,
     module: "portero",
     stage: "iniciacion",
@@ -800,6 +839,7 @@ export const GPH_STATION_TESTS: readonly GphStationTest[] = [
   }),
   t({
     id: "ini_p_pie",
+    retired: true,
     number: 9,
     module: "portero",
     stage: "iniciacion",
@@ -818,6 +858,7 @@ export const GPH_STATION_TESTS: readonly GphStationTest[] = [
   }),
   t({
     id: "ini_p_despeje",
+    retired: true,
     number: 10,
     module: "portero",
     stage: "iniciacion",
@@ -836,6 +877,9 @@ export const GPH_STATION_TESTS: readonly GphStationTest[] = [
   t({
     id: "ini_p_tiro_gol",
     number: 11,
+    code: "4H",
+    section: "tecnicas",
+    subsection: gkSub("pies"),
     module: "portero",
     stage: "iniciacion",
     usage: "esencial",
@@ -855,6 +899,7 @@ export const GPH_STATION_TESTS: readonly GphStationTest[] = [
   }),
   t({
     id: "des_p_pies",
+    retired: true,
     number: 1,
     module: "portero",
     stage: "desarrollo",
@@ -872,6 +917,7 @@ export const GPH_STATION_TESTS: readonly GphStationTest[] = [
   }),
   t({
     id: "des_p_blocaje",
+    retired: true,
     number: 2,
     module: "portero",
     stage: "desarrollo",
@@ -890,6 +936,7 @@ export const GPH_STATION_TESTS: readonly GphStationTest[] = [
   }),
   t({
     id: "des_p_caidas",
+    retired: true,
     number: 3,
     module: "portero",
     stage: "desarrollo",
@@ -908,6 +955,7 @@ export const GPH_STATION_TESTS: readonly GphStationTest[] = [
   }),
   t({
     id: "des_p_aereo",
+    retired: true,
     number: 4,
     module: "portero",
     stage: "desarrollo",
@@ -926,6 +974,7 @@ export const GPH_STATION_TESTS: readonly GphStationTest[] = [
   }),
   t({
     id: "des_p_segunda",
+    retired: true,
     number: 5,
     module: "portero",
     stage: "desarrollo",
@@ -944,6 +993,7 @@ export const GPH_STATION_TESTS: readonly GphStationTest[] = [
   }),
   t({
     id: "des_p_1v1",
+    retired: true,
     number: 6,
     module: "portero",
     stage: "desarrollo",
@@ -962,6 +1012,7 @@ export const GPH_STATION_TESTS: readonly GphStationTest[] = [
   }),
   t({
     id: "des_p_reaccion",
+    retired: true,
     number: 7,
     module: "portero",
     stage: "desarrollo",
@@ -980,6 +1031,7 @@ export const GPH_STATION_TESTS: readonly GphStationTest[] = [
   }),
   t({
     id: "des_p_presion",
+    retired: true,
     number: 8,
     module: "portero",
     stage: "desarrollo",
@@ -998,6 +1050,7 @@ export const GPH_STATION_TESTS: readonly GphStationTest[] = [
   }),
   t({
     id: "des_p_mano",
+    retired: true,
     number: 9,
     module: "portero",
     stage: "desarrollo",
@@ -1016,6 +1069,7 @@ export const GPH_STATION_TESTS: readonly GphStationTest[] = [
   }),
   t({
     id: "des_p_saque",
+    retired: true,
     number: 10,
     module: "portero",
     stage: "desarrollo",
@@ -1033,6 +1087,7 @@ export const GPH_STATION_TESTS: readonly GphStationTest[] = [
   }),
   t({
     id: "des_p_volea",
+    retired: true,
     number: 11,
     module: "portero",
     stage: "desarrollo",
@@ -1050,6 +1105,7 @@ export const GPH_STATION_TESTS: readonly GphStationTest[] = [
   }),
   t({
     id: "des_p_juego",
+    retired: true,
     number: 12,
     module: "portero",
     stage: "desarrollo",
@@ -1068,9 +1124,12 @@ export const GPH_STATION_TESTS: readonly GphStationTest[] = [
   t({
     id: "des_p_conduccion",
     number: 13,
+    code: "4E",
+    section: "tecnicas",
+    subsection: gkSub("pies"),
     module: "portero",
-    stage: "desarrollo",
-    usage: "plus",
+    stage: "ambos",
+    usage: "esencial",
     label: "Conducción a velocidad",
     unit: "rúbrica 0–6",
     kind: "contacts",
@@ -1086,6 +1145,7 @@ export const GPH_STATION_TESTS: readonly GphStationTest[] = [
   }),
   t({
     id: "des_p_dominadas",
+    retired: true,
     number: 14,
     module: "portero",
     stage: "desarrollo",
@@ -1104,8 +1164,11 @@ export const GPH_STATION_TESTS: readonly GphStationTest[] = [
   t({
     id: "des_p_pase",
     number: 15,
+    code: "4B",
+    section: "tecnicas",
+    subsection: gkSub("pies"),
     module: "portero",
-    stage: "desarrollo",
+    stage: "ambos",
     usage: "esencial",
     label: "Pase de precisión",
     unit: "aciertos / 12",
@@ -1123,6 +1186,9 @@ export const GPH_STATION_TESTS: readonly GphStationTest[] = [
   t({
     id: "des_p_tiro_gol",
     number: 16,
+    code: "4H",
+    section: "tecnicas",
+    subsection: gkSub("pies"),
     module: "portero",
     stage: "desarrollo",
     usage: "esencial",
@@ -1137,6 +1203,531 @@ export const GPH_STATION_TESTS: readonly GphStationTest[] = [
     execution:
       "En cada distancia: tiro a gol fijo con derecha y con izquierda. Precisión y potencia.",
     record: "Precisión y potencia a 11 m, 16.5 m y 20 m, izquierda y derecha.",
+    indicatorId: "golpeo",
+    relevanceDefault: 3,
+  }),
+  t({
+    id: "gk_bloq_bajo_perfilado",
+    number: 1,
+    code: "1A",
+    section: "tecnicas",
+    subsection: gkSub("bloqueo"),
+    module: "portero",
+    stage: "ambos",
+    usage: "esencial",
+    label: "Bloqueo bajo perfilado",
+    unit: "1–10",
+    kind: "points",
+    conversion: "accuracy",
+    attempts: 0,
+    maxPoints: 10,
+    setup: "Un bloque de 10 repeticiones. Bloqueo bajo con perfil.",
+    execution: "10 repeticiones. Calificar de 1 a 10 el bloque completo.",
+    record: "Calificación 1–10 del bloque.",
+    indicatorId: "blocaje_recepcion",
+    relevanceDefault: 3,
+  }),
+  t({
+    id: "gk_bloq_bajo_europeo",
+    number: 2,
+    code: "1B",
+    section: "tecnicas",
+    subsection: gkSub("bloqueo"),
+    module: "portero",
+    stage: "ambos",
+    usage: "esencial",
+    label: "Bloqueo bajo europeo",
+    unit: "1–10",
+    kind: "points",
+    conversion: "accuracy",
+    attempts: 0,
+    maxPoints: 10,
+    setup: "Un bloque de 10 repeticiones. Bloqueo bajo estilo europeo.",
+    execution: "10 repeticiones. Calificar de 1 a 10 el bloque completo.",
+    record: "Calificación 1–10 del bloque.",
+    indicatorId: "blocaje_recepcion",
+    relevanceDefault: 3,
+  }),
+  t({
+    id: "gk_bloq_medio",
+    number: 3,
+    code: "1C",
+    section: "tecnicas",
+    subsection: gkSub("bloqueo"),
+    module: "portero",
+    stage: "ambos",
+    usage: "esencial",
+    label: "Bloqueo medio",
+    unit: "1–10",
+    kind: "points",
+    conversion: "accuracy",
+    attempts: 0,
+    maxPoints: 10,
+    setup: "Un bloque de 10 repeticiones. Bloqueo a media altura.",
+    execution: "10 repeticiones. Calificar de 1 a 10 el bloque completo.",
+    record: "Calificación 1–10 del bloque.",
+    indicatorId: "blocaje_recepcion",
+    relevanceDefault: 3,
+  }),
+  t({
+    id: "gk_bloq_frontal",
+    number: 4,
+    code: "1D",
+    section: "tecnicas",
+    subsection: gkSub("bloqueo"),
+    module: "portero",
+    stage: "ambos",
+    usage: "esencial",
+    label: "Bloqueo frontal",
+    unit: "1–10",
+    kind: "points",
+    conversion: "accuracy",
+    attempts: 0,
+    maxPoints: 10,
+    setup: "Un bloque de 10 repeticiones. Bloqueo frontal.",
+    execution: "10 repeticiones. Calificar de 1 a 10 el bloque completo.",
+    record: "Calificación 1–10 del bloque.",
+    indicatorId: "blocaje_recepcion",
+    relevanceDefault: 3,
+  }),
+  t({
+    id: "gk_bloq_boliche",
+    number: 5,
+    code: "1E",
+    section: "tecnicas",
+    subsection: gkSub("bloqueo"),
+    module: "portero",
+    stage: "ambos",
+    usage: "esencial",
+    label: "Reinicio de boliche y rotación",
+    unit: "1–10",
+    kind: "points",
+    conversion: "accuracy",
+    attempts: 0,
+    maxPoints: 10,
+    setup: "Un bloque de 10 repeticiones. Acción de reinicio de boliche y rotación.",
+    execution: "10 repeticiones. Calificar de 1 a 10 el bloque completo.",
+    record: "Calificación 1–10 del bloque.",
+    indicatorId: "blocaje_recepcion",
+    relevanceDefault: 2,
+  }),
+  t({
+    id: "gk_rechace_1palma",
+    number: 1,
+    code: "2A",
+    section: "tecnicas",
+    subsection: gkSub("recueste"),
+    module: "portero",
+    stage: "ambos",
+    usage: "esencial",
+    label: "Rechace a 1 palma",
+    unit: "aciertos / 5 por pie",
+    kind: "accuracy",
+    conversion: "accuracy",
+    attempts: 0,
+    maxPoints: 5,
+    setup: "Servicios a cada lado. 5 izquierdo y 5 derechos.",
+    execution: "5 repeticiones por lado. Rechace con una palma.",
+    record: "Aciertos por pie (5 izq y 5 der).",
+    indicatorId: "caidas_desvios",
+    relevanceDefault: 3,
+  }),
+  t({
+    id: "gk_rechace_2palmas",
+    number: 2,
+    code: "2B",
+    section: "tecnicas",
+    subsection: gkSub("recueste"),
+    module: "portero",
+    stage: "ambos",
+    usage: "esencial",
+    label: "Rechace a 2 palmas",
+    unit: "aciertos / 5 por pie",
+    kind: "accuracy",
+    conversion: "accuracy",
+    attempts: 0,
+    maxPoints: 5,
+    setup: "Servicios a cada lado. 5 izquierdo y 5 derechos.",
+    execution: "5 repeticiones por lado. Rechace con dos palmas.",
+    record: "Aciertos por pie (5 izq y 5 der).",
+    indicatorId: "caidas_desvios",
+    relevanceDefault: 3,
+  }),
+  t({
+    id: "gk_recueste_1palma",
+    number: 3,
+    code: "2C",
+    section: "tecnicas",
+    subsection: gkSub("recueste"),
+    module: "portero",
+    stage: "ambos",
+    usage: "esencial",
+    label: "Recueste a 1 palma (bote picado)",
+    unit: "aciertos / 5 por pie",
+    kind: "accuracy",
+    conversion: "accuracy",
+    attempts: 0,
+    maxPoints: 5,
+    setup: "Bote picado. 5 izquierdo y 5 derechos.",
+    execution: "5 repeticiones por lado. Recueste con una palma.",
+    record: "Aciertos por pie (5 izq y 5 der).",
+    indicatorId: "caidas_desvios",
+    relevanceDefault: 3,
+  }),
+  t({
+    id: "gk_recueste_2palmas",
+    number: 4,
+    code: "2D",
+    section: "tecnicas",
+    subsection: gkSub("recueste"),
+    module: "portero",
+    stage: "ambos",
+    usage: "esencial",
+    label: "Recueste a 2 palmas (bote picado)",
+    unit: "aciertos / 5 por pie",
+    kind: "accuracy",
+    conversion: "accuracy",
+    attempts: 0,
+    maxPoints: 5,
+    setup: "Bote picado. 5 izquierdo y 5 derechos.",
+    execution: "5 repeticiones por lado. Recueste con dos palmas.",
+    record: "Aciertos por pie (5 izq y 5 der).",
+    indicatorId: "caidas_desvios",
+    relevanceDefault: 3,
+  }),
+  t({
+    id: "gk_recueste_raso",
+    number: 5,
+    code: "2E",
+    section: "tecnicas",
+    subsection: gkSub("recueste"),
+    module: "portero",
+    stage: "ambos",
+    usage: "esencial",
+    label: "Recueste raso",
+    unit: "aciertos / 5 por pie",
+    kind: "accuracy",
+    conversion: "accuracy",
+    attempts: 0,
+    maxPoints: 5,
+    setup: "Servicio raso. 5 izquierdo y 5 derechos.",
+    execution: "5 repeticiones por lado. Recueste a ras de suelo.",
+    record: "Aciertos por pie (5 izq y 5 der).",
+    indicatorId: "caidas_desvios",
+    relevanceDefault: 3,
+  }),
+  t({
+    id: "gk_recueste_media",
+    number: 6,
+    code: "2E",
+    section: "tecnicas",
+    subsection: gkSub("recueste"),
+    module: "portero",
+    stage: "ambos",
+    usage: "esencial",
+    label: "Recueste media altura",
+    unit: "aciertos / 5 por pie",
+    kind: "accuracy",
+    conversion: "accuracy",
+    attempts: 0,
+    maxPoints: 5,
+    setup: "Servicio a media altura. 5 izquierdo y 5 derechos.",
+    execution: "5 repeticiones por lado. Recueste a media altura.",
+    record: "Aciertos por pie (5 izq y 5 der).",
+    indicatorId: "caidas_desvios",
+    relevanceDefault: 3,
+  }),
+  t({
+    id: "gk_recueste_vuelo",
+    number: 7,
+    code: "2E",
+    section: "tecnicas",
+    subsection: gkSub("recueste"),
+    module: "portero",
+    stage: "ambos",
+    usage: "esencial",
+    label: "Recueste fase de vuelo",
+    unit: "aciertos / 5 por pie",
+    kind: "accuracy",
+    conversion: "accuracy",
+    attempts: 0,
+    maxPoints: 5,
+    setup: "Servicio en fase de vuelo. 5 izquierdo y 5 derechos.",
+    execution: "5 repeticiones por lado. Recueste en el aire.",
+    record: "Aciertos por pie (5 izq y 5 der).",
+    indicatorId: "caidas_desvios",
+    relevanceDefault: 3,
+  }),
+  t({
+    id: "gk_aereo_abajo_arriba",
+    number: 1,
+    code: "3A",
+    section: "tecnicas",
+    subsection: gkSub("aereo"),
+    module: "portero",
+    stage: "ambos",
+    usage: "esencial",
+    label: "Abajo hacia arriba",
+    unit: "aciertos / 10",
+    kind: "accuracy",
+    conversion: "accuracy",
+    attempts: 0,
+    maxPoints: 10,
+    setup: "10 servicios de trayectoria de abajo hacia arriba.",
+    execution: "10 repeticiones. Juego aéreo de abajo hacia arriba.",
+    record: "Aciertos sobre 10.",
+    indicatorId: "juego_aereo",
+    relevanceDefault: 3,
+  }),
+  t({
+    id: "gk_aereo_arriba_abajo",
+    number: 2,
+    code: "3B",
+    section: "tecnicas",
+    subsection: gkSub("aereo"),
+    module: "portero",
+    stage: "ambos",
+    usage: "esencial",
+    label: "Arriba hacia abajo",
+    unit: "aciertos / 10",
+    kind: "accuracy",
+    conversion: "accuracy",
+    attempts: 0,
+    maxPoints: 10,
+    setup: "10 servicios de trayectoria de arriba hacia abajo.",
+    execution: "10 repeticiones. Juego aéreo de arriba hacia abajo.",
+    record: "Aciertos sobre 10.",
+    indicatorId: "juego_aereo",
+    relevanceDefault: 3,
+  }),
+  t({
+    id: "gk_fildeo_corto",
+    number: 3,
+    code: "3C",
+    section: "tecnicas",
+    subsection: gkSub("aereo"),
+    module: "portero",
+    stage: "ambos",
+    usage: "esencial",
+    label: "Fildeo corto (frontal)",
+    unit: "aciertos / 10",
+    kind: "accuracy",
+    conversion: "accuracy",
+    attempts: 0,
+    maxPoints: 10,
+    setup: "10 repeticiones. Fildeo corto frontal.",
+    execution: "10 acciones de fildeo corto de frente.",
+    record: "Aciertos sobre 10.",
+    indicatorId: "juego_aereo",
+    relevanceDefault: 3,
+  }),
+  t({
+    id: "gk_fildeo_medio",
+    number: 4,
+    code: "3C",
+    section: "tecnicas",
+    subsection: gkSub("aereo"),
+    module: "portero",
+    stage: "ambos",
+    usage: "esencial",
+    label: "Fildeo medio (frontal)",
+    unit: "aciertos / 10",
+    kind: "accuracy",
+    conversion: "accuracy",
+    attempts: 0,
+    maxPoints: 10,
+    setup: "10 repeticiones. Fildeo medio frontal.",
+    execution: "10 acciones de fildeo medio de frente.",
+    record: "Aciertos sobre 10.",
+    indicatorId: "juego_aereo",
+    relevanceDefault: 3,
+  }),
+  t({
+    id: "gk_fildeo_largo",
+    number: 5,
+    code: "3C",
+    section: "tecnicas",
+    subsection: gkSub("aereo"),
+    module: "portero",
+    stage: "ambos",
+    usage: "esencial",
+    label: "Fildeo largo (frontal)",
+    unit: "aciertos / 10",
+    kind: "accuracy",
+    conversion: "accuracy",
+    attempts: 0,
+    maxPoints: 10,
+    setup: "10 repeticiones. Fildeo largo frontal.",
+    execution: "10 acciones de fildeo largo de frente.",
+    record: "Aciertos sobre 10.",
+    indicatorId: "juego_aereo",
+    relevanceDefault: 3,
+  }),
+  t({
+    id: "gk_circulacion_corta",
+    number: 1,
+    code: "4A",
+    section: "tecnicas",
+    subsection: gkSub("pies"),
+    module: "portero",
+    stage: "ambos",
+    usage: "esencial",
+    label: "Circulación corta",
+    unit: "aciertos / 5 por pie",
+    kind: "accuracy",
+    conversion: "accuracy",
+    attempts: 0,
+    maxPoints: 5,
+    setup: "10 acciones, 5 con cada pie. Circulación corta.",
+    execution: "5 pases cortos por pie.",
+    record: "Aciertos por pie (5 izq y 5 der).",
+    indicatorId: "distribucion",
+    relevanceDefault: 3,
+  }),
+  t({
+    id: "gk_circulacion_media",
+    number: 2,
+    code: "4A",
+    section: "tecnicas",
+    subsection: gkSub("pies"),
+    module: "portero",
+    stage: "ambos",
+    usage: "esencial",
+    label: "Circulación media",
+    unit: "aciertos / 5 por pie",
+    kind: "accuracy",
+    conversion: "accuracy",
+    attempts: 0,
+    maxPoints: 5,
+    setup: "10 acciones, 5 con cada pie. Circulación media.",
+    execution: "5 pases medios por pie.",
+    record: "Aciertos por pie (5 izq y 5 der).",
+    indicatorId: "distribucion",
+    relevanceDefault: 3,
+  }),
+  t({
+    id: "gk_circulacion_larga",
+    number: 3,
+    code: "4A",
+    section: "tecnicas",
+    subsection: gkSub("pies"),
+    module: "portero",
+    stage: "ambos",
+    usage: "esencial",
+    label: "Circulación larga",
+    unit: "aciertos / 5 por pie",
+    kind: "accuracy",
+    conversion: "accuracy",
+    attempts: 0,
+    maxPoints: 5,
+    setup: "10 acciones, 5 con cada pie. Circulación larga.",
+    execution: "5 pases largos por pie.",
+    record: "Aciertos por pie (5 izq y 5 der).",
+    indicatorId: "distribucion",
+    relevanceDefault: 3,
+  }),
+  t({
+    id: "gk_pase_elevado",
+    number: 4,
+    code: "4C",
+    section: "tecnicas",
+    subsection: gkSub("pies"),
+    module: "portero",
+    stage: "ambos",
+    usage: "esencial",
+    label: "Pase elevado",
+    unit: "aciertos / 5 por pie",
+    kind: "accuracy",
+    conversion: "accuracy",
+    attempts: 0,
+    maxPoints: 5,
+    setup: "10 acciones, 5 con cada pie. Pase elevado.",
+    execution: "5 pases elevados por pie.",
+    record: "Aciertos por pie (5 izq y 5 der).",
+    indicatorId: "distribucion",
+    relevanceDefault: 3,
+  }),
+  t({
+    id: "gk_pase_volea",
+    number: 5,
+    code: "4D",
+    section: "tecnicas",
+    subsection: gkSub("pies"),
+    module: "portero",
+    stage: "ambos",
+    usage: "esencial",
+    label: "Pase de volea largo",
+    unit: "aciertos / 5 por pie",
+    kind: "accuracy",
+    conversion: "accuracy",
+    attempts: 0,
+    maxPoints: 5,
+    setup: "10 acciones, 5 con cada pie. Volea larga.",
+    execution: "5 voleas largas por pie.",
+    record: "Aciertos por pie (5 izq y 5 der).",
+    indicatorId: "distribucion",
+    relevanceDefault: 2,
+  }),
+  t({
+    id: "gk_control_fijo",
+    number: 6,
+    code: "4F",
+    section: "tecnicas",
+    subsection: gkSub("pies"),
+    module: "portero",
+    stage: "ambos",
+    usage: "esencial",
+    label: "Control fijo",
+    unit: "aciertos / 5 por pie",
+    kind: "accuracy",
+    conversion: "accuracy",
+    attempts: 0,
+    maxPoints: 5,
+    setup: "10 acciones, 5 con cada pie. Control fijo.",
+    execution: "5 controles fijos por pie.",
+    record: "Aciertos por pie (5 izq y 5 der).",
+    indicatorId: "control_orientado",
+    relevanceDefault: 3,
+  }),
+  t({
+    id: "gk_control_orientado",
+    number: 7,
+    code: "4F",
+    section: "tecnicas",
+    subsection: gkSub("pies"),
+    module: "portero",
+    stage: "ambos",
+    usage: "esencial",
+    label: "Control orientado",
+    unit: "aciertos / 5 por pie",
+    kind: "accuracy",
+    conversion: "accuracy",
+    attempts: 0,
+    maxPoints: 5,
+    setup: "10 acciones, 5 con cada pie. Control orientado.",
+    execution: "5 controles orientados por pie.",
+    record: "Aciertos por pie (5 izq y 5 der).",
+    indicatorId: "control_orientado",
+    relevanceDefault: 3,
+  }),
+  t({
+    id: "gk_rompimiento",
+    number: 8,
+    code: "4G",
+    section: "tecnicas",
+    subsection: gkSub("pies"),
+    module: "portero",
+    stage: "ambos",
+    usage: "esencial",
+    label: "Rompimiento de primera",
+    unit: "aciertos / 5 por pie",
+    kind: "accuracy",
+    conversion: "accuracy",
+    attempts: 0,
+    maxPoints: 5,
+    setup: "10 acciones, 5 con cada pie. Rompimiento de primera.",
+    execution: "5 rompimientos de primera por pie.",
+    record: "Aciertos por pie (5 izq y 5 der).",
     indicatorId: "golpeo",
     relevanceDefault: 3,
   }),
@@ -1704,11 +2295,11 @@ export const GPH_ROTATION_CAMPO = [
 ] as const;
 
 export const GPH_ROTATION_PORTERO = [
-  { minutes: "10 min", title: "Activación", detail: "Registro y ensayo no válido." },
-  { minutes: "30 min", title: "Pies / manos", detail: "Posición, desplazamiento y blocaje." },
-  { minutes: "25 min", title: "Acciones", detail: "Caídas, 1v1 y reacción." },
-  { minutes: "15 min", title: "Distribución", detail: "Mano, pie y despeje." },
-  { minutes: "10 min", title: "Cierre", detail: "Campos vacíos y video." },
+  { minutes: "1", title: "Físicas", detail: "Sprint, 505, Illinois, Navette y fuerza." },
+  { minutes: "2", title: "Técnicas", detail: "Bloqueo, recueste, juego aéreo y juego de pies." },
+  { minutes: "3", title: "Coordinativas", detail: "Semáforo, perfiles, marcha y giros." },
+  { minutes: "4", title: "Cognitivas", detail: "Memoria, percepción y toma de decisiones." },
+  { minutes: "5", title: "Reglamentarias", detail: "Las 17 reglas en orden." },
 ] as const;
 
 export const GPH_WEEK_360 = [
@@ -1737,6 +2328,7 @@ export function testsForBattery(
   stage: GphProtocolStage,
   sessionType: GphSessionType,
 ) {
+  const sectionOrder = GPH_BATTERY_SECTIONS.map((item) => item.id);
   return GPH_STATION_TESTS.filter((test) => {
     if (test.retired) return false;
     const modules = test.appliesTo ?? [test.module];
@@ -1744,7 +2336,16 @@ export function testsForBattery(
     if (test.stage !== "ambos" && test.stage !== stage) return false;
     if (sessionType === "esencial") return test.usage === "esencial";
     return true;
-  });
+  }).slice()
+    .sort((a, b) => {
+      const as = a.section ? sectionOrder.indexOf(a.section) : 99;
+      const bs = b.section ? sectionOrder.indexOf(b.section) : 99;
+      if (as !== bs) return as - bs;
+      const ac = a.code ?? "";
+      const bc = b.code ?? "";
+      if (ac !== bc) return ac.localeCompare(bc, "es", { numeric: true });
+      return a.number - b.number || a.label.localeCompare(b.label, "es");
+    });
 }
 
 export function testHeading(test: GphStationTest) {
@@ -1875,6 +2476,7 @@ export function testNeedsBilateral(test: GphStationTest) {
   return (
     text.includes("bilateral") ||
     text.includes("por pie") ||
+    text.includes("izq y der") ||
     text.includes("pie menos") ||
     text.includes("pie menor")
   );
@@ -2071,6 +2673,11 @@ export function derivedPercent(test: GphStationTest, capture: GphTestCapture) {
       if (!maxPerDistance) return null;
       return (distanceTotal / (distanceCount * maxPerDistance)) * 100;
     }
+    if (capture.leftHits != null && capture.rightHits != null) {
+      const maxEach = capture.opportunities ?? test.maxPoints;
+      if (!maxEach) return null;
+      return ((capture.leftHits + capture.rightHits) / (2 * maxEach)) * 100;
+    }
     const values = numericAttempts(capture);
     const total =
       capture.hits != null
@@ -2190,6 +2797,11 @@ export function isTestCaptureComplete(test: GphStationTest, capture: GphTestCapt
       const hasDistances =
         capture.hits5m != null && capture.hits10m != null && capture.hits20m != null;
       if (!hasDistances && capture.hits == null) return false;
+    } else if (testNeedsBilateral(test)) {
+      if (max == null || max <= 0) return false;
+      if (capture.leftHits == null || capture.rightHits == null) {
+        if (capture.hits == null) return false;
+      }
     } else if (capture.hits == null || max == null || max <= 0) {
       return false;
     }

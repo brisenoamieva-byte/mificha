@@ -132,8 +132,21 @@ export function GphProtocolContent() {
                   <p className="text-sm font-semibold text-mf-text">
                     {section.number}. {section.label}
                   </p>
-                  {sectionTests.map((test) => (
-                    <article key={test.id} className="rounded-xl border border-mf-border-subtle p-3">
+                  {sectionTests.map((test, index) => {
+                    const prev = sectionTests[index - 1];
+                    const showSub =
+                      test.subsection && test.subsection.id !== prev?.subsection?.id;
+                    return (
+                    <div key={test.id} className="space-y-3">
+                    {showSub && test.subsection ? (
+                      <p className="text-xs font-semibold text-mf-text">
+                        {test.subsection.label}
+                        <span className="ml-2 font-normal text-mf-text-muted">
+                          {test.subsection.protocol}
+                        </span>
+                      </p>
+                    ) : null}
+                    <article className="rounded-xl border border-mf-border-subtle p-3">
                       <p className="text-sm font-semibold text-mf-text">
                         {testHeading(test)}
                         {test.usage === "plus" ? (
@@ -163,7 +176,9 @@ export function GphProtocolContent() {
                         </div>
                       </dl>
                     </article>
-                  ))}
+                    </div>
+                    );
+                  })}
                 </section>
               );
             })}
