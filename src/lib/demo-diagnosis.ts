@@ -285,7 +285,7 @@ export function buildDemoDiagnosisReport(): {
             note: "5 m fuerte; cae a 20 m. 11/18 der · 9/18 izq",
           }),
           des_c_control: demoTest({
-            attempts: [4, 6],
+            attempts: [4, 4, 6, 4],
             hits: null,
             opportunities: null,
             errors: null,
