@@ -834,6 +834,26 @@ export const GPH_STATION_TESTS: readonly GphStationTest[] = [
     relevanceDefault: 2,
   }),
   t({
+    id: "ini_p_tiro_gol",
+    number: 11,
+    module: "portero",
+    stage: "iniciacion",
+    usage: "esencial",
+    label: "Tiro a gol fijo",
+    unit: "precisión + potencia · 11 / 16.5 / 20 m · izq y der",
+    kind: "points",
+    conversion: "accuracy",
+    attempts: 0,
+    maxPoints: 8,
+    setup:
+      "Balón detenido; distancias 11 m (penal), 16.5 m (fuera de área) y 20 m; ambos perfiles; radar opcional.",
+    execution:
+      "En cada distancia: tiro a gol fijo con derecha y con izquierda. Precisión y potencia.",
+    record: "Precisión y potencia a 11 m, 16.5 m y 20 m, izquierda y derecha.",
+    indicatorId: "golpeo",
+    relevanceDefault: 3,
+  }),
+  t({
     id: "des_p_pies",
     number: 1,
     module: "portero",
@@ -1098,6 +1118,26 @@ export const GPH_STATION_TESTS: readonly GphStationTest[] = [
       "En cada distancia: 12 pases (6 por pie), balón detenido. Registrar aciertos a 5, 10 y 20 m.",
     record: "Aciertos a 5 m, 10 m y 20 m; % por pie; diferencia bilateral.",
     indicatorId: "pase",
+    relevanceDefault: 3,
+  }),
+  t({
+    id: "des_p_tiro_gol",
+    number: 16,
+    module: "portero",
+    stage: "desarrollo",
+    usage: "esencial",
+    label: "Tiro a gol fijo",
+    unit: "precisión + potencia · 11 / 16.5 / 20 m · izq y der",
+    kind: "points",
+    conversion: "accuracy",
+    attempts: 0,
+    maxPoints: 8,
+    setup:
+      "Balón detenido; distancias 11 m (penal), 16.5 m (fuera de área) y 20 m; ambos perfiles; radar opcional.",
+    execution:
+      "En cada distancia: tiro a gol fijo con derecha y con izquierda. Precisión y potencia.",
+    record: "Precisión y potencia a 11 m, 16.5 m y 20 m, izquierda y derecha.",
+    indicatorId: "golpeo",
     relevanceDefault: 3,
   }),
   t({
@@ -1869,7 +1909,9 @@ function isShotGolTest(test: GphStationTest) {
     test.id === "des_c_tiro" ||
     test.id === "des_c_tiro_gol" ||
     test.id === "ini_c_tiro" ||
-    test.id === "ini_c_tiro_gol"
+    test.id === "ini_c_tiro_gol" ||
+    test.id === "ini_p_tiro_gol" ||
+    test.id === "des_p_tiro_gol"
   );
 }
 
