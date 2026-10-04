@@ -305,15 +305,9 @@ export function DiagnosisForm({
 
     if (mode === "ready") {
       const stations = fieldSessionProgress(fieldSession, diagnosisModule);
-      if (stations.filled < stations.total) {
+      if (stations.filled === 0 && live.scoredCount === 0) {
         toast.error(
-          `Faltan ${stations.total - stations.filled} pruebas de estación: ${stations.missing.map((test) => test.label).join(", ")}.`,
-        );
-        return;
-      }
-      if (!live.complete) {
-        toast.error(
-          `Faltan ${live.requiredCount - live.scoredCount} indicadores por valorar (físico, mental y lo que no midió la estación).`,
+          "Captura o marca «No aplica» en al menos una prueba. Si vas a mitad, usa Guardar avance.",
         );
         return;
       }
@@ -406,7 +400,12 @@ export function DiagnosisForm({
         );
         router.push(`/fut/dashboard/diagnostico/${diagnosis.id}`);
       } else {
-        toast.success("Ficha lista: dato, 1–5, lectura y plan.");
+        const stations = fieldSessionProgress(nextSession, diagnosisModule);
+        toast.success(
+          stations.filled < stations.total
+            ? `Ficha lista con batería parcial (${stations.filled}/${stations.total} pruebas).`
+            : "Ficha lista: dato, 1–5, lectura y plan.",
+        );
         router.push(`/fut/dashboard/diagnostico/${diagnosis.id}`);
       }
     } catch (error) {
@@ -539,7 +538,7 @@ export function DiagnosisForm({
       {diagnosisId ? (
         <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">
           {isFieldSessionDraft(fieldSession)
-            ? "Avance en captura. Guarda cuando quieras y continúa después; Generar ficha cierra el diagnóstico completo."
+            ? "Avance en captura. Guarda cuando quieras y continúa después. Generar ficha cierra aunque falten pruebas (útil en iniciación)."
             : "Editando una ficha ya generada. Guardar avance la marca otra vez como borrador; Generar ficha la vuelve a cerrar."}
         </div>
       ) : (

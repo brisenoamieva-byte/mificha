@@ -54,6 +54,7 @@ function demoTest(
     | "hits20m"
     | "shotDistances"
     | "ruleSlots"
+    | "skipped"
   > &
     Partial<
       Pick<
@@ -66,6 +67,7 @@ function demoTest(
         | "hits20m"
         | "shotDistances"
         | "ruleSlots"
+        | "skipped"
       >
     >,
 ): GphTestCapture {
@@ -78,6 +80,7 @@ function demoTest(
     shotDistances: {},
     ruleSlots: [],
     radarKmh: null,
+    skipped: false,
     ...capture,
   };
 }

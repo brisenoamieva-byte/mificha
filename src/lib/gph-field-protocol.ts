@@ -160,6 +160,8 @@ export interface GphTestCapture {
   score: number | null;
   relevance: 1 | 2 | 3;
   flagged: boolean;
+  /** Iniciación u omisión: no se corre la prueba y no bloquea la ficha. */
+  skipped: boolean;
   note: string;
 }
 
@@ -167,6 +169,7 @@ export interface GphPhysicalCapture {
   attempts: Array<number | null>;
   note: string;
   score: number | null;
+  skipped: boolean;
 }
 
 export const DIAGNOSIS_EVIDENCE_MAX = 12;
@@ -2402,6 +2405,7 @@ export function isPhysicalCaptureComplete(
   capture: GphPhysicalCapture | undefined,
 ) {
   if (!capture) return false;
+  if (capture.skipped) return true;
   const hasAttempt = capture.attempts.some((value) => value != null && Number.isFinite(value));
   return hasAttempt || capture.score != null;
 }
@@ -2434,6 +2438,7 @@ export function emptyTestCapture(test: GphStationTest): GphTestCapture {
     score: null,
     relevance: test.relevanceDefault,
     flagged: false,
+    skipped: false,
     note: "",
   };
 }
@@ -2778,6 +2783,7 @@ export function isRatioKind(kind: GphTestKind) {
 
 export function isTestCaptureComplete(test: GphStationTest, capture: GphTestCapture | undefined) {
   if (!capture) return false;
+  if (capture.skipped) return true;
   const score = capture.score ?? suggestedScore(test, capture);
   if (test.id === "gph_reglas") {
     const filled = (capture.ruleSlots ?? []).filter((item) => item.trim()).length;
@@ -2837,6 +2843,7 @@ export function fieldSessionProgress(
 
 export function formatTestRaw(test: GphStationTest, capture: GphTestCapture | undefined) {
   if (!capture) return "—";
+  if (capture.skipped) return "No aplica";
   if (test.id === "gph_reglas") {
     const filled = (capture.ruleSlots ?? []).filter((item) => item.trim()).length;
     const hits = regulationOrderHits(capture.ruleSlots);
@@ -3005,6 +3012,7 @@ export function parseFieldSession(value: unknown): GphFieldSession {
         score: parseNum(raw.score),
         relevance: relevanceRaw === 1 || relevanceRaw === 3 ? relevanceRaw : 2,
         flagged: Boolean(raw.flagged),
+        skipped: Boolean(raw.skipped),
         note: typeof raw.note === "string" ? raw.note : "",
       };
     }
@@ -3017,6 +3025,7 @@ export function parseFieldSession(value: unknown): GphFieldSession {
         attempts: Array.isArray(raw.attempts) ? raw.attempts.map((item) => parseNum(item)) : [],
         note: typeof raw.note === "string" ? raw.note : "",
         score: parseNum(raw.score),
+        skipped: Boolean(raw.skipped),
       };
     }
   }
@@ -3037,6 +3046,7 @@ export function parseFieldSession(value: unknown): GphFieldSession {
         attempts: illinoisAttempts,
         note: existingIllinois?.note ?? "",
         score: existingIllinois?.score ?? null,
+        skipped: existingIllinois?.skipped ?? false,
       };
     }
     physical.cambio_5105 = {
@@ -3117,7 +3127,7 @@ export function scoresFromFieldSession(session: GphFieldSession, module: Diagnos
   for (const test of tests) {
     if (!test.indicatorId) continue;
     const capture = session.tests[test.id];
-    if (!capture) continue;
+    if (!capture || capture.skipped) continue;
     const score = capture.score ?? suggestedScore(test, capture);
     if (score == null) continue;
     const list = buckets.get(test.indicatorId) ?? [];
@@ -3128,6 +3138,7 @@ export function scoresFromFieldSession(session: GphFieldSession, module: Diagnos
     if ("legacy" in test && test.legacy) continue;
     if (test.desarrolloOnly && session.protocolStage !== "desarrollo") continue;
     const capture = session.physical[test.id];
+    if (capture?.skipped) continue;
     if (capture?.score == null) continue;
     const list = buckets.get(test.indicatorId) ?? [];
     list.push(capture.score);
@@ -3145,6 +3156,7 @@ export function flaggedIndicatorsFromField(session: GphFieldSession, module: Dia
   const ids: string[] = [];
   for (const test of tests) {
     if (!test.indicatorId) continue;
+    if (session.tests[test.id]?.skipped) continue;
     if (session.tests[test.id]?.flagged) ids.push(test.indicatorId);
   }
   return [...new Set(ids)];
@@ -3155,6 +3167,7 @@ export function suggestPrioritiesFromField(session: GphFieldSession, module: Dia
   return tests
     .map((test) => {
       const capture = session.tests[test.id] ?? emptyTestCapture(test);
+      if (capture.skipped) return null;
       const score = capture.score ?? suggestedScore(test, capture);
       if (score == null) return null;
       const weight = priorityValue(score, capture.relevance);

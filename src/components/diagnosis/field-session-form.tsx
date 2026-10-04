@@ -190,6 +190,10 @@ export function FieldSessionForm({ academyId, module, session, onChange }: Field
             <Link href="/fut/dashboard/diagnostico/protocolo" className="font-semibold text-mf-brand hover:underline">
               Montaje
             </Link>
+            {" "}
+            Iniciación o niños que aún no deben correr toda la batería: marca{" "}
+            <span className="font-semibold text-mf-text">No aplica</span> en esas pruebas y genera
+            ficha igual.
           </p>
           {session.sessionType === "esencial" && only360.length > 0 ? (
             <p className="mt-1 text-[11px] text-mf-text-muted">
@@ -216,7 +220,7 @@ export function FieldSessionForm({ academyId, module, session, onChange }: Field
           <select
             value={session.protocolStage}
             onChange={(e) =>
-              patch({ protocolStage: e.target.value as GphProtocolStage, tests: {}, physical: {} })
+              patch({ protocolStage: e.target.value as GphProtocolStage })
             }
             className="mf-input mt-1"
           >
@@ -369,6 +373,7 @@ export function FieldSessionForm({ academyId, module, session, onChange }: Field
                 attempts: Array.from({ length: test.attempts }, () => null),
                 note: "",
                 score: null,
+                skipped: false,
               };
               const attempts = Array.from(
                 { length: test.attempts },
@@ -397,10 +402,37 @@ export function FieldSessionForm({ academyId, module, session, onChange }: Field
                       </p>
                     </div>
                   ) : null}
-                  <p className="text-xs font-medium text-mf-text">
-                    {"code" in test && test.code ? `${test.code}) ${test.label}` : test.label}
-                  </p>
+                  <div className="flex flex-wrap items-start justify-between gap-2">
+                    <p className="text-xs font-medium text-mf-text">
+                      {"code" in test && test.code ? `${test.code}) ${test.label}` : test.label}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        patch({
+                          physical: {
+                            ...session.physical,
+                            [test.id]: { ...capture, skipped: !capture.skipped },
+                          },
+                        })
+                      }
+                      className={cn(
+                        "rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide",
+                        capture.skipped
+                          ? "border-mf-brand bg-mf-brand-soft text-mf-brand"
+                          : "border-mf-border text-mf-text-muted hover:bg-mf-canvas",
+                      )}
+                    >
+                      {capture.skipped ? "No aplica" : "Omitir"}
+                    </button>
+                  </div>
                   <p className="text-[11px] text-mf-text-muted">{test.protocol}</p>
+                  {capture.skipped ? (
+                    <p className="mt-2 text-[11px] text-mf-text-secondary">
+                      No se corre esta prueba. No bloquea la ficha.
+                    </p>
+                  ) : (
+                    <>
                   <div className="mt-1.5 flex flex-wrap gap-2">
                     {attempts.map((value, index) => (
                       <MeasureField
@@ -466,6 +498,8 @@ export function FieldSessionForm({ academyId, module, session, onChange }: Field
                       ))}
                     </div>
                   </div>
+                    </>
+                  )}
                 </div>
               );
             })}
@@ -537,6 +571,19 @@ export function FieldSessionForm({ academyId, module, session, onChange }: Field
                     {indicator ? ` · Pasa a ${indicator.label}` : ""}
                   </p>
                 </div>
+                <div className="flex shrink-0 items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={() => patchTest(test, { ...capture, skipped: !capture.skipped })}
+                    className={cn(
+                      "rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide",
+                      capture.skipped
+                        ? "border-mf-brand bg-mf-brand-soft text-mf-brand"
+                        : "border-mf-border text-mf-text-muted hover:bg-mf-canvas",
+                    )}
+                  >
+                    {capture.skipped ? "No aplica" : "Omitir"}
+                  </button>
                 <button
                   type="button"
                   onClick={() => patchTest(test, { ...capture, flagged: !capture.flagged })}
@@ -548,8 +595,15 @@ export function FieldSessionForm({ academyId, module, session, onChange }: Field
                 >
                   <Star className="h-4 w-4" fill={capture.flagged ? "currentColor" : "none"} />
                 </button>
+                </div>
               </div>
 
+              {capture.skipped ? (
+                <p className="mt-3 text-[11px] text-mf-text-secondary">
+                  No se corre esta prueba. No bloquea generar la ficha.
+                </p>
+              ) : (
+              <>
               {test.id === "gph_reglas" ? (
                 <div className="mt-3 space-y-2">
                   <p className="text-[11px] text-mf-text-muted">
@@ -915,6 +969,8 @@ export function FieldSessionForm({ academyId, module, session, onChange }: Field
                 placeholder="Nota de estación (pie, penalización, incidente…)"
                 className="mf-input mt-3"
               />
+              </>
+              )}
             </article>
             </div>
           );
@@ -923,7 +979,8 @@ export function FieldSessionForm({ academyId, module, session, onChange }: Field
 
       {progress.missing.length > 0 ? (
         <p className="text-xs text-mf-warning">
-          Faltan: {progress.missing.map((test) => test.label).join(", ")}.
+          Faltan: {progress.missing.map((test) => test.label).join(", ")}. Márcalas No aplica
+          si el niño no las corre.
         </p>
       ) : (
         <p className="text-xs text-mf-accent-dark">Estaciones completas. El dato ya alimenta la ficha.</p>

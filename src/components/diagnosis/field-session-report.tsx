@@ -143,7 +143,11 @@ export function FieldSessionReport({ session, module }: FieldSessionReportProps)
                   return (
                     <li key={test.id}>
                       {test.label}:{" "}
-                      {values.length ? `${values.join(" / ")} ${test.unit}` : "—"}
+                      {capture?.skipped
+                        ? "No aplica"
+                        : values.length
+                          ? `${values.join(" / ")} ${test.unit}`
+                          : "—"}
                       {capture?.note ? ` · ${capture.note}` : ""}
                     </li>
                   );
