@@ -2,8 +2,9 @@ import {
   GPH_PHYSICAL_TESTS,
   GPH_STATION_TESTS,
   GPH_VENUE_CODES,
-  fieldSessionProgress,
   formatTestRaw,
+  hasCapturedPhysicalData,
+  hasCapturedStationData,
   suggestedScore,
   testHeading,
   testsForBattery,
@@ -17,16 +18,6 @@ interface FieldSessionReportProps {
   module: DiagnosisModule;
 }
 
-function hasRawTests(session: GphFieldSession) {
-  return Object.values(session.tests).some(
-    (capture) =>
-      capture &&
-      ((capture.attempts ?? []).some((value) => value != null) ||
-        capture.hits != null ||
-        capture.score != null),
-  );
-}
-
 function evidenceLabel(item: GphEvidenceItem) {
   const station = GPH_STATION_TESTS.find((test) => test.id === item.stationId);
   const bits = [
@@ -38,15 +29,15 @@ function evidenceLabel(item: GphEvidenceItem) {
 
 export function FieldSessionReport({ session, module }: FieldSessionReportProps) {
   if (!session) return null;
-  const populated = hasRawTests(session);
+  const tests = testsForBattery(module, session.protocolStage, session.sessionType).filter(
+    (test) => hasCapturedStationData(test, session.tests[test.id]),
+  );
+  const physical = GPH_PHYSICAL_TESTS.filter((item) =>
+    hasCapturedPhysicalData(session.physical[item.id]),
+  );
+  const populated = tests.length > 0 || physical.length > 0;
   if (!populated && session.evidence.length === 0) return null;
-  const tests = testsForBattery(module, session.protocolStage, session.sessionType);
-  const progress = fieldSessionProgress(session, module);
   const venue = GPH_VENUE_CODES.find((item) => item.id === session.venueCode)?.label;
-  const physical = GPH_PHYSICAL_TESTS.filter((item) => {
-    const capture = session.physical[item.id];
-    return capture && (capture.attempts.some((value) => value != null) || capture.note);
-  });
 
   return (
     <section className="border-t border-mf-border-subtle px-5 py-6">
@@ -57,8 +48,8 @@ export function FieldSessionReport({ session, module }: FieldSessionReportProps)
         <>
           <p className="mt-2 text-xs text-mf-text-muted">
             {session.protocolStage === "iniciacion" ? "Iniciación" : "Desarrollo"} ·{" "}
-            {session.sessionType === "360" ? "360" : "Esencial"} · {progress.filled}/
-            {progress.total} pruebas
+            {session.sessionType === "360" ? "360" : "Esencial"} · {tests.length + physical.length}{" "}
+            pruebas aplicadas
             {venue ? ` · ${venue}` : session.venueCode ? ` · ${session.venueCode}` : ""}
             {session.surface ? ` · ${session.surface}` : ""}
             {session.weather ? ` · ${session.weather}` : ""}
@@ -74,6 +65,7 @@ export function FieldSessionReport({ session, module }: FieldSessionReportProps)
             {session.evidence.length ? ` · Evidencia: ${session.evidence.length}` : ""}
           </p>
 
+          {tests.length > 0 ? (
           <div className="mt-4 overflow-x-auto">
             <table className="min-w-full text-left text-sm">
               <thead>
@@ -128,6 +120,7 @@ export function FieldSessionReport({ session, module }: FieldSessionReportProps)
               </tbody>
             </table>
           </div>
+          ) : null}
 
           {physical.length > 0 ? (
             <div className="mt-4">
@@ -143,11 +136,7 @@ export function FieldSessionReport({ session, module }: FieldSessionReportProps)
                   return (
                     <li key={test.id}>
                       {test.label}:{" "}
-                      {capture?.skipped
-                        ? "No aplica"
-                        : values.length
-                          ? `${values.join(" / ")} ${test.unit}`
-                          : "—"}
+                      {values.length ? `${values.join(" / ")} ${test.unit}` : "—"}
                       {capture?.note ? ` · ${capture.note}` : ""}
                     </li>
                   );

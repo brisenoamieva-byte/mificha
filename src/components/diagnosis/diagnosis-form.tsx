@@ -13,11 +13,14 @@ import {
   emptyFieldSession,
   fieldSessionProgress,
   flaggedIndicatorsFromField,
+  physicalTestsForSession,
   scoresFromFieldSession,
   suggestPrioritiesFromField,
   GPH_VENUE_CODES,
   isFieldSessionDraft,
   protocolStageFromAge,
+  testHeading,
+  testsForBattery,
   type GphFieldSession,
 } from "@/lib/gph-field-protocol";
 import { diagnosisAuthedFetch } from "@/lib/player-diagnosis-client";
@@ -27,8 +30,8 @@ import {
   DIAGNOSIS_GROUP_LABELS,
   DIAGNOSIS_KIND_LABELS,
   DIAGNOSIS_KINDS,
-  DIAGNOSIS_MONTH_META,
-  DIAGNOSIS_MONTHS,
+  planRouteTitle,
+  rollingPlanMonths,
   DIAGNOSIS_SCALE,
   DIAGNOSIS_SESSION_DAYS,
   DIAGNOSIS_STAGE_COPY,
@@ -198,6 +201,27 @@ export function DiagnosisForm({
     group,
     items: required.filter((item) => item.group === group),
   }));
+  const stationFeedByIndicator = useMemo(() => {
+    const map = new Map<string, string[]>();
+    const push = (id: string | undefined, label: string) => {
+      if (!id) return;
+      const current = map.get(id) ?? [];
+      if (!current.includes(label)) current.push(label);
+      map.set(id, current);
+    };
+    for (const test of testsForBattery(
+      diagnosisModule,
+      fieldSession.protocolStage,
+      fieldSession.sessionType,
+    )) {
+      push(test.indicatorId, testHeading(test));
+    }
+    for (const test of physicalTestsForSession(fieldSession)) {
+      push(test.indicatorId, test.code ? `${test.code}) ${test.label}` : test.label);
+    }
+    return map;
+  }, [diagnosisModule, fieldSession]);
+  const pendingObservation = required.filter((item) => mergedScores[item.id] == null);
 
   function setScore(id: string, value: number) {
     setScores((prev) => ({ ...prev, [id]: value }));
@@ -559,7 +583,7 @@ export function DiagnosisForm({
         <li className="rounded-xl border border-mf-border bg-white px-3 py-2.5">
           <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-mf-brand">2 · Cierre 1–5</p>
           <p className="mt-1 text-xs leading-5 text-mf-text-secondary">
-            Técnica y decisión se cargan solas desde las estaciones. Completa físico y mental.
+            Lo de estación se carga solo. Perfil, duelos, lectura y lo mental se califican abajo en 1–5: no tienen prueba.
           </p>
         </li>
         <li className="rounded-xl border border-mf-border bg-white px-3 py-2.5">
@@ -585,6 +609,9 @@ export function DiagnosisForm({
             <p className="text-[11px] text-mf-text-muted">
               Estaciones {stationProgress.filled}/{stationProgress.total} · Cierre {result.scoredCount}/
               {result.requiredCount}
+              {pendingObservation.length > 0
+                ? ` · ${pendingObservation.length} sin estación, se califican abajo`
+                : ""}
               {isFieldSessionDraft(fieldSession) || !diagnosisId
                 ? " · Puedes guardar avance sin terminar"
                 : ""}
@@ -813,20 +840,66 @@ export function DiagnosisForm({
         onChange={setFieldSession}
       />
 
-      <section className="rounded-2xl border border-mf-border bg-white p-4">
+      <section id="cierre-observacion" className="rounded-2xl border border-mf-border bg-white p-4">
         <div className="flex flex-wrap items-end justify-between gap-2">
           <div>
             <h2 className="text-base font-semibold text-mf-text">2. Calificación de cierre 1–5</h2>
             <p className="mt-1 text-xs text-mf-text-muted">
-              Lo que ya midió la estación aparece cerrado. Completa físico, mental y lo que
-              falte. Toca «Ajustar» solo si el 1–5 de cancha no convence.{" "}
-              {DIAGNOSIS_SCALE.map((item) => `${item.value} ${item.label}`).join(" · ")}
+              Lo que ya midió la estación aparece cerrado. Lo demás (perfil, duelos, lectura,
+              mental, hábitos) se llena aquí con lo que viste en cancha. Si no lo observaste,
+              déjalo vacío y no sale en el reporte. Toca «Ajustar» solo si el 1–5 de estación no
+              convence. {DIAGNOSIS_SCALE.map((item) => `${item.value} ${item.label}`).join(" · ")}
             </p>
           </div>
           <p className="text-xs text-mf-text-muted">
             Módulo {diagnosisModule === "portero" ? "portero" : "jugador de campo"}
           </p>
         </div>
+
+        {pendingObservation.length > 0 ? (
+          <div className="mt-5 rounded-xl border border-amber-200 bg-amber-50 px-3 py-3">
+            <p className="text-sm font-semibold text-amber-950">
+              Sin nota todavía · {pendingObservation.length}
+            </p>
+            <p className="mt-1 text-[11px] text-amber-900">
+              No salen de una estación, o la prueba se omitió. Pon 1–5 si lo viste en el juego.
+              Si no, déjalo vacío.
+            </p>
+            <div className="mt-3 space-y-2">
+              {pendingObservation.map((item) => {
+                const feed = stationFeedByIndicator.get(item.id);
+                return (
+                  <div
+                    key={item.id}
+                    className="flex flex-wrap items-center gap-2 rounded-lg bg-white px-3 py-2"
+                  >
+                    <div className="min-w-[160px] flex-1">
+                      <p className="text-sm font-medium text-mf-text">{item.label}</p>
+                      <p className="text-[11px] text-mf-text-muted">
+                        {feed?.length
+                          ? `Prueba: ${feed.join(", ")}. Si no se corrió, califica aquí.`
+                          : "No hay prueba de estación. Califica lo que viste en cancha."}
+                      </p>
+                    </div>
+                    <div className="flex gap-1">
+                      {DIAGNOSIS_SCALE.map((level) => (
+                        <button
+                          key={level.value}
+                          type="button"
+                          title={level.hint}
+                          onClick={() => setScore(item.id, level.value)}
+                          className="h-9 w-9 rounded-lg bg-mf-canvas text-sm font-semibold tabular-nums text-mf-text-secondary hover:bg-mf-brand-soft"
+                        >
+                          {level.value}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ) : null}
 
         <div className="mt-5 space-y-6">
           {groups.map(({ group, items }) => (
@@ -1080,7 +1153,7 @@ export function DiagnosisForm({
                   setPriorities(next);
                 }}
                 className="mf-input"
-                placeholder="Meta a diciembre"
+                placeholder="Meta al cierre"
               />
               <input
                 value={item.baseline}
@@ -1123,38 +1196,38 @@ export function DiagnosisForm({
           onClick={() => setPlanOpen((open) => !open)}
           className="flex w-full items-center justify-between px-4 py-3 text-left text-sm font-semibold text-mf-text"
         >
-          Ruta septiembre–diciembre
+          {planRouteTitle(evaluatedAt)}
           <span className="text-xs font-medium text-mf-text-muted">
             {planOpen ? "Ocultar" : "Opcional"}
           </span>
         </button>
         {planOpen ? (
           <div className="grid gap-3 border-t border-mf-border-subtle p-4 sm:grid-cols-2">
-            {DIAGNOSIS_MONTHS.map((month) => (
-              <div key={month} className="rounded-xl bg-mf-canvas p-3">
+            {rollingPlanMonths(evaluatedAt).map((month) => (
+              <div key={month.key} className="rounded-xl bg-mf-canvas p-3">
                 <p className="text-sm font-semibold text-mf-brand">
-                  {DIAGNOSIS_MONTH_META[month].label}
+                  {month.label}
                 </p>
                 <p className="text-[11px] text-mf-text-muted">
-                  {DIAGNOSIS_MONTH_META[month].focus}
+                  {month.focus}
                 </p>
                 <input
-                  value={monthlyPlan[month].objective}
+                  value={monthlyPlan[month.key].objective}
                   onChange={(e) =>
                     setMonthlyPlan((prev) => ({
                       ...prev,
-                      [month]: { ...prev[month], objective: e.target.value },
+                      [month.key]: { ...prev[month.key], objective: e.target.value },
                     }))
                   }
                   className="mf-input mt-2"
                   placeholder="Objetivo"
                 />
                 <input
-                  value={monthlyPlan[month].actions}
+                  value={monthlyPlan[month.key].actions}
                   onChange={(e) =>
                     setMonthlyPlan((prev) => ({
                       ...prev,
-                      [month]: { ...prev[month], actions: e.target.value },
+                      [month.key]: { ...prev[month.key], actions: e.target.value },
                     }))
                   }
                   className="mf-input mt-2"

@@ -17,6 +17,7 @@ import {
   DIAGNOSIS_DOMAINS,
   DIAGNOSIS_MONTH_META,
   DIAGNOSIS_MONTHS,
+  rollingPlanMonths,
   DIAGNOSIS_SCALE,
   DIAGNOSIS_STAGE_COPY,
   DIAGNOSIS_STAGE_LABELS,
@@ -772,6 +773,8 @@ function buildMonthlyPlan(
   module: DiagnosisModule,
 ): DiagnosisMonthlyPlan {
   const plan = emptyMonthlyPlan();
+  const calendar = rollingPlanMonths(new Date().toISOString().slice(0, 10));
+  const firstMonth = calendar[0]?.label ?? "el primer mes";
   const primary = lows[0];
   const secondary = lows[1];
   const pack1 = primary ? drillFor(primary.id, age) : DEFAULT_DRILL;
@@ -814,7 +817,7 @@ function buildMonthlyPlan(
   plan.december = {
     objective: DIAGNOSIS_MONTH_META.december.focus,
     actions:
-      "Repetir la misma hoja 1–5 y las estaciones GPH de septiembre. Comparar. Si no subió el indicador entrenado, no se cambia de moda: se ajusta la tarea y se vuelve a medir.",
+      `Repetir la misma hoja 1–5 y las estaciones GPH de ${firstMonth}. Comparar. Si no subió el indicador entrenado, no se cambia de moda: se ajusta la tarea y se vuelve a medir.`,
   };
   return plan;
 }

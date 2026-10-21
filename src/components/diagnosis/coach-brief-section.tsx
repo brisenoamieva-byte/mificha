@@ -6,10 +6,12 @@ export function CoachBriefSection({
   brief,
   compact = false,
   hideFamily = false,
+  hideStaffAlerts = false,
 }: {
   brief: DiagnosisCoachBrief;
   compact?: boolean;
   hideFamily?: boolean;
+  hideStaffAlerts?: boolean;
 }) {
   const sourceLabel = brief.source === "ai" ? "IA · staff GPH" : "Staff GPH";
 
@@ -42,7 +44,7 @@ export function CoachBriefSection({
         </div>
       ) : null}
 
-      {brief.warnings.length > 0 ? (
+      {!hideStaffAlerts && brief.warnings.length > 0 ? (
         <div className="rounded-xl border border-mf-gph/30 bg-mf-gph-soft px-3 py-3">
           <p className="text-xs font-semibold text-mf-gph">Alertas de staff</p>
           <ul className="mt-1.5 space-y-1 text-sm text-mf-text-secondary">

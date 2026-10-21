@@ -193,7 +193,8 @@ export function FieldSessionForm({ academyId, module, session, onChange }: Field
             {" "}
             Iniciación o niños que aún no deben correr toda la batería: marca{" "}
             <span className="font-semibold text-mf-text">No aplica</span> en esas pruebas y genera
-            ficha igual.
+            ficha igual. Perfil, duelos, lectura y mental no tienen estación: van en el cierre 1–5
+            de abajo.
           </p>
           {session.sessionType === "esencial" && only360.length > 0 ? (
             <p className="mt-1 text-[11px] text-mf-text-muted">

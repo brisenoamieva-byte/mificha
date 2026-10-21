@@ -120,6 +120,104 @@ export const DIAGNOSIS_MONTH_META: Record<
   december: { label: "Diciembre", focus: "Revaloración y siguiente ciclo" },
 };
 
+const MONTH_LABELS_LONG_ES = [
+  "enero",
+  "febrero",
+  "marzo",
+  "abril",
+  "mayo",
+  "junio",
+  "julio",
+  "agosto",
+  "septiembre",
+  "octubre",
+  "noviembre",
+  "diciembre",
+] as const;
+
+export type DiagnosisPlanCalendarMonth = {
+  key: DiagnosisMonth;
+  year: number;
+  month: number;
+  label: string;
+  focus: string;
+};
+
+function parseIsoDay(iso: string) {
+  const [year, month, day] = iso.slice(0, 10).split("-").map(Number);
+  if (!year || !month || !day) return null;
+  return { year, month, day };
+}
+
+/** Cuatro meses de ruta: el siguiente al mes de la evaluación (o a hoy, si ya pasó). */
+export function rollingPlanMonths(
+  evaluatedAt: string,
+  todayIso = new Date().toISOString().slice(0, 10),
+): DiagnosisPlanCalendarMonth[] {
+  const evalDay = parseIsoDay(evaluatedAt) ?? parseIsoDay(todayIso);
+  const today = parseIsoDay(todayIso);
+  if (!evalDay || !today) return [];
+  let year = evalDay.year;
+  let month = evalDay.month;
+  if (
+    today.year > evalDay.year ||
+    (today.year === evalDay.year && today.month > evalDay.month) ||
+    (today.year === evalDay.year && today.month === evalDay.month)
+  ) {
+    year = today.year;
+    month = today.month;
+  }
+  month += 1;
+  if (month > 12) {
+    month = 1;
+    year += 1;
+  }
+  return DIAGNOSIS_MONTHS.map((key, index) => {
+    let slotMonth = month + index;
+    let slotYear = year;
+    while (slotMonth > 12) {
+      slotMonth -= 12;
+      slotYear += 1;
+    }
+    const name = MONTH_LABELS_LONG_ES[slotMonth - 1];
+    const capitalized = name.charAt(0).toUpperCase() + name.slice(1);
+    return {
+      key,
+      year: slotYear,
+      month: slotMonth,
+      label: `${capitalized} ${slotYear}`,
+      focus: DIAGNOSIS_MONTH_META[key].focus,
+    };
+  });
+}
+
+export function planRouteTitle(evaluatedAt: string) {
+  const months = rollingPlanMonths(evaluatedAt);
+  if (months.length < 4) return "Ruta de 4 meses";
+  const first = months[0];
+  const last = months[3];
+  if (first.year === last.year) {
+    const firstName = MONTH_LABELS_LONG_ES[first.month - 1];
+    return `Ruta ${firstName}–${MONTH_LABELS_LONG_ES[last.month - 1]} ${first.year}`;
+  }
+  return `Ruta ${first.label} – ${last.label}`;
+}
+
+/** Cambia “septiembre…diciembre” del texto generado a los meses reales de la ruta. */
+export function relabelPlanCopy(text: string, months: DiagnosisPlanCalendarMonth[]) {
+  if (!text || months.length < 4) return text;
+  const pairs = DIAGNOSIS_MONTHS.map((key, index) => ({
+    from: DIAGNOSIS_MONTH_META[key].label,
+    to: MONTH_LABELS_LONG_ES[months[index].month - 1],
+  }));
+  let next = text;
+  for (const pair of pairs) {
+    next = next.replaceAll(pair.from, pair.to.charAt(0).toUpperCase() + pair.to.slice(1));
+    next = next.replaceAll(pair.from.toLowerCase(), pair.to);
+  }
+  return next;
+}
+
 export interface DiagnosisIndicator {
   id: string;
   label: string;

@@ -17,11 +17,13 @@ import {
   DIAGNOSIS_DOMAINS,
   DIAGNOSIS_GROUP_LABELS,
   DIAGNOSIS_KIND_LABELS,
-  DIAGNOSIS_MONTH_META,
-  DIAGNOSIS_MONTHS,
   DIAGNOSIS_SCALE,
   DIAGNOSIS_STAGE_LABELS,
+  computeDiagnosisResult,
   formatDiagnosisDate,
+  planRouteTitle,
+  relabelPlanCopy,
+  rollingPlanMonths,
   indicatorsForModule,
   rankedIndicators,
   scoreTone,
@@ -117,13 +119,17 @@ export function DiagnosisReport({
   const groups = (["comun", diagnosis.module, "fisico", "mental"] as const).map(
     (group) => ({
       group,
-      items: moduleIndicators.filter((item) => item.group === group),
+      items: moduleIndicators.filter(
+        (item) => item.group === group && diagnosis.scores[item.id] != null,
+      ),
     }),
   );
-  const hasPlan = DIAGNOSIS_MONTHS.some(
+  const hasScoredIndicators = groups.some((item) => item.items.length > 0);
+  const planMonths = rollingPlanMonths(diagnosis.evaluated_at);
+  const hasPlan = planMonths.some(
     (month) =>
-      diagnosis.monthly_plan[month]?.objective ||
-      diagnosis.monthly_plan[month]?.actions,
+      diagnosis.monthly_plan[month.key]?.objective ||
+      diagnosis.monthly_plan[month.key]?.actions,
   );
   const priorities = diagnosis.program_priorities.filter((item) => item.title);
   const brief = diagnosis.field_session.coachBrief;
@@ -141,6 +147,10 @@ export function DiagnosisReport({
       diagnosis.session_days ||
       diagnosis.assigned_group ||
       diagnosis.field_session.currentClub,
+  );
+  const liveResult = computeDiagnosisResult(diagnosis.scores, diagnosis.module);
+  const scoredDomains = DIAGNOSIS_DOMAINS.filter(
+    (domain) => liveResult.domainAverages[domain] != null,
   );
   const age = calculateAge(player.birth_date);
 
@@ -284,20 +294,22 @@ export function DiagnosisReport({
         </section>
       ) : null}
 
+      {scoredDomains.length > 0 ? (
       <section className="px-5 py-6">
         <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
           Perfil ponderado
         </p>
         <div className="mt-4 space-y-4">
-          {DIAGNOSIS_DOMAINS.map((domain) => (
+          {scoredDomains.map((domain) => (
             <DomainBar
               key={domain}
               domain={domain}
-              value={diagnosis.domain_averages[domain]}
+              value={liveResult.domainAverages[domain]}
             />
           ))}
         </div>
       </section>
+      ) : null}
 
       <section
         className={cn(
@@ -343,7 +355,7 @@ export function DiagnosisReport({
 
       {brief ? (
         <section className="border-t border-mf-border-subtle px-5 py-6">
-          <CoachBriefSection brief={brief} hideFamily />
+          <CoachBriefSection brief={brief} hideFamily hideStaffAlerts />
         </section>
       ) : diagnosis.assignment_notes ? (
         <section className="mx-5 mb-6 rounded-xl bg-mf-canvas px-4 py-3">
@@ -356,6 +368,7 @@ export function DiagnosisReport({
 
       <FieldSessionReport session={diagnosis.field_session} module={diagnosis.module} />
 
+      {hasScoredIndicators ? (
       <section className="border-t border-mf-border-subtle px-5 py-6">
         <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
           Mapa de indicadores
@@ -388,11 +401,12 @@ export function DiagnosisReport({
           )}
         </div>
       </section>
+      ) : null}
 
       {priorities.length > 0 ? (
         <section className="border-t border-mf-border-subtle px-5 py-6">
           <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
-            Prioridades a diciembre
+            Prioridades al cierre
           </p>
           <div className="mt-4 grid gap-3">
             {priorities.map((item, index) => (
@@ -414,7 +428,7 @@ export function DiagnosisReport({
                     ) : null}
                     {item.december_goal ? (
                       <div>
-                        <dt className="text-[11px] text-mf-text-muted">Meta diciembre</dt>
+                        <dt className="text-[11px] text-mf-text-muted">Meta al cierre</dt>
                         <dd>{item.december_goal}</dd>
                       </div>
                     ) : null}
@@ -441,15 +455,14 @@ export function DiagnosisReport({
       {hasPlan ? (
         <section className="border-t border-mf-border-subtle px-5 py-6">
           <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
-            Ruta septiembre–diciembre
+            {planRouteTitle(diagnosis.evaluated_at)}
           </p>
           <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {DIAGNOSIS_MONTHS.map((month, index) => {
-              const plan = diagnosis.monthly_plan[month];
-              const meta = DIAGNOSIS_MONTH_META[month];
+            {planMonths.map((month, index) => {
+              const plan = diagnosis.monthly_plan[month.key];
               return (
                 <div
-                  key={month}
+                  key={month.key}
                   className={cn(
                     "rounded-xl border px-3 py-3",
                     index === 0
@@ -457,13 +470,17 @@ export function DiagnosisReport({
                       : "border-transparent bg-mf-canvas",
                   )}
                 >
-                  <p className="text-xs font-semibold text-mf-gph">{meta.label}</p>
-                  <p className="mt-0.5 text-[11px] text-mf-text-muted">{meta.focus}</p>
+                  <p className="text-xs font-semibold text-mf-gph">{month.label}</p>
+                  <p className="mt-0.5 text-[11px] text-mf-text-muted">{month.focus}</p>
                   {plan.objective ? (
-                    <p className="mt-2 text-sm font-medium text-mf-gph-ink">{plan.objective}</p>
+                    <p className="mt-2 text-sm font-medium text-mf-gph-ink">
+                      {relabelPlanCopy(plan.objective, planMonths)}
+                    </p>
                   ) : null}
                   {plan.actions ? (
-                    <p className="mt-1 text-xs text-mf-text-secondary">{plan.actions}</p>
+                    <p className="mt-1 text-xs text-mf-text-secondary">
+                      {relabelPlanCopy(plan.actions, planMonths)}
+                    </p>
                   ) : null}
                 </div>
               );

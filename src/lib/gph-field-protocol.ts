@@ -595,7 +595,7 @@ export const GPH_STATION_TESTS: readonly GphStationTest[] = [
     execution:
       "En cada distancia: tiro a gol fijo con derecha y con izquierda. Precisión y potencia.",
     record: "Precisión y potencia a 11 m, 16.5 m y 20 m, izquierda y derecha.",
-    indicatorId: "finalizacion",
+    indicatorId: "golpeo",
     relevanceDefault: 3,
   }),
   t({
@@ -1773,7 +1773,7 @@ export const GPH_STATION_TESTS: readonly GphStationTest[] = [
     execution:
       "En cada distancia: tiro a gol fijo con derecha y con izquierda. Precisión y potencia.",
     record: "Precisión y potencia a 11 m, 16.5 m y 20 m, izquierda y derecha.",
-    indicatorId: "finalizacion",
+    indicatorId: "golpeo",
     relevanceDefault: 3,
   }),
   t({
@@ -1946,7 +1946,7 @@ export const GPH_STATION_TESTS: readonly GphStationTest[] = [
     execution:
       "Un intento. El jugador recibe el estímulo y adopta el perfil pedido antes del siguiente contacto.",
     record: "Rúbrica 0–6: velocidad de orientación y perfil útil. 1 intento.",
-    indicatorId: "coordinacion",
+    indicatorId: "perfil_corporal",
     relevanceDefault: 2,
   }),
   t({
@@ -2839,6 +2839,24 @@ export function fieldSessionProgress(
     total: tests.length + physical.length,
     missing,
   };
+}
+
+export function hasCapturedStationData(
+  test: GphStationTest,
+  capture: GphTestCapture | undefined,
+) {
+  if (!capture || capture.skipped) return false;
+  if (capture.score != null) return true;
+  if ((capture.note ?? "").trim()) return true;
+  const raw = formatTestRaw(test, capture);
+  return raw !== "—" && raw !== "No aplica";
+}
+
+export function hasCapturedPhysicalData(capture: GphPhysicalCapture | undefined) {
+  if (!capture || capture.skipped) return false;
+  if (capture.score != null) return true;
+  if ((capture.note ?? "").trim()) return true;
+  return capture.attempts.some((value) => value != null && Number.isFinite(value));
 }
 
 export function formatTestRaw(test: GphStationTest, capture: GphTestCapture | undefined) {
