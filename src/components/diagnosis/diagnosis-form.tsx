@@ -217,7 +217,10 @@ export function DiagnosisForm({
       push(test.indicatorId, testHeading(test));
     }
     for (const test of physicalTestsForSession(fieldSession)) {
-      push(test.indicatorId, test.code ? `${test.code}) ${test.label}` : test.label);
+      push(
+        test.indicatorId,
+        "code" in test && test.code ? `${test.code}) ${test.label}` : test.label,
+      );
     }
     return map;
   }, [diagnosisModule, fieldSession]);
