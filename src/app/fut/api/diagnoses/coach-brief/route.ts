@@ -136,6 +136,12 @@ export async function POST(request: Request) {
       familyGoal: typeof body.family_goal === "string" ? body.family_goal : null,
       whyJoin: typeof body.why_join === "string" ? body.why_join : null,
       fieldSession: parseFieldSession(body.field_session),
+      assignedStage:
+        body.assigned_stage === "iniciacion" ||
+        body.assigned_stage === "desarrollo" ||
+        body.assigned_stage === "alto_rendimiento"
+          ? body.assigned_stage
+          : null,
     };
 
     const output = await generateCoachBrief(input);

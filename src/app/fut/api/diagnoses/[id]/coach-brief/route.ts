@@ -59,6 +59,7 @@ export async function POST(request: Request, context: RouteContext) {
       familyGoal: diagnosis.family_goal,
       whyJoin: diagnosis.why_join,
       fieldSession: diagnosis.field_session,
+      assignedStage: diagnosis.assigned_stage,
     });
 
     const updated = await updatePlayerDiagnosis(admin, diagnosis.academy_id, id, {

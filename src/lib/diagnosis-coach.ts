@@ -52,6 +52,7 @@ export interface CoachBriefInput {
   familyGoal: string | null;
   whyJoin: string | null;
   fieldSession: GphFieldSession;
+  assignedStage?: DiagnosisStage | null;
 }
 
 export interface CoachBriefOutput {
@@ -374,7 +375,7 @@ function physicalLogged(session: GphFieldSession) {
 
 function buildRulesBrief(input: CoachBriefInput): CoachBriefOutput {
   const result = computeDiagnosisResult(input.scores, input.module);
-  const stage = result.stage;
+  const stage = input.assignedStage ?? result.stage;
   const name = input.firstName.trim() || "El jugador";
   const ageBit = input.age != null ? ` (${input.age} años)` : "";
   const pos = getPositionLabel(input.position);
@@ -594,7 +595,7 @@ function buildFamily(args: {
     stageBit,
     work,
     familyGoal,
-    "No representa beca, selección, contrato ni resultado profesional. El avance se ve en el siguiente corte con la misma escala.",
+    `No representa beca, selección, contrato ni resultado profesional. El avance se ve en ${rollingPlanMonths(new Date().toISOString().slice(0, 10))[3]?.label ?? "el siguiente corte"} con la misma escala.`,
   ]
     .filter(Boolean)
     .join(" ");

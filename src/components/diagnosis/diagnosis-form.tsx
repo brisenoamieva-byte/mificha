@@ -265,6 +265,7 @@ export function DiagnosisForm({
         player_goal: playerGoal,
         family_goal: familyGoal,
         why_join: whyJoin,
+        assigned_stage: assignedStage || null,
         field_session: fieldSession,
       }),
     });
@@ -1109,7 +1110,21 @@ export function DiagnosisForm({
         ) : null}
         {coachBrief ? (
           <div className="mt-4 border-t border-mf-border-subtle pt-4">
-            <CoachBriefSection brief={coachBrief} />
+            <label className="block text-xs font-medium text-mf-text-muted">
+              Texto para la familia (se puede editar)
+              <textarea
+                value={coachBrief.family}
+                onChange={(e) => {
+                  const next = { ...coachBrief, family: e.target.value };
+                  setCoachBrief(next);
+                  setFieldSession((prev) => ({ ...prev, coachBrief: next }));
+                }}
+                className="mf-input mt-1 min-h-28"
+              />
+            </label>
+            <div className="mt-4">
+              <CoachBriefSection brief={coachBrief} hideFamily />
+            </div>
           </div>
         ) : (
           <p className="mt-3 text-sm text-mf-text-muted">

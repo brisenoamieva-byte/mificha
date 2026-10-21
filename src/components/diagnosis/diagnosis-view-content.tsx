@@ -10,7 +10,14 @@ import { Skeleton } from "@/components/dashboard/skeletons";
 import { toast } from "@/components/ui/toast";
 import { diagnosisAuthedFetch } from "@/lib/player-diagnosis-client";
 import { isFieldSessionDraft } from "@/lib/gph-field-protocol";
-import type { PlayerDiagnosisRecord, DiagnosisAcademySnapshot, DiagnosisPlayerSnapshot } from "@/lib/player-diagnosis";
+import {
+  DIAGNOSIS_STAGE_LABELS,
+  DIAGNOSIS_STAGES,
+  type DiagnosisAcademySnapshot,
+  type DiagnosisPlayerSnapshot,
+  type DiagnosisStage,
+  type PlayerDiagnosisRecord,
+} from "@/lib/player-diagnosis";
 
 export function DiagnosisViewContent({ diagnosisId }: { diagnosisId: string }) {
   const { academy, isGphEvaluator } = useDashboard();
@@ -21,6 +28,9 @@ export function DiagnosisViewContent({ diagnosisId }: { diagnosisId: string }) {
   const [academySnap, setAcademySnap] = useState<DiagnosisAcademySnapshot | null>(null);
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [coachBusy, setCoachBusy] = useState(false);
+  const [familyDraft, setFamilyDraft] = useState("");
+  const [stageDraft, setStageDraft] = useState<DiagnosisStage | "">("");
+  const [savingCopy, setSavingCopy] = useState(false);
 
   useEffect(() => {
     const stored = sessionStorage.getItem(`diagnosis-share:${diagnosisId}`);
@@ -51,6 +61,12 @@ export function DiagnosisViewContent({ diagnosisId }: { diagnosisId: string }) {
     };
   }, [academy, diagnosisId, isGphEvaluator]);
 
+  useEffect(() => {
+    if (!diagnosis) return;
+    setFamilyDraft(diagnosis.field_session.coachBrief?.family ?? "");
+    setStageDraft(diagnosis.assigned_stage ?? "");
+  }, [diagnosis]);
+
   if (!academy && !isGphEvaluator) return <NoAcademyState />;
 
   if (loading) {
@@ -66,6 +82,31 @@ export function DiagnosisViewContent({ diagnosisId }: { diagnosisId: string }) {
         </Link>
       </div>
     );
+  }
+
+  async function saveFamilyAndStage() {
+    if (!diagnosis) return;
+    setSavingCopy(true);
+    try {
+      const brief = diagnosis.field_session.coachBrief;
+      const payload = await diagnosisAuthedFetch(`/fut/api/diagnoses/${diagnosisId}`, {
+        method: "PUT",
+        body: JSON.stringify({
+          academy_id: diagnosis.academy_id,
+          assigned_stage: stageDraft || null,
+          field_session: {
+            ...diagnosis.field_session,
+            coachBrief: brief ? { ...brief, family: familyDraft } : brief,
+          },
+        }),
+      });
+      setDiagnosis(payload.diagnosis as PlayerDiagnosisRecord);
+      toast.success("Texto y etapa guardados.");
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "No se pudo guardar.");
+    } finally {
+      setSavingCopy(false);
+    }
   }
 
   return (
@@ -124,6 +165,49 @@ export function DiagnosisViewContent({ diagnosisId }: { diagnosisId: string }) {
           </button>
         </div>
       </div>
+
+      {!isFieldSessionDraft(diagnosis.field_session) ? (
+        <div className="rounded-2xl border border-mf-border bg-white p-4">
+          <p className="text-sm font-semibold text-mf-text">Editar ficha para la familia</p>
+          <p className="mt-1 text-[11px] text-mf-text-muted">
+            El comentario de arriba se genera solo. Aquí lo cambias sin volver a correr las
+            pruebas. La etapa asignada es la que debe verse (no el promedio).
+          </p>
+          <div className="mt-3 grid gap-3 sm:grid-cols-[12rem_1fr]">
+            <label className="text-xs font-medium text-mf-text-muted">
+              Etapa asignada
+              <select
+                value={stageDraft}
+                onChange={(e) => setStageDraft(e.target.value as DiagnosisStage | "")}
+                className="mf-input mt-1"
+              >
+                <option value="">Usar la calculada</option>
+                {DIAGNOSIS_STAGES.map((stage) => (
+                  <option key={stage} value={stage}>
+                    {DIAGNOSIS_STAGE_LABELS[stage]}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="text-xs font-medium text-mf-text-muted sm:col-span-1">
+              Texto para la familia
+              <textarea
+                value={familyDraft}
+                onChange={(e) => setFamilyDraft(e.target.value)}
+                className="mf-input mt-1 min-h-24"
+              />
+            </label>
+          </div>
+          <button
+            type="button"
+            disabled={savingCopy}
+            onClick={() => void saveFamilyAndStage()}
+            className="mf-btn-primary mt-3"
+          >
+            {savingCopy ? "Guardando…" : "Guardar texto y etapa"}
+          </button>
+        </div>
+      ) : null}
 
       {isFieldSessionDraft(diagnosis.field_session) ? (
         <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">

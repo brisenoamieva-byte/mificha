@@ -290,7 +290,9 @@ export function DiagnosisReport({
           <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
             Para la familia
           </p>
-          <p className="mt-2 text-sm leading-7 text-mf-gph-ink sm:text-[15px]">{brief.family}</p>
+          <p className="mt-2 text-sm leading-7 text-mf-gph-ink sm:text-[15px]">
+            {relabelPlanCopy(brief.family, planMonths)}
+          </p>
         </section>
       ) : null}
 
