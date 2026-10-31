@@ -164,6 +164,18 @@ export function DiagnosisReport({
     setLink(shareUrl ?? null);
   }, [shareUrl]);
 
+  useEffect(() => {
+    const openStaffNotes = () => {
+      reportRef.current
+        ?.querySelectorAll("details")
+        .forEach((node) => {
+          node.open = true;
+        });
+    };
+    window.addEventListener("beforeprint", openStaffNotes);
+    return () => window.removeEventListener("beforeprint", openStaffNotes);
+  }, []);
+
   async function copyShare() {
     let url = link;
     if (!url && onCreateShareLink) {
@@ -605,7 +617,7 @@ export function DiagnosisReport({
             Retroalimentación: {formatDiagnosisDate(diagnosis.field_session.closing.feedbackDate)}
           </p>
         ) : null}
-        <div className="mt-6 hidden grid-cols-2 gap-8 print:grid">
+        <div className="diagnosis-report-signoff mt-6 hidden grid-cols-2 gap-8 print:grid">
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-[0.12em]">
               Firma del evaluador

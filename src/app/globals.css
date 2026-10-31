@@ -313,13 +313,26 @@ body {
 
   .diagnosis-report {
     position: absolute;
-    inset: 0;
+    left: 0;
+    top: 0;
+    right: 0;
+    height: auto !important;
+    overflow: visible !important;
     box-shadow: none !important;
     border-radius: 0 !important;
     width: 100%;
     max-width: none !important;
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
+  }
+
+  .diagnosis-report details {
+    display: block !important;
+  }
+
+  .diagnosis-report details[open] > *:not(summary),
+  .diagnosis-report details > *:not(summary) {
+    display: block !important;
   }
 
   .diagnosis-report-toolbar,
