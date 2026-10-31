@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Printer, Share2 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { FileDown, Printer, Share2 } from "lucide-react";
 import { CoachBriefSection } from "@/components/diagnosis/coach-brief-section";
 import { DiagnosisScoreRing } from "@/components/diagnosis/diagnosis-score-ring";
 import { FieldSessionReport } from "@/components/diagnosis/field-session-report";
@@ -33,6 +33,7 @@ import {
   type PlayerDiagnosisRecord,
 } from "@/lib/player-diagnosis";
 import { getDominantFootLabel } from "@/lib/player-utils";
+import { diagnosisPdfFilename, exportDiagnosisPdf } from "@/lib/diagnosis-pdf";
 import { cn } from "@/lib/utils";
 
 const TONE_SOFT: Record<ReturnType<typeof scoreTone>, string> = {
@@ -156,6 +157,8 @@ export function DiagnosisReport({
 
   const [link, setLink] = useState(shareUrl ?? null);
   const [sharing, setSharing] = useState(false);
+  const [exportingPdf, setExportingPdf] = useState(false);
+  const reportRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     setLink(shareUrl ?? null);
@@ -181,8 +184,34 @@ export function DiagnosisReport({
     }
   }
 
+  async function downloadPdf() {
+    if (!reportRef.current || exportingPdf) return;
+    setExportingPdf(true);
+    try {
+      const result = await exportDiagnosisPdf(
+        reportRef.current,
+        diagnosisPdfFilename(
+          player.first_name,
+          player.last_name,
+          diagnosis.evaluated_at,
+        ),
+      );
+      toast.success(
+        result === "shared" ? "PDF listo para enviar." : "PDF descargado.",
+      );
+    } catch (err: unknown) {
+      if (err instanceof DOMException && err.name === "AbortError") return;
+      toast.error("No se pudo armar el PDF. Usa Imprimir y guarda como PDF.");
+    } finally {
+      setExportingPdf(false);
+    }
+  }
+
   return (
-    <article className="diagnosis-report overflow-hidden rounded-2xl border border-mf-gph/15 bg-white">
+    <article
+      ref={reportRef}
+      className="diagnosis-report overflow-hidden rounded-2xl border border-mf-gph/15 bg-white"
+    >
       <header className="border-b border-mf-gph/15 bg-white">
         <div className="flex items-center justify-between gap-4 px-5 py-3">
           <div className="min-w-0">
@@ -202,6 +231,15 @@ export function DiagnosisReport({
       </header>
 
       <div className="diagnosis-report-toolbar flex flex-wrap items-center justify-end gap-2 border-b border-mf-border-subtle bg-white px-5 py-2 print:hidden">
+        <button
+          type="button"
+          onClick={() => void downloadPdf()}
+          disabled={exportingPdf}
+          className="inline-flex items-center gap-1.5 rounded-lg bg-mf-gph px-3 py-1.5 text-xs font-semibold text-white hover:bg-mf-gph-hot disabled:opacity-60"
+        >
+          <FileDown className="h-3.5 w-3.5" />
+          {exportingPdf ? "Armando PDF…" : "Descargar PDF"}
+        </button>
         {link || onCreateShareLink ? (
           <button
             type="button"
@@ -210,7 +248,7 @@ export function DiagnosisReport({
             className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold text-mf-gph-ink hover:bg-mf-gph-soft"
           >
             <Share2 className="h-3.5 w-3.5" />
-            {sharing ? "Generando…" : "Copiar ficha"}
+            {sharing ? "Generando…" : "Copiar liga"}
           </button>
         ) : null}
         <button
