@@ -5,8 +5,7 @@ import {
   type FamilyOrderRow,
   type FamilySku,
 } from "@/lib/gph-commerce";
-import { canAccessPitchDeck } from "@/lib/pitch-access";
-import { isGphEvaluatorUser } from "@/lib/gph-partner-server";
+import { canViewPartnershipLedger } from "@/lib/partnership-access";
 
 export type { FamilyOrderRow, FamilySku };
 
@@ -192,9 +191,8 @@ export async function listFamilyOrders(admin: SupabaseClient) {
 }
 
 export async function canManageFamilyOrders(
-  admin: SupabaseClient,
+  _admin: SupabaseClient,
   user: { id: string; email?: string | null },
 ) {
-  if (canAccessPitchDeck(user.id, user.email)) return true;
-  return isGphEvaluatorUser(admin, user.id, user.email);
+  return canViewPartnershipLedger(user);
 }

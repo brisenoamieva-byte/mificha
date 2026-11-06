@@ -17,6 +17,7 @@ import {
 import { BrandLogo } from "@/components/ui/brand-logo";
 import { PitchDeckNavLink } from "@/components/dashboard/pitch-deck-nav-link";
 import { useDashboard } from "@/components/dashboard/dashboard-context";
+import { canViewPartnershipLedger } from "@/lib/partnership-access";
 import { canViewVisoriaRoster } from "@/lib/visoria-access";
 
 const navItems = [
@@ -37,10 +38,9 @@ interface DashboardSidebarProps {
 export function DashboardSidebar({ open, onClose }: DashboardSidebarProps) {
   const pathname = usePathname();
   const { isGphEvaluator, profile } = useDashboard();
-  const canSeeVisorias = canViewVisoriaRoster({
-    id: profile?.id,
-    email: profile?.email,
-  });
+  const staffUser = { id: profile?.id, email: profile?.email };
+  const canSeeVisorias = canViewVisoriaRoster(staffUser);
+  const canSeeLedger = canViewPartnershipLedger(staffUser);
 
   const content = (
     <div className="flex h-full flex-col">
@@ -71,7 +71,7 @@ export function DashboardSidebar({ open, onClose }: DashboardSidebarProps) {
             Visorías
           </Link>
         ) : null}
-        {isGphEvaluator ? (
+        {canSeeLedger ? (
           <Link
             href="/fut/dashboard/cobros"
             onClick={onClose}
@@ -82,7 +82,7 @@ export function DashboardSidebar({ open, onClose }: DashboardSidebarProps) {
             }
           >
             <Wallet className="h-[18px] w-[18px] shrink-0" />
-            Cobros
+            Ganancias
           </Link>
         ) : null}
         {navItems.map(({ href, label, icon: Icon }) => {

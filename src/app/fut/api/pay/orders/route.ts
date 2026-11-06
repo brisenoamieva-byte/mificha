@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { canManageFamilyOrders, listFamilyOrders } from "@/lib/family-orders";
+import { canManageFamilyOrders } from "@/lib/family-orders";
+import { loadPartnershipLedger } from "@/lib/partnership-ledger";
 import { createSupabaseAdminClient } from "@/lib/supabase-admin";
 import { getAuthedSupabaseClient } from "@/lib/supabase-server";
 
@@ -18,6 +19,6 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "No autorizado." }, { status: 403 });
   }
 
-  const orders = await listFamilyOrders(admin);
-  return NextResponse.json({ orders });
+  const ledger = await loadPartnershipLedger(admin);
+  return NextResponse.json(ledger);
 }

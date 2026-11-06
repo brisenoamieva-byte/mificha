@@ -1,16 +1,35 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
+import Link from "next/link";
 import { diagnosisAuthedFetch } from "@/lib/player-diagnosis-client";
 import {
   FAMILY_PRODUCTS,
   formatMxn,
-  GPH_PARTNERSHIP,
   type FamilyOrderRow,
 } from "@/lib/gph-commerce";
+import { DIAGNOSIS_KIND_LABELS } from "@/lib/player-diagnosis";
+import type { LedgerDiagnosis, PartnershipLedger } from "@/lib/partnership-ledger";
+
+function statusLabel(status: FamilyOrderRow["status"]) {
+  if (status === "paid") return "Pagado";
+  if (status === "pending") return "Pendiente";
+  if (status === "failed") return "Fallido";
+  return "Vencido";
+}
+
+function formatDay(iso: string) {
+  const [year, month, day] = iso.slice(0, 10).split("-").map(Number);
+  if (!year || !month || !day) return iso;
+  return new Intl.DateTimeFormat("es-MX", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  }).format(new Date(year, month - 1, day));
+}
 
 export function FamilyOrdersAdmin() {
-  const [rows, setRows] = useState<FamilyOrderRow[]>([]);
+  const [ledger, setLedger] = useState<PartnershipLedger | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -18,11 +37,11 @@ export function FamilyOrdersAdmin() {
     let cancelled = false;
     void diagnosisAuthedFetch("/fut/api/pay/orders")
       .then((payload) => {
-        if (!cancelled) setRows((payload.orders as FamilyOrderRow[]) ?? []);
+        if (!cancelled) setLedger(payload as unknown as PartnershipLedger);
       })
       .catch((err: unknown) => {
         if (!cancelled) {
-          setError(err instanceof Error ? err.message : "No se cargaron los cobros.");
+          setError(err instanceof Error ? err.message : "No se cargó el reparto.");
         }
       })
       .finally(() => {
@@ -33,67 +52,166 @@ export function FamilyOrdersAdmin() {
     };
   }, []);
 
-  const totals = useMemo(() => {
-    const paid = rows.filter((row) => row.status === "paid");
-    return {
-      count: paid.length,
-      mificha: paid.reduce((sum, row) => sum + row.mificha_share_mxn, 0),
-      gph: paid.reduce((sum, row) => sum + row.gph_share_mxn, 0),
-    };
-  }, [rows]);
-
-  if (loading) return <p className="text-sm text-mf-text-muted">Cargando cobros…</p>;
+  if (loading) return <p className="text-sm text-mf-text-muted">Cargando ganancias…</p>;
   if (error) return <p className="text-sm text-mf-danger">{error}</p>;
+  if (!ledger) return null;
+
+  const { collected, pendingDiagnoses } = ledger;
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-8">
       <div>
         <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
-          Split interno
+          Privado · Ricardo y Gustavo
         </p>
-        <h1 className="mt-1 text-2xl font-semibold text-mf-text">Cobros familia</h1>
-        <p className="mt-2 text-sm text-mf-text-secondary">
-          {GPH_PARTNERSHIP.platformOperator} · ${GPH_PARTNERSHIP.mifichaShareMxn} por venta.
-          {GPH_PARTNERSHIP.gphOperator} el resto. Pagados: {totals.count} · MiFicha{" "}
-          {formatMxn(totals.mificha)} · GPH {formatMxn(totals.gph)}.
+        <h1 className="mt-1 text-2xl font-semibold text-mf-text">Ganancias</h1>
+        <p className="mt-2 max-w-2xl text-sm leading-6 text-mf-text-secondary">
+          Desde el {formatDay(ledger.cutoff)}. Diagnóstico de {FAMILY_PRODUCTS.diagnosis.priceLabel}:{" "}
+          {formatMxn(FAMILY_PRODUCTS.diagnosis.mifichaShareMxn)} para Ricardo y{" "}
+          {formatMxn(FAMILY_PRODUCTS.diagnosis.gphShareMxn)} para Gustavo. Membresía de{" "}
+          {FAMILY_PRODUCTS.membership.priceLabel}: {formatMxn(FAMILY_PRODUCTS.membership.mifichaShareMxn)}{" "}
+          para cada uno. Solo suma lo cobrado.
         </p>
       </div>
-      <div className="overflow-x-auto rounded-xl border border-mf-border bg-white">
-        <table className="min-w-full text-left text-sm">
-          <thead className="border-b border-mf-border text-[11px] uppercase tracking-[0.12em] text-mf-text-muted">
-            <tr>
-              <th className="px-4 py-3">Folio</th>
-              <th className="px-4 py-3">Producto</th>
-              <th className="px-4 py-3">Tutor</th>
-              <th className="px-4 py-3">Total</th>
-              <th className="px-4 py-3">MiFicha</th>
-              <th className="px-4 py-3">GPH</th>
-              <th className="px-4 py-3">Estado</th>
+
+      <div className="grid gap-3 sm:grid-cols-3">
+        <article className="rounded-xl bg-mf-gph-ink px-4 py-4 text-white">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-mf-gph-hot">
+            Ricardo · MiFicha
+          </p>
+          <p className="mt-2 text-2xl font-semibold tabular-nums">{formatMxn(collected.mificha)}</p>
+          <p className="mt-1 text-xs text-white/60">Cobrado</p>
+        </article>
+        <article className="rounded-xl border border-mf-border bg-white px-4 py-4">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-mf-gph">
+            Gustavo · GPH
+          </p>
+          <p className="mt-2 text-2xl font-semibold tabular-nums text-mf-gph-ink">
+            {formatMxn(collected.gph)}
+          </p>
+          <p className="mt-1 text-xs text-mf-text-muted">Cobrado</p>
+        </article>
+        <article className="rounded-xl border border-mf-border bg-white px-4 py-4">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-mf-text-muted">
+            Por cobrar
+          </p>
+          <p className="mt-2 text-2xl font-semibold tabular-nums text-mf-gph-ink">
+            {pendingDiagnoses.count}
+          </p>
+          <p className="mt-1 text-xs text-mf-text-muted">
+            Diagnósticos iniciales sin pago. Si se cobran: Ricardo{" "}
+            {formatMxn(pendingDiagnoses.mificha)} · Gustavo {formatMxn(pendingDiagnoses.gph)}.
+          </p>
+        </article>
+      </div>
+
+      <section className="space-y-3">
+        <div>
+          <h2 className="text-lg font-semibold text-mf-text">Cobros</h2>
+          <p className="mt-1 text-sm text-mf-text-secondary">
+            {collected.diagnosisCount} diagnósticos y {collected.membershipCount} membresías pagadas
+            · {formatMxn(collected.total)}
+          </p>
+        </div>
+        <OrderTable rows={ledger.orders} />
+      </section>
+
+      <section className="space-y-3">
+        <div>
+          <h2 className="text-lg font-semibold text-mf-text">Diagnósticos</h2>
+          <p className="mt-1 text-sm text-mf-text-secondary">
+            El seguimiento y la revaloración no generan otros $600: el año ya viene incluido en la
+            evaluación de {FAMILY_PRODUCTS.diagnosis.priceLabel}.
+          </p>
+        </div>
+        <DiagnosisTable rows={ledger.diagnoses} />
+      </section>
+    </div>
+  );
+}
+
+function OrderTable({ rows }: { rows: FamilyOrderRow[] }) {
+  return (
+    <div className="overflow-x-auto rounded-xl border border-mf-border bg-white">
+      <table className="min-w-full text-left text-sm">
+        <thead className="border-b border-mf-border text-[11px] uppercase tracking-[0.12em] text-mf-text-muted">
+          <tr>
+            <th className="px-4 py-3">Fecha</th>
+            <th className="px-4 py-3">Producto</th>
+            <th className="px-4 py-3">Jugador</th>
+            <th className="px-4 py-3">Total</th>
+            <th className="px-4 py-3">Ricardo</th>
+            <th className="px-4 py-3">Gustavo</th>
+            <th className="px-4 py-3">Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row) => (
+            <tr key={row.id} className="border-b border-mf-border-subtle">
+              <td className="px-4 py-3 tabular-nums">{formatDay(row.paid_at ?? row.created_at)}</td>
+              <td className="px-4 py-3">{FAMILY_PRODUCTS[row.sku]?.publicName ?? row.sku}</td>
+              <td className="px-4 py-3">
+                {row.player_name || "—"}
+                <span className="block text-xs text-mf-text-muted">{row.payer_name}</span>
+              </td>
+              <td className="px-4 py-3 tabular-nums">{formatMxn(row.amount_mxn)}</td>
+              <td className="px-4 py-3 tabular-nums">{formatMxn(row.mificha_share_mxn)}</td>
+              <td className="px-4 py-3 tabular-nums">{formatMxn(row.gph_share_mxn)}</td>
+              <td className="px-4 py-3">{statusLabel(row.status)}</td>
             </tr>
-          </thead>
-          <tbody>
-            {rows.map((row) => (
-              <tr key={row.id} className="border-b border-mf-border-subtle">
-                <td className="px-4 py-3 font-mono text-xs">{row.folio}</td>
-                <td className="px-4 py-3">{FAMILY_PRODUCTS[row.sku]?.publicName ?? row.sku}</td>
-                <td className="px-4 py-3">
-                  {row.payer_name}
-                  {row.player_name ? (
-                    <span className="block text-xs text-mf-text-muted">{row.player_name}</span>
-                  ) : null}
-                </td>
-                <td className="px-4 py-3">{formatMxn(row.amount_mxn)}</td>
-                <td className="px-4 py-3">{formatMxn(row.mificha_share_mxn)}</td>
-                <td className="px-4 py-3">{formatMxn(row.gph_share_mxn)}</td>
-                <td className="px-4 py-3 capitalize">{row.status}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        {rows.length === 0 ? (
-          <p className="px-4 py-6 text-sm text-mf-text-muted">Aún no hay cobros.</p>
-        ) : null}
-      </div>
+          ))}
+        </tbody>
+      </table>
+      {rows.length === 0 ? (
+        <p className="px-4 py-6 text-sm text-mf-text-muted">Aún no hay cobros desde esta fecha.</p>
+      ) : null}
+    </div>
+  );
+}
+
+function DiagnosisTable({ rows }: { rows: LedgerDiagnosis[] }) {
+  return (
+    <div className="overflow-x-auto rounded-xl border border-mf-border bg-white">
+      <table className="min-w-full text-left text-sm">
+        <thead className="border-b border-mf-border text-[11px] uppercase tracking-[0.12em] text-mf-text-muted">
+          <tr>
+            <th className="px-4 py-3">Fecha</th>
+            <th className="px-4 py-3">Jugador</th>
+            <th className="px-4 py-3">Tipo</th>
+            <th className="px-4 py-3">Ricardo</th>
+            <th className="px-4 py-3">Gustavo</th>
+            <th className="px-4 py-3">Cobro</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row) => (
+            <tr key={row.id} className="border-b border-mf-border-subtle">
+              <td className="px-4 py-3 tabular-nums">{formatDay(row.evaluatedAt)}</td>
+              <td className="px-4 py-3">
+                <Link href={`/fut/dashboard/diagnostico/${row.id}`} className="font-medium hover:underline">
+                  {row.playerName}
+                </Link>
+                <span className="block text-xs text-mf-text-muted">{row.evaluatorName}</span>
+              </td>
+              <td className="px-4 py-3">{DIAGNOSIS_KIND_LABELS[row.kind]}</td>
+              <td className="px-4 py-3 tabular-nums">
+                {row.billable ? formatMxn(row.mifichaShareMxn) : "—"}
+              </td>
+              <td className="px-4 py-3 tabular-nums">
+                {row.billable ? formatMxn(row.gphShareMxn) : "—"}
+              </td>
+              <td className="px-4 py-3">
+                {!row.billable ? "Incluido" : row.collected ? "Pagado" : "Sin cobro"}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      {rows.length === 0 ? (
+        <p className="px-4 py-6 text-sm text-mf-text-muted">
+          No hay diagnósticos desde esta fecha.
+        </p>
+      ) : null}
     </div>
   );
 }

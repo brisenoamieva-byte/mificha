@@ -1,4 +1,5 @@
-/** Acuerdo comercial GPH × MiFicha — 6 nov 2026. */
+/** Acuerdo comercial GPH × MiFicha. Vigente desde el 6 nov 2026. */
+export const PARTNERSHIP_EFFECTIVE_ON = "2026-11-06";
 
 export const GPH_PARTNERSHIP = {
   gphOperator: "Gustavo Reyes",

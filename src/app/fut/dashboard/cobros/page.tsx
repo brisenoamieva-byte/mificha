@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { FamilyOrdersAdmin } from "@/components/pay/family-orders-admin";
 
 export const metadata: Metadata = {
-  title: "Cobros | MiFicha",
+  title: "Ganancias | MiFicha",
 };
 
 export default function DashboardCobrosPage() {
