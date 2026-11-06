@@ -95,7 +95,37 @@ export function VisoriaLanding() {
         </section>
 
         <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
-          <div className="grid gap-4 lg:grid-cols-2">
+          <div className="rounded-xl bg-white px-5 py-5 ring-1 ring-mf-border sm:px-6">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
+              Categorías
+            </p>
+            <p className="mt-2 text-lg font-semibold tracking-tight text-mf-gph-ink sm:text-xl">
+              Femenil y varonil, los dos días
+            </p>
+            <p className="mt-1 max-w-2xl text-sm leading-6 text-mf-text-secondary">
+              La rama no define la fecha. El jueves 26 es abierto. El viernes 27 es solo
+              para seleccionados.
+            </p>
+            <div className="mt-4 flex flex-col gap-3 border-t border-mf-border pt-4 sm:flex-row sm:gap-12">
+              <p>
+                <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
+                  Femenil
+                </span>
+                <span className="mt-1 block text-base font-semibold text-mf-gph-ink">
+                  Nacidas de {VISORIA_EVENT.categories.femenil.years}
+                </span>
+              </p>
+              <p>
+                <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
+                  Varonil
+                </span>
+                <span className="mt-1 block text-base font-semibold text-mf-gph-ink">
+                  Nacidos de {VISORIA_EVENT.categories.varonil.years}
+                </span>
+              </p>
+            </div>
+          </div>
+          <div className="mt-4 grid gap-4 lg:grid-cols-2">
             {VISORIA_EVENT.days.map((day) => {
               const open = day.id === "jueves";
               return (
@@ -153,6 +183,15 @@ export function VisoriaLanding() {
                   <p
                     className={
                       open
+                        ? "mt-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-mf-gph-hot"
+                        : "mt-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-mf-gph"
+                    }
+                  >
+                    Femenil y varonil
+                  </p>
+                  <p
+                    className={
+                      open
                         ? "mt-4 max-w-md text-sm leading-6 text-white/65"
                         : "mt-4 max-w-md text-sm leading-6 text-mf-text-secondary"
                     }
@@ -162,26 +201,6 @@ export function VisoriaLanding() {
                 </article>
               );
             })}
-          </div>
-          <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            {(
-              [
-                ["Femenil", VISORIA_EVENT.categories.femenil.years],
-                ["Varonil", VISORIA_EVENT.categories.varonil.years],
-              ] as const
-            ).map(([label, years]) => (
-              <div
-                key={label}
-                className="flex items-baseline justify-between gap-3 rounded-xl bg-mf-gph-soft px-5 py-4"
-              >
-                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
-                  {label}
-                </p>
-                <p className="text-base font-semibold tracking-tight text-mf-gph-ink">
-                  Nacid{label === "Femenil" ? "as" : "os"} de {years}
-                </p>
-              </div>
-            ))}
           </div>
         </section>
 

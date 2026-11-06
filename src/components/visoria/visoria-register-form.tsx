@@ -255,6 +255,9 @@ export function VisoriaRegisterForm() {
           03 · Jornada
         </p>
         <div className="space-y-3 rounded-lg bg-mf-canvas px-4 py-4">
+        <p className="text-[11px] leading-4 text-mf-text-muted">
+          Femenil y varonil. El día no depende de la categoría.
+        </p>
         <label className="flex gap-3 text-sm text-mf-text-secondary">
           <input
             type="checkbox"
