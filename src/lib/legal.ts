@@ -8,7 +8,7 @@ export const LEGAL_ENTITY = {
   contactEmail: "hola@mificha.mx",
   privacyEmail: "privacidad@mificha.mx",
   jurisdiction: "Estados Unidos Mexicanos",
-  lastUpdated: "7 de junio de 2026",
+  lastUpdated: "6 de noviembre de 2026",
 } as const;
 
 export const LEGAL_ROUTES = {

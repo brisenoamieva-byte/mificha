@@ -7,6 +7,7 @@ import {
   LineChart,
   Mail,
   ClipboardList,
+  Eye,
   Settings,
   Trophy,
   Users,
@@ -50,6 +51,20 @@ export function DashboardSidebar({ open, onClose }: DashboardSidebarProps) {
       </div>
 
       <nav className="flex-1 space-y-1 px-3 py-4">
+        {isGphEvaluator ? (
+          <Link
+            href="/fut/dashboard/visorias"
+            onClick={onClose}
+            className={
+              pathname.startsWith("/fut/dashboard/visorias")
+                ? "mf-nav-link-active"
+                : "mf-nav-link"
+            }
+          >
+            <Eye className="h-[18px] w-[18px] shrink-0" />
+            Visorías
+          </Link>
+        ) : null}
         {navItems.map(({ href, label, icon: Icon }) => {
           const itemLabel =
             href === "/fut/dashboard/diagnostico" && isGphEvaluator

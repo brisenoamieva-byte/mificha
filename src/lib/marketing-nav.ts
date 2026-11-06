@@ -41,6 +41,11 @@ export const MARKETING_NAV: NavSection[] = [
         label: "Evaluaciones GPH",
         description: "Evaluación GPH, seguimiento en la misma ficha",
       },
+      {
+        href: "/fut/visorias",
+        label: "Visorías Querétaro",
+        description: "26 y 27 de noviembre · registro en un link",
+      },
     ],
   },
   {
@@ -62,6 +67,11 @@ export const MARKETING_NAV: NavSection[] = [
         href: "/fut/explorar",
         label: "Explorar",
         description: "Directorio, rankings e 11 ideal semanal",
+      },
+      {
+        href: "/fut/membresia",
+        label: "Membresía anual",
+        description: "Familias: ficha, GPH y precio de diagnóstico",
       },
     ],
   },

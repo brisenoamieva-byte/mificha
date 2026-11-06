@@ -131,6 +131,11 @@ export function EvaluacionesPageContent() {
                 <p className="mt-2 text-3xl font-semibold tracking-tight text-mf-gph">
                   {plan.priceLabel}
                 </p>
+                {plan.id === "individual" ? (
+                  <p className="mt-1 text-xs font-semibold text-mf-gph">
+                    Miembro anual MiFicha: {DIAGNOSIS_PRODUCT.memberPriceLabel}
+                  </p>
+                ) : null}
                 <p className="mt-1 text-xs font-medium text-mf-text-muted">{plan.period}</p>
                 <p className="mt-4 text-sm leading-7 text-mf-text-secondary">
                   {plan.description}

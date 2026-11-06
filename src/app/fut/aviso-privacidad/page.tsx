@@ -140,6 +140,30 @@ export default function AvisoPrivacidadPage() {
         </LegalParagraph>
       </LegalSection>
 
+      <LegalSection title="Visorías GPH / CRACKS">
+        <LegalParagraph>
+          Cuando un padre, madre o tutor registra a un jugador en{" "}
+          <Link href="/fut/visorias" className="text-mf-brand hover:underline">
+            /fut/visorias
+          </Link>
+          , MiFicha es responsable del tratamiento de esos datos (jugador y tutor) para
+          organizar visorías en Querétaro. Base legal: consentimiento del tutor, LFPDPPP
+          y su Reglamento. El evento es de particulares; la Ley de Protección de Datos
+          Personales en Posesión de Sujetos Obligados del Estado de Querétaro aplica a
+          autoridades, no a GPH, CRACKS ni MiFicha.
+        </LegalParagraph>
+        <LegalList
+          items={[
+            "Finalidad primaria: inscribir, confirmar sede y horario, y permitir que visores de clubes de Primera División evalúen al jugador en cancha.",
+            "Transferencia necesaria: clubes visores confirmados (hoy Club Deportivo Guadalajara y Club Santos Laguna, y los que se anuncien). Sin esta autorización no hay registro.",
+            "Imagen: fotos y video del evento para difusión de GPH y CRACKS, con consentimiento expreso del tutor (LGDNNA).",
+            "Finalidad secundaria opcional: avisos de otras convocatorias. Se puede negar sin perder la inscripción.",
+            `ARCO y revocación: ${LEGAL_ENTITY.privacyEmail} o WhatsApp 446 132 2207. Plazo de respuesta: 20 días hábiles.`,
+            "No hay promesa de selección, beca, contrato ni resultado profesional.",
+          ]}
+        />
+      </LegalSection>
+
       <LegalSection title="Transferencias y encargados">
         <LegalParagraph>
           Podemos compartir datos con proveedores que nos ayudan a operar el
@@ -198,9 +222,9 @@ export default function AvisoPrivacidadPage() {
           ]}
         />
         <LegalParagraph>
-          También puedes acudir al Instituto Nacional de Transparencia, Acceso a la
-          Información y Protección de Datos Personales (INAI) si consideras que tu
-          derecho no fue atendido.
+          También puedes acudir a la autoridad federal de protección de datos
+          personales que resulte competente si consideras que tu derecho no fue
+          atendido.
         </LegalParagraph>
       </LegalSection>
 

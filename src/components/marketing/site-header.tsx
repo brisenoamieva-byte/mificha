@@ -61,6 +61,12 @@ export function SiteFooter() {
           <Link href="/fut/evaluaciones" className="transition hover:text-mf-text">
             Evaluaciones
           </Link>
+          <Link href="/fut/visorias" className="transition hover:text-mf-text">
+            Visorías
+          </Link>
+          <Link href="/fut/membresia" className="transition hover:text-mf-text">
+            Membresía
+          </Link>
           <Link href="/fut/organizadores" className="transition hover:text-mf-text">
             Organizadores
           </Link>

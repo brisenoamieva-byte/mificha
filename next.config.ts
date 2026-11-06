@@ -20,6 +20,8 @@ const nextConfig: NextConfig = {
       { source: "/organizadores", destination: "/fut/organizadores", permanent: false },
       { source: "/padres", destination: "/fut/padres", permanent: false },
       { source: "/evaluaciones", destination: "/fut/evaluaciones", permanent: false },
+      { source: "/visorias", destination: "/fut/visorias", permanent: false },
+      { source: "/membresia", destination: "/fut/membresia", permanent: false },
       { source: "/interno", destination: "/fut/interno", permanent: false },
       { source: "/interno/:path*", destination: "/fut/interno/:path*", permanent: false },
       { source: "/terminos", destination: "/fut/terminos", permanent: false },

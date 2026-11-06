@@ -1,0 +1,27 @@
+---
+description: Modelo de negocio MiFicha/GPH — fuentes de ingreso y cómo priorizar producto
+alwaysApply: true
+---
+
+# Modelo de negocio MiFicha / GPH
+
+La plataforma no es el producto único: es el canal para vender y operar el negocio de GPH con familias, clubes y marcas. Toda feature debe acercar o cobrar una de estas fuentes. Si no toca ninguna, no es prioridad.
+
+## Fuentes de ingreso (en este orden de trabajo)
+
+1. **Entrenamientos** — sesiones, camps, convocatorias de training GPH. La membresía puede incluir entrenamiento gratis; el extra se cobra.
+2. **Anualidad de plataforma** — membresía **anual** (no mensual). Ficha, visibilidad, beneficios GPH.
+3. **Diagnósticos GPH** — evaluación de pago. Precio lista ~$2,900 MXN; socio ~$2,200. El PDF y el flujo de compra existen para cerrar esto.
+4. **Eventos** — visorías, jornadas, clínicas. El registro en sitio es captura; el ingreso es cupo, add-ons o upsell a diagnóstico/membresía/entrenamiento, no “el form gratis” como fin.
+5. **Patrocinios** — marcas en eventos, fichas, convocatoria. Inventario claro (logo, mención, presencia).
+6. **Fees por organización de torneos** — MiFicha/GPH cobra por armar, inscribir y operar torneos (calendario, convocatorias, cobro).
+7. **Publicidad en la plataforma** — espacios pagados dentro del producto (home, ficha, visorías, calendario). Distinto a patrocinio de evento.
+
+## Cómo lograrlo en producto
+
+- Funnel: evento/visoría gratis o barato → tutor en WhatsApp y en DB → anualidad + diagnóstico + entrenamientos.
+- No construir como red social. Construir como operación que cobra: registro, cobro, lista, confirmación, entrega (PDF, horario, sede).
+- Visorías y calendario de torneos alimentan (4) y (6); no sustituyen (2) ni (3).
+- Padres subiendo videos/goles sirve a ficha y a visores; el pago sigue siendo anualidad, diagnóstico o evento.
+- Copy y pricing deben empujar anualidad y diagnóstico, no suscripción mensual.
+- Al diseñar UI, deja gancho visible a membresía, diagnóstico y entrenamientos cerca de registros de evento.
