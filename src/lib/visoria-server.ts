@@ -1,7 +1,6 @@
 import { randomBytes, randomUUID } from "crypto";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { canAccessPitchDeck } from "@/lib/pitch-access";
-import { isGphEvaluatorUser } from "@/lib/gph-partner-server";
+import { canViewVisoriaRoster } from "@/lib/visoria-access";
 import {
   VISORIA_EVENT_ID,
   birthYearFromDate,
@@ -238,19 +237,26 @@ export async function listVisoriaRegistrations(
     .eq("event_id", eventId)
     .order("created_at", { ascending: false });
 
-  if (!error) return (data ?? []) as VisoriaRegistrationRow[];
-  if (!isMissingTable(error)) throw new Error(error.message);
+  const stored = async () => {
+    const rows = await readStorageRows(admin);
+    return rows
+      .filter((row) => row.event_id === eventId)
+      .sort((a, b) => b.created_at.localeCompare(a.created_at));
+  };
 
-  const rows = await readStorageRows(admin);
-  return rows
-    .filter((row) => row.event_id === eventId)
-    .sort((a, b) => b.created_at.localeCompare(a.created_at));
+  if (!error) {
+    const tableRows = (data ?? []) as VisoriaRegistrationRow[];
+    if (tableRows.length > 0) return tableRows;
+    const fromFile = await stored();
+    return fromFile.length > 0 ? fromFile : tableRows;
+  }
+  if (!isMissingTable(error)) throw new Error(error.message);
+  return stored();
 }
 
 export async function canManageVisorias(
-  admin: SupabaseClient,
+  _admin: SupabaseClient,
   user: { id: string; email?: string | null },
 ) {
-  if (canAccessPitchDeck(user.id, user.email)) return true;
-  return isGphEvaluatorUser(admin, user.id, user.email);
+  return canViewVisoriaRoster(user);
 }

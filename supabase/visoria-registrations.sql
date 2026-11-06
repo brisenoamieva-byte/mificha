@@ -58,8 +58,10 @@ on public.visoria_registrations
 for select
 to authenticated
 using (
-  public.get_user_role() = 'admin'
-  or public.is_gph_evaluator()
+  lower(coalesce(auth.jwt() ->> 'email', '')) in (
+    'brisenoamieva@gmail.com',
+    'gkperformancehub@gmail.com'
+  )
 );
 
 comment on table public.visoria_registrations is

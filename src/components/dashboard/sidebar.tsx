@@ -17,6 +17,7 @@ import {
 import { BrandLogo } from "@/components/ui/brand-logo";
 import { PitchDeckNavLink } from "@/components/dashboard/pitch-deck-nav-link";
 import { useDashboard } from "@/components/dashboard/dashboard-context";
+import { canViewVisoriaRoster } from "@/lib/visoria-access";
 
 const navItems = [
   { href: "/fut/dashboard", label: "Inicio", icon: LayoutDashboard },
@@ -35,7 +36,11 @@ interface DashboardSidebarProps {
 
 export function DashboardSidebar({ open, onClose }: DashboardSidebarProps) {
   const pathname = usePathname();
-  const { isGphEvaluator } = useDashboard();
+  const { isGphEvaluator, profile } = useDashboard();
+  const canSeeVisorias = canViewVisoriaRoster({
+    id: profile?.id,
+    email: profile?.email,
+  });
 
   const content = (
     <div className="flex h-full flex-col">
@@ -52,7 +57,7 @@ export function DashboardSidebar({ open, onClose }: DashboardSidebarProps) {
       </div>
 
       <nav className="flex-1 space-y-1 px-3 py-4">
-        {isGphEvaluator ? (
+        {canSeeVisorias ? (
           <Link
             href="/fut/dashboard/visorias"
             onClick={onClose}
