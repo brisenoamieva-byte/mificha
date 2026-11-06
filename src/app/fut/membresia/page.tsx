@@ -6,7 +6,7 @@ import { FAMILY_PRODUCTS } from "@/lib/gph-commerce";
 export const metadata: Metadata = {
   title: "Membresía anual | MiFicha",
   description:
-    "Membresía anual $1,200 MXN. Evaluación GPH $2,900 incluye un año de MiFicha. Pago con Mercado Pago.",
+    "Membresía anual $1,200 MXN: el tutor lleva el seguimiento del hijo con videos, fotos e historia en MiFicha.",
 };
 
 export default function MembresiaPage() {
@@ -19,41 +19,41 @@ export default function MembresiaPage() {
             Familias
           </p>
           <h1 className="mt-3 text-3xl font-semibold tracking-tight text-mf-text sm:text-4xl">
-            Membresía anual, no mensual
+            El seguimiento de tu hijo, un año
           </h1>
           <p className="mt-4 text-sm leading-7 text-mf-text-secondary">
-            Un pago al año: {FAMILY_PRODUCTS.membership.priceLabel} MXN. El tutor arma la
-            ficha del hijo (fotos, videos, goles). GPH abre entrenamientos con cupo. La
-            evaluación GPH va aparte ({FAMILY_PRODUCTS.diagnosis.priceLabel}) y ya incluye
-            este mismo año de plataforma. Pagas aquí con Mercado Pago.
+            {FAMILY_PRODUCTS.membership.priceLabel} MXN al año. Entras como papá, mamá o
+            tutor y armas la ficha: videos, fotos e historia. GPH y los visores consultan
+            ese mismo expediente. No es una red social y no se cobra por mes.
           </p>
           <ul className="mt-8 space-y-4 text-sm leading-7 text-mf-text-secondary">
             <li>
-              <span className="font-semibold text-mf-text">Ficha del hijo. </span>
-              Papá o mamá sube evidencia y goles. Eso vive en la misma ficha que ya
-              usa el diagnóstico y el torneo.
+              <span className="font-semibold text-mf-text">Tú subes el material. </span>
+              Clips, fotos, goles y notas del jugador. Queda en su ficha, no en el feed
+              de nadie.
             </li>
             <li>
-              <span className="font-semibold text-mf-text">Entrenamientos GPH. </span>
-              Cortesía de la membresía, con cupo y calendario que GPH publique.
+              <span className="font-semibold text-mf-text">Un lugar para el año. </span>
+              Partidos, visorías y, si lo contratas, el diagnóstico GPH se leen sobre la
+              misma ficha.
             </li>
             <li>
-              <span className="font-semibold text-mf-text">Selectivos y visorías. </span>
-              Las convocatorias (como{" "}
-              <Link href="/fut/visorias" className="font-semibold text-mf-gph hover:underline">
-                Querétaro 26 y 27 de noviembre
-              </Link>
-              ) se publican aquí. El registro ya no va a Google Forms.
+              <span className="font-semibold text-mf-text">Privado por defecto. </span>
+              El tutor decide si esa ficha se comparte con un club. Los menores no se
+              publican solos.
             </li>
             <li>
-              <span className="font-semibold text-mf-text">Diagnóstico. </span>
-              {FAMILY_PRODUCTS.diagnosis.priceLabel} e incluye este año de MiFicha. Si ya
-              pagaste membresía y luego quieres evaluación, escríbenos para coordinar.
+              <span className="font-semibold text-mf-text">La evaluación ya incluye el año. </span>
+              Si pagas el diagnóstico GPH ({FAMILY_PRODUCTS.diagnosis.priceLabel}), no
+              vuelves a pagar estos {FAMILY_PRODUCTS.membership.priceLabel}.
             </li>
           </ul>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link href="/fut/pagar?sku=membership" className="mf-btn-gph">
               Pagar membresía {FAMILY_PRODUCTS.membership.priceLabel}
+            </Link>
+            <Link href="/fut/tutor" className="mf-btn-gph-ghost">
+              Entrar como tutor
             </Link>
             <Link href="/fut/visorias" className="mf-btn-gph-ghost">
               Registrar visoría
