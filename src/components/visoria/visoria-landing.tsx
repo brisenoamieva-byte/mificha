@@ -45,11 +45,11 @@ export function VisoriaLanding() {
               <p className="mt-6 text-[11px] font-semibold uppercase tracking-[0.22em] text-mf-gph-hot">
                 Querétaro · 26 y 27 de noviembre
               </p>
-              <h1 className="mt-3 font-semibold tracking-[-0.04em]">
-                <span className="block max-w-[12ch] text-[2.35rem] leading-[0.98] sm:text-5xl lg:text-[3.4rem]">
+              <h1 className="mt-3 tracking-[-0.04em]">
+                <span className="block max-w-[12ch] text-[2.35rem] font-semibold leading-[0.98] sm:text-5xl lg:text-[3.4rem]">
                   Visorías gratuitas.
                 </span>
-                <span className="mt-4 block max-w-[16ch] text-[1.85rem] leading-[1.02] sm:text-4xl lg:text-[2.75rem]">
+                <span className="mt-4 block max-w-[16ch] text-[1.85rem] font-normal leading-[1.02] text-white/80 sm:text-4xl lg:text-[2.75rem]">
                   Club Deportivo Guadalajara
                   <span className="mt-1 block">y Club Santos Laguna</span>
                 </span>
