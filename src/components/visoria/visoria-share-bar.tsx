@@ -22,20 +22,23 @@ export function VisoriaShareBar() {
   }
 
   return (
-    <div className="grid gap-5 rounded-2xl border border-mf-gph/20 bg-white p-5 sm:grid-cols-[auto_1fr] sm:items-center">
-      <div className="mx-auto rounded-xl bg-white p-3 ring-1 ring-mf-border">
-        <QRCode value={url} size={132} />
+    <div className="grid gap-6 rounded-xl bg-mf-canvas px-5 py-6 sm:grid-cols-[auto_1fr] sm:items-center sm:px-7 sm:py-7">
+      <div className="mx-auto rounded-lg bg-white p-3 ring-1 ring-mf-border">
+        <QRCode value={url} size={128} />
       </div>
       <div>
         <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
-          Comparte el registro
+          Un solo link
         </p>
-        <p className="mt-2 text-sm leading-6 text-mf-text-secondary">
-          Un solo link. Lo mandas por WhatsApp, lo pones en el cartel o lo enseñas en
-          recepción. Quien lo abre llena el formulario y cae en la base de MiFicha.
+        <h2 className="mt-2 text-xl font-semibold tracking-tight text-mf-gph-ink">
+          Compártelo por WhatsApp o en recepción
+        </h2>
+        <p className="mt-2 max-w-xl text-sm leading-6 text-mf-text-secondary">
+          Quien abre la liga llena el formulario y cae en la base de MiFicha. Sin Google
+          Forms.
         </p>
-        <p className="mt-2 break-all text-xs font-medium text-mf-gph-ink">{url}</p>
-        <div className="mt-4 flex flex-wrap gap-2">
+        <p className="mt-3 break-all font-mono text-[11px] text-mf-text-muted">{url}</p>
+        <div className="mt-5 flex flex-wrap gap-2">
           <a
             href={visoriaWhatsAppShareHref(url.replace(/\/fut\/visorias$/, ""))}
             className="mf-btn-gph"

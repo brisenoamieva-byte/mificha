@@ -58,22 +58,24 @@ export const ORGANIZER_PRICING = {
   ] satisfies OrganizerPricingPlan[],
 } as const;
 
-/** Evaluaciones GPH — producto aparte de torneo y academia. Sin Stripe por ahora. */
+/** Evaluaciones GPH — $2,900 incluye 12 meses de MiFicha. Split interno: MiFicha $600. */
 export const DIAGNOSIS_PRODUCT = {
   title: "Evaluaciones",
   subtitle:
     "Se contratan por su cuenta. No forman parte de la cuota del torneo ni de la cuenta gratis de la academia.",
-  footnote: "Metodología GPH · ficha y seguimiento en mificha.mx · cotización por WhatsApp.",
-  memberPriceLabel: "$2,200",
+  footnote:
+    "Metodología GPH · incluye 12 meses de mificha.mx · pago con Mercado Pago o WhatsApp.",
+  memberPriceLabel: "$1,200",
   publicPriceLabel: "$2,900",
+  checkoutHref: "/fut/pagar?sku=diagnosis",
   plans: [
     {
       id: "individual",
       label: "Jugador",
       priceLabel: "$2,900",
-      period: "MXN por evaluación",
+      period: "MXN · evaluación + 12 meses MiFicha",
       description:
-        "Diagnóstico de tu hijo: sesión GPH, ficha visual, lectura de entrenador y seguimiento de etapa en MiFicha. Miembro anual MiFicha: $2,200.",
+        "Diagnóstico GPH (sesión, ficha y lectura de entrenador) e incluye un año de acceso a MiFicha. Membresía sola, sin evaluación: $1,200.",
     },
     {
       id: "grupo",

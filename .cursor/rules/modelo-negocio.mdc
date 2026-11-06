@@ -10,8 +10,16 @@ La plataforma no es el producto único: es el canal para vender y operar el nego
 ## Fuentes de ingreso (en este orden de trabajo)
 
 1. **Entrenamientos** — sesiones, camps, convocatorias de training GPH. La membresía puede incluir entrenamiento gratis; el extra se cobra.
-2. **Anualidad de plataforma** — membresía **anual** (no mensual). Ficha, visibilidad, beneficios GPH.
-3. **Diagnósticos GPH** — evaluación de pago. Precio lista ~$2,900 MXN; socio ~$2,200. El PDF y el flujo de compra existen para cerrar esto.
+2. **Anualidad de plataforma** — membresía **anual $1,200 MXN** (no mensual). Ficha, visibilidad, beneficios GPH.
+3. **Diagnósticos GPH** — evaluación **$2,900 MXN e incluye 12 meses de MiFicha**. Cobro en `/fut/pagar` con Mercado Pago.
+
+## Acuerdo GPH × MiFicha (6 nov 2026)
+
+- Opera evaluaciones: **Gustavo Reyes (GPH)**.
+- Plataforma: **José Ricardo Briseño Amieva (MiFicha)**.
+- Por cada evaluación cobrada ($2,900): MiFicha **$600**, GPH **$2,300**.
+- Por cada membresía sola ($1,200): MiFicha **$600**, GPH **$600**.
+- El dinero entra por Mercado Pago de MiFicha; el split se registra en cobros para liquidar a GPH. No hay precio socio $2,200: la evaluación ya trae el año de plataforma.
 4. **Eventos** — visorías, jornadas, clínicas. El registro en sitio es captura; el ingreso es cupo, add-ons o upsell a diagnóstico/membresía/entrenamiento, no “el form gratis” como fin.
 5. **Patrocinios** — marcas en eventos, fichas, convocatoria. Inventario claro (logo, mención, presencia).
 6. **Fees por organización de torneos** — MiFicha/GPH cobra por armar, inscribir y operar torneos (calendario, convocatorias, cobro).

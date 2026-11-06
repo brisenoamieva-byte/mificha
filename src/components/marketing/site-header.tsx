@@ -67,6 +67,9 @@ export function SiteFooter() {
           <Link href="/fut/membresia" className="transition hover:text-mf-text">
             Membresía
           </Link>
+          <Link href="/fut/pagar" className="transition hover:text-mf-text">
+            Pagar
+          </Link>
           <Link href="/fut/organizadores" className="transition hover:text-mf-text">
             Organizadores
           </Link>

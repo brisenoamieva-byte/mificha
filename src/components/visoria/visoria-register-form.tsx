@@ -12,7 +12,9 @@ import {
   type VisoriaPosition,
 } from "@/lib/visoria-event";
 
-const inputClass = "mf-input mt-1";
+const inputClass =
+  "mf-input mt-1 focus:!border-mf-gph focus:!shadow-[0_0_0_3px_color-mix(in_srgb,var(--mf-gph)_16%,transparent)]";
+const checkClass = "mt-1 size-4 shrink-0 accent-[#f54200]";
 
 export function VisoriaRegisterForm() {
   const [playerName, setPlayerName] = useState("");
@@ -78,11 +80,13 @@ export function VisoriaRegisterForm() {
 
   if (folio) {
     return (
-      <div className="rounded-2xl border border-mf-gph/25 bg-mf-gph-soft/70 px-5 py-6 sm:px-6">
+      <div className="px-1 py-2">
         <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
           Registro listo
         </p>
-        <h3 className="mt-2 text-2xl font-semibold text-mf-gph-ink">Folio {folio}</h3>
+        <h3 className="mt-2 font-mono text-3xl font-semibold tracking-tight text-mf-gph-ink">
+          {folio}
+        </h3>
         <p className="mt-3 text-sm leading-7 text-mf-text-secondary">
           Guardamos a {playerName.trim() || "el jugador"}. Te confirmamos por WhatsApp el
           día, la sede y el horario. Lleva una identificación del tutor el día del evento.
@@ -100,7 +104,11 @@ export function VisoriaRegisterForm() {
   }
 
   return (
-    <form onSubmit={(event) => void onSubmit(event)} className="space-y-5">
+    <form onSubmit={(event) => void onSubmit(event)} className="space-y-8">
+      <fieldset className="space-y-4">
+        <legend className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
+          01 · Jugador
+        </legend>
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="sm:col-span-2">
           <label htmlFor="playerName" className="text-sm font-medium text-mf-text">
@@ -190,6 +198,14 @@ export function VisoriaRegisterForm() {
             className={inputClass}
           />
         </div>
+      </div>
+      </fieldset>
+
+      <fieldset className="space-y-4">
+        <legend className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
+          02 · Tutor
+        </legend>
+      <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <label htmlFor="guardianName" className="text-sm font-medium text-mf-text">
             Padre, madre o tutor
@@ -231,15 +247,18 @@ export function VisoriaRegisterForm() {
           />
         </div>
       </div>
+      </fieldset>
 
-      <fieldset className="space-y-3 rounded-xl border border-mf-border bg-mf-canvas px-4 py-4">
-        <legend className="text-sm font-semibold text-mf-text">Jornada</legend>
+      <fieldset className="space-y-3 rounded-lg bg-mf-canvas px-4 py-4">
+        <legend className="px-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
+          03 · Jornada
+        </legend>
         <label className="flex gap-3 text-sm text-mf-text-secondary">
           <input
             type="checkbox"
             checked={thursday}
             onChange={(event) => setThursday(event.target.checked)}
-            className="mt-1"
+            className={checkClass}
           />
           <span>
             Jueves 26 · San Javier · abierta a todo público (9:00 a.m. a 2:00 p.m.)
@@ -250,7 +269,7 @@ export function VisoriaRegisterForm() {
             type="checkbox"
             checked={gphSelected}
             onChange={(event) => setGphSelected(event.target.checked)}
-            className="mt-1"
+            className={checkClass}
           />
           <span>
             Soy seleccionado/a de GPH. Quiero la jornada del viernes 27 en Casa de la
@@ -259,9 +278,9 @@ export function VisoriaRegisterForm() {
         </label>
       </fieldset>
 
-      <div className="rounded-xl border border-mf-border bg-white px-4 py-4">
+      <div className="rounded-lg bg-mf-canvas px-4 py-4">
         <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-mf-gph">
-          Aviso de privacidad (LFPDPPP)
+          04 · Privacidad
         </p>
         <p className="mt-2 text-xs leading-6 text-mf-text-secondary">{VISORIA_PRIVACY_SHORT}</p>
         <Link
@@ -278,7 +297,7 @@ export function VisoriaRegisterForm() {
           required
           checked={privacy}
           onChange={(event) => setPrivacy(event.target.checked)}
-          className="mt-1"
+          className={checkClass}
         />
         <span>
           Soy padre, madre o tutor y acepto el aviso de privacidad. Autorizo el
@@ -291,7 +310,7 @@ export function VisoriaRegisterForm() {
           required
           checked={clubsShare}
           onChange={(event) => setClubsShare(event.target.checked)}
-          className="mt-1"
+          className={checkClass}
         />
         <span>
           Autorizo que GPH/CRACKS compartan los datos con los clubes visores (Chivas y
@@ -305,7 +324,7 @@ export function VisoriaRegisterForm() {
           required
           checked={imageRights}
           onChange={(event) => setImageRights(event.target.checked)}
-          className="mt-1"
+          className={checkClass}
         />
         <span>
           Autorizo fotos y video del evento, y que GPH y CRACKS los usen en sus redes
@@ -317,7 +336,7 @@ export function VisoriaRegisterForm() {
           type="checkbox"
           checked={marketing}
           onChange={(event) => setMarketing(event.target.checked)}
-          className="mt-1"
+          className={checkClass}
         />
         <span>
           Opcional: quiero avisos de otras convocatorias GPH y de MiFicha por WhatsApp o

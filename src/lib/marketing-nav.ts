@@ -69,9 +69,14 @@ export const MARKETING_NAV: NavSection[] = [
         description: "Directorio, rankings e 11 ideal semanal",
       },
       {
+        href: "/fut/pagar",
+        label: "Pagar",
+        description: "Evaluación $2,900 o membresía $1,200",
+      },
+      {
         href: "/fut/membresia",
         label: "Membresía anual",
-        description: "Familias: ficha, GPH y precio de diagnóstico",
+        description: "Familias: $1,200 al año · pagar en línea",
       },
     ],
   },

@@ -3,6 +3,8 @@ import { LEGAL_ENTITY, LEGAL_ROUTES } from "@/lib/legal";
 export const VISORIA_EVENT_ID = "queretaro-nov-2026";
 
 export const VISORIA_POSTER = "/partners/visorias-queretaro-nov-2026.jpg";
+/** 1200×630 para WhatsApp/OG: recorte desde arriba para no cortar logos ni el título. */
+export const VISORIA_OG_IMAGE = "/partners/visorias-queretaro-nov-2026-og.jpg";
 
 export const VISORIA_VIDEOS = [
   {

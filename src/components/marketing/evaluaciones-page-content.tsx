@@ -133,7 +133,8 @@ export function EvaluacionesPageContent() {
                 </p>
                 {plan.id === "individual" ? (
                   <p className="mt-1 text-xs font-semibold text-mf-gph">
-                    Miembro anual MiFicha: {DIAGNOSIS_PRODUCT.memberPriceLabel}
+                    Incluye 12 meses de MiFicha. Membresía sola:{" "}
+                    {DIAGNOSIS_PRODUCT.memberPriceLabel}
                   </p>
                 ) : null}
                 <p className="mt-1 text-xs font-medium text-mf-text-muted">{plan.period}</p>
@@ -145,15 +146,20 @@ export function EvaluacionesPageContent() {
           </div>
           <p className="mt-4 text-xs text-mf-text-muted">{DIAGNOSIS_PRODUCT.footnote}</p>
           <div className="mt-8">
-            <a
-              href={whatsapp}
-              className="mf-btn-gph"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Pedir cotización
-              <ArrowRight className="h-4 w-4" />
-            </a>
+            <div className="flex flex-wrap gap-3">
+              <Link href="/fut/pagar?sku=diagnosis" className="mf-btn-gph">
+                Pagar evaluación
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+              <a
+                href={whatsapp}
+                className="mf-btn-gph-ghost"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Cotizar grupo
+              </a>
+            </div>
           </div>
         </div>
       </section>

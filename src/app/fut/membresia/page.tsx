@@ -1,18 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SiteFooter, SiteHeader } from "@/components/marketing/site-header";
-import { diagnosisWhatsAppHref } from "@/lib/gph-alliance";
-import { DIAGNOSIS_PRODUCT } from "@/lib/pricing";
+import { FAMILY_PRODUCTS } from "@/lib/gph-commerce";
 
 export const metadata: Metadata = {
   title: "Membresía anual | MiFicha",
   description:
-    "Membresía anual para familias: ficha del hijo, precio preferente en el diagnóstico GPH y convocatorias de selectivos.",
+    "Membresía anual $1,200 MXN. Evaluación GPH $2,900 incluye un año de MiFicha. Pago con Mercado Pago.",
 };
 
 export default function MembresiaPage() {
-  const whatsapp = diagnosisWhatsAppHref();
-
   return (
     <div className="flex min-h-dvh flex-col bg-mf-canvas">
       <SiteHeader />
@@ -25,11 +22,10 @@ export default function MembresiaPage() {
             Membresía anual, no mensual
           </h1>
           <p className="mt-4 text-sm leading-7 text-mf-text-secondary">
-            La idea: un pago al año. El tutor arma la ficha del hijo (fotos, videos,
-            goles, historia). Por ser miembro, GPH abre entrenamientos y el diagnóstico
-            baja de {DIAGNOSIS_PRODUCT.publicPriceLabel} a{" "}
-            {DIAGNOSIS_PRODUCT.memberPriceLabel} MXN. El cobro anual todavía se cierra
-            por WhatsApp; no hay cargo mes a mes.
+            Un pago al año: {FAMILY_PRODUCTS.membership.priceLabel} MXN. El tutor arma la
+            ficha del hijo (fotos, videos, goles). GPH abre entrenamientos con cupo. La
+            evaluación GPH va aparte ({FAMILY_PRODUCTS.diagnosis.priceLabel}) y ya incluye
+            este mismo año de plataforma. Pagas aquí con Mercado Pago.
           </p>
           <ul className="mt-8 space-y-4 text-sm leading-7 text-mf-text-secondary">
             <li>
@@ -51,14 +47,14 @@ export default function MembresiaPage() {
             </li>
             <li>
               <span className="font-semibold text-mf-text">Diagnóstico. </span>
-              Lista {DIAGNOSIS_PRODUCT.publicPriceLabel}. Miembro{" "}
-              {DIAGNOSIS_PRODUCT.memberPriceLabel}.
+              {FAMILY_PRODUCTS.diagnosis.priceLabel} e incluye este año de MiFicha. Si ya
+              pagaste membresía y luego quieres evaluación, escríbenos para coordinar.
             </li>
           </ul>
           <div className="mt-8 flex flex-wrap gap-3">
-            <a href={whatsapp} className="mf-btn-gph" target="_blank" rel="noopener noreferrer">
-              Quiero la membresía
-            </a>
+            <Link href="/fut/pagar?sku=membership" className="mf-btn-gph">
+              Pagar membresía {FAMILY_PRODUCTS.membership.priceLabel}
+            </Link>
             <Link href="/fut/visorias" className="mf-btn-gph-ghost">
               Registrar visoría
             </Link>

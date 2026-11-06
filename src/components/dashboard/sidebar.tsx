@@ -9,6 +9,7 @@ import {
   ClipboardList,
   Eye,
   Settings,
+  Wallet,
   Trophy,
   Users,
   X,
@@ -63,6 +64,20 @@ export function DashboardSidebar({ open, onClose }: DashboardSidebarProps) {
           >
             <Eye className="h-[18px] w-[18px] shrink-0" />
             Visorías
+          </Link>
+        ) : null}
+        {isGphEvaluator ? (
+          <Link
+            href="/fut/dashboard/cobros"
+            onClick={onClose}
+            className={
+              pathname.startsWith("/fut/dashboard/cobros")
+                ? "mf-nav-link-active"
+                : "mf-nav-link"
+            }
+          >
+            <Wallet className="h-[18px] w-[18px] shrink-0" />
+            Cobros
           </Link>
         ) : null}
         {navItems.map(({ href, label, icon: Icon }) => {

@@ -66,7 +66,8 @@ export default function CookiesPage() {
         <LegalList
           items={[
             "Supabase — autenticación y base de datos.",
-            "Stripe — checkout de suscripciones (solo en flujo de pago).",
+            "Stripe — checkout de suscripciones de academia (si se activa).",
+            "Mercado Pago — cobro de evaluación GPH y membresía anual.",
           ]}
         />
         <LegalParagraph>
