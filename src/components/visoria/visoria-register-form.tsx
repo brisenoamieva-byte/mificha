@@ -106,10 +106,10 @@ export function VisoriaRegisterForm() {
 
   return (
     <form onSubmit={(event) => void onSubmit(event)} className="space-y-8">
-      <fieldset className="space-y-4">
-        <legend className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
+      <div className="space-y-4">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
           01 · Jugador
-        </legend>
+        </p>
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="sm:col-span-2">
           <label htmlFor="playerName" className="text-sm font-medium text-mf-text">
@@ -200,12 +200,12 @@ export function VisoriaRegisterForm() {
           />
         </div>
       </div>
-      </fieldset>
+      </div>
 
-      <fieldset className="space-y-4">
-        <legend className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
+      <div className="space-y-4">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
           02 · Tutor
-        </legend>
+        </p>
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <label htmlFor="guardianName" className="text-sm font-medium text-mf-text">
@@ -248,12 +248,13 @@ export function VisoriaRegisterForm() {
           />
         </div>
       </div>
-      </fieldset>
+      </div>
 
-      <fieldset className="space-y-3 rounded-lg bg-mf-canvas px-4 py-4">
-        <legend className="px-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
+      <div className="space-y-3">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
           03 · Jornada
-        </legend>
+        </p>
+        <div className="space-y-3 rounded-lg bg-mf-canvas px-4 py-4">
         <label className="flex gap-3 text-sm text-mf-text-secondary">
           <input
             type="checkbox"
@@ -277,7 +278,8 @@ export function VisoriaRegisterForm() {
             Juventud.
           </span>
         </label>
-      </fieldset>
+        </div>
+      </div>
 
       <div className="space-y-2 rounded-lg bg-mf-canvas px-3 py-2.5">
         <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
