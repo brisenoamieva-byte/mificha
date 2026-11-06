@@ -5,7 +5,6 @@ import { SiteFooter, SiteHeader } from "@/components/marketing/site-header";
 import { VisoriaRegisterForm } from "@/components/visoria/visoria-register-form";
 import { VisoriaShareBar } from "@/components/visoria/visoria-share-bar";
 import { GphLogo } from "@/components/ui/gph-logo";
-import { DIAGNOSIS_PRODUCT } from "@/lib/pricing";
 import {
   VISORIA_EVENT,
   VISORIA_POSTER,
@@ -104,13 +103,7 @@ export function VisoriaLanding() {
         </section>
 
         <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
-            Jornadas
-          </p>
-          <h2 className="mt-2 text-2xl font-semibold tracking-[-0.03em] text-mf-gph-ink sm:text-3xl">
-            Dos días. Una abierta, una cerrada.
-          </h2>
-          <div className="mt-8 grid gap-4 lg:grid-cols-2">
+          <div className="grid gap-4 lg:grid-cols-2">
             {VISORIA_EVENT.days.map((day) => {
               const open = day.id === "jueves";
               return (
@@ -202,15 +195,9 @@ export function VisoriaLanding() {
 
         <section className="border-y border-mf-border bg-mf-gph-ink">
           <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph-hot">
+            <h2 className="text-3xl font-semibold tracking-[-0.03em] text-mf-gph sm:text-5xl">
               Los visores
-            </p>
-            <h2 className="mt-2 max-w-xl text-2xl font-semibold tracking-[-0.03em] text-white sm:text-3xl">
-              Ellos te hablan. Tú registras abajo.
             </h2>
-            <p className="mt-3 max-w-xl text-sm leading-7 text-white/60">
-              Mensajes de los visores de Chivas y Santos Laguna para esta convocatoria.
-            </p>
             <div className="mt-8 grid gap-5 sm:grid-cols-2">
               {VISORIA_VIDEOS.map((video) => (
                 <figure key={video.src} className="group">
@@ -267,24 +254,6 @@ export function VisoriaLanding() {
             </Link>
             .
           </p>
-
-          <aside className="mt-10 rounded-xl border border-mf-gph/20 bg-mf-gph-soft/80 px-5 py-5 sm:px-6">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
-              Después de la visoría
-            </p>
-            <p className="mt-2 text-sm leading-6 text-mf-gph-ink">
-              Evaluación GPH {DIAGNOSIS_PRODUCT.publicPriceLabel} (incluye 12 meses de
-              MiFicha) o membresía sola {DIAGNOSIS_PRODUCT.memberPriceLabel}.
-            </p>
-            <div className="mt-4 flex flex-wrap gap-2">
-              <Link href="/fut/pagar?sku=diagnosis" className="mf-btn-gph">
-                Pagar evaluación
-              </Link>
-              <Link href="/fut/pagar?sku=membership" className="mf-btn-gph-ghost">
-                Solo membresía
-              </Link>
-            </div>
-          </aside>
         </section>
       </main>
       <a
