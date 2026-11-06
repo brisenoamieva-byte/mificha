@@ -48,10 +48,6 @@ export function VisoriaLanding() {
               <h1 className="mt-3 max-w-[14ch] text-[2.35rem] font-semibold leading-[0.98] tracking-[-0.04em] sm:text-5xl lg:text-[3.4rem]">
                 Visorías gratuitas. Visores de Primera.
               </h1>
-              <p className="mt-5 max-w-xl text-[15px] leading-7 text-white/72 sm:text-base sm:leading-8">
-                Chivas y Santos Laguna observan en cancha. {VISORIA_EVENT.cost}. El tutor
-                registra aquí; Gustavo confirma por WhatsApp día, sede y horario.
-              </p>
               <div className="mt-6 flex flex-wrap gap-2">
                 {VISORIA_EVENT.clubs.map((club) => (
                   <span
