@@ -103,8 +103,7 @@ export function VisoriaLanding() {
               Femenil y varonil, los dos días
             </p>
             <p className="mt-1 max-w-2xl text-sm leading-6 text-mf-text-secondary">
-              La rama no define la fecha. El jueves 26 es abierto. El viernes 27 es solo
-              para seleccionados.
+              El jueves 26 es abierto. El viernes 27 es solo para seleccionados.
             </p>
             <div className="mt-4 flex flex-col gap-3 border-t border-mf-border pt-4 sm:flex-row sm:gap-12">
               <p>
