@@ -15,6 +15,18 @@ type SortKey =
   | "guardian_phone"
   | "created_at";
 
+const SOURCE_LABELS: Record<string, string> = {
+  platform: "Página",
+  google_forms: "Excel",
+  whatsapp: "WhatsApp",
+  import: "Importación",
+};
+
+function sourceLabel(value: string | null | undefined) {
+  if (!value) return "";
+  return SOURCE_LABELS[value] ?? value;
+}
+
 function positionLabel(value: string | null) {
   if (!value) return "";
   return VISORIA_POSITIONS.find((item) => item.value === value)?.label ?? value;
@@ -57,6 +69,7 @@ export function VisoriaAdminList() {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<"all" | "femenil" | "varonil">("all");
   const [day, setDay] = useState<"all" | "jueves" | "viernes">("all");
+  const [source, setSource] = useState("all");
   const [sortKey, setSortKey] = useState<SortKey>("player_full_name");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
 
@@ -86,12 +99,13 @@ export function VisoriaAdminList() {
       if (category !== "all" && row.category !== category) return false;
       if (day === "jueves" && !row.attend_thursday) return false;
       if (day === "viernes" && !row.attend_friday) return false;
+      if (source !== "all" && row.source !== source) return false;
       if (needle && !cellText(row).includes(needle)) return false;
       return true;
     });
     const sorted = [...filtered].sort((a, b) => compare(a, b, sortKey));
     return sortDir === "asc" ? sorted : sorted.reverse();
-  }, [rows, query, category, day, sortKey, sortDir]);
+  }, [rows, query, category, day, source, sortKey, sortDir]);
 
   function toggleSort(key: SortKey) {
     if (sortKey === key) {
@@ -121,7 +135,7 @@ export function VisoriaAdminList() {
       "Jueves 26": row.attend_thursday ? "Sí" : "",
       "Viernes 27": row.attend_friday ? "Sí" : "",
       "Seleccionado GPH": row.gph_selected ? "Sí" : "",
-      Origen: row.source,
+      Origen: sourceLabel(row.source),
       Notas: row.notes ?? "",
       Registro: row.created_at,
     }));
@@ -203,6 +217,16 @@ export function VisoriaAdminList() {
           <option value="jueves">Jueves 26</option>
           <option value="viernes">Viernes 27</option>
         </select>
+        <select
+          value={source}
+          onChange={(event) => setSource(event.target.value)}
+          className="mf-input w-auto"
+        >
+          <option value="all">Todos los orígenes</option>
+          <option value="platform">Página</option>
+          <option value="google_forms">Excel</option>
+          <option value="whatsapp">WhatsApp</option>
+        </select>
       </div>
 
       <div className="max-h-[70vh] overflow-auto rounded-xl border border-mf-border bg-white">
@@ -218,12 +242,13 @@ export function VisoriaAdminList() {
               {header("guardian_phone", "WhatsApp")}
               <th className="sticky top-0 bg-white px-3 py-2 font-medium">Días</th>
               <th className="sticky top-0 bg-white px-3 py-2 font-medium">NUI</th>
+              <th className="sticky top-0 bg-white px-3 py-2 font-medium">Origen</th>
             </tr>
           </thead>
           <tbody>
             {visible.length === 0 ? (
               <tr>
-                <td colSpan={9} className="px-3 py-8 text-center text-mf-text-muted">
+                <td colSpan={10} className="px-3 py-8 text-center text-mf-text-muted">
                   Ninguna fila coincide con el filtro.
                 </td>
               </tr>
@@ -253,6 +278,7 @@ export function VisoriaAdminList() {
                     {row.attend_friday ? "Vie 27" : ""}
                   </td>
                   <td className="px-3 py-2 text-xs">{row.nui}</td>
+                  <td className="px-3 py-2 text-xs">{sourceLabel(row.source)}</td>
                 </tr>
               ))
             )}
