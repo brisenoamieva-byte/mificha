@@ -1,5 +1,10 @@
 import { DEMO_FICHA_PREVIEW } from "@/lib/demo-ficha-preview";
-import { emptyFieldSession, type GphTestCapture } from "@/lib/gph-field-protocol";
+import {
+  emptyFieldSession,
+  GPH_REGULATION_RULES,
+  type GphPhysicalCapture,
+  type GphTestCapture,
+} from "@/lib/gph-field-protocol";
 import { MARKETING_IMAGES } from "@/lib/marketing-assets";
 import {
   computeDiagnosisResult,
@@ -83,6 +88,24 @@ function demoTest(
     skipped: false,
     ...capture,
   };
+}
+
+function demoPhysical(attempts: number[], score: number, note = ""): GphPhysicalCapture {
+  return { attempts, note, score, skipped: false };
+}
+
+function demoRules() {
+  const known = GPH_REGULATION_RULES.map((rule) => rule.title);
+  return [
+    ...known.slice(0, 10),
+    "Posición adelantada",
+    "Tarjetas",
+    "Tiros",
+    "Tiro desde el punto",
+    "Banda",
+    "Puerta",
+    "Esquina",
+  ];
 }
 
 export function isDemoDiagnosisToken(token: string) {
@@ -213,12 +236,34 @@ export function buildDemoDiagnosisReport(): {
             id: "demo-ev-2",
             kind: "photo",
             url: MARKETING_IMAGES.audienceAcademias,
-            caption: "Circuito de transiciones",
-            stationId: "",
+            caption: "Toma de decisiones 5, 6 y 7",
+            stationId: "gph_decisiones",
             createdAt: "2026-09-06T12:08:00.000Z",
           },
         ],
-        observation: "Pierde calidad al cambiar de posesión; el pase corto es funcional.",
+        observation:
+          "Pierde calidad al cambiar de posesión. El pase corto es funcional; a 20 m cae. En las 17 reglas se detiene a partir del fuera de juego.",
+        closing: {
+          testsComplete: true,
+          videosIdentified: true,
+          dataLoaded: true,
+          incidentsLogged: true,
+          reportScheduled: true,
+          feedbackDate: "2026-09-13",
+        },
+        physical: {
+          sprint_5m: demoPhysical([1.12, 1.08], 4),
+          sprint_10m: demoPhysical([1.95, 1.88], 4),
+          sprint_20m: demoPhysical([3.42, 3.31], 4),
+          sprint_30m: demoPhysical([4.86, 4.71], 4),
+          cambio_5105: demoPhysical([2.58, 2.71], 4, "Izquierda más lenta."),
+          illinois: demoPhysical([17.1, 16.6], 4),
+          resistencia_20: demoPhysical([8], 4, "Palier 8."),
+          fuerza_lagartijas: demoPhysical([18], 3),
+          fuerza_abdominales: demoPhysical([28], 3),
+          fuerza_espalda_baja: demoPhysical([22], 3),
+          fuerza_sentadillas: demoPhysical([32], 3),
+        },
         coachBrief: {
           source: "gph",
           generatedAt: "2026-09-06T12:00:00.000Z",
@@ -232,7 +277,7 @@ export function buildDemoDiagnosisReport(): {
             tecnica:
               "Conducción y 1v1 con techo. Piso en el pase. Consigna: apoyo firme y tercer hombre; no acelerar el golpeo hasta que el pase corto sea 8/10.",
             tactica:
-              "Cuello de botella. El juego de aplicación quedó marcado en protocolo. Consigna: primer paso al robo o a la pérdida en 2–3 segundos.",
+              "Cuello de botella. Percepción 3/5 y toma de decisiones 4/6. Consigna: primer paso al robo o a la pérdida en 2–3 segundos.",
             fisico:
               "Usable para la edad. Movilidad y estabilidad un punto abajo de velocidad y resistencia. Dosificar sprints al cierre para que la decisión no caiga al minuto 3.",
             mental:
@@ -253,14 +298,26 @@ export function buildDemoDiagnosisReport(): {
         },
         tests: {
           des_c_dominadas: demoTest({
-            attempts: [18, 21, 19, 22, 20],
+            attempts: [42, 38, 45, 41, 44],
             hits: null,
             opportunities: null,
             errors: null,
-            score: 5,
+            leftHits: 38,
+            rightHits: 45,
+            score: 4,
             relevance: 3,
             flagged: false,
-            note: "",
+            note: "Pie menor 84%.",
+          }),
+          des_c_patrones: demoTest({
+            attempts: [6, 4, 4, 6, 4, 4, 6, 4],
+            hits: null,
+            opportunities: 6,
+            errors: null,
+            score: 4,
+            relevance: 3,
+            flagged: false,
+            note: "Cae a 30 m con el perfil izquierdo.",
           }),
           des_c_slalom: demoTest({
             attempts: [11.4, 10.8, 11.1, 10.6],
@@ -335,25 +392,126 @@ export function buildDemoDiagnosisReport(): {
             flagged: false,
             note: "Penal sólido; fuera de área menos preciso.",
           }),
-          des_c_largo: demoTest({
-            attempts: [],
-            hits: 10,
-            opportunities: 18,
+          des_c_dribling: demoTest({
+            attempts: [1.92, 1.88, 2.08, 2.02, 2.18, 2.14, 2.34, 2.26],
+            hits: null,
+            opportunities: null,
+            errors: null,
+            score: 4,
+            relevance: 3,
+            flagged: false,
+            note: "Dinámica estable; la estática izquierda es la más lenta.",
+          }),
+          des_c_control_elevado: demoTest({
+            attempts: [4, 4, 6, 4, 2, 4],
+            hits: null,
+            opportunities: 6,
+            errors: null,
+            score: 4,
+            relevance: 3,
+            flagged: false,
+            note: "Pie orientado a 20 m queda en regular.",
+          }),
+          des_c_fildeo: demoTest({
+            attempts: [4, 6, 4, 2],
+            hits: null,
+            opportunities: 6,
+            errors: null,
+            score: 4,
+            relevance: 2,
+            flagged: false,
+            note: "Cabeza derecha regular.",
+          }),
+          gph_semaforo: demoTest({
+            attempts: [4],
+            hits: null,
+            opportunities: 6,
+            errors: null,
+            score: 4,
+            relevance: 2,
+            flagged: false,
+            note: "Frena en rojo; el cambio de dirección llega un paso tarde.",
+          }),
+          gph_perfiles: demoTest({
+            attempts: [4],
+            hits: null,
+            opportunities: 6,
+            errors: null,
+            score: 4,
+            relevance: 2,
+            flagged: false,
+            note: "",
+          }),
+          gph_marcha: demoTest({
+            attempts: [5.4, 5.1, 5.8, 5.5, 3.4, 3.2],
+            hits: null,
+            opportunities: null,
+            errors: null,
+            score: 4,
+            relevance: 2,
+            flagged: false,
+            note: "Un tropiezo en unipodal izquierda.",
+          }),
+          gph_giros: demoTest({
+            attempts: [4, 4, 6, 4, 2, 4],
+            hits: null,
+            opportunities: 6,
+            errors: null,
+            score: 4,
+            relevance: 2,
+            flagged: false,
+            note: "La reorientación después del giro queda irregular.",
+          }),
+          gph_memoria_corto: demoTest({
+            attempts: [4, 5],
+            hits: null,
+            opportunities: 6,
             errors: null,
             score: 3,
             relevance: 2,
             flagged: false,
-            note: "Primer bote; 1 fuera de corredor.",
+            note: "Pierde el orden en el tercer elemento.",
           }),
-          des_c_juego: demoTest({
-            attempts: [],
-            hits: 8,
-            opportunities: 18,
-            errors: 10,
+          gph_percepcion: demoTest({
+            attempts: [3],
+            hits: null,
+            opportunities: 5,
+            errors: null,
+            score: 3,
+            relevance: 2,
+            flagged: true,
+            note: "Ve el espacio libre tarde.",
+          }),
+          gph_decisiones: demoTest({
+            attempts: [1, 0, 1, 1, 0, 1],
+            hits: null,
+            opportunities: null,
+            errors: null,
             score: 3,
             relevance: 3,
             flagged: true,
-            note: "",
+            note: "Falla el segundo intento del escenario 5 y el primero del 7.",
+          }),
+          gph_memoria_largo: demoTest({
+            attempts: [3],
+            hits: null,
+            opportunities: 6,
+            errors: null,
+            score: 3,
+            relevance: 2,
+            flagged: false,
+            note: "Al cierre recuerda 3 de 6.",
+          }),
+          gph_reglas: demoTest({
+            attempts: [],
+            hits: 10,
+            opportunities: 17,
+            errors: null,
+            ruleSlots: demoRules(),
+            score: 3,
+            relevance: 2,
+            flagged: false,
+            note: "Llega hasta el resultado del partido y a partir del fuera de juego se pierde.",
           }),
         },
       },
