@@ -19,6 +19,10 @@ export default async function Home() {
   return (
     <div className="flex min-h-dvh flex-col bg-mf-canvas">
       <SiteHeader />
+      <p className="border-b border-mf-brand/15 bg-mf-brand-soft px-4 py-2.5 text-center text-sm text-mf-brand-dark">
+        <span className="font-semibold">Próximamente.</span> MiFicha está en construcción.
+        Lo que ves es el avance del producto, todavía no la versión abierta.
+      </p>
 
       <main className="flex-1">
         <HomeHero />
