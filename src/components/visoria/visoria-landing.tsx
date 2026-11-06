@@ -45,19 +45,15 @@ export function VisoriaLanding() {
               <p className="mt-6 text-[11px] font-semibold uppercase tracking-[0.22em] text-mf-gph-hot">
                 Querétaro · 26 y 27 de noviembre
               </p>
-              <h1 className="mt-3 max-w-[14ch] text-[2.35rem] font-semibold leading-[0.98] tracking-[-0.04em] sm:text-5xl lg:text-[3.4rem]">
-                Visorías gratuitas. Visores de Primera.
+              <h1 className="mt-3 font-semibold tracking-[-0.04em]">
+                <span className="block max-w-[12ch] text-[2.35rem] leading-[0.98] sm:text-5xl lg:text-[3.4rem]">
+                  Visorías gratuitas.
+                </span>
+                <span className="mt-4 block max-w-[16ch] text-[1.85rem] leading-[1.02] sm:text-4xl lg:text-[2.75rem]">
+                  Club Deportivo Guadalajara
+                  <span className="mt-1 block">y Club Santos Laguna</span>
+                </span>
               </h1>
-              <div className="mt-6 flex flex-wrap gap-2">
-                {VISORIA_EVENT.clubs.map((club) => (
-                  <span
-                    key={club}
-                    className="rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-medium text-white/90"
-                  >
-                    {club.replace(" (Chivas)", "")}
-                  </span>
-                ))}
-              </div>
               <div className="mt-8 flex flex-wrap gap-3">
                 <a href="#registro" className="mf-btn-gph">
                   Registrar jugador
