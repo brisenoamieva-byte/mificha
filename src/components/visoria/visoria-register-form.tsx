@@ -15,6 +15,7 @@ import {
 const inputClass =
   "mf-input mt-1 focus:!border-mf-gph focus:!shadow-[0_0_0_3px_color-mix(in_srgb,var(--mf-gph)_16%,transparent)]";
 const checkClass = "mt-1 size-4 shrink-0 accent-[#f54200]";
+const consentCheck = "mt-0.5 size-3 shrink-0 accent-[#f54200]";
 
 export function VisoriaRegisterForm() {
   const [playerName, setPlayerName] = useState("");
@@ -278,71 +279,71 @@ export function VisoriaRegisterForm() {
         </label>
       </fieldset>
 
-      <div className="rounded-lg bg-mf-canvas px-4 py-4">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-mf-gph">
-          04 · Privacidad
-        </p>
-        <p className="mt-2 text-xs leading-6 text-mf-text-secondary">{VISORIA_PRIVACY_SHORT}</p>
-        <Link
-          href={LEGAL_ROUTES.privacy}
-          className="mt-2 inline-block text-xs font-semibold text-mf-brand hover:underline"
-        >
-          Ver aviso integral
-        </Link>
+      <div className="space-y-2 rounded-lg bg-mf-canvas px-3 py-2.5">
+        <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-mf-text-muted">
+            Privacidad
+          </p>
+          <Link
+            href={LEGAL_ROUTES.privacy}
+            className="text-[11px] text-mf-text-muted underline-offset-2 hover:underline"
+          >
+            Aviso integral
+          </Link>
+        </div>
+        <p className="text-[11px] leading-4 text-mf-text-muted">{VISORIA_PRIVACY_SHORT}</p>
+        <label className="flex gap-2 text-[11px] leading-4 text-mf-text-muted">
+          <input
+            type="checkbox"
+            required
+            checked={privacy}
+            onChange={(event) => setPrivacy(event.target.checked)}
+            className={consentCheck}
+          />
+          <span>
+            Soy padre, madre o tutor y acepto el aviso de privacidad. Autorizo el
+            tratamiento de los datos del menor para esta visoría.
+          </span>
+        </label>
+        <label className="flex gap-2 text-[11px] leading-4 text-mf-text-muted">
+          <input
+            type="checkbox"
+            required
+            checked={clubsShare}
+            onChange={(event) => setClubsShare(event.target.checked)}
+            className={consentCheck}
+          />
+          <span>
+            Autorizo que GPH/CRACKS compartan los datos con los clubes visores (Chivas y
+            Santos Laguna, u otros de Primera División que se confirmen) solo para evaluar
+            al jugador. Sin esto no hay inscripción.
+          </span>
+        </label>
+        <label className="flex gap-2 text-[11px] leading-4 text-mf-text-muted">
+          <input
+            type="checkbox"
+            required
+            checked={imageRights}
+            onChange={(event) => setImageRights(event.target.checked)}
+            className={consentCheck}
+          />
+          <span>
+            Autorizo fotos y video del evento, y que GPH y CRACKS los usen en sus redes
+            para difundir las visorías. Puedo revocar esto escribiendo a privacidad@mificha.mx.
+          </span>
+        </label>
+        <label className="flex gap-2 text-[11px] leading-4 text-mf-text-muted">
+          <input
+            type="checkbox"
+            checked={marketing}
+            onChange={(event) => setMarketing(event.target.checked)}
+            className={consentCheck}
+          />
+          <span>
+            Opcional: avisos de otras convocatorias GPH y de MiFicha por WhatsApp o correo.
+          </span>
+        </label>
       </div>
-
-      <label className="flex gap-3 text-sm text-mf-text-secondary">
-        <input
-          type="checkbox"
-          required
-          checked={privacy}
-          onChange={(event) => setPrivacy(event.target.checked)}
-          className={checkClass}
-        />
-        <span>
-          Soy padre, madre o tutor y acepto el aviso de privacidad. Autorizo el
-          tratamiento de los datos del menor para esta visoría.
-        </span>
-      </label>
-      <label className="flex gap-3 text-sm text-mf-text-secondary">
-        <input
-          type="checkbox"
-          required
-          checked={clubsShare}
-          onChange={(event) => setClubsShare(event.target.checked)}
-          className={checkClass}
-        />
-        <span>
-          Autorizo que GPH/CRACKS compartan los datos con los clubes visores (Chivas y
-          Santos Laguna, u otros de Primera División que se confirmen) solo para evaluar
-          al jugador. Sin esto no hay inscripción.
-        </span>
-      </label>
-      <label className="flex gap-3 text-sm text-mf-text-secondary">
-        <input
-          type="checkbox"
-          required
-          checked={imageRights}
-          onChange={(event) => setImageRights(event.target.checked)}
-          className={checkClass}
-        />
-        <span>
-          Autorizo fotos y video del evento, y que GPH y CRACKS los usen en sus redes
-          para difundir las visorías. Puedo revocar esto escribiendo a privacidad@mificha.mx.
-        </span>
-      </label>
-      <label className="flex gap-3 text-sm text-mf-text-muted">
-        <input
-          type="checkbox"
-          checked={marketing}
-          onChange={(event) => setMarketing(event.target.checked)}
-          className={checkClass}
-        />
-        <span>
-          Opcional: quiero avisos de otras convocatorias GPH y de MiFicha por WhatsApp o
-          correo. Puedo decir que no y igual me registro.
-        </span>
-      </label>
 
       <div className="hidden" aria-hidden>
         <label>
