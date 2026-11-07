@@ -32,6 +32,11 @@ export const MARKETING_NAV: NavSection[] = [
         description: "Stats del torneo en una ficha real",
       },
       {
+        href: "/fut/tutor",
+        label: "Soy tutor",
+        description: "Piloto: ficha con fotos, videos e historia",
+      },
+      {
         href: "/fut/padres",
         label: "Padres",
         description: "Ficha post-partido por WhatsApp o email",

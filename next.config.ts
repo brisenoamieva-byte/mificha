@@ -24,6 +24,7 @@ const nextConfig: NextConfig = {
       { source: "/membresia", destination: "/fut/membresia", permanent: false },
       { source: "/pagar", destination: "/fut/pagar", permanent: false },
       { source: "/tutor", destination: "/fut/tutor", permanent: false },
+      { source: "/f/:path*", destination: "/fut/f/:path*", permanent: false },
       { source: "/interno", destination: "/fut/interno", permanent: false },
       { source: "/interno/:path*", destination: "/fut/interno/:path*", permanent: false },
       { source: "/terminos", destination: "/fut/terminos", permanent: false },

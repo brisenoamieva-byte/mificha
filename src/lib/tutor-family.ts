@@ -1,4 +1,4 @@
-import { randomUUID } from "crypto";
+import { randomBytes, randomUUID } from "crypto";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { listFamilyOrders, type FamilyOrderRow } from "@/lib/family-orders";
 
@@ -6,7 +6,23 @@ const OPS_BUCKET = "mificha-ops";
 const ROSTER = "families/roster.json";
 const MATERIALS = "families/materials.json";
 
+/** Piloto gratuito: sin cobro de $1,200. Apagar cuando se active la membresía. */
+export const TUTOR_PILOT_FREE = true;
+export const TUTOR_PILOT_LABEL = "Piloto gratuito · sin cobro de membresía";
+
 export type TutorMaterialKind = "photo" | "video" | "story";
+
+export interface TutorChildProfile {
+  birth_date: string | null;
+  position: string | null;
+  club: string | null;
+  school: string | null;
+  city: string | null;
+  height_cm: number | null;
+  dominant_foot: "left" | "right" | "both" | null;
+  bio: string | null;
+  goals: string | null;
+}
 
 export interface TutorChild {
   id: string;
@@ -16,6 +32,8 @@ export interface TutorChild {
   player_name: string;
   membership_until: string | null;
   source_folios: string[];
+  share_token: string;
+  profile: TutorChildProfile;
   created_at: string;
 }
 
@@ -29,6 +47,20 @@ export interface TutorMaterial {
   storage_path: string | null;
   created_at: string;
 }
+
+export type TutorChildInput = {
+  player_name: string;
+  guardian_phone?: string | null;
+  birth_date?: string | null;
+  position?: string | null;
+  club?: string | null;
+  school?: string | null;
+  city?: string | null;
+  height_cm?: number | null;
+  dominant_foot?: "left" | "right" | "both" | null;
+  bio?: string | null;
+  goals?: string | null;
+};
 
 function phoneKey(value: string | null | undefined) {
   const digits = String(value ?? "").replace(/\D/g, "");
@@ -44,9 +76,43 @@ function todayIso() {
   return new Date().toISOString().slice(0, 10);
 }
 
+function emptyProfile(): TutorChildProfile {
+  return {
+    birth_date: null,
+    position: null,
+    club: null,
+    school: null,
+    city: null,
+    height_cm: null,
+    dominant_foot: null,
+    bio: null,
+    goals: null,
+  };
+}
+
+function newShareToken() {
+  return randomBytes(12).toString("hex");
+}
+
+function normalizeChild(raw: TutorChild): TutorChild {
+  return {
+    ...raw,
+    share_token: raw.share_token || newShareToken(),
+    profile: {
+      ...emptyProfile(),
+      ...(raw.profile ?? {}),
+    },
+  };
+}
+
 export function membershipIsActive(until: string | null | undefined) {
+  if (TUTOR_PILOT_FREE) return true;
   if (!until) return false;
   return until.slice(0, 10) >= todayIso();
+}
+
+export function tutorSharePath(token: string) {
+  return `/fut/f/${token}`;
 }
 
 async function ensureOpsBucket(admin: SupabaseClient) {
@@ -77,12 +143,17 @@ async function writeJson(admin: SupabaseClient, path: string, rows: unknown[]) {
 
 function orderMatchesGuardian(order: FamilyOrderRow, email: string, phone: string) {
   if (order.status !== "paid") return false;
-  if (!membershipIsActive(order.membership_until)) return false;
+  if (!TUTOR_PILOT_FREE && !membershipIsActive(order.membership_until)) return false;
   const orderEmail = (order.payer_email ?? "").trim().toLowerCase();
   const orderPhone = phoneKey(order.payer_phone);
   if (email && orderEmail && orderEmail === email) return true;
   if (phone && orderPhone && orderPhone === phone) return true;
   return false;
+}
+
+function assertCanUpload(child: TutorChild) {
+  if (membershipIsActive(child.membership_until)) return;
+  throw new Error("La membresía no está vigente. Paga el año para subir material.");
 }
 
 export async function syncTutorChildren(
@@ -94,7 +165,8 @@ export async function syncTutorChildren(
   const phone = phoneKey(phoneRaw);
   const orders = await listFamilyOrders(admin);
   const matched = orders.filter((order) => orderMatchesGuardian(order, email, phone));
-  const roster = await readJson<TutorChild>(admin, ROSTER);
+  let roster = (await readJson<TutorChild>(admin, ROSTER)).map(normalizeChild);
+  let changed = false;
 
   for (const order of matched) {
     const playerName = (order.player_name ?? "").trim() || "Jugador";
@@ -106,15 +178,23 @@ export async function syncTutorChildren(
     if (existing) {
       if (!existing.source_folios.includes(order.folio)) {
         existing.source_folios.push(order.folio);
+        changed = true;
       }
       if (
         order.membership_until &&
         (!existing.membership_until || order.membership_until > existing.membership_until)
       ) {
         existing.membership_until = order.membership_until;
+        changed = true;
       }
-      existing.guardian_email = email || existing.guardian_email;
-      existing.guardian_phone = phone || existing.guardian_phone;
+      if (email && existing.guardian_email !== email) {
+        existing.guardian_email = email;
+        changed = true;
+      }
+      if (phone && existing.guardian_phone !== phone) {
+        existing.guardian_phone = phone;
+        changed = true;
+      }
       continue;
     }
     roster.unshift({
@@ -125,14 +205,105 @@ export async function syncTutorChildren(
       player_name: playerName,
       membership_until: order.membership_until,
       source_folios: [order.folio],
+      share_token: newShareToken(),
+      profile: emptyProfile(),
       created_at: new Date().toISOString(),
     });
+    changed = true;
   }
 
-  await writeJson(admin, ROSTER, roster);
+  // Persist share_token / profile backfill for older rows of this guardian.
+  roster = roster.map((child) => {
+    if (child.guardian_user_id !== user.id) return child;
+    if (!child.share_token || !child.profile) {
+      changed = true;
+      return normalizeChild(child);
+    }
+    return child;
+  });
+
+  if (changed) await writeJson(admin, ROSTER, roster);
   return roster
     .filter((child) => child.guardian_user_id === user.id)
     .sort((a, b) => a.player_name.localeCompare(b.player_name, "es"));
+}
+
+export async function createTutorChild(
+  admin: SupabaseClient,
+  user: { id: string; email?: string | null },
+  input: TutorChildInput,
+) {
+  const playerName = input.player_name.trim();
+  if (playerName.length < 2) throw new Error("Escribe el nombre completo del jugador.");
+
+  const email = (user.email ?? "").trim().toLowerCase();
+  const phone = phoneKey(input.guardian_phone);
+  const roster = (await readJson<TutorChild>(admin, ROSTER)).map(normalizeChild);
+  const duplicate = roster.find(
+    (child) =>
+      child.guardian_user_id === user.id && nameKey(child.player_name) === nameKey(playerName),
+  );
+  if (duplicate) throw new Error("Ese jugador ya está en tu cuenta.");
+
+  const child: TutorChild = {
+    id: randomUUID(),
+    guardian_user_id: user.id,
+    guardian_email: email,
+    guardian_phone: phone || null,
+    player_name: playerName,
+    membership_until: TUTOR_PILOT_FREE ? "2099-12-31" : null,
+    source_folios: [],
+    share_token: newShareToken(),
+    profile: {
+      birth_date: input.birth_date?.trim() || null,
+      position: input.position?.trim() || null,
+      club: input.club?.trim() || null,
+      school: input.school?.trim() || null,
+      city: input.city?.trim() || null,
+      height_cm: input.height_cm ?? null,
+      dominant_foot: input.dominant_foot ?? null,
+      bio: input.bio?.trim() || null,
+      goals: input.goals?.trim() || null,
+    },
+    created_at: new Date().toISOString(),
+  };
+  roster.unshift(child);
+  await writeJson(admin, ROSTER, roster);
+  return child;
+}
+
+export async function updateTutorChild(
+  admin: SupabaseClient,
+  userId: string,
+  childId: string,
+  input: TutorChildInput,
+) {
+  const roster = (await readJson<TutorChild>(admin, ROSTER)).map(normalizeChild);
+  const index = roster.findIndex(
+    (child) => child.id === childId && child.guardian_user_id === userId,
+  );
+  if (index < 0) throw new Error("No encontramos a ese jugador.");
+
+  const current = roster[index];
+  const playerName = input.player_name.trim() || current.player_name;
+  roster[index] = {
+    ...current,
+    player_name: playerName,
+    guardian_phone: phoneKey(input.guardian_phone) || current.guardian_phone,
+    profile: {
+      birth_date: input.birth_date?.trim() || null,
+      position: input.position?.trim() || null,
+      club: input.club?.trim() || null,
+      school: input.school?.trim() || null,
+      city: input.city?.trim() || null,
+      height_cm: input.height_cm ?? null,
+      dominant_foot: input.dominant_foot ?? null,
+      bio: input.bio?.trim() || null,
+      goals: input.goals?.trim() || null,
+    },
+  };
+  await writeJson(admin, ROSTER, roster);
+  return roster[index];
 }
 
 export async function listTutorMaterials(admin: SupabaseClient, child: TutorChild) {
@@ -160,11 +331,18 @@ export async function getTutorChild(
   userId: string,
   childId: string,
 ) {
-  const roster = await readJson<TutorChild>(admin, ROSTER);
+  const roster = (await readJson<TutorChild>(admin, ROSTER)).map(normalizeChild);
   return (
     roster.find((child) => child.id === childId && child.guardian_user_id === userId) ??
     null
   );
+}
+
+export async function getTutorChildByShareToken(admin: SupabaseClient, token: string) {
+  const clean = token.trim().toLowerCase();
+  if (!clean) return null;
+  const roster = (await readJson<TutorChild>(admin, ROSTER)).map(normalizeChild);
+  return roster.find((child) => child.share_token === clean) ?? null;
 }
 
 export async function addTutorStory(
@@ -173,9 +351,7 @@ export async function addTutorStory(
   title: string,
   body: string,
 ) {
-  if (!membershipIsActive(child.membership_until)) {
-    throw new Error("La membresía no está vigente. Paga el año para subir material.");
-  }
+  assertCanUpload(child);
   const rows = await readJson<TutorMaterial>(admin, MATERIALS);
   const row: TutorMaterial = {
     id: randomUUID(),
@@ -198,9 +374,7 @@ export async function prepareTutorUpload(
   kind: "photo" | "video",
   fileName: string,
 ) {
-  if (!membershipIsActive(child.membership_until)) {
-    throw new Error("La membresía no está vigente. Paga el año para subir material.");
-  }
+  assertCanUpload(child);
   await ensureOpsBucket(admin);
   const safe = fileName.replace(/[^a-zA-Z0-9._-]+/g, "-").slice(0, 80) || "archivo";
   const storagePath = `families/${child.id}/${randomUUID()}-${safe}`;
@@ -219,9 +393,7 @@ export async function commitTutorUpload(
   child: TutorChild,
   input: { kind: "photo" | "video"; title: string; path: string },
 ) {
-  if (!membershipIsActive(child.membership_until)) {
-    throw new Error("La membresía no está vigente.");
-  }
+  assertCanUpload(child);
   if (!input.path.startsWith(`families/${child.id}/`)) {
     throw new Error("Archivo inválido.");
   }

@@ -3,9 +3,9 @@ import { SiteFooter, SiteHeader } from "@/components/marketing/site-header";
 import { TutorWorkspace } from "@/components/tutor/tutor-workspace";
 
 export const metadata: Metadata = {
-  title: "Tutor | MiFicha",
+  title: "Tutor · piloto | MiFicha",
   description:
-    "Entra como padre, madre o tutor para ver a tus hijos y subir videos, fotos e historia.",
+    "Organiza fotos, videos e historia de tu hijo y genera una ficha para universidades o visorías. Piloto gratuito.",
 };
 
 export default function TutorPage() {

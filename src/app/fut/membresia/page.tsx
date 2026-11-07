@@ -21,10 +21,16 @@ export default function MembresiaPage() {
           <h1 className="mt-3 text-3xl font-semibold tracking-tight text-mf-text sm:text-4xl">
             El seguimiento de tu hijo, un año
           </h1>
+          <p className="mt-4 rounded-lg bg-mf-gph-soft px-4 py-3 text-sm leading-7 text-mf-gph-ink">
+            <span className="font-semibold">Piloto gratuito ahora.</span> Puedes entrar
+            como tutor, subir material y generar la ficha presentable sin pagar los{" "}
+            {FAMILY_PRODUCTS.membership.priceLabel}. El cobro anual se activa después del
+            piloto.
+          </p>
           <p className="mt-4 text-sm leading-7 text-mf-text-secondary">
-            {FAMILY_PRODUCTS.membership.priceLabel} MXN al año. Entras como papá, mamá o
-            tutor y armas la ficha: videos, fotos e historia. GPH y los visores consultan
-            ese mismo expediente. No es una red social y no se cobra por mes.
+            Cuando el piloto cierre, la membresía será {FAMILY_PRODUCTS.membership.priceLabel}{" "}
+            MXN al año. Entras como papá, mamá o tutor y armas la ficha: videos, fotos e
+            historia para universidades, visorías o clubes.
           </p>
           <ul className="mt-8 space-y-4 text-sm leading-7 text-mf-text-secondary">
             <li>
@@ -49,11 +55,11 @@ export default function MembresiaPage() {
             </li>
           </ul>
           <div className="mt-8 flex flex-wrap gap-3">
-            <Link href="/fut/pagar?sku=membership" className="mf-btn-gph">
-              Pagar membresía {FAMILY_PRODUCTS.membership.priceLabel}
+            <Link href="/fut/tutor" className="mf-btn-gph">
+              Entrar al piloto de tutor
             </Link>
-            <Link href="/fut/tutor" className="mf-btn-gph-ghost">
-              Entrar como tutor
+            <Link href="/fut/pagar?sku=membership" className="mf-btn-gph-ghost">
+              Pagar membresía {FAMILY_PRODUCTS.membership.priceLabel}
             </Link>
             <Link href="/fut/visorias" className="mf-btn-gph-ghost">
               Registrar visoría

@@ -4,7 +4,12 @@ import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { signIn, signUp } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
-import type { TutorMaterialKind } from "@/lib/tutor-family";
+import {
+  TUTOR_PILOT_FREE,
+  TUTOR_PILOT_LABEL,
+  tutorSharePath,
+  type TutorMaterialKind,
+} from "@/lib/tutor-family";
 
 interface MaterialItem {
   id: string;
@@ -19,12 +24,37 @@ interface TutorChildCard {
   id: string;
   player_name: string;
   membership_until: string | null;
+  share_token: string;
   active: boolean;
+  profile: {
+    birth_date: string | null;
+    position: string | null;
+    club: string | null;
+    school: string | null;
+    city: string | null;
+    height_cm: number | null;
+    dominant_foot: "left" | "right" | "both" | null;
+    bio: string | null;
+    goals: string | null;
+  };
   materials: MaterialItem[];
 }
 
 const inputClass =
   "mf-input mt-1 focus:!border-mf-gph focus:!shadow-[0_0_0_3px_color-mix(in_srgb,var(--mf-gph)_16%,transparent)]";
+
+const emptyForm = {
+  player_name: "",
+  birth_date: "",
+  position: "",
+  club: "",
+  school: "",
+  city: "",
+  height_cm: "",
+  dominant_foot: "" as "" | "left" | "right" | "both",
+  bio: "",
+  goals: "",
+};
 
 async function authed(path: string, init?: RequestInit) {
   const {
@@ -44,6 +74,7 @@ async function authed(path: string, init?: RequestInit) {
     children?: TutorChildCard[];
     token?: string;
     path?: string;
+    child?: TutorChildCard;
   };
   if (!response.ok) throw new Error(payload.error || "No se pudo completar.");
   return payload;
@@ -54,7 +85,7 @@ export function TutorWorkspace() {
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
-  const [mode, setMode] = useState<"login" | "signup">("login");
+  const [mode, setMode] = useState<"login" | "signup">("signup");
   const [sessionEmail, setSessionEmail] = useState<string | null>(null);
   const [children, setChildren] = useState<TutorChildCard[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -63,13 +94,19 @@ export function TutorWorkspace() {
   const [storyTitle, setStoryTitle] = useState("");
   const [storyBody, setStoryBody] = useState("");
   const [busy, setBusy] = useState(false);
+  const [form, setForm] = useState(emptyForm);
+  const [editing, setEditing] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const load = useCallback(async (whatsapp: string) => {
     const query = whatsapp ? `?phone=${encodeURIComponent(whatsapp)}` : "";
     const payload = await authed(`/fut/api/tutor/home${query}`);
     const rows = payload.children ?? [];
     setChildren(rows);
-    setSelectedId((current) => current ?? rows[0]?.id ?? null);
+    setSelectedId((current) => {
+      if (current && rows.some((row) => row.id === current)) return current;
+      return rows[0]?.id ?? null;
+    });
   }, []);
 
   useEffect(() => {
@@ -92,6 +129,22 @@ export function TutorWorkspace() {
 
   const child = children.find((item) => item.id === selectedId) ?? null;
 
+  useEffect(() => {
+    if (!child || editing) return;
+    setForm({
+      player_name: child.player_name,
+      birth_date: child.profile.birth_date ?? "",
+      position: child.profile.position ?? "",
+      club: child.profile.club ?? "",
+      school: child.profile.school ?? "",
+      city: child.profile.city ?? "",
+      height_cm: child.profile.height_cm != null ? String(child.profile.height_cm) : "",
+      dominant_foot: child.profile.dominant_foot ?? "",
+      bio: child.profile.bio ?? "",
+      goals: child.profile.goals ?? "",
+    });
+  }, [child, editing]);
+
   async function onAuth(event: React.FormEvent) {
     event.preventDefault();
     setError(null);
@@ -110,6 +163,39 @@ export function TutorWorkspace() {
       await load(phone);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "No se pudo entrar.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function saveChild(event: React.FormEvent) {
+    event.preventDefault();
+    setBusy(true);
+    setError(null);
+    try {
+      const payload = await authed("/fut/api/tutor/children", {
+        method: "POST",
+        body: JSON.stringify({
+          child_id: editing && child ? child.id : undefined,
+          player_name: form.player_name,
+          guardian_phone: phone || undefined,
+          birth_date: form.birth_date || null,
+          position: form.position || null,
+          club: form.club || null,
+          school: form.school || null,
+          city: form.city || null,
+          height_cm: form.height_cm ? Number(form.height_cm) : null,
+          dominant_foot: form.dominant_foot || null,
+          bio: form.bio || null,
+          goals: form.goals || null,
+        }),
+      });
+      await load(phone);
+      if (payload.child?.id) setSelectedId(payload.child.id);
+      setEditing(false);
+      if (!editing) setForm(emptyForm);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "No se guardó el jugador.");
     } finally {
       setBusy(false);
     }
@@ -177,76 +263,117 @@ export function TutorWorkspace() {
     }
   }
 
+  async function copyShare() {
+    if (!child?.share_token) return;
+    const url = `${window.location.origin}${tutorSharePath(child.share_token)}`;
+    await navigator.clipboard.writeText(url);
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 2000);
+  }
+
   if (loading) {
     return <p className="text-sm text-mf-text-muted">Cargando…</p>;
   }
 
   if (!sessionEmail) {
     return (
-      <form onSubmit={(event) => void onAuth(event)} className="mx-auto max-w-md space-y-4">
-        <div className="flex gap-2 text-sm font-semibold">
-          <button type="button" className={mode === "login" ? "text-mf-gph" : "text-mf-text-muted"} onClick={() => setMode("login")}>
-            Entrar
-          </button>
-          <button type="button" className={mode === "signup" ? "text-mf-gph" : "text-mf-text-muted"} onClick={() => setMode("signup")}>
-            Crear cuenta
-          </button>
+      <div className="mx-auto max-w-md space-y-6">
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
+            {TUTOR_PILOT_FREE ? "Piloto gratuito" : "Tutor"}
+          </p>
+          <h1 className="mt-2 text-2xl font-semibold tracking-tight text-mf-gph-ink">
+            Organiza la ficha de tu hijo
+          </h1>
+          <p className="mt-2 text-sm leading-7 text-mf-text-secondary">
+            Sube fotos, videos e historia. Arma una ficha para presentar en
+            universidades, visorías o clubes.{" "}
+            {TUTOR_PILOT_FREE ? TUTOR_PILOT_LABEL : "Incluido con la membresía anual."}
+          </p>
         </div>
-        {mode === "signup" ? (
+        <form onSubmit={(event) => void onAuth(event)} className="space-y-4 rounded-xl border border-mf-border bg-white p-5">
+          <div className="flex gap-2 text-sm font-semibold">
+            <button
+              type="button"
+              className={mode === "signup" ? "text-mf-gph" : "text-mf-text-muted"}
+              onClick={() => setMode("signup")}
+            >
+              Crear cuenta
+            </button>
+            <button
+              type="button"
+              className={mode === "login" ? "text-mf-gph" : "text-mf-text-muted"}
+              onClick={() => setMode("login")}
+            >
+              Entrar
+            </button>
+          </div>
+          {mode === "signup" ? (
+            <label className="block text-sm font-medium text-mf-text">
+              Tu nombre
+              <input
+                required
+                value={fullName}
+                onChange={(event) => setFullName(event.target.value)}
+                className={inputClass}
+              />
+            </label>
+          ) : null}
           <label className="block text-sm font-medium text-mf-text">
-            Tu nombre
-            <input required value={fullName} onChange={(event) => setFullName(event.target.value)} className={inputClass} />
+            Correo
+            <input
+              required
+              type="email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              className={inputClass}
+            />
           </label>
-        ) : null}
-        <label className="block text-sm font-medium text-mf-text">
-          Correo con el que pagaste
-          <input required type="email" value={email} onChange={(event) => setEmail(event.target.value)} className={inputClass} />
-        </label>
-        <label className="block text-sm font-medium text-mf-text">
-          WhatsApp del pago
-          <input value={phone} onChange={(event) => setPhone(event.target.value)} className={inputClass} placeholder="10 dígitos" />
-        </label>
-        <label className="block text-sm font-medium text-mf-text">
-          Contraseña
-          <input required type="password" minLength={6} value={password} onChange={(event) => setPassword(event.target.value)} className={inputClass} />
-        </label>
-        {error ? <p className="text-sm text-mf-danger">{error}</p> : null}
-        <button type="submit" disabled={busy} className="mf-btn-gph w-full justify-center">
-          {busy ? "Entrando…" : mode === "login" ? "Entrar" : "Crear cuenta de tutor"}
-        </button>
-        <p className="text-xs leading-6 text-mf-text-muted">
-          Ligamos la cuenta al correo o al WhatsApp del pago de $1,200 o de la evaluación de $2,900.
-        </p>
-      </form>
+          <label className="block text-sm font-medium text-mf-text">
+            WhatsApp
+            <input
+              value={phone}
+              onChange={(event) => setPhone(event.target.value)}
+              className={inputClass}
+              placeholder="10 dígitos"
+            />
+          </label>
+          <label className="block text-sm font-medium text-mf-text">
+            Contraseña
+            <input
+              required
+              type="password"
+              minLength={6}
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              className={inputClass}
+            />
+          </label>
+          {error ? <p className="text-sm text-mf-danger">{error}</p> : null}
+          <button type="submit" disabled={busy} className="mf-btn-gph w-full justify-center">
+            {busy ? "Entrando…" : mode === "login" ? "Entrar" : "Empezar piloto"}
+          </button>
+        </form>
+      </div>
     );
   }
+
+  const shareHref = child?.share_token ? tutorSharePath(child.share_token) : null;
 
   return (
     <div className="space-y-8">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">Tutor</p>
-          <h1 className="mt-1 text-2xl font-semibold tracking-tight text-mf-gph-ink">Tus jugadores</h1>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
+            {TUTOR_PILOT_FREE ? "Piloto gratuito" : "Tutor"}
+          </p>
+          <h1 className="mt-1 text-2xl font-semibold tracking-tight text-mf-gph-ink">
+            Ficha de tus hijos
+          </h1>
           <p className="mt-1 text-sm text-mf-text-secondary">{sessionEmail}</p>
-          <form
-            className="mt-3 flex flex-wrap gap-2"
-            onSubmit={(event) => {
-              event.preventDefault();
-              void load(phone).catch((err: unknown) => {
-                setError(err instanceof Error ? err.message : "No se vinculó el WhatsApp.");
-              });
-            }}
-          >
-            <input
-              value={phone}
-              onChange={(event) => setPhone(event.target.value)}
-              placeholder="WhatsApp del pago"
-              className="mf-input w-48"
-            />
-            <button type="submit" className="mf-btn-gph-ghost">
-              Vincular
-            </button>
-          </form>
+          {TUTOR_PILOT_FREE ? (
+            <p className="mt-1 text-xs text-mf-text-muted">{TUTOR_PILOT_LABEL}</p>
+          ) : null}
         </div>
         <button
           type="button"
@@ -259,23 +386,16 @@ export function TutorWorkspace() {
 
       {error ? <p className="text-sm text-mf-danger">{error}</p> : null}
 
-      {children.length === 0 ? (
-        <div className="rounded-xl border border-mf-border bg-white px-5 py-6">
-          <p className="text-sm leading-7 text-mf-text-secondary">
-            No hay un pago vigente con este correo o WhatsApp. La membresía de $1,200 o la
-            evaluación de $2,900 abre el año para subir material.
-          </p>
-          <Link href="/fut/pagar?sku=membership" className="mf-btn-gph mt-4">
-            Pagar membresía
-          </Link>
-        </div>
-      ) : (
+      {children.length > 0 ? (
         <div className="flex flex-wrap gap-2">
           {children.map((item) => (
             <button
               key={item.id}
               type="button"
-              onClick={() => setSelectedId(item.id)}
+              onClick={() => {
+                setSelectedId(item.id);
+                setEditing(false);
+              }}
               className={
                 item.id === child?.id
                   ? "rounded-full bg-mf-gph px-4 py-2 text-sm font-semibold text-white"
@@ -285,20 +405,190 @@ export function TutorWorkspace() {
               {item.player_name}
             </button>
           ))}
+          <button
+            type="button"
+            onClick={() => {
+              setSelectedId(null);
+              setEditing(false);
+              setForm(emptyForm);
+            }}
+            className="rounded-full border border-dashed border-mf-gph/40 px-4 py-2 text-sm font-semibold text-mf-gph"
+          >
+            + Otro hijo
+          </button>
         </div>
-      )}
+      ) : null}
 
-      {child ? (
+      {!child || editing || children.length === 0 ? (
+        <form
+          onSubmit={(event) => void saveChild(event)}
+          className="space-y-4 rounded-xl border border-mf-border bg-white p-5"
+        >
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
+              {editing ? "Editar ficha" : "Nuevo jugador"}
+            </p>
+            <p className="mt-1 text-sm text-mf-text-secondary">
+              Datos para presentar en visorías, universidades o clubes.
+            </p>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <label className="block text-sm font-medium text-mf-text sm:col-span-2">
+              Nombre completo
+              <input
+                required
+                value={form.player_name}
+                onChange={(event) => setForm((current) => ({ ...current, player_name: event.target.value }))}
+                className={inputClass}
+              />
+            </label>
+            <label className="block text-sm font-medium text-mf-text">
+              Fecha de nacimiento
+              <input
+                type="date"
+                value={form.birth_date}
+                onChange={(event) => setForm((current) => ({ ...current, birth_date: event.target.value }))}
+                className={inputClass}
+              />
+            </label>
+            <label className="block text-sm font-medium text-mf-text">
+              Posición
+              <input
+                value={form.position}
+                onChange={(event) => setForm((current) => ({ ...current, position: event.target.value }))}
+                className={inputClass}
+                placeholder="Delantero, medio…"
+              />
+            </label>
+            <label className="block text-sm font-medium text-mf-text">
+              Club o academia
+              <input
+                value={form.club}
+                onChange={(event) => setForm((current) => ({ ...current, club: event.target.value }))}
+                className={inputClass}
+              />
+            </label>
+            <label className="block text-sm font-medium text-mf-text">
+              Escuela
+              <input
+                value={form.school}
+                onChange={(event) => setForm((current) => ({ ...current, school: event.target.value }))}
+                className={inputClass}
+              />
+            </label>
+            <label className="block text-sm font-medium text-mf-text">
+              Ciudad
+              <input
+                value={form.city}
+                onChange={(event) => setForm((current) => ({ ...current, city: event.target.value }))}
+                className={inputClass}
+              />
+            </label>
+            <label className="block text-sm font-medium text-mf-text">
+              Estatura (cm)
+              <input
+                inputMode="numeric"
+                value={form.height_cm}
+                onChange={(event) => setForm((current) => ({ ...current, height_cm: event.target.value }))}
+                className={inputClass}
+              />
+            </label>
+            <label className="block text-sm font-medium text-mf-text">
+              Pie dominante
+              <select
+                value={form.dominant_foot}
+                onChange={(event) =>
+                  setForm((current) => ({
+                    ...current,
+                    dominant_foot: event.target.value as typeof form.dominant_foot,
+                  }))
+                }
+                className={inputClass}
+              >
+                <option value="">Opcional</option>
+                <option value="right">Diestro</option>
+                <option value="left">Zurdo</option>
+                <option value="both">Ambidiestro</option>
+              </select>
+            </label>
+            <label className="block text-sm font-medium text-mf-text sm:col-span-2">
+              Presentación
+              <textarea
+                value={form.bio}
+                onChange={(event) => setForm((current) => ({ ...current, bio: event.target.value }))}
+                className={`${inputClass} min-h-24`}
+                placeholder="Quién es, cómo juega, trayectoria breve…"
+              />
+            </label>
+            <label className="block text-sm font-medium text-mf-text sm:col-span-2">
+              Objetivo
+              <textarea
+                value={form.goals}
+                onChange={(event) => setForm((current) => ({ ...current, goals: event.target.value }))}
+                className={`${inputClass} min-h-20`}
+                placeholder="Universidad, visoría, club, siguiente paso…"
+              />
+            </label>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <button type="submit" disabled={busy} className="mf-btn-gph">
+              {busy ? "Guardando…" : editing ? "Guardar cambios" : "Crear ficha"}
+            </button>
+            {editing ? (
+              <button
+                type="button"
+                className="mf-btn-gph-ghost"
+                onClick={() => setEditing(false)}
+              >
+                Cancelar
+              </button>
+            ) : null}
+          </div>
+        </form>
+      ) : null}
+
+      {child && !editing ? (
         <div className="grid gap-4">
           <section className="rounded-xl border border-mf-gph/30 bg-white p-5">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
+                  Ficha presentable
+                </p>
+                <h2 className="mt-2 text-xl font-semibold text-mf-gph-ink">{child.player_name}</h2>
+                <p className="mt-1 text-sm text-mf-text-secondary">
+                  {[child.profile.position, child.profile.club, child.profile.city]
+                    .filter(Boolean)
+                    .join(" · ") || "Completa el perfil para presentarlo mejor."}
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <button type="button" className="mf-btn-gph-ghost" onClick={() => setEditing(true)}>
+                  Editar datos
+                </button>
+                {shareHref ? (
+                  <>
+                    <Link href={shareHref} target="_blank" className="mf-btn-gph-ghost">
+                      Ver ficha
+                    </Link>
+                    <button type="button" className="mf-btn-gph" onClick={() => void copyShare()}>
+                      {copied ? "Link copiado" : "Copiar link"}
+                    </button>
+                  </>
+                ) : null}
+              </div>
+            </div>
+            {child.profile.bio ? (
+              <p className="mt-4 text-sm leading-7 text-mf-text-secondary">{child.profile.bio}</p>
+            ) : null}
+          </section>
+
+          <section className="rounded-xl border border-mf-border bg-white p-5">
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
               Material del tutor
             </p>
             <p className="mt-2 text-sm text-mf-text-secondary">
-              Videos, fotos e historia que subes tú.{" "}
-              {child.active
-                ? `Membresía vigente hasta ${child.membership_until}.`
-                : "La membresía no está vigente."}
+              Fotos, videos e historia. Esto alimenta la ficha que compartes.
             </p>
             {child.active ? (
               <div className="mt-4 space-y-4">
@@ -347,33 +637,43 @@ export function TutorWorkspace() {
               </Link>
             )}
             <ul className="mt-6 space-y-4">
-              {child.materials.map((item) => (
-                <li key={item.id} className="rounded-lg bg-mf-canvas px-4 py-3">
-                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-mf-gph">
-                    {item.kind === "story" ? "Historia" : item.kind === "photo" ? "Foto" : "Video"}
-                  </p>
-                  <p className="mt-1 text-sm font-semibold text-mf-gph-ink">{item.title}</p>
-                  {item.body ? <p className="mt-1 text-sm leading-6 text-mf-text-secondary">{item.body}</p> : null}
-                  {item.kind === "photo" && item.url ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={item.url} alt="" className="mt-3 max-h-80 rounded-lg" />
-                  ) : null}
-                  {item.kind === "video" && item.url ? (
-                    <video src={item.url} controls playsInline className="mt-3 max-h-80 w-full rounded-lg bg-black" />
-                  ) : null}
-                </li>
-              ))}
+              {child.materials.length === 0 ? (
+                <li className="text-sm text-mf-text-muted">Aún no hay material.</li>
+              ) : (
+                child.materials.map((item) => (
+                  <li key={item.id} className="rounded-lg bg-mf-canvas px-4 py-3">
+                    <p className="text-xs font-semibold uppercase tracking-[0.12em] text-mf-gph">
+                      {item.kind === "story" ? "Historia" : item.kind === "photo" ? "Foto" : "Video"}
+                    </p>
+                    <p className="mt-1 text-sm font-semibold text-mf-gph-ink">{item.title}</p>
+                    {item.body ? (
+                      <p className="mt-1 text-sm leading-6 text-mf-text-secondary">{item.body}</p>
+                    ) : null}
+                    {item.kind === "photo" && item.url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={item.url} alt="" className="mt-3 max-h-80 rounded-lg" />
+                    ) : null}
+                    {item.kind === "video" && item.url ? (
+                      <video
+                        src={item.url}
+                        controls
+                        playsInline
+                        className="mt-3 max-h-80 w-full rounded-lg bg-black"
+                      />
+                    ) : null}
+                  </li>
+                ))
+              )}
             </ul>
           </section>
 
           <section className="rounded-xl border border-mf-border bg-mf-canvas p-5">
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-brand">
-              MiFicha
+              MiFicha · torneo
             </p>
-            <h2 className="mt-2 text-lg font-semibold text-mf-text">{child.player_name}</h2>
             <p className="mt-2 text-sm leading-6 text-mf-text-secondary">
-              Identidad, partidos y stats los arma la plataforma. Esta sección es de solo
-              lectura. Cuando el jugador esté en un torneo, el historial aparece aquí.
+              Partidos y stats oficiales llegarán aquí cuando la ficha del torneo esté
+              abierta. Mientras tanto, esta ficha del tutor ya sirve para presentar.
             </p>
           </section>
 
@@ -381,10 +681,12 @@ export function TutorWorkspace() {
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
               GPH
             </p>
-            <h2 className="mt-2 text-lg font-semibold text-mf-gph-ink">Diagnóstico</h2>
             <p className="mt-2 text-sm leading-6 text-mf-text-secondary">
-              Lo escribe el evaluador de GPH. Tú lo consultas. No se edita desde la cuenta
-              del tutor. Si aún no hay sesión, esta sección queda vacía.
+              El diagnóstico lo escribe el evaluador. Si quieres una sesión,{" "}
+              <Link href="/fut/evaluaciones" className="font-semibold text-mf-gph hover:underline">
+                agenda por WhatsApp
+              </Link>
+              .
             </p>
           </section>
         </div>

@@ -55,6 +55,9 @@ export function SiteFooter() {
           <Link href="/fut/explorar" className="transition hover:text-mf-text">
             Explorar
           </Link>
+          <Link href="/fut/tutor" className="transition hover:text-mf-text">
+            Tutor
+          </Link>
           <Link href="/fut/padres" className="transition hover:text-mf-text">
             Padres
           </Link>

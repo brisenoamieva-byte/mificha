@@ -12,19 +12,19 @@ export function HomeHero() {
       description={
         <>
           <WithBrandName>
-            La ficha del torneo aún no está abierta. Lo que sí puedes contratar ya es el
-            diagnóstico GPH: sesión, lectura y seguimiento.
+            Piloto abierto para tutores: arma la ficha de tu hijo con fotos, videos e
+            historia. El diagnóstico GPH también se puede agendar ya.
           </WithBrandName>
         </>
       }
       actions={
         <>
-          <Link href="#diagnosticos-gph" className="mf-btn-gph">
-            Contratar diagnóstico GPH
+          <Link href="/fut/tutor" className="mf-btn-gph">
+            Entrar como tutor
             <ArrowRight className="h-4 w-4" />
           </Link>
-          <Link href="#como-funciona" className="mf-btn-accent">
-            Cómo va a funcionar la ficha
+          <Link href="#diagnosticos-gph" className="mf-btn-accent">
+            Diagnóstico GPH
           </Link>
         </>
       }

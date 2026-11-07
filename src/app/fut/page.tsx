@@ -21,8 +21,11 @@ export default async function Home() {
       <SiteHeader />
       <div className="border-b border-mf-brand/15 bg-mf-brand-soft px-4 py-3 text-center text-sm text-mf-brand-dark sm:px-6">
         <p>
-          <span className="font-semibold">Ficha del jugador: próximamente.</span> Esa parte
-          de MiFicha sigue en construcción.
+          <span className="font-semibold">Piloto abierto.</span> Los tutores ya pueden
+          armar la ficha de su hijo (fotos, videos e historia) sin cobro.{" "}
+          <a href="/fut/tutor" className="font-semibold underline underline-offset-2">
+            Entrar como tutor
+          </a>
         </p>
         <p className="mt-1">
           <span className="font-semibold text-mf-gph">Diagnósticos GPH: ya disponibles.</span>{" "}
