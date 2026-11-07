@@ -7,24 +7,24 @@ import { WithBrandName } from "@/components/ui/brand-wordmark";
 export function HomeHero() {
   return (
     <MarketingPageHero
-      eyebrow="Torneos interescolares · Querétaro"
+      eyebrow="Torneos interescolares · Querétaro · en desarrollo"
       title="La ficha de cada jugador, sincronizada con el torneo"
       description={
         <>
           <WithBrandName>
-            Stats oficiales del torneo en la ficha de cada jugador. Gratis para academias;
-            el tutor recibe su link tras cada jornada.
+            La ficha del torneo aún no está abierta. Lo que sí puedes contratar ya es el
+            diagnóstico GPH: sesión, lectura y seguimiento.
           </WithBrandName>
         </>
       }
       actions={
         <>
-          <Link href="/fut/signup" className="mf-btn-primary">
-            Registrar academia
+          <Link href="#diagnosticos-gph" className="mf-btn-gph">
+            Contratar diagnóstico GPH
             <ArrowRight className="h-4 w-4" />
           </Link>
           <Link href="#como-funciona" className="mf-btn-accent">
-            Ver cómo funciona
+            Cómo va a funcionar la ficha
           </Link>
         </>
       }

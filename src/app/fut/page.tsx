@@ -19,10 +19,19 @@ export default async function Home() {
   return (
     <div className="flex min-h-dvh flex-col bg-mf-canvas">
       <SiteHeader />
-      <p className="border-b border-mf-brand/15 bg-mf-brand-soft px-4 py-2.5 text-center text-sm text-mf-brand-dark">
-        <span className="font-semibold">Próximamente.</span> MiFicha está en construcción.
-        Lo que ves es el avance del producto, todavía no la versión abierta.
-      </p>
+      <div className="border-b border-mf-brand/15 bg-mf-brand-soft px-4 py-3 text-center text-sm text-mf-brand-dark sm:px-6">
+        <p>
+          <span className="font-semibold">Ficha del jugador: próximamente.</span> Esa parte
+          de MiFicha sigue en construcción.
+        </p>
+        <p className="mt-1">
+          <span className="font-semibold text-mf-gph">Diagnósticos GPH: ya disponibles.</span>{" "}
+          Se agendan por WhatsApp.{" "}
+          <a href="#diagnosticos-gph" className="font-semibold underline underline-offset-2">
+            Ver cómo contratar
+          </a>
+        </p>
+      </div>
 
       <main className="flex-1">
         <HomeHero />

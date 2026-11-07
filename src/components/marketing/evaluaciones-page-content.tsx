@@ -4,7 +4,11 @@ import { MarketingPageHero } from "@/components/marketing/marketing-page-hero";
 import { AllianceLockup, GphLogo } from "@/components/ui/gph-logo";
 import { BrandWordmark, WithBrandName } from "@/components/ui/brand-wordmark";
 import { CURRENT_SEASON_LABEL } from "@/lib/marketing-season";
-import { GPH_ALLIANCE, diagnosisWhatsAppHref } from "@/lib/gph-alliance";
+import {
+  GPH_ALLIANCE,
+  GPH_WHATSAPP_DISPLAY,
+  diagnosisWhatsAppHref,
+} from "@/lib/gph-alliance";
 import { DIAGNOSIS_PRODUCT } from "@/lib/pricing";
 import { cn } from "@/lib/utils";
 
@@ -52,11 +56,11 @@ export function EvaluacionesPageContent() {
               target="_blank"
               rel="noopener noreferrer"
             >
-              Contratar evaluación
+              Agendar por WhatsApp
               <ArrowRight className="h-4 w-4" />
             </a>
-            <Link href="/fut/d/demo" className="mf-btn-gph-ghost">
-              Ver ficha de ejemplo
+            <Link href="#precios" className="mf-btn-gph-ghost">
+              Ver precio
             </Link>
           </>
         }
@@ -77,16 +81,48 @@ export function EvaluacionesPageContent() {
         }
       />
 
+      <section
+        id="agendar"
+        className="scroll-mt-24 border-b border-mf-border bg-mf-gph-soft"
+      >
+        <div className="mx-auto flex max-w-6xl flex-col gap-5 px-4 py-10 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-12">
+          <div className="max-w-xl">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
+              Agendar diagnóstico
+            </p>
+            <h2 className="mt-2 text-2xl font-semibold tracking-[-0.02em] text-mf-gph-ink">
+              Pide información por WhatsApp
+            </h2>
+            <p className="mt-2 text-sm leading-7 text-mf-text-secondary">
+              Escribe para fecha, sede y si es un jugador o un grupo. Número:{" "}
+              <span className="font-semibold tabular-nums text-mf-gph-ink">
+                {GPH_WHATSAPP_DISPLAY}
+              </span>
+              .
+            </p>
+          </div>
+          <a
+            href={whatsapp}
+            className="mf-btn-gph shrink-0 self-start sm:self-center"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <MessageCircle className="h-4 w-4" />
+            WhatsApp {GPH_WHATSAPP_DISPLAY}
+          </a>
+        </div>
+      </section>
+
       <section className="border-b border-mf-border bg-mf-canvas">
         <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
           <div className="max-w-2xl">
             <p className="mf-marketing-eyebrow">Cómo funciona</p>
             <h2 className="mt-3 text-2xl font-semibold tracking-[-0.02em] text-mf-text">
-              Independiente del calendario del torneo
+              Independiente de la ficha del torneo
             </h2>
             <p className="mt-2 text-sm leading-7 text-mf-text-secondary">
-              La ficha de partido sigue saliendo con el acta. Esta evaluación es otro
-              servicio: se pide, se paga y se consulta por su cuenta.
+              La plataforma de fichas de partido aún está en desarrollo. El diagnóstico
+              GPH ya se contrata: se agenda por WhatsApp, se paga y se consulta aparte.
             </p>
           </div>
           <ol className="mt-8 grid gap-3 sm:grid-cols-3 sm:gap-4">
@@ -147,19 +183,31 @@ export function EvaluacionesPageContent() {
           <p className="mt-4 text-xs text-mf-text-muted">{DIAGNOSIS_PRODUCT.footnote}</p>
           <div className="mt-8">
             <div className="flex flex-wrap gap-3">
-              <Link href="/fut/pagar?sku=diagnosis" className="mf-btn-gph">
-                Pagar evaluación
-                <ArrowRight className="h-4 w-4" />
-              </Link>
               <a
                 href={whatsapp}
-                className="mf-btn-gph-ghost"
+                className="mf-btn-gph"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                Cotizar grupo
+                <MessageCircle className="h-4 w-4" />
+                Agendar por WhatsApp
               </a>
+              <Link href="/fut/pagar?sku=diagnosis" className="mf-btn-gph-ghost">
+                Pagar evaluación
+              </Link>
             </div>
+            <p className="mt-3 text-sm text-mf-text-secondary">
+              Para cotizar un grupo o confirmar fecha: WhatsApp{" "}
+              <a
+                href={whatsapp}
+                className="font-semibold text-mf-gph hover:underline"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {GPH_WHATSAPP_DISPLAY}
+              </a>
+              .
+            </p>
           </div>
         </div>
       </section>
@@ -167,22 +215,42 @@ export function EvaluacionesPageContent() {
   );
 }
 
-/** Banda corta en home: evaluación GPH sin mezclarla con el flujo del torneo. */
+/** Banda en home: diagnósticos GPH ya contratables; ficha de torneo aparte. */
 export function HomeGphAllianceBand() {
+  const whatsapp = diagnosisWhatsAppHref();
+
   return (
-    <section className="border-t border-mf-border bg-mf-gph-ink">
-      <div className="mx-auto flex max-w-6xl flex-col gap-5 px-4 py-8 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-        <div className="min-w-0">
-          <div className="inline-block rounded-md bg-white px-2 py-1.5">
-            <AllianceLockup size="md" />
-          </div>
-          <p className="mt-3 max-w-xl text-sm leading-6 text-white/75">
-            {GPH_ALLIANCE.headline}.
-          </p>
+    <section id="diagnosticos-gph" className="scroll-mt-24 border-t border-mf-border bg-mf-gph-ink">
+      <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-12">
+        <div className="inline-block rounded-md bg-white px-2 py-1.5">
+          <AllianceLockup size="md" />
         </div>
-        <div className="flex flex-wrap gap-3">
-          <Link href="/fut/evaluaciones" className="mf-btn-gph">
-            Evaluaciones
+        <p className="mt-4 text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph-hot">
+          Disponible ahora
+        </p>
+        <h2 className="mt-2 max-w-2xl text-2xl font-semibold tracking-[-0.02em] text-white sm:text-3xl">
+          Diagnósticos GPH. Ya se pueden contratar.
+        </h2>
+        <p className="mt-3 max-w-2xl text-sm leading-7 text-white/75 sm:text-base">
+          Mientras la ficha del torneo sigue en desarrollo, el diagnóstico presencial
+          ya está abierto: {DIAGNOSIS_PRODUCT.publicPriceLabel}, incluye 12 meses de
+          MiFicha. Agenda por WhatsApp.
+        </p>
+        <div className="mt-6 flex flex-wrap items-center gap-3">
+          <a
+            href={whatsapp}
+            className="mf-btn-gph"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <MessageCircle className="h-4 w-4" />
+            WhatsApp {GPH_WHATSAPP_DISPLAY}
+          </a>
+          <Link
+            href="/fut/evaluaciones"
+            className="inline-flex items-center justify-center gap-2 rounded-full border border-white/25 px-5 py-2.5 text-sm font-semibold text-white hover:bg-white/10"
+          >
+            Ver detalle
             <ArrowRight className="h-4 w-4" />
           </Link>
           <Link
@@ -198,6 +266,8 @@ export function HomeGphAllianceBand() {
 }
 
 export function PadresGphSection() {
+  const whatsapp = diagnosisWhatsAppHref();
+
   return (
     <section className="border-t border-mf-border bg-mf-surface">
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:py-14">
@@ -205,11 +275,11 @@ export function PadresGphSection() {
           <div className="max-w-xl">
             <p className="mf-marketing-eyebrow">{GPH_ALLIANCE.shortLabel}</p>
             <h2 className="mt-2 text-xl font-semibold text-mf-text">
-              También puedes contratar un diagnóstico
+              Diagnóstico GPH: ya se puede agendar
             </h2>
             <p className="mt-2 text-sm leading-7 text-mf-text-secondary">
-              La evaluación GPH y el seguimiento de partido quedan en la misma
-              ficha de <BrandWordmark className="text-sm" />.
+              Pide información por WhatsApp ({GPH_WHATSAPP_DISPLAY}). La evaluación
+              queda en la ficha de <BrandWordmark className="text-sm" />.
             </p>
             <div className="mt-4 flex items-center gap-3">
               <GphLogo size="sm" />
@@ -218,10 +288,20 @@ export function PadresGphSection() {
               </span>
             </div>
           </div>
-          <Link href="/fut/evaluaciones" className="mf-btn-gph shrink-0 self-start sm:self-center">
-            Cómo contratar
-            <ArrowRight className="h-4 w-4" />
-          </Link>
+          <div className="flex shrink-0 flex-wrap gap-3 self-start sm:self-center">
+            <a
+              href={whatsapp}
+              className="mf-btn-gph"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <MessageCircle className="h-4 w-4" />
+              WhatsApp
+            </a>
+            <Link href="/fut/evaluaciones" className="mf-btn-gph-ghost">
+              Ver detalle
+            </Link>
+          </div>
         </div>
       </div>
     </section>
