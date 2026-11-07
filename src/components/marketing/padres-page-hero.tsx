@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowDown, BarChart3, ClipboardList, MessageCircle, Printer } from "lucide-react";
+import { BarChart3, ClipboardList, MessageCircle, Printer } from "lucide-react";
 import { HomeFichaPreview } from "@/components/marketing/home-ficha-preview";
 import { CURRENT_SEASON_LABEL } from "@/lib/marketing-season";
 import { WithBrandName } from "@/components/ui/brand-wordmark";
@@ -46,14 +46,10 @@ export function PadresPageHero() {
 
             <div className="mt-8 flex flex-wrap gap-3">
               <Link href="/fut/tutor" className="mf-btn-gph">
-                Entrar como tutor
+                Crear cuenta de tutor
               </Link>
-              <Link
-                href="#abrir-ficha"
-                className="inline-flex items-center gap-2 text-sm font-semibold text-mf-brand transition hover:text-mf-brand-dark"
-              >
-                Abrir ficha con tu link
-                <ArrowDown className="h-4 w-4" aria-hidden />
+              <Link href="/fut/evaluaciones" className="mf-btn-gph-ghost">
+                Diagnóstico GPH
               </Link>
             </div>
           </div>

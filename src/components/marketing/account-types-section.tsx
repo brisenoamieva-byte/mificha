@@ -9,7 +9,7 @@ const ACCOUNTS = [
     canDo: [
       "Dar de alta a tu hijo y armar su ficha (fotos, videos, historia)",
       "Compartir un link presentable para visorías o universidades",
-      "Ligar al hijo con su academia si ya está en un plantel",
+      "Ligar al hijo con su academia y ver stats de torneo cuando existan",
     ],
     href: "/fut/tutor",
     cta: "Entrar como tutor",
@@ -26,18 +26,6 @@ const ACCOUNTS = [
     ],
     href: "/fut/signup",
     cta: "Registrar academia",
-    primary: false,
-  },
-  {
-    id: "link",
-    title: "Solo con un link",
-    forWho: "Padres con ficha de torneo",
-    status: "Sin cuenta",
-    canDo: [
-      "Abrir la ficha post-partido cuando la academia envía el enlace",
-    ],
-    href: "/fut/padres#abrir-ficha",
-    cta: "Abrir con link",
     primary: false,
   },
 ] as const;

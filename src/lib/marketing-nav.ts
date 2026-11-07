@@ -39,7 +39,7 @@ export const MARKETING_NAV: NavSection[] = [
       {
         href: "/fut/padres",
         label: "Padres",
-        description: "Piloto tutor gratis · stats de torneo después",
+        description: "Cuenta de tutor para la ficha de tu hijo",
       },
       {
         href: "/fut/evaluaciones",

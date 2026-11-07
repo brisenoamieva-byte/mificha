@@ -6,13 +6,12 @@ import { PadresAcademyExample } from "@/components/marketing/padres-academy-exam
 import { PadresBenefitsSection } from "@/components/marketing/padres-benefits-section";
 import { PadresGphSection } from "@/components/marketing/evaluaciones-page-content";
 import { PadresPageHero } from "@/components/marketing/padres-page-hero";
-import { ParentLinkForm } from "@/components/marketing/parent-link-form";
 import { SiteFooter, SiteHeader } from "@/components/marketing/site-header";
 
 export const metadata: Metadata = {
   title: "Padres y jugadores | MiFicha",
   description:
-    "Piloto: arma la ficha del tutor gratis. Después, stats de torneo e informe GPH en el mismo expediente.",
+    "Crea tu cuenta de tutor: arma la ficha de tu hijo y sigue su desarrollo en un solo lugar.",
 };
 
 export default function PadresPage() {
@@ -26,21 +25,21 @@ export default function PadresPage() {
         <PadresBenefitsSection />
         <PadresGphSection />
 
-        <section
-          id="abrir-ficha"
-          className="scroll-mt-20 mx-auto max-w-3xl px-4 py-14 sm:px-6 lg:py-16"
-        >
-          <div className="mb-8 max-w-2xl">
-            <p className="mf-marketing-eyebrow">Acceso directo</p>
-            <h2 className="mt-3 text-2xl font-semibold tracking-[-0.02em] text-mf-text">
-              Abre la ficha con tu link
+        <section className="scroll-mt-20 border-t border-mf-border bg-white">
+          <div className="mx-auto flex max-w-3xl flex-col gap-4 px-4 py-14 sm:px-6 lg:py-16">
+            <p className="mf-marketing-eyebrow">Familias</p>
+            <h2 className="text-2xl font-semibold tracking-[-0.02em] text-mf-text">
+              Empieza con tu cuenta de tutor
             </h2>
-            <p className="mt-3 text-sm leading-7 text-mf-text-secondary">
-              Pega la URL que te envió la academia o escribe el identificador al final del
-              enlace.
+            <p className="text-sm leading-7 text-mf-text-secondary">
+              Ahí armas la ficha, subes material y, cuando haya torneo, verás las stats en el
+              mismo lugar.
             </p>
+            <Link href="/fut/tutor" className="mf-btn-gph self-start">
+              Crear cuenta de tutor
+              <ArrowRight className="h-4 w-4" />
+            </Link>
           </div>
-          <ParentLinkForm />
         </section>
 
         <PadresAcademyExample />

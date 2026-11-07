@@ -16,9 +16,9 @@ const TYPES = [
     title: "Ficha de torneo",
     status: "En desarrollo",
     detail:
-      "Stats oficiales después del partido (goles, minutos, evaluación del entrenador). Llega con un link.",
-    href: "/fut/padres#abrir-ficha",
-    cta: "Abrir con link",
+      "Stats oficiales después del partido. Se verán en tu cuenta de tutor cuando la academia publique la jornada.",
+    href: "/fut/tutor",
+    cta: "Crear cuenta de tutor",
     live: false,
   },
   {
