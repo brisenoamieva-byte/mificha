@@ -5,8 +5,14 @@ function parseList(raw: string): string[] {
     .filter(Boolean);
 }
 
-/** Evaluador GPH (Gustavo) si aún no está en gph_evaluators. */
-const GPH_EVALUATOR_FALLBACK = ["gkperformancehub@gmail.com"];
+/**
+ * Evaluadores / super-admins GPH si aún no están en gph_evaluators.
+ * Incluye a Ricardo (plataforma) y Gustavo (metodología).
+ */
+const GPH_EVALUATOR_FALLBACK = [
+  "gkperformancehub@gmail.com",
+  "brisenoamieva@gmail.com",
+];
 
 /** Correos extra de evaluadores GPH (comma-separated). La fuente de verdad es gph_evaluators. */
 export function getGphEvaluatorEmailsFromEnv(): string[] {

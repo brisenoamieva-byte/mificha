@@ -21,6 +21,8 @@ import { supabase } from "@/lib/supabase";
 import type { Player } from "@/types/database";
 import { cn } from "@/lib/utils";
 
+const ALL_ACADEMIES = "";
+
 const TONE_PILL: Record<ReturnType<typeof scoreTone>, string> = {
   danger: "bg-mf-danger-soft text-mf-danger",
   warning: "bg-mf-warning-soft text-mf-warning",
@@ -28,17 +30,25 @@ const TONE_PILL: Record<ReturnType<typeof scoreTone>, string> = {
   neutral: "bg-mf-canvas text-mf-text-muted",
 };
 
+type EnrichedDiagnosis = PlayerDiagnosisRecord & {
+  player_first_name?: string;
+  player_last_name?: string;
+  player_photo_url?: string | null;
+  academy_name?: string;
+};
+
 export function DiagnosisList() {
   const { academy, isGphEvaluator } = useDashboard();
   const [loading, setLoading] = useState(true);
   const [players, setPlayers] = useState<Player[]>([]);
-  const [diagnoses, setDiagnoses] = useState<PlayerDiagnosisRecord[]>([]);
+  const [diagnoses, setDiagnoses] = useState<EnrichedDiagnosis[]>([]);
   const [academies, setAcademies] = useState<Array<{ id: string; name: string }>>([]);
-  const [academyId, setAcademyId] = useState(academy?.id ?? "");
+  /** Vacío = todas las academias (solo evaluador GPH / super admin). */
+  const [academyId, setAcademyId] = useState(isGphEvaluator ? ALL_ACADEMIES : academy?.id ?? "");
 
   useEffect(() => {
-    if (academy?.id && !academyId) setAcademyId(academy.id);
-  }, [academy?.id, academyId]);
+    if (!isGphEvaluator && academy?.id && !academyId) setAcademyId(academy.id);
+  }, [academy?.id, academyId, isGphEvaluator]);
 
   const load = useCallback(async () => {
     if (!academy && !isGphEvaluator) return;
@@ -48,8 +58,15 @@ export function DiagnosisList() {
         const roster = await diagnosisAuthedFetch("/fut/api/diagnoses/academies");
         const list = (roster.academies as Array<{ id: string; name: string }>) ?? [];
         setAcademies(list);
-        const selected = academyId || academy?.id || list[0]?.id || "";
-        if (selected && selected !== academyId) setAcademyId(selected);
+
+        if (academyId === ALL_ACADEMIES) {
+          const diagnosesPayload = await diagnosisAuthedFetch("/fut/api/diagnoses");
+          setPlayers([]);
+          setDiagnoses((diagnosesPayload.diagnoses as EnrichedDiagnosis[]) ?? []);
+          return;
+        }
+
+        const selected = academyId;
         if (!selected) {
           setPlayers([]);
           setDiagnoses([]);
@@ -64,7 +81,7 @@ export function DiagnosisList() {
           ),
         ]);
         setPlayers((playersPayload.players as Player[]) ?? []);
-        setDiagnoses((diagnosesPayload.diagnoses as PlayerDiagnosisRecord[]) ?? []);
+        setDiagnoses((diagnosesPayload.diagnoses as EnrichedDiagnosis[]) ?? []);
         return;
       }
 
@@ -80,7 +97,7 @@ export function DiagnosisList() {
         ),
       ]);
       setPlayers(data ?? []);
-      setDiagnoses((payload.diagnoses as PlayerDiagnosisRecord[]) ?? []);
+      setDiagnoses((payload.diagnoses as EnrichedDiagnosis[]) ?? []);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "No se cargó el listado.");
     } finally {
@@ -93,7 +110,7 @@ export function DiagnosisList() {
   }, [load]);
 
   const byPlayer = useMemo(() => {
-    const map = new Map<string, PlayerDiagnosisRecord[]>();
+    const map = new Map<string, EnrichedDiagnosis[]>();
     for (const row of diagnoses) {
       const list = map.get(row.player_id) ?? [];
       list.push(row);
@@ -101,6 +118,8 @@ export function DiagnosisList() {
     }
     return map;
   }, [diagnoses]);
+
+  const showGlobalList = isGphEvaluator && academyId === ALL_ACADEMIES;
 
   if (!academy && !isGphEvaluator) return <NoAcademyState />;
 
@@ -121,9 +140,11 @@ export function DiagnosisList() {
             {isGphEvaluator ? "Diagnósticos GPH" : "Diagnósticos"}
           </h1>
           <p className="mt-1 text-sm text-mf-text-secondary">
-            Metodología GPH en cancha. Dato crudo, escala 1–5 y ficha de seguimiento.
+            {showGlobalList
+              ? "Todos los diagnósticos reales de la plataforma, de más reciente a más antiguo."
+              : "Metodología GPH en cancha. Dato crudo, escala 1–5 y ficha de seguimiento."}
           </p>
-          {isGphEvaluator && academies.length > 0 ? (
+          {isGphEvaluator ? (
             <label className="mt-3 block max-w-sm text-xs font-medium text-mf-text-secondary">
               Academia
               <select
@@ -131,6 +152,7 @@ export function DiagnosisList() {
                 onChange={(event) => setAcademyId(event.target.value)}
                 className="mf-input mt-1 text-sm"
               >
+                <option value={ALL_ACADEMIES}>Todas las academias</option>
                 {academies.map((item) => (
                   <option key={item.id} value={item.id}>
                     {item.name}
@@ -159,7 +181,110 @@ export function DiagnosisList() {
         </Link>
       </div>
 
-      {players.length === 0 ? (
+      {showGlobalList ? (
+        diagnoses.length === 0 ? (
+          <div className="rounded-2xl border border-mf-border bg-white px-6 py-16 text-center">
+            <ClipboardList className="mx-auto h-10 w-10 text-mf-text-muted" />
+            <p className="mt-3 font-semibold text-mf-text">Sin diagnósticos aún</p>
+            <p className="mt-1 text-sm text-mf-text-secondary">
+              Cuando se guarde una evaluación real, aparecerá aquí.
+            </p>
+          </div>
+        ) : (
+          <div className="overflow-hidden rounded-2xl border border-mf-border bg-white">
+            <div className="border-b border-mf-border-subtle px-4 py-3 text-xs text-mf-text-muted sm:px-5">
+              {diagnoses.length} diagnóstico{diagnoses.length === 1 ? "" : "s"} en total
+            </div>
+            <table className="min-w-full text-left text-sm">
+              <thead>
+                <tr className="border-b border-mf-border-subtle text-mf-text-muted">
+                  <th className="px-4 py-3 font-medium sm:px-5">Jugador</th>
+                  <th className="px-4 py-3 font-medium">Academia</th>
+                  <th className="px-4 py-3 font-medium">Evaluación</th>
+                  <th className="px-4 py-3 font-medium">Global</th>
+                  <th className="px-4 py-3 font-medium">Etapa</th>
+                  <th className="px-4 py-3 font-medium" />
+                </tr>
+              </thead>
+              <tbody>
+                {diagnoses.map((row) => {
+                  const stage = row.assigned_stage ?? row.computed_stage ?? null;
+                  const tone = scoreTone(row.global_score ?? null);
+                  return (
+                    <tr key={row.id} className="border-b border-mf-border-subtle last:border-0">
+                      <td className="px-4 py-3 sm:px-5">
+                        <div className="flex items-center gap-3">
+                          <PlayerAvatar
+                            firstName={row.player_first_name ?? "Jugador"}
+                            lastName={row.player_last_name ?? ""}
+                            photoUrl={row.player_photo_url ?? null}
+                          />
+                          <div>
+                            <p className="font-medium text-mf-text">
+                              {row.player_first_name} {row.player_last_name}
+                            </p>
+                            <p className="text-xs text-mf-text-muted">{row.evaluator_name}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-mf-text-secondary">
+                        {row.academy_name ?? "—"}
+                      </td>
+                      <td className="px-4 py-3 text-mf-text-secondary">
+                        <span className="inline-flex flex-wrap items-center gap-1.5">
+                          <span>
+                            {DIAGNOSIS_KIND_LABELS[row.kind]} ·{" "}
+                            {formatDiagnosisDate(row.evaluated_at)}
+                          </span>
+                          {isFieldSessionDraft(row.field_session) ? (
+                            <span className="rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-800">
+                              Borrador
+                            </span>
+                          ) : null}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3">
+                        {row.global_score != null ? (
+                          <span
+                            className={cn(
+                              "inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold tabular-nums",
+                              TONE_PILL[tone],
+                            )}
+                          >
+                            {row.global_score.toFixed(1)}
+                          </span>
+                        ) : (
+                          "—"
+                        )}
+                      </td>
+                      <td className="px-4 py-3 text-mf-text-secondary">
+                        {stage ? DIAGNOSIS_STAGE_LABELS[stage] : "—"}
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        {isFieldSessionDraft(row.field_session) ? (
+                          <Link
+                            href={`/fut/dashboard/diagnostico/${row.id}/editar`}
+                            className="text-xs font-semibold text-mf-brand hover:underline"
+                          >
+                            Continuar
+                          </Link>
+                        ) : (
+                          <Link
+                            href={`/fut/dashboard/diagnostico/${row.id}`}
+                            className="text-xs font-semibold text-mf-brand hover:underline"
+                          >
+                            Ver ficha
+                          </Link>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )
+      ) : players.length === 0 ? (
         <div className="rounded-2xl border border-mf-border bg-white px-6 py-16 text-center">
           <ClipboardList className="mx-auto h-10 w-10 text-mf-text-muted" />
           <p className="mt-3 font-semibold text-mf-text">Sin plantel</p>

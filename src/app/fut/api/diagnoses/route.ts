@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import {
   createPlayerDiagnosis,
   listAcademyDiagnoses,
-  listAllDiagnoses,
+  listAllDiagnosesDetailed,
   requireDiagnosisAccess,
 } from "@/lib/player-diagnosis-server";
 import { isGphEvaluatorUser } from "@/lib/gph-partner-server";
@@ -29,13 +29,13 @@ export async function GET(request: Request) {
       if (!(await isGphEvaluatorUser(admin, user.id, user.email))) {
         return NextResponse.json({ error: "academy_id es obligatorio." }, { status: 400 });
       }
-      const diagnoses = await listAllDiagnoses(admin);
-      return NextResponse.json({ diagnoses });
+      const diagnoses = await listAllDiagnosesDetailed(admin);
+      return NextResponse.json({ diagnoses, scope: "all" });
     }
 
     await requireDiagnosisAccess(supabase, user, academyId);
     const diagnoses = await listAcademyDiagnoses(admin, academyId, playerId);
-    return NextResponse.json({ diagnoses });
+    return NextResponse.json({ diagnoses, scope: "academy" });
   } catch (error) {
     const message = error instanceof Error ? error.message : "No se pudieron cargar.";
     const status = message === "No autorizado." ? 403 : 400;

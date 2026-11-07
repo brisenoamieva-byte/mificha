@@ -390,9 +390,58 @@ export async function listAllDiagnoses(admin: SupabaseClient, academyId?: string
     .select("*")
     .order("evaluated_at", { ascending: false })
     .order("created_at", { ascending: false })
-    .limit(200);
+    .limit(500);
   if (error) throw new Error(error.message);
   return (data ?? []).map((row) => mapDiagnosisRow(row as Record<string, unknown>));
+}
+
+export type DiagnosisListItem = PlayerDiagnosisRecord & {
+  player_first_name: string;
+  player_last_name: string;
+  player_photo_url: string | null;
+  academy_name: string;
+};
+
+/** Listado global enriquecido (evaluador / super admin GPH). */
+export async function listAllDiagnosesDetailed(admin: SupabaseClient) {
+  const diagnoses = await listAllDiagnoses(admin);
+  if (diagnoses.length === 0) return [] as DiagnosisListItem[];
+
+  const playerIds = [...new Set(diagnoses.map((row) => row.player_id))];
+  const academyIds = [...new Set(diagnoses.map((row) => row.academy_id))];
+
+  const [{ data: players }, { data: academies }] = await Promise.all([
+    admin
+      .from("players")
+      .select("id, first_name, last_name, photo_url")
+      .in("id", playerIds),
+    admin.from("academies").select("id, name").in("id", academyIds),
+  ]);
+
+  const playerMap = new Map(
+    (players ?? []).map((row) => [
+      String(row.id),
+      {
+        first_name: String(row.first_name ?? ""),
+        last_name: String(row.last_name ?? ""),
+        photo_url: row.photo_url ? String(row.photo_url) : null,
+      },
+    ]),
+  );
+  const academyMap = new Map(
+    (academies ?? []).map((row) => [String(row.id), String(row.name ?? "Academia")]),
+  );
+
+  return diagnoses.map((row) => {
+    const player = playerMap.get(row.player_id);
+    return {
+      ...row,
+      player_first_name: player?.first_name || "Jugador",
+      player_last_name: player?.last_name || "",
+      player_photo_url: player?.photo_url ?? null,
+      academy_name: academyMap.get(row.academy_id) || "Academia",
+    };
+  });
 }
 
 export async function getDiagnosisForAcademy(
