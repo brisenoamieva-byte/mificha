@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { signIn, signUp } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import {
@@ -12,6 +12,8 @@ import {
   tutorSharePath,
   type TutorMaterialKind,
 } from "@/lib/tutor-family";
+
+const PHONE_STORAGE_KEY = "mificha.tutor.phone";
 
 interface MaterialItem {
   id: string;
@@ -99,16 +101,29 @@ export function TutorWorkspace() {
   const [form, setForm] = useState(emptyForm);
   const [editing, setEditing] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [notice, setNotice] = useState<string | null>(null);
+  const childPanelRef = useRef<HTMLDivElement | null>(null);
 
-  const load = useCallback(async (whatsapp: string) => {
+  const load = useCallback(async (whatsapp: string, preferId?: string | null) => {
     const query = whatsapp ? `?phone=${encodeURIComponent(whatsapp)}` : "";
     const payload = await authed(`/fut/api/tutor/home${query}`);
     const rows = payload.children ?? [];
     setChildren(rows);
     setSelectedId((current) => {
+      if (preferId && rows.some((row) => row.id === preferId)) return preferId;
       if (current && rows.some((row) => row.id === current)) return current;
       return rows[0]?.id ?? null;
     });
+    return rows;
+  }, []);
+
+  useEffect(() => {
+    try {
+      const saved = window.localStorage.getItem(PHONE_STORAGE_KEY);
+      if (saved) setPhone(saved);
+    } catch {
+      /* ignore */
+    }
   }, []);
 
   useEffect(() => {
@@ -119,7 +134,11 @@ export function TutorWorkspace() {
       setSessionEmail(current);
       setLoading(false);
       if (current) {
-        void load("").catch((err: unknown) => {
+        const savedPhone =
+          typeof window !== "undefined"
+            ? window.localStorage.getItem(PHONE_STORAGE_KEY) ?? ""
+            : "";
+        void load(savedPhone || phone).catch((err: unknown) => {
           setError(err instanceof Error ? err.message : "No se cargó la ficha.");
         });
       }
@@ -161,6 +180,13 @@ export function TutorWorkspace() {
       } else {
         await signIn(email.trim().toLowerCase(), password);
       }
+      if (phone) {
+        try {
+          window.localStorage.setItem(PHONE_STORAGE_KEY, phone);
+        } catch {
+          /* ignore */
+        }
+      }
       setSessionEmail(email.trim().toLowerCase());
       await load(phone);
     } catch (err: unknown) {
@@ -174,11 +200,20 @@ export function TutorWorkspace() {
     event.preventDefault();
     setBusy(true);
     setError(null);
+    setNotice(null);
+    const wasEditing = editing;
     try {
+      if (phone) {
+        try {
+          window.localStorage.setItem(PHONE_STORAGE_KEY, phone);
+        } catch {
+          /* ignore */
+        }
+      }
       const payload = await authed("/fut/api/tutor/children", {
         method: "POST",
         body: JSON.stringify({
-          child_id: editing && child ? child.id : undefined,
+          child_id: wasEditing && child ? child.id : undefined,
           player_name: form.player_name,
           guardian_phone: phone || undefined,
           birth_date: form.birth_date || null,
@@ -192,12 +227,21 @@ export function TutorWorkspace() {
           goals: form.goals || null,
         }),
       });
-      await load(phone);
-      if (payload.child?.id) setSelectedId(payload.child.id);
+      const createdId = payload.child?.id ?? null;
+      await load(phone, createdId);
+      if (createdId) setSelectedId(createdId);
       setEditing(false);
-      if (!editing) setForm(emptyForm);
+      setNotice(
+        wasEditing
+          ? "Cambios guardados. Abajo está la ficha de tu hijo."
+          : "Ficha creada. Abajo puedes verla, copiar el link o subir fotos.",
+      );
+      window.setTimeout(() => {
+        childPanelRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 80);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "No se guardó el jugador.");
+      window.scrollTo({ top: 0, behavior: "smooth" });
     } finally {
       setBusy(false);
     }
@@ -386,40 +430,60 @@ export function TutorWorkspace() {
         </button>
       </div>
 
-      {error ? <p className="text-sm text-mf-danger">{error}</p> : null}
+      {error ? (
+        <p className="rounded-lg bg-mf-danger-soft px-4 py-3 text-sm text-mf-danger">{error}</p>
+      ) : null}
+      {notice ? (
+        <p className="rounded-lg bg-mf-gph-soft px-4 py-3 text-sm font-medium text-mf-gph-ink">
+          {notice}
+        </p>
+      ) : null}
 
       {children.length > 0 ? (
-        <div className="flex flex-wrap gap-2">
-          {children.map((item) => (
+        <div className="space-y-2">
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-mf-text-muted">
+            Tus hijos · elige uno para ver su ficha
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {children.map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => {
+                  setSelectedId(item.id);
+                  setEditing(false);
+                  setNotice(null);
+                  setError(null);
+                }}
+                className={
+                  item.id === child?.id
+                    ? "rounded-full bg-mf-gph px-4 py-2 text-sm font-semibold text-white"
+                    : "rounded-full border border-mf-border bg-white px-4 py-2 text-sm font-semibold text-mf-gph-ink"
+                }
+              >
+                {item.player_name}
+              </button>
+            ))}
             <button
-              key={item.id}
               type="button"
               onClick={() => {
-                setSelectedId(item.id);
+                setSelectedId(null);
                 setEditing(false);
+                setForm(emptyForm);
+                setNotice(null);
+                setError(null);
               }}
-              className={
-                item.id === child?.id
-                  ? "rounded-full bg-mf-gph px-4 py-2 text-sm font-semibold text-white"
-                  : "rounded-full border border-mf-border bg-white px-4 py-2 text-sm font-semibold text-mf-gph-ink"
-              }
+              className="rounded-full border border-dashed border-mf-gph/40 px-4 py-2 text-sm font-semibold text-mf-gph"
             >
-              {item.player_name}
+              + Otro hijo
             </button>
-          ))}
-          <button
-            type="button"
-            onClick={() => {
-              setSelectedId(null);
-              setEditing(false);
-              setForm(emptyForm);
-            }}
-            className="rounded-full border border-dashed border-mf-gph/40 px-4 py-2 text-sm font-semibold text-mf-gph"
-          >
-            + Otro hijo
-          </button>
+          </div>
         </div>
-      ) : null}
+      ) : (
+        <p className="rounded-lg border border-dashed border-mf-border bg-white px-4 py-3 text-sm text-mf-text-secondary">
+          Aún no hay jugadores. Completa el formulario y pulsa <strong>Crear ficha</strong>.
+        </p>
+      )}
 
       {!child || editing || children.length === 0 ? (
         <form
@@ -552,6 +616,9 @@ export function TutorWorkspace() {
               />
             </label>
           </div>
+          {error ? (
+            <p className="rounded-lg bg-mf-danger-soft px-3 py-2 text-sm text-mf-danger">{error}</p>
+          ) : null}
           <div className="flex flex-wrap gap-2">
             <button type="submit" disabled={busy} className="mf-btn-gph">
               {busy ? "Guardando…" : editing ? "Guardar cambios" : "Crear ficha"}
@@ -570,7 +637,7 @@ export function TutorWorkspace() {
       ) : null}
 
       {child && !editing ? (
-        <div className="grid gap-4">
+        <div ref={childPanelRef} className="grid scroll-mt-24 gap-4">
           <section className="rounded-xl border border-mf-gph/30 bg-white p-5">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
