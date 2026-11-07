@@ -98,7 +98,7 @@ export function VisoriaRegisterForm() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Escribir a Gustavo
+          Escribir a GPH
         </a>
       </div>
     );

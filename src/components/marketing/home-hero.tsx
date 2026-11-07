@@ -7,8 +7,8 @@ import { WithBrandName } from "@/components/ui/brand-wordmark";
 export function HomeHero() {
   return (
     <MarketingPageHero
-      eyebrow="Torneos interescolares · Querétaro · en desarrollo"
-      title="La ficha de cada jugador, sincronizada con el torneo"
+      eyebrow="Piloto abierto · Querétaro"
+      title="La ficha de tu hijo, lista para visorías y seguimiento"
       description={
         <>
           <WithBrandName>

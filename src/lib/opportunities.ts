@@ -51,7 +51,7 @@ export const MIFICH_OPPORTUNITIES: OpportunityItem[] = [
     dateLabel: "Avisos a miembros",
     place: "Selección GPH / MiFicha",
     detail:
-      "Solo convocatorias curadas. No es un mural abierto de torneos.",
+      "Avisos curados por GPH/MiFicha cuando haya convocatoria publicada.",
     status: "proximamente",
     href: "/fut/membresia",
     cta: "Cómo funciona",

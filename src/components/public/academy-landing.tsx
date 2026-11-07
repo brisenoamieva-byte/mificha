@@ -267,8 +267,8 @@ export function AcademyLanding({ data }: AcademyLandingProps) {
           <Link href="/fut/explorar" className="text-slate-400 transition hover:text-white">
             Explorar directorio
           </Link>
-          <Link href="/fut/padres" className="text-slate-400 transition hover:text-white">
-            ¿Eres padre?
+          <Link href="/fut/tutor" className="text-slate-400 transition hover:text-white">
+            Crear cuenta de tutor
           </Link>
         </div>
         <p className="mt-2">mificha.mx</p>

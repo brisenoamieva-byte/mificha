@@ -67,8 +67,8 @@ export default async function PagoRetornoPage({
               ) : null}
               {paid && membershipUntil ? (
                 <p className="mt-3 text-sm leading-6 text-mf-text-secondary">
-                  Acceso hasta {membershipUntil}. Si contrataste evaluación, Gustavo coordina la
-                  sesión por WhatsApp.
+                  Acceso hasta {membershipUntil}. Si contrataste evaluación, el equipo GPH
+                  coordina la sesión por WhatsApp.
                 </p>
               ) : null}
               {!paid && !pending ? (

@@ -54,8 +54,8 @@ export default async function TutorShareFichaPage({ params }: PageProps) {
         </p>
         <TutorPublicFicha child={child} materials={materials} />
         <p className="mt-6 text-center text-xs leading-6 text-mf-text-muted print:hidden">
-          Esta ficha reúne el material que el tutor eligió compartir. No es una
-          evaluación GPH ni un acta oficial de torneo.
+          Material que el tutor eligió compartir. El informe GPH y las stats de torneo
+          aparecen aquí cuando existan.
         </p>
       </main>
       <SiteFooter />

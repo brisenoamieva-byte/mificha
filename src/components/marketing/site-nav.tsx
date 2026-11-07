@@ -61,8 +61,8 @@ export function SiteNavDesktop() {
 }
 
 export function SiteNavMobile({
-  actionHref = "/fut/login",
-  actionLabel = "Iniciar sesión",
+  actionHref = "/fut/tutor",
+  actionLabel = "Soy tutor",
 }: {
   actionHref?: string;
   actionLabel?: string;
@@ -123,6 +123,13 @@ export function SiteNavMobile({
                   onClick={() => setMobileOpen(false)}
                 >
                   {actionLabel}
+                </Link>
+                <Link
+                  href="/fut/login"
+                  className="block rounded-lg px-2 py-2.5 text-center text-sm font-medium text-mf-text-secondary hover:bg-mf-brand-soft"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  Academia · iniciar sesión
                 </Link>
                 <Link
                   href="/fut/signup"

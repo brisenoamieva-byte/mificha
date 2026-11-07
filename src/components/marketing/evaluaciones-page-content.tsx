@@ -59,8 +59,11 @@ export function EvaluacionesPageContent() {
               Agendar por WhatsApp
               <ArrowRight className="h-4 w-4" />
             </a>
-            <Link href="#precios" className="mf-btn-gph-ghost">
-              Ver precio
+            <Link href="/fut/pagar?sku=diagnosis" className="mf-btn-gph-ghost">
+              Pagar evaluación
+            </Link>
+            <Link href="/fut/tutor" className="mf-btn-gph-ghost">
+              Cuenta de tutor
             </Link>
           </>
         }
@@ -118,11 +121,11 @@ export function EvaluacionesPageContent() {
           <div className="max-w-2xl">
             <p className="mf-marketing-eyebrow">Cómo funciona</p>
             <h2 className="mt-3 text-2xl font-semibold tracking-[-0.02em] text-mf-text">
-              Independiente de la ficha del torneo
+              Diagnóstico + seguimiento en MiFicha
             </h2>
             <p className="mt-2 text-sm leading-7 text-mf-text-secondary">
-              La plataforma de fichas de partido aún está en desarrollo. El diagnóstico
-              GPH ya se contrata: se agenda por WhatsApp, se paga y se consulta aparte.
+              Agenda por WhatsApp o paga en línea. El informe queda en tu cuenta; conviene
+              tener la ficha del tutor lista para el seguimiento.
             </p>
           </div>
           <ol className="mt-8 grid gap-3 sm:grid-cols-3 sm:gap-4">
@@ -169,8 +172,8 @@ export function EvaluacionesPageContent() {
                 </p>
                 {plan.id === "individual" ? (
                   <p className="mt-1 text-xs font-semibold text-mf-gph">
-                    Incluye 12 meses de MiFicha. Membresía sola:{" "}
-                    {DIAGNOSIS_PRODUCT.memberPriceLabel}
+                    Incluye 12 meses de MiFicha. En el piloto, la ficha del tutor ya está
+                    gratis sin pagar membresía.
                   </p>
                 ) : null}
                 <p className="mt-1 text-xs font-medium text-mf-text-muted">{plan.period}</p>
@@ -194,6 +197,9 @@ export function EvaluacionesPageContent() {
               </a>
               <Link href="/fut/pagar?sku=diagnosis" className="mf-btn-gph-ghost">
                 Pagar evaluación
+              </Link>
+              <Link href="/fut/tutor" className="mf-btn-gph-ghost">
+                Crear cuenta de tutor
               </Link>
             </div>
             <p className="mt-3 text-sm text-mf-text-secondary">
@@ -232,9 +238,9 @@ export function HomeGphAllianceBand() {
           Diagnósticos GPH. Ya se pueden contratar.
         </h2>
         <p className="mt-3 max-w-2xl text-sm leading-7 text-white/75 sm:text-base">
-          Mientras la ficha del torneo sigue en desarrollo, el diagnóstico presencial
-          ya está abierto: {DIAGNOSIS_PRODUCT.publicPriceLabel}, incluye 12 meses de
-          MiFicha. Agenda por WhatsApp.
+          Diagnóstico presencial abierto: {DIAGNOSIS_PRODUCT.publicPriceLabel}, incluye 12
+          meses de MiFicha. Agenda por WhatsApp o paga en línea. La ficha del tutor ya está
+          gratis en el piloto.
         </p>
         <div className="mt-6 flex flex-wrap items-center gap-3">
           <a

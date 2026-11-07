@@ -3,7 +3,7 @@
 export const MEMBERSHIP_OFFER = {
   headline: "Seguimiento del jugador + puertas a oportunidades reales",
   summary:
-    "MiFicha no es una red social. Es el expediente del hijo y el acceso a visorías, torneos, eventos y entrenamiento con GPH.",
+    "Expediente del hijo y acceso a visorías, torneos, eventos y entrenamiento con GPH — en una sola cuenta.",
   priceLabel: "$1,200",
   pricePeriod: "MXN al año",
   pilotNote:
@@ -22,7 +22,7 @@ export const MEMBERSHIP_OFFER = {
       id: "torneos",
       title: "Convocatorias a torneos de alto nivel",
       detail:
-        "Avisos curados por GPH/MiFicha. No es un mural abierto: solo convocatorias que ustedes operan o recomiendan.",
+        "Avisos curados de torneos recomendados por GPH/MiFicha cuando haya convocatoria.",
       status: "membresia" as const,
     },
     {
@@ -43,7 +43,7 @@ export const MEMBERSHIP_OFFER = {
       id: "especializacion",
       title: "Entrenamiento de especialización gratis",
       detail:
-        "Incluido con límite: 1 ciclo al mes según calendario GPH. Sesiones extra se cobran (fuente de ingreso #1).",
+        "Incluido con límite: 1 ciclo al mes según calendario GPH. Sesiones extra se cotizan aparte.",
       status: "membresia" as const,
     },
   ],
@@ -52,5 +52,5 @@ export const MEMBERSHIP_OFFER = {
 export const MEMBERSHIP_STATUS_LABEL = {
   piloto: "En piloto",
   vivo: "Disponible",
-  membresia: "Con membresía",
+  membresia: "En calendario",
 } as const;

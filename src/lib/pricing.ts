@@ -62,7 +62,7 @@ export const ORGANIZER_PRICING = {
 export const DIAGNOSIS_PRODUCT = {
   title: "Evaluaciones",
   subtitle:
-    "Se contratan por su cuenta. No forman parte de la cuota del torneo ni de la cuenta gratis de la academia.",
+    "Se contratan aparte de la academia. En el piloto, la ficha del tutor ya está gratis; la evaluación se agenda y se paga.",
   footnote:
     "Metodología GPH · incluye 12 meses de mificha.mx · pago con Mercado Pago o WhatsApp.",
   memberPriceLabel: "$1,200",
@@ -75,7 +75,7 @@ export const DIAGNOSIS_PRODUCT = {
       priceLabel: "$2,900",
       period: "MXN · evaluación + 12 meses MiFicha",
       description:
-        "Diagnóstico GPH (sesión, ficha y lectura de entrenador) e incluye un año de acceso a MiFicha. Membresía sola, sin evaluación: $1,200.",
+        "Diagnóstico GPH (sesión, ficha y lectura de entrenador). Incluye un año de acceso a MiFicha; en el piloto la ficha del tutor ya está gratis sin pagar membresía sola.",
     },
     {
       id: "grupo",

@@ -115,8 +115,8 @@ export function PublicPlayerCard({ data }: PublicPlayerCardProps) {
         <footer className="mt-8 border-t border-mf-border pt-6 text-center print:hidden">
           <BrandLogoLink className="justify-center" size="sm" />
           <div className="mt-4 flex flex-wrap justify-center gap-x-4 gap-y-2 text-sm font-medium">
-            <Link href="/fut/padres" className="text-mf-brand hover:underline">
-              ¿Eres padre?
+            <Link href="/fut/tutor" className="text-mf-brand hover:underline">
+              Crear cuenta de tutor
             </Link>
             <Link href="/fut/explorar" className="text-mf-brand hover:underline">
               Explorar directorio

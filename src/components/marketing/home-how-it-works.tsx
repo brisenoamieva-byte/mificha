@@ -5,22 +5,23 @@ const STEPS = [
   {
     icon: Users,
     step: "1",
-    title: "Plantel",
-    description: "La academia carga jugadores, consentimiento y contacto del tutor.",
+    title: "Cuenta de tutor",
+    description: "La familia crea su cuenta y arma la ficha del hijo (piloto gratis).",
   },
   {
     icon: FileCheck,
     step: "2",
-    title: "Acta del torneo",
-    description: "El organizador publica calendario, marcador y stats por jugador.",
+    title: "Academia y torneo",
+    description: "La academia opera plantel; el torneo publica el acta cuando esté activo.",
   },
   {
     icon: Bell,
     step: "3",
-    title: "Ficha al tutor",
+    title: "Todo en un lugar",
     description: (
       <>
-        <BrandWordmark /> actualiza cada ficha y envía el link automáticamente.
+        Material del tutor, stats de partido e informe GPH viven en{" "}
+        <BrandWordmark />.
       </>
     ),
   },
@@ -36,8 +37,8 @@ export function HomeHowItWorks() {
             Tres pasos, una sola fuente
           </h2>
           <p className="mt-2 text-sm leading-7 text-mf-text-secondary">
-            El torneo publica el acta. Cada escuela opera su plantel. Stats verificadas,
-            sin reescribir el partido.
+            Empieza con la ficha del tutor. Cuando haya torneo y diagnóstico, el historial
+            se concentra en la misma cuenta.
           </p>
         </div>
 

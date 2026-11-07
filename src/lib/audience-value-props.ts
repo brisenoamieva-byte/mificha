@@ -73,8 +73,8 @@ export const AUDIENCE_VALUE_PROPS: AudienceValueProp[] = [
       "Insignias cuando destacás en una jornada.",
       "Link para visorías, pruebas o becas.",
     ],
-    href: "/fut/padres",
-    cta: "Ver mi ficha",
+    href: "/fut/tutor",
+    cta: "Crear ficha de tutor",
     tone: "accent",
   },
   {

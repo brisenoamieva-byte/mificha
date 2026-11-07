@@ -15,8 +15,8 @@ export default function LoginPage() {
       subtitle="Accede al panel de tu academia"
       footer={
         <>
-          <Link href="/fut/padres" className="text-mf-brand hover:underline">
-            ¿Eres padre? Abre la ficha de tu hijo
+          <Link href="/fut/tutor" className="text-mf-brand hover:underline">
+            ¿Eres padre? Crear cuenta de tutor
           </Link>
           <span className="mx-2 text-mf-text-muted">·</span>
           <Link href="/" className="text-mf-brand hover:underline">

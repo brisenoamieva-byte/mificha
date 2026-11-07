@@ -247,7 +247,7 @@ export function VisoriaLanding() {
           </h2>
           <p className="mt-3 text-sm leading-7 text-mf-text-secondary">
             Lo llena el padre, madre o tutor. Un minuto. El folio queda en MiFicha;
-            Gustavo confirma por WhatsApp. Sin promesa de selección, beca o contrato.
+            el equipo GPH confirma por WhatsApp. Sin promesa de selección, beca o contrato.
           </p>
           <div className="mt-8 overflow-hidden rounded-xl border border-mf-border bg-white shadow-[var(--mf-shadow)]">
             <div className="h-1 bg-mf-gph" aria-hidden />

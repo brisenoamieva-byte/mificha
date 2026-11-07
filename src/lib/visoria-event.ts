@@ -119,7 +119,7 @@ Viernes 27 · 9:00 a.m. a 4:00 p.m. · Casa de la Juventud · solo seleccionados
 Registro (sin Google Forms):
 ${url}
 
-Dudas: Gustavo Reyes, ${VISORIA_WHATSAPP_DISPLAY}`;
+Dudas: GPH · ${VISORIA_WHATSAPP_DISPLAY}`;
   return `https://wa.me/?text=${encodeURIComponent(text)}`;
 }
 

@@ -24,32 +24,32 @@ export const MARKETING_NAV: NavSection[] = [
       {
         href: "/fut/#como-funciona",
         label: "Cómo funciona",
-        description: "Plantel, acta oficial y aviso al tutor",
+        description: "Tutor, academia y seguimiento en un lugar",
       },
       {
         href: "/fut/j/santiago-hernandez-demo",
         label: "Ficha de ejemplo",
-        description: "Stats del torneo en una ficha real",
+        description: "Stats del torneo en una ficha de muestra",
       },
       {
         href: "/fut/tutor",
         label: "Soy tutor",
-        description: "Piloto: ficha con fotos, videos e historia",
+        description: "Piloto gratis: ficha con fotos, videos e historia",
       },
       {
         href: "/fut/padres",
         label: "Padres",
-        description: "Cuenta de tutor para la ficha de tu hijo",
+        description: "Explicación + registro de tutor",
       },
       {
         href: "/fut/evaluaciones",
         label: "Evaluaciones GPH",
-        description: "Evaluación GPH, seguimiento en la misma ficha",
+        description: "Diagnóstico $2,900 · seguimiento en MiFicha",
       },
       {
         href: "/fut/visorias",
         label: "Visorías Querétaro",
-        description: "26 y 27 de noviembre · registro en un link",
+        description: "26 y 27 de noviembre · registro abierto",
       },
     ],
   },
@@ -74,7 +74,7 @@ export const MARKETING_NAV: NavSection[] = [
         description: "Directorio, rankings e 11 ideal semanal",
       },
       {
-        href: "/fut/pagar",
+        href: "/fut/pagar?sku=diagnosis",
         label: "Pagar diagnóstico",
         description: "Evaluación GPH $2,900 (incluye 1 año). Membresía gratis en piloto",
       },

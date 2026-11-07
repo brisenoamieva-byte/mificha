@@ -10,8 +10,8 @@ interface SiteHeaderProps {
 }
 
 export function SiteHeader({
-  actionHref = "/fut/login",
-  actionLabel = "Iniciar sesión",
+  actionHref = "/fut/tutor",
+  actionLabel = "Soy tutor",
 }: SiteHeaderProps) {
   return (
     <header className="mf-safe-top relative sticky top-0 z-50">
@@ -31,6 +31,9 @@ export function SiteHeader({
           <Link href={actionHref} className="mf-btn-ghost hidden sm:inline-flex">
             {actionLabel}
           </Link>
+          <Link href="/fut/login" className="mf-btn-ghost hidden lg:inline-flex">
+            Academia
+          </Link>
           <Link href="/fut/signup" className="mf-btn-primary hidden sm:inline-flex">
             Registrar academia
           </Link>
@@ -49,7 +52,7 @@ export function SiteFooter() {
           <Link href="/fut#como-funciona" className="transition hover:text-mf-text">
             Cómo funciona
           </Link>
-          <Link href="/fut#accesos" className="transition hover:text-mf-text">
+          <Link href="/fut#tipos-de-cuenta" className="transition hover:text-mf-text">
             Accesos
           </Link>
           <Link href="/fut/explorar" className="transition hover:text-mf-text">
@@ -59,7 +62,7 @@ export function SiteFooter() {
             Tutor
           </Link>
           <Link href="/fut/padres" className="transition hover:text-mf-text">
-            Padres
+            Info padres
           </Link>
           <Link href="/fut/evaluaciones" className="transition hover:text-mf-text">
             Evaluaciones
@@ -70,8 +73,8 @@ export function SiteFooter() {
           <Link href="/fut/membresia" className="transition hover:text-mf-text">
             Membresía
           </Link>
-          <Link href="/fut/pagar" className="transition hover:text-mf-text">
-            Pagar
+          <Link href="/fut/pagar?sku=diagnosis" className="transition hover:text-mf-text">
+            Pagar diagnóstico
           </Link>
           <Link href="/fut/organizadores" className="transition hover:text-mf-text">
             Organizadores

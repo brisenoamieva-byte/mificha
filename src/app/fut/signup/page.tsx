@@ -21,8 +21,8 @@ export default function SignUpPage() {
       }
       footer={
         <>
-          <Link href="/fut/padres" className="text-mf-brand hover:underline">
-            ¿Eres padre?
+          <Link href="/fut/tutor" className="text-mf-brand hover:underline">
+            ¿Eres padre? Crear cuenta de tutor
           </Link>
           <span className="mx-2 text-mf-text-muted">·</span>
           <Link href="/" className="text-mf-brand hover:underline">
