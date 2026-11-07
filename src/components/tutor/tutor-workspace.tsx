@@ -12,6 +12,7 @@ import {
   tutorSharePath,
   type TutorMaterialKind,
 } from "@/lib/tutor-family";
+import { MEMBERSHIP_CHECKOUT_DISABLED } from "@/lib/gph-commerce";
 
 const PHONE_STORAGE_KEY = "mificha.tutor.phone";
 
@@ -720,6 +721,14 @@ export function TutorWorkspace() {
                   </button>
                 </form>
               </div>
+            ) : MEMBERSHIP_CHECKOUT_DISABLED ? (
+              <p className="mt-4 text-sm text-mf-text-secondary">
+                Piloto activo: no hace falta renovar.{" "}
+                <Link href="/fut/pagar?sku=diagnosis" className="font-semibold text-mf-gph hover:underline">
+                  Diagnóstico GPH
+                </Link>{" "}
+                si lo necesitas.
+              </p>
             ) : (
               <Link href="/fut/pagar?sku=membership" className="mf-btn-gph mt-4">
                 Renovar año

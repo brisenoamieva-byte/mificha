@@ -39,7 +39,7 @@ export const MARKETING_NAV: NavSection[] = [
       {
         href: "/fut/padres",
         label: "Padres",
-        description: "Ficha post-partido por WhatsApp o email",
+        description: "Piloto tutor gratis · stats de torneo después",
       },
       {
         href: "/fut/evaluaciones",

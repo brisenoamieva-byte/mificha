@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { FichaTypesSection } from "@/components/marketing/ficha-types-section";
 import { PadresAcademyExample } from "@/components/marketing/padres-academy-example";
 import { PadresBenefitsSection } from "@/components/marketing/padres-benefits-section";
 import { PadresGphSection } from "@/components/marketing/evaluaciones-page-content";
@@ -11,7 +12,7 @@ import { SiteFooter, SiteHeader } from "@/components/marketing/site-header";
 export const metadata: Metadata = {
   title: "Padres y jugadores | MiFicha",
   description:
-    "Recibe el link de la ficha de tu hijo tras cada jornada. Stats del torneo, evaluación del entrenador e historial en un solo lugar.",
+    "Piloto: arma la ficha del tutor gratis. Después, stats de torneo e informe GPH en el mismo expediente.",
 };
 
 export default function PadresPage() {
@@ -21,6 +22,7 @@ export default function PadresPage() {
 
       <main className="flex-1">
         <PadresPageHero />
+        <FichaTypesSection />
         <PadresBenefitsSection />
         <PadresGphSection />
 

@@ -29,10 +29,10 @@ export function PadresPageHero() {
 
             <ul className="mt-6 flex flex-wrap gap-2">
               {[
-                { icon: MessageCircle, label: "Aviso post-partido" },
-                { icon: BarChart3, label: "Stats del torneo" },
-                { icon: Printer, label: "Ficha imprimible" },
+                { icon: Printer, label: "Ficha del tutor (piloto)" },
                 { icon: ClipboardList, label: "Diagnóstico GPH" },
+                { icon: MessageCircle, label: "Aviso post-partido (próximo)" },
+                { icon: BarChart3, label: "Stats del torneo (próximo)" },
               ].map(({ icon: Icon, label }) => (
                 <li
                   key={label}

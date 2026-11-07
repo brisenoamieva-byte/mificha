@@ -4,6 +4,7 @@ import { HomeCtaBand } from "@/components/marketing/home-cta-band";
 import { HomeHero } from "@/components/marketing/home-hero";
 import { HomeHowItWorks } from "@/components/marketing/home-how-it-works";
 import { HomeGphAllianceBand } from "@/components/marketing/evaluaciones-page-content";
+import { FichaTypesSection } from "@/components/marketing/ficha-types-section";
 import { MembershipOfferSection } from "@/components/marketing/membership-offer-section";
 import { OpportunitiesSection } from "@/components/marketing/opportunities-section";
 import { VerifiedAcademiesShowcase } from "@/components/marketing/verified-academies-showcase";
@@ -40,6 +41,7 @@ export default async function Home() {
 
       <main className="flex-1">
         <HomeHero />
+        <FichaTypesSection />
         <MembershipOfferSection />
         <OpportunitiesSection />
         <HomeHowItWorks />
