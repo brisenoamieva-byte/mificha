@@ -16,6 +16,9 @@ import type { PlayerPosition } from "@/types/database";
 
 export const DEMO_ACADEMY_SLUG = "academia-gallos-demo";
 
+/** Academia de `/fut/api/seed` — no cuenta como red certificada en marketing. */
+export const SEED_ACADEMY_SLUG = "academia-nortenios";
+
 /** Enlace de academia compartido por los perfiles de ejemplo. */
 export const DEMO_ACADEMY_PLAYER_LINK = {
   name: "Academia Gallos",
@@ -205,6 +208,12 @@ export function isDemoAcademySlug(slug: string) {
   return slug === DEMO_ACADEMY_SLUG;
 }
 
+export function isMarketingPlaceholderAcademy(
+  academy: Pick<DirectoryAcademy, "slug">,
+) {
+  return academy.slug === DEMO_ACADEMY_SLUG || academy.slug === SEED_ACADEMY_SLUG;
+}
+
 export function filterDemoExploreAcademy(
   query: string,
   state = "",
@@ -230,14 +239,19 @@ export function filterDemoExploreAcademy(
   return haystack.includes(normalizedQuery);
 }
 
-/** Academias visibles en el directorio (demo + reales, sin duplicar slug). */
+/**
+ * Academias reales para la home (red certificada).
+ * Sin demo ni seed: la sección se oculta sola si el arreglo queda vacío.
+ */
 export function buildHomeShowcaseAcademies(data: PublicDirectoryData): DirectoryAcademy[] {
-  const real = data.academies.filter((academy) => academy.slug !== DEMO_ACADEMY_SLUG);
-  return [DEMO_EXPLORE_ACADEMY, ...real];
+  return data.academies.filter((academy) => !isMarketingPlaceholderAcademy(academy));
 }
 
+/** Conteo del directorio Explorar: demo de marketing + reales (sin seed). */
 export function countExploreDirectoryAcademies(data: PublicDirectoryData): number {
-  return buildHomeShowcaseAcademies(data).length;
+  const real = data.academies.filter((academy) => !isMarketingPlaceholderAcademy(academy));
+  const hasDemoSlug = real.some((academy) => academy.slug === DEMO_ACADEMY_SLUG);
+  return real.length + (hasDemoSlug ? 0 : 1);
 }
 
 const DEMO_ACADEMY_PROFILE: PublicAcademy = {

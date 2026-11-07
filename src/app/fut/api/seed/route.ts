@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
+import { SEED_ACADEMY_SLUG } from "@/lib/explore-demo-data";
 import { createSupabaseAdminClient } from "@/lib/supabase-admin";
-
-const SEED_ACADEMY_SLUG = "academia-nortenios";
 
 const PLAYERS = [
   {
