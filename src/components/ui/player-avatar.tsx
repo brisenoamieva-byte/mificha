@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { getPlayerInitials } from "@/lib/player-utils";
 
@@ -23,13 +24,17 @@ export function PlayerAvatar({
   photoUrl,
   size = "sm",
 }: PlayerAvatarProps) {
-  if (photoUrl) {
+  const [failed, setFailed] = useState(false);
+  const showPhoto = Boolean(photoUrl) && !failed;
+
+  if (showPhoto) {
     return (
       // eslint-disable-next-line @next/next/no-img-element
       <img
-        src={photoUrl}
-        alt={`${firstName} ${lastName}`}
+        src={photoUrl!}
+        alt=""
         className={cn("object-cover", sizeClasses[size])}
+        onError={() => setFailed(true)}
       />
     );
   }

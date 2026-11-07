@@ -432,16 +432,23 @@ export async function listAllDiagnosesDetailed(admin: SupabaseClient) {
     (academies ?? []).map((row) => [String(row.id), String(row.name ?? "Academia")]),
   );
 
-  return diagnoses.map((row) => {
-    const player = playerMap.get(row.player_id);
-    return {
-      ...row,
-      player_first_name: player?.first_name || "Jugador",
-      player_last_name: player?.last_name || "",
-      player_photo_url: player?.photo_url ?? null,
-      academy_name: academyMap.get(row.academy_id) || "Academia",
-    };
-  });
+  const { signPlayerPhotoUrl } = await import("@/lib/supabase-admin");
+  const signedPhotos = await Promise.all(
+    diagnoses.map(async (row) => {
+      const player = playerMap.get(row.player_id);
+      const signed = player?.photo_url
+        ? await signPlayerPhotoUrl(player.photo_url)
+        : null;
+      return {
+        ...row,
+        player_first_name: player?.first_name || "Jugador",
+        player_last_name: player?.last_name || "",
+        player_photo_url: signed,
+        academy_name: academyMap.get(row.academy_id) || "Academia",
+      };
+    }),
+  );
+  return signedPhotos;
 }
 
 export async function getDiagnosisForAcademy(
