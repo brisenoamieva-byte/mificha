@@ -15,9 +15,11 @@ const inputClass =
 
 export function FamilyCheckout({
   initialSku,
+  initialPlayerName,
   mercadoPagoReady,
 }: {
   initialSku?: FamilySku;
+  initialPlayerName?: string;
   mercadoPagoReady: boolean;
 }) {
   const preferred: FamilySku =
@@ -26,7 +28,7 @@ export function FamilyCheckout({
       : (initialSku ?? "diagnosis");
   const [sku, setSku] = useState<FamilySku>(preferred);
   const [payerName, setPayerName] = useState("");
-  const [playerName, setPlayerName] = useState("");
+  const [playerName, setPlayerName] = useState(initialPlayerName?.trim() ?? "");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -41,6 +43,12 @@ export function FamilyCheckout({
       setSku(initialSku);
     }
   }, [initialSku]);
+
+  useEffect(() => {
+    if (initialPlayerName?.trim()) {
+      setPlayerName(initialPlayerName.trim());
+    }
+  }, [initialPlayerName]);
 
   async function onSubmit(event: React.FormEvent) {
     event.preventDefault();

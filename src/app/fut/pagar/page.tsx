@@ -21,13 +21,20 @@ function parseSku(value: string | string[] | undefined): FamilySku | undefined {
   return undefined;
 }
 
+function parsePlayer(value: string | string[] | undefined) {
+  const raw = Array.isArray(value) ? value[0] : value;
+  const name = raw?.trim() ?? "";
+  return name.length > 0 && name.length <= 80 ? name : undefined;
+}
+
 export default async function PagarPage({
   searchParams,
 }: {
-  searchParams: Promise<{ sku?: string | string[] }>;
+  searchParams: Promise<{ sku?: string | string[]; player?: string | string[] }>;
 }) {
   const params = await searchParams;
   const sku = parseSku(params.sku);
+  const playerName = parsePlayer(params.player);
   const mercadoPagoReady = isMercadoPagoConfigured();
 
   return (
@@ -39,9 +46,11 @@ export default async function PagarPage({
             Familias
           </p>
           <h1 className="mt-2 text-3xl font-semibold tracking-[-0.03em] text-mf-gph-ink sm:text-4xl">
-            {MEMBERSHIP_CHECKOUT_DISABLED
-              ? "Diagnóstico GPH · membresía gratis en piloto"
-              : "Paga aquí. Un año de plataforma."}
+            {playerName
+              ? `Diagnóstico GPH para ${playerName}`
+              : MEMBERSHIP_CHECKOUT_DISABLED
+                ? "Diagnóstico GPH · membresía gratis en piloto"
+                : "Paga aquí. Un año de plataforma."}
           </h1>
           <p className="mt-3 max-w-2xl text-sm leading-7 text-mf-text-secondary">
             {MEMBERSHIP_CHECKOUT_DISABLED ? (
@@ -59,7 +68,11 @@ export default async function PagarPage({
             )}
           </p>
           <div className="mt-10">
-            <FamilyCheckout initialSku={sku} mercadoPagoReady={mercadoPagoReady} />
+            <FamilyCheckout
+              initialSku={sku}
+              initialPlayerName={playerName}
+              mercadoPagoReady={mercadoPagoReady}
+            />
           </div>
         </section>
       </main>

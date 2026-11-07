@@ -5,6 +5,7 @@ import { Copy, Printer } from "lucide-react";
 import { useState } from "react";
 import { FichaDocument } from "@/components/ficha/ficha-document";
 import { BrandLogoLink } from "@/components/ui/brand-logo";
+import { DiagnosisHireCard } from "@/components/public/diagnosis-hire-card";
 import { GphPublicStrip } from "@/components/public/gph-public-strip";
 import { PlayerAchievementsShelf } from "@/components/public/player-achievements-shelf";
 import { PlayerVideoGallery } from "@/components/public/player-video-gallery";
@@ -54,7 +55,9 @@ export function PublicPlayerCard({ data }: PublicPlayerCardProps) {
             summary={gph}
             href={buildPublicGphEvaluationPath(player.slug)}
           />
-        ) : null}
+        ) : (
+          <DiagnosisHireCard playerName={fullName} className="mt-4" />
+        )}
 
         <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:justify-end print:hidden">
           <a

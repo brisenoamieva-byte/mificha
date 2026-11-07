@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SiteFooter, SiteHeader } from "@/components/marketing/site-header";
+import { DiagnosisHireCard } from "@/components/public/diagnosis-hire-card";
 import { TutorPublicFicha } from "@/components/tutor/tutor-public-ficha";
 import {
   getTutorChildByShareToken,
@@ -53,9 +54,10 @@ export default async function TutorShareFichaPage({ params }: PageProps) {
           </Link>
         </p>
         <TutorPublicFicha child={child} materials={materials} />
+        <DiagnosisHireCard playerName={child.player_name} className="mt-6" />
         <p className="mt-6 text-center text-xs leading-6 text-mf-text-muted print:hidden">
-          Material que el tutor eligió compartir. El informe GPH y las stats de torneo
-          aparecen aquí cuando existan.
+          Material que el tutor eligió compartir. El informe GPH queda ligado a esta ficha
+          cuando se contrata.
         </p>
       </main>
       <SiteFooter />

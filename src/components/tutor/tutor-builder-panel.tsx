@@ -575,13 +575,24 @@ export function TutorBuilderPanel({
                 </Link>
               </div>
             ) : null}
-            <div className="rounded-xl bg-mf-canvas px-4 py-3 text-sm leading-6 text-mf-text-secondary">
-              El diagnóstico GPH y las stats de torneo se suman a esta misma ficha cuando
-              existan.{" "}
-              <Link href="/fut/evaluaciones" className="font-semibold text-mf-gph hover:underline">
-                Ver evaluaciones
-              </Link>
-              .
+            <div className="rounded-xl border border-mf-gph/25 bg-mf-gph-soft px-4 py-4">
+              <p className="text-sm font-semibold text-mf-gph-ink">
+                ¿Quieres el diagnóstico GPH de {child.player_name}?
+              </p>
+              <p className="mt-1 text-sm leading-6 text-mf-text-secondary">
+                Se agenda por WhatsApp y el informe queda ligado a esta ficha.
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <Link
+                  href={`/fut/pagar?sku=diagnosis&player=${encodeURIComponent(child.player_name)}`}
+                  className="mf-btn-gph"
+                >
+                  Contratar diagnóstico
+                </Link>
+                <Link href="/fut/evaluaciones" className="mf-btn-gph-ghost">
+                  Ver detalle
+                </Link>
+              </div>
             </div>
           </section>
         ) : null}
