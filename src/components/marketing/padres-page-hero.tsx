@@ -17,12 +17,13 @@ export function PadresPageHero() {
           <div className="max-w-xl lg:pt-2">
             <p className="mf-marketing-eyebrow">Padres y jugadores · {CURRENT_SEASON_LABEL}</p>
             <h1 className="mt-4 text-[2rem] font-semibold leading-[1.08] tracking-[-0.035em] text-mf-text sm:text-[2.5rem]">
-              La ficha de tu hijo, después de cada jornada
+              La ficha de tu hijo, en un solo lugar
             </h1>
             <p className="mt-5 text-base leading-8 text-mf-text-secondary sm:text-[1.0625rem]">
               <WithBrandName>
-                MiFicha envía el link por WhatsApp o email cuando el torneo publica las stats.
-                Consulta goles, minutos, evaluación del entrenador e historial en un solo lugar.
+                Hoy puedes armar la ficha del tutor (fotos, videos e historia) en piloto
+                gratis. Después del partido, cuando el torneo esté activo, también llegarán
+                las stats oficiales al mismo expediente.
               </WithBrandName>
             </p>
 
@@ -43,13 +44,18 @@ export function PadresPageHero() {
               ))}
             </ul>
 
-            <Link
-              href="#abrir-ficha"
-              className="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-mf-brand transition hover:text-mf-brand-dark"
-            >
-              Abrir ficha con tu link
-              <ArrowDown className="h-4 w-4" aria-hidden />
-            </Link>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link href="/fut/tutor" className="mf-btn-gph">
+                Entrar como tutor
+              </Link>
+              <Link
+                href="#abrir-ficha"
+                className="inline-flex items-center gap-2 text-sm font-semibold text-mf-brand transition hover:text-mf-brand-dark"
+              >
+                Abrir ficha con tu link
+                <ArrowDown className="h-4 w-4" aria-hidden />
+              </Link>
+            </div>
           </div>
 
           <div className="min-w-0 lg:justify-self-end">

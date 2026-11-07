@@ -12,8 +12,8 @@ export function HomeHero() {
       description={
         <>
           <WithBrandName>
-            Piloto abierto para tutores: arma la ficha de tu hijo con fotos, videos e
-            historia. El diagnóstico GPH también se puede agendar ya.
+            Seguimiento del jugador, visorías de Primera, convocatorias y especialización.
+            Piloto de tutor abierto sin cobro; el diagnóstico GPH ya se agenda.
           </WithBrandName>
         </>
       }

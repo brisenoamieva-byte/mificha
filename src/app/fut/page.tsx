@@ -5,6 +5,7 @@ import { HomeHero } from "@/components/marketing/home-hero";
 import { HomeHowItWorks } from "@/components/marketing/home-how-it-works";
 import { HomeGphAllianceBand } from "@/components/marketing/evaluaciones-page-content";
 import { MembershipOfferSection } from "@/components/marketing/membership-offer-section";
+import { OpportunitiesSection } from "@/components/marketing/opportunities-section";
 import { VerifiedAcademiesShowcase } from "@/components/marketing/verified-academies-showcase";
 import {
   buildHomeShowcaseAcademies,
@@ -40,6 +41,7 @@ export default async function Home() {
       <main className="flex-1">
         <HomeHero />
         <MembershipOfferSection />
+        <OpportunitiesSection />
         <HomeHowItWorks />
         <HomeGphAllianceBand />
         <HomeAudienceSection />

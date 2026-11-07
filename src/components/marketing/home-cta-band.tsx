@@ -16,28 +16,35 @@ export function HomeCtaBand() {
       <div className="relative mx-auto flex max-w-6xl flex-col items-start gap-5 px-4 py-10 sm:px-6 sm:py-14 lg:flex-row lg:items-center lg:justify-between">
         <div className="max-w-xl">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-white/60">
-            Piloto · Querétaro
+            Piloto · familias
           </p>
           <h2 className="mt-2 text-xl font-semibold tracking-[-0.02em] text-white sm:text-2xl">
-            ¿Tu colegio ya está en la red?
+            Arma la ficha de tu hijo hoy
           </h2>
           <p className="mt-2 text-sm leading-6 text-white/80">
-            Registra plantel y tutores, o entra como padre si tu escuela ya participa.
+            Tutor sin cobro en el piloto. Visorías abiertas. Diagnóstico GPH cuando lo
+            necesites.
           </p>
         </div>
         <div className="flex flex-wrap gap-3">
           <Link
-            href="/fut/signup"
+            href="/fut/tutor"
             className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-mf-brand transition hover:bg-white/95"
           >
-            Registrar academia
+            Entrar como tutor
             <ArrowRight className="h-4 w-4" />
           </Link>
           <Link
-            href="/fut/padres"
+            href="/fut/visorias"
             className="inline-flex items-center gap-2 rounded-full border border-mf-accent/40 bg-mf-accent/10 px-6 py-3 text-sm font-semibold text-mf-accent-bright transition hover:bg-mf-accent/20"
           >
-            Soy padre
+            Visorías
+          </Link>
+          <Link
+            href="/fut/evaluaciones"
+            className="inline-flex items-center gap-2 rounded-full border border-white/30 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
+          >
+            Diagnóstico GPH
           </Link>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { OpportunitiesSection } from "@/components/marketing/opportunities-section";
 import { SiteFooter, SiteHeader } from "@/components/marketing/site-header";
 import { FAMILY_PRODUCTS } from "@/lib/gph-commerce";
 import {
@@ -72,6 +73,7 @@ export default function MembresiaPage() {
             </Link>
           </div>
         </section>
+        <OpportunitiesSection />
       </main>
       <SiteFooter />
     </div>
