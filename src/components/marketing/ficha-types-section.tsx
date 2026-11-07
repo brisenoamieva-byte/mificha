@@ -44,10 +44,8 @@ export function FichaTypesSection() {
           Tres cosas distintas, un mismo expediente
         </h2>
         <p className="mt-3 max-w-2xl text-sm leading-7 text-mf-text-secondary">
-          No son lo mismo: la ficha que armas tú, las stats del torneo y el informe GPH.
-          Si tu hijo también está en el plantel de una academia, en el espacio de tutor
-          puedes <span className="font-semibold text-mf-gph-ink">ligarlo</span> para que
-          el sistema reconozca que es la misma persona.
+          Ficha del tutor, stats de torneo e informe GPH. Si tu hijo ya está en un plantel,
+          en el espacio de tutor puedes ligarlo con su academia.
         </p>
 
         <ul className="mt-8 grid gap-3 md:grid-cols-3">

@@ -11,7 +11,6 @@ const ACCOUNTS = [
       "Compartir un link presentable para visorías o universidades",
       "Ligar al hijo con su academia si ya está en un plantel",
     ],
-    notFor: "No es el panel de la academia ni el de Ganancias.",
     href: "/fut/tutor",
     cta: "Entrar como tutor",
     primary: true,
@@ -23,10 +22,8 @@ const ACCOUNTS = [
     status: "Activa",
     canDo: [
       "Registrar plantel, partidos y avisos a tutores",
-      "Dar de alta jugadores del club (no sustituye la ficha del papá)",
-      "Staff y dueño operan el día a día del torneo",
+      "Operar el día a día del torneo con staff",
     ],
-    notFor: "No sirve para armar la ficha familiar del piloto.",
     href: "/fut/signup",
     cta: "Registrar academia",
     primary: false,
@@ -34,13 +31,12 @@ const ACCOUNTS = [
   {
     id: "gph",
     title: "Evaluador / GPH",
-    forWho: "Gustavo y staff autorizado",
+    forWho: "Staff autorizado",
     status: "Privado",
     canDo: [
-      "Crear y ver diagnósticos reales",
-      "Administrar visorías y el ledger de ganancias",
+      "Crear y ver diagnósticos",
+      "Administrar visorías y ganancias",
     ],
-    notFor: "No es una cuenta pública de familia.",
     href: "/fut/evaluaciones",
     cta: "Ver evaluaciones",
     primary: false,
@@ -51,10 +47,8 @@ const ACCOUNTS = [
     forWho: "Padres con ficha de torneo",
     status: "Sin cuenta",
     canDo: [
-      "Abrir la ficha post-partido si la academia ya envió el enlace",
-      "No hace falta registrarse como tutor para ver ese link",
+      "Abrir la ficha post-partido cuando la academia envía el enlace",
     ],
-    notFor: "Sin link no hay acceso a stats de torneo todavía.",
     href: "/fut/padres#abrir-ficha",
     cta: "Abrir con link",
     primary: false,
@@ -72,8 +66,7 @@ export function AccountTypesSection() {
           Qué cuenta necesitas
         </h2>
         <p className="mt-3 max-w-2xl text-sm leading-7 text-mf-text-secondary">
-          No es lo mismo ser papá, academia o evaluador. El mismo correo puede usarse en
-          más de un rol, pero cada entrada abre un panel distinto.
+          Elige tu entrada según tu rol. El mismo correo puede usarse en más de uno.
         </p>
 
         <ul className="mt-8 grid gap-3 lg:grid-cols-2">
@@ -102,7 +95,6 @@ export function AccountTypesSection() {
                   <li key={line}>· {line}</li>
                 ))}
               </ul>
-              <p className="mt-3 text-xs leading-5 text-mf-text-muted">{item.notFor}</p>
               <Link
                 href={item.href}
                 className={
