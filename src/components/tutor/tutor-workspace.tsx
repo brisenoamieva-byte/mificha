@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import { signIn, signUp } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import {
+  TUTOR_CITY_OPTIONS,
   TUTOR_PILOT_FREE,
   TUTOR_PILOT_LABEL,
   TUTOR_POSITION_OPTIONS,
@@ -489,11 +490,21 @@ export function TutorWorkspace() {
             </label>
             <label className="block text-sm font-medium text-mf-text">
               Ciudad
-              <input
+              <select
                 value={form.city}
                 onChange={(event) => setForm((current) => ({ ...current, city: event.target.value }))}
                 className={inputClass}
-              />
+              >
+                <option value="">Selecciona…</option>
+                {TUTOR_CITY_OPTIONS.map((city) => (
+                  <option key={city} value={city}>
+                    {city}
+                  </option>
+                ))}
+                {form.city && !(TUTOR_CITY_OPTIONS as readonly string[]).includes(form.city) ? (
+                  <option value={form.city}>{form.city}</option>
+                ) : null}
+              </select>
             </label>
             <label className="block text-sm font-medium text-mf-text">
               Estatura (cm)

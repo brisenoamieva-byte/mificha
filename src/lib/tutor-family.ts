@@ -129,6 +129,27 @@ export const TUTOR_POSITION_OPTIONS = [
   "Delantero",
 ] as const;
 
+/** Ciudades frecuentes para el piloto GPH / Bajío (+ principales). */
+export const TUTOR_CITY_OPTIONS = [
+  "Querétaro",
+  "Corregidora",
+  "El Marqués",
+  "San Juan del Río",
+  "Tequisquiapan",
+  "Celaya",
+  "Irapuato",
+  "León",
+  "San Luis Potosí",
+  "Guanajuato",
+  "Morelia",
+  "Ciudad de México",
+  "Guadalajara",
+  "Monterrey",
+  "Puebla",
+  "Toluca",
+  "Otra",
+] as const;
+
 async function ensureOpsBucket(admin: SupabaseClient) {
   const { data } = await admin.storage.listBuckets();
   if (data?.some((bucket) => bucket.name === OPS_BUCKET)) return;
