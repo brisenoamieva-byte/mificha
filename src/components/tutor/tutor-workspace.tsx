@@ -31,6 +31,11 @@ interface TutorChildCard {
   membership_until: string | null;
   share_token: string;
   active: boolean;
+  linked_player_id?: string | null;
+  linked_academy_id?: string | null;
+  linked_academy_name?: string | null;
+  linked_player_slug?: string | null;
+  linked_at?: string | null;
   profile: {
     birth_date: string | null;
     position: string | null;
@@ -43,6 +48,15 @@ interface TutorChildCard {
     goals: string | null;
   };
   materials: MaterialItem[];
+}
+
+interface LinkSuggestion {
+  player_id: string;
+  academy_id: string;
+  academy_name: string;
+  player_name: string;
+  slug: string;
+  reason: string;
 }
 
 const inputClass =
@@ -80,6 +94,7 @@ async function authed(path: string, init?: RequestInit) {
     token?: string;
     path?: string;
     child?: TutorChildCard;
+    suggestions?: LinkSuggestion[];
   };
   if (!response.ok) throw new Error(payload.error || "No se pudo completar.");
   return payload;
@@ -103,6 +118,8 @@ export function TutorWorkspace() {
   const [editing, setEditing] = useState(false);
   const [copied, setCopied] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
+  const [linkSuggestions, setLinkSuggestions] = useState<LinkSuggestion[]>([]);
+  const [linkBusy, setLinkBusy] = useState(false);
   const childPanelRef = useRef<HTMLDivElement | null>(null);
 
   const load = useCallback(async (whatsapp: string, preferId?: string | null) => {
@@ -166,6 +183,62 @@ export function TutorWorkspace() {
       goals: child.profile.goals ?? "",
     });
   }, [child, editing]);
+
+  useEffect(() => {
+    if (!child || editing || child.linked_player_id) {
+      setLinkSuggestions([]);
+      return;
+    }
+    let cancelled = false;
+    void authed(`/fut/api/tutor/links?child_id=${encodeURIComponent(child.id)}`)
+      .then((payload) => {
+        if (cancelled) return;
+        setLinkSuggestions((payload.suggestions as LinkSuggestion[]) ?? []);
+      })
+      .catch(() => {
+        if (!cancelled) setLinkSuggestions([]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [child, editing]);
+
+  async function linkPlayer(playerId: string) {
+    if (!child) return;
+    setLinkBusy(true);
+    setError(null);
+    try {
+      await authed("/fut/api/tutor/links", {
+        method: "POST",
+        body: JSON.stringify({ child_id: child.id, player_id: playerId }),
+      });
+      await load(phone, child.id);
+      setNotice("Jugador ligado con su academia. Es la misma persona en ambos lados.");
+      setLinkSuggestions([]);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "No se pudo ligar.");
+    } finally {
+      setLinkBusy(false);
+    }
+  }
+
+  async function unlinkPlayer() {
+    if (!child) return;
+    setLinkBusy(true);
+    setError(null);
+    try {
+      await authed("/fut/api/tutor/links", {
+        method: "POST",
+        body: JSON.stringify({ action: "unlink", child_id: child.id }),
+      });
+      await load(phone, child.id);
+      setNotice("Se quitó el vínculo con la academia.");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "No se pudo desligar.");
+    } finally {
+      setLinkBusy(false);
+    }
+  }
 
   async function onAuth(event: React.FormEvent) {
     event.preventDefault();
@@ -671,6 +744,77 @@ export function TutorWorkspace() {
             {child.profile.bio ? (
               <p className="mt-4 text-sm leading-7 text-mf-text-secondary">{child.profile.bio}</p>
             ) : null}
+          </section>
+
+          <section className="rounded-xl border border-mf-border bg-white p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
+              Academia
+            </p>
+            {child.linked_player_id ? (
+              <div className="mt-3 space-y-3">
+                <p className="text-sm leading-6 text-mf-text-secondary">
+                  Ligado a <span className="font-semibold text-mf-gph-ink">{child.linked_academy_name}</span>
+                  {child.linked_player_slug ? (
+                    <>
+                      {" "}
+                      ·{" "}
+                      <Link
+                        href={`/fut/j/${child.linked_player_slug}`}
+                        className="font-semibold text-mf-gph hover:underline"
+                        target="_blank"
+                      >
+                        ver ficha de torneo
+                      </Link>
+                    </>
+                  ) : null}
+                </p>
+                <button
+                  type="button"
+                  disabled={linkBusy}
+                  onClick={() => void unlinkPlayer()}
+                  className="text-xs font-semibold text-mf-text-muted hover:text-mf-danger"
+                >
+                  Quitar vínculo
+                </button>
+              </div>
+            ) : (
+              <div className="mt-3 space-y-3">
+                <p className="text-sm leading-6 text-mf-text-secondary">
+                  Si tu hijo ya está en el plantel de una academia (mismo WhatsApp o correo
+                  de tutor), puedes ligarlo para que sea la misma persona.
+                </p>
+                {linkSuggestions.length === 0 ? (
+                  <p className="text-xs text-mf-text-muted">
+                    No hay coincidencias todavía. Pide a la academia que registre tu mismo
+                    correo/WhatsApp en el plantel.
+                  </p>
+                ) : (
+                  <ul className="space-y-2">
+                    {linkSuggestions.map((item) => (
+                      <li
+                        key={item.player_id}
+                        className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-mf-canvas px-3 py-3"
+                      >
+                        <div>
+                          <p className="text-sm font-semibold text-mf-gph-ink">{item.player_name}</p>
+                          <p className="text-xs text-mf-text-muted">
+                            {item.academy_name} · {item.reason}
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          disabled={linkBusy}
+                          onClick={() => void linkPlayer(item.player_id)}
+                          className="mf-btn-gph"
+                        >
+                          {linkBusy ? "Ligando…" : "Es el mismo"}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            )}
           </section>
 
           <section className="rounded-xl border border-mf-border bg-white p-5">

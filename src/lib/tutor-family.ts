@@ -35,6 +35,12 @@ export interface TutorChild {
   share_token: string;
   profile: TutorChildProfile;
   created_at: string;
+  /** Vínculo opcional con jugador de plantel (misma persona). */
+  linked_player_id: string | null;
+  linked_academy_id: string | null;
+  linked_academy_name: string | null;
+  linked_player_slug: string | null;
+  linked_at: string | null;
 }
 
 export interface TutorMaterial {
@@ -102,6 +108,11 @@ function normalizeChild(raw: TutorChild): TutorChild {
       ...emptyProfile(),
       ...(raw.profile ?? {}),
     },
+    linked_player_id: raw.linked_player_id ?? null,
+    linked_academy_id: raw.linked_academy_id ?? null,
+    linked_academy_name: raw.linked_academy_name ?? null,
+    linked_player_slug: raw.linked_player_slug ?? null,
+    linked_at: raw.linked_at ?? null,
   };
 }
 
@@ -243,6 +254,11 @@ export async function syncTutorChildren(
       share_token: newShareToken(),
       profile: emptyProfile(),
       created_at: new Date().toISOString(),
+      linked_player_id: null,
+      linked_academy_id: null,
+      linked_academy_name: null,
+      linked_player_slug: null,
+      linked_at: null,
     });
     changed = true;
   }
@@ -301,6 +317,11 @@ export async function createTutorChild(
       goals: input.goals?.trim() || null,
     },
     created_at: new Date().toISOString(),
+    linked_player_id: null,
+    linked_academy_id: null,
+    linked_academy_name: null,
+    linked_player_slug: null,
+    linked_at: null,
   };
   roster.unshift(child);
   await writeJson(admin, ROSTER, roster);
@@ -371,6 +392,30 @@ export async function getTutorChild(
     roster.find((child) => child.id === childId && child.guardian_user_id === userId) ??
     null
   );
+}
+
+export const getTutorChildForGuardian = getTutorChild;
+
+export async function updateTutorChildLink(
+  admin: SupabaseClient,
+  userId: string,
+  childId: string,
+  link: {
+    linked_player_id: string | null;
+    linked_academy_id: string | null;
+    linked_academy_name: string | null;
+    linked_player_slug: string | null;
+    linked_at: string | null;
+  },
+) {
+  const roster = (await readJson<TutorChild>(admin, ROSTER)).map(normalizeChild);
+  const index = roster.findIndex(
+    (child) => child.id === childId && child.guardian_user_id === userId,
+  );
+  if (index < 0) throw new Error("No encontramos a ese jugador.");
+  roster[index] = { ...roster[index], ...link };
+  await writeJson(admin, ROSTER, roster);
+  return roster[index];
 }
 
 export async function getTutorChildByShareToken(admin: SupabaseClient, token: string) {

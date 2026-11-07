@@ -45,7 +45,9 @@ export function FichaTypesSection() {
         </h2>
         <p className="mt-3 max-w-2xl text-sm leading-7 text-mf-text-secondary">
           No son lo mismo: la ficha que armas tú, las stats del torneo y el informe GPH.
-          Hoy lo que ya puedes usar sin espera es la ficha del tutor.
+          Si tu hijo también está en el plantel de una academia, en el espacio de tutor
+          puedes <span className="font-semibold text-mf-gph-ink">ligarlo</span> para que
+          el sistema reconozca que es la misma persona.
         </p>
 
         <ul className="mt-8 grid gap-3 md:grid-cols-3">
