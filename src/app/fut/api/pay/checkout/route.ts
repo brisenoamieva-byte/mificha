@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createFamilyOrder, parseCheckoutInput, patchFamilyOrder } from "@/lib/family-orders";
-import { familyProduct } from "@/lib/gph-commerce";
+import { MEMBERSHIP_CHECKOUT_DISABLED, familyProduct } from "@/lib/gph-commerce";
 import { createMercadoPagoPreference, isMercadoPagoConfigured } from "@/lib/mercadopago";
 import { createSupabaseAdminClient } from "@/lib/supabase-admin";
 
@@ -9,6 +9,16 @@ export async function POST(request: Request) {
   const parsed = parseCheckoutInput(body);
   if ("error" in parsed) {
     return NextResponse.json({ error: parsed.error }, { status: 400 });
+  }
+
+  if (MEMBERSHIP_CHECKOUT_DISABLED && parsed.data.sku === "membership") {
+    return NextResponse.json(
+      {
+        error:
+          "La membresía está gratis en el piloto. Entra en /fut/tutor sin pagar. Solo el diagnóstico GPH se cobra.",
+      },
+      { status: 400 },
+    );
   }
 
   if (!isMercadoPagoConfigured()) {

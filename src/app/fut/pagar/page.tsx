@@ -1,12 +1,18 @@
 import type { Metadata } from "next";
 import { SiteFooter, SiteHeader } from "@/components/marketing/site-header";
 import { FamilyCheckout } from "@/components/pay/family-checkout";
-import { FAMILY_PRODUCTS, type FamilySku } from "@/lib/gph-commerce";
+import {
+  FAMILY_PRODUCTS,
+  MEMBERSHIP_CHECKOUT_DISABLED,
+  type FamilySku,
+} from "@/lib/gph-commerce";
+import { isMercadoPagoConfigured } from "@/lib/mercadopago";
 
 export const metadata: Metadata = {
-  title: "Pagar evaluación o membresía | MiFicha",
-  description:
-    "Paga la evaluación GPH ($2,900, incluye 1 año de MiFicha) o solo la membresía anual ($1,200) con Mercado Pago.",
+  title: "Pagar diagnóstico GPH | MiFicha",
+  description: MEMBERSHIP_CHECKOUT_DISABLED
+    ? "Paga la evaluación GPH ($2,900, incluye 1 año de MiFicha). La membresía anual está gratis en el piloto."
+    : "Paga la evaluación GPH ($2,900, incluye 1 año de MiFicha) o la membresía anual ($1,200) con Mercado Pago.",
 };
 
 function parseSku(value: string | string[] | undefined): FamilySku | undefined {
@@ -22,6 +28,7 @@ export default async function PagarPage({
 }) {
   const params = await searchParams;
   const sku = parseSku(params.sku);
+  const mercadoPagoReady = isMercadoPagoConfigured();
 
   return (
     <div className="flex min-h-dvh flex-col bg-mf-canvas">
@@ -32,14 +39,27 @@ export default async function PagarPage({
             Familias
           </p>
           <h1 className="mt-2 text-3xl font-semibold tracking-[-0.03em] text-mf-gph-ink sm:text-4xl">
-            Paga aquí. Un año de plataforma.
+            {MEMBERSHIP_CHECKOUT_DISABLED
+              ? "Diagnóstico GPH · membresía gratis en piloto"
+              : "Paga aquí. Un año de plataforma."}
           </h1>
           <p className="mt-3 max-w-2xl text-sm leading-7 text-mf-text-secondary">
-            Evaluación GPH {FAMILY_PRODUCTS.diagnosis.priceLabel} (incluye 12 meses de MiFicha)
-            o membresía sola {FAMILY_PRODUCTS.membership.priceLabel}. Cobro con Mercado Pago.
+            {MEMBERSHIP_CHECKOUT_DISABLED ? (
+              <>
+                Evaluación GPH {FAMILY_PRODUCTS.diagnosis.priceLabel} (incluye 12 meses de
+                MiFicha). La membresía sola no se cobra mientras dure el piloto: entra como
+                tutor sin pagar.
+              </>
+            ) : (
+              <>
+                Evaluación GPH {FAMILY_PRODUCTS.diagnosis.priceLabel} (incluye 12 meses de
+                MiFicha) o membresía sola {FAMILY_PRODUCTS.membership.priceLabel}. Cobro con
+                Mercado Pago.
+              </>
+            )}
           </p>
           <div className="mt-10">
-            <FamilyCheckout initialSku={sku} />
+            <FamilyCheckout initialSku={sku} mercadoPagoReady={mercadoPagoReady} />
           </div>
         </section>
       </main>

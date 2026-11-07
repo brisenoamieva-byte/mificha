@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { OpportunitiesSection } from "@/components/marketing/opportunities-section";
 import { SiteFooter, SiteHeader } from "@/components/marketing/site-header";
-import { FAMILY_PRODUCTS } from "@/lib/gph-commerce";
+import { FAMILY_PRODUCTS, MEMBERSHIP_CHECKOUT_DISABLED } from "@/lib/gph-commerce";
 import {
   MEMBERSHIP_OFFER,
   MEMBERSHIP_STATUS_LABEL,
@@ -10,8 +10,9 @@ import {
 
 export const metadata: Metadata = {
   title: "Membresía anual | MiFicha",
-  description:
-    "MiFicha $1,200 al año: seguimiento del jugador, visorías de Primera, convocatorias, eventos con descuento y especialización acotada.",
+  description: MEMBERSHIP_CHECKOUT_DISABLED
+    ? "Piloto gratis: arma la ficha del tutor sin cobro. Precio de lista $1,200 al año al cerrar el piloto. Diagnóstico GPH $2,900 incluye el año."
+    : "MiFicha $1,200 al año: seguimiento del jugador, visorías de Primera, convocatorias, eventos con descuento y especialización acotada.",
 };
 
 export default function MembresiaPage() {
@@ -21,7 +22,9 @@ export default function MembresiaPage() {
       <main className="flex-1">
         <section className="mx-auto max-w-3xl px-4 py-14 sm:px-6">
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
-            Familias · {FAMILY_PRODUCTS.membership.priceLabel} al año
+            {MEMBERSHIP_CHECKOUT_DISABLED
+              ? "Familias · piloto gratis"
+              : `Familias · ${FAMILY_PRODUCTS.membership.priceLabel} al año`}
           </p>
           <h1 className="mt-3 text-3xl font-semibold tracking-tight text-mf-text sm:text-4xl">
             {MEMBERSHIP_OFFER.headline}
@@ -62,9 +65,15 @@ export default function MembresiaPage() {
             <Link href="/fut/tutor" className="mf-btn-gph">
               Entrar al piloto de tutor
             </Link>
-            <Link href="/fut/pagar?sku=membership" className="mf-btn-gph-ghost">
-              Pagar membresía {FAMILY_PRODUCTS.membership.priceLabel}
-            </Link>
+            {MEMBERSHIP_CHECKOUT_DISABLED ? (
+              <Link href="/fut/pagar?sku=diagnosis" className="mf-btn-gph-ghost">
+                Pagar diagnóstico {FAMILY_PRODUCTS.diagnosis.priceLabel}
+              </Link>
+            ) : (
+              <Link href="/fut/pagar?sku=membership" className="mf-btn-gph-ghost">
+                Pagar membresía {FAMILY_PRODUCTS.membership.priceLabel}
+              </Link>
+            )}
             <Link href="/fut/visorias" className="mf-btn-gph-ghost">
               Visorías
             </Link>

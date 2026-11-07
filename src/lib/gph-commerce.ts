@@ -1,6 +1,12 @@
 /** Acuerdo comercial GPH × MiFicha. Vigente desde el 6 nov 2026. */
 export const PARTNERSHIP_EFFECTIVE_ON = "2026-11-06";
 
+/**
+ * Mientras el piloto esté abierto, la membresía anual no se cobra.
+ * Mantener alineado con TUTOR_PILOT_FREE en tutor-family.ts.
+ */
+export const MEMBERSHIP_CHECKOUT_DISABLED = true;
+
 export const GPH_PARTNERSHIP = {
   gphOperator: "Gustavo Reyes",
   gphBrand: "GPH",

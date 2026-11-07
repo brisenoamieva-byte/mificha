@@ -75,13 +75,13 @@ export const MARKETING_NAV: NavSection[] = [
       },
       {
         href: "/fut/pagar",
-        label: "Pagar",
-        description: "Evaluación $2,900 o membresía $1,200",
+        label: "Pagar diagnóstico",
+        description: "Evaluación GPH $2,900 (incluye 1 año). Membresía gratis en piloto",
       },
       {
         href: "/fut/membresia",
         label: "Membresía anual",
-        description: "Seguimiento, visorías, torneos y especialización · $1,200",
+        description: "Piloto gratis · precio de lista $1,200 al cerrar",
       },
     ],
   },
