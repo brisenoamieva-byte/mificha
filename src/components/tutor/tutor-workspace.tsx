@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { TutorBuilderPanel } from "@/components/tutor/tutor-builder-panel";
 import { signIn, signUp } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import {
@@ -12,7 +12,6 @@ import {
   tutorSharePath,
   type TutorMaterialKind,
 } from "@/lib/tutor-family";
-import { MEMBERSHIP_CHECKOUT_DISABLED } from "@/lib/gph-commerce";
 
 const PHONE_STORAGE_KEY = "mificha.tutor.phone";
 
@@ -287,7 +286,7 @@ export function TutorWorkspace() {
       const payload = await authed("/fut/api/tutor/children", {
         method: "POST",
         body: JSON.stringify({
-          child_id: wasEditing && child ? child.id : undefined,
+          child_id: child?.id,
           player_name: form.player_name,
           guardian_phone: phone || undefined,
           birth_date: form.birth_date || null,
@@ -306,9 +305,9 @@ export function TutorWorkspace() {
       if (createdId) setSelectedId(createdId);
       setEditing(false);
       setNotice(
-        wasEditing
-          ? "Cambios guardados. Abajo está la ficha de tu hijo."
-          : "Ficha creada. Abajo puedes verla, copiar el link o subir fotos.",
+        wasEditing || child
+          ? "Ficha actualizada. La vista previa ya refleja los cambios."
+          : "Ficha creada. Sigue los pasos para completarla.",
       );
       window.setTimeout(() => {
         childPanelRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -478,21 +477,13 @@ export function TutorWorkspace() {
     );
   }
 
-  const shareHref = child?.share_token ? tutorSharePath(child.share_token) : null;
-
   return (
     <div className="space-y-8">
-      <div className="flex flex-wrap items-end justify-between gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
-            {TUTOR_PILOT_FREE ? "Piloto gratuito" : "Tutor"}
-          </p>
-          <h1 className="mt-1 text-2xl font-semibold tracking-tight text-mf-gph-ink">
-            Ficha de tus hijos
-          </h1>
-          <p className="mt-1 text-sm text-mf-text-secondary">{sessionEmail}</p>
+          <p className="text-sm text-mf-text-secondary">{sessionEmail}</p>
           {TUTOR_PILOT_FREE ? (
-            <p className="mt-1 text-xs text-mf-text-muted">{TUTOR_PILOT_LABEL}</p>
+            <p className="mt-0.5 text-xs text-mf-text-muted">{TUTOR_PILOT_LABEL}</p>
           ) : null}
         </div>
         <button
@@ -516,7 +507,7 @@ export function TutorWorkspace() {
       {children.length > 0 ? (
         <div className="space-y-2">
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-mf-text-muted">
-            Tus hijos · elige uno para ver su ficha
+            Tus hijos · elige a quién armar
           </p>
           <div className="flex flex-wrap gap-2">
             {children.map((item) => (
@@ -711,226 +702,26 @@ export function TutorWorkspace() {
       ) : null}
 
       {child && !editing ? (
-        <div ref={childPanelRef} className="grid scroll-mt-24 gap-4">
-          <section className="rounded-xl border border-mf-gph/30 bg-white p-5">
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div>
-                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
-                  Ficha presentable
-                </p>
-                <h2 className="mt-2 text-xl font-semibold text-mf-gph-ink">{child.player_name}</h2>
-                <p className="mt-1 text-sm text-mf-text-secondary">
-                  {[child.profile.position, child.profile.club, child.profile.city]
-                    .filter(Boolean)
-                    .join(" · ") || "Completa el perfil para presentarlo mejor."}
-                </p>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                <button type="button" className="mf-btn-gph-ghost" onClick={() => setEditing(true)}>
-                  Editar datos
-                </button>
-                {shareHref ? (
-                  <>
-                    <Link href={shareHref} target="_blank" className="mf-btn-gph-ghost">
-                      Ver ficha
-                    </Link>
-                    <button type="button" className="mf-btn-gph" onClick={() => void copyShare()}>
-                      {copied ? "Link copiado" : "Copiar link"}
-                    </button>
-                  </>
-                ) : null}
-              </div>
-            </div>
-            {child.profile.bio ? (
-              <p className="mt-4 text-sm leading-7 text-mf-text-secondary">{child.profile.bio}</p>
-            ) : null}
-          </section>
-
-          <section className="rounded-xl border border-mf-border bg-white p-5">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
-              Academia
-            </p>
-            {child.linked_player_id ? (
-              <div className="mt-3 space-y-3">
-                <p className="text-sm leading-6 text-mf-text-secondary">
-                  Ligado a <span className="font-semibold text-mf-gph-ink">{child.linked_academy_name}</span>
-                  {child.linked_player_slug ? (
-                    <>
-                      {" "}
-                      ·{" "}
-                      <Link
-                        href={`/fut/j/${child.linked_player_slug}`}
-                        className="font-semibold text-mf-gph hover:underline"
-                        target="_blank"
-                      >
-                        ver ficha de torneo
-                      </Link>
-                    </>
-                  ) : null}
-                </p>
-                <button
-                  type="button"
-                  disabled={linkBusy}
-                  onClick={() => void unlinkPlayer()}
-                  className="text-xs font-semibold text-mf-text-muted hover:text-mf-danger"
-                >
-                  Quitar vínculo
-                </button>
-              </div>
-            ) : (
-              <div className="mt-3 space-y-3">
-                <p className="text-sm leading-6 text-mf-text-secondary">
-                  Si tu hijo ya está en el plantel de una academia (mismo WhatsApp o correo
-                  de tutor), puedes ligarlo para que sea la misma persona.
-                </p>
-                {linkSuggestions.length === 0 ? (
-                  <p className="text-xs text-mf-text-muted">
-                    No hay coincidencias todavía. Pide a la academia que registre tu mismo
-                    correo/WhatsApp en el plantel.
-                  </p>
-                ) : (
-                  <ul className="space-y-2">
-                    {linkSuggestions.map((item) => (
-                      <li
-                        key={item.player_id}
-                        className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-mf-canvas px-3 py-3"
-                      >
-                        <div>
-                          <p className="text-sm font-semibold text-mf-gph-ink">{item.player_name}</p>
-                          <p className="text-xs text-mf-text-muted">
-                            {item.academy_name} · {item.reason}
-                          </p>
-                        </div>
-                        <button
-                          type="button"
-                          disabled={linkBusy}
-                          onClick={() => void linkPlayer(item.player_id)}
-                          className="mf-btn-gph"
-                        >
-                          {linkBusy ? "Ligando…" : "Es el mismo"}
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            )}
-          </section>
-
-          <section className="rounded-xl border border-mf-border bg-white p-5">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
-              Material del tutor
-            </p>
-            <p className="mt-2 text-sm text-mf-text-secondary">
-              Fotos, videos e historia. Esto alimenta la ficha que compartes.
-            </p>
-            {child.active ? (
-              <div className="mt-4 space-y-4">
-                <div className="flex flex-wrap gap-3">
-                  <label className="mf-btn-gph cursor-pointer">
-                    Subir foto
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="sr-only"
-                      onChange={(event) => void onFile("photo", event.target.files?.[0])}
-                    />
-                  </label>
-                  <label className="mf-btn-gph-ghost cursor-pointer">
-                    Subir video
-                    <input
-                      type="file"
-                      accept="video/*"
-                      className="sr-only"
-                      onChange={(event) => void onFile("video", event.target.files?.[0])}
-                    />
-                  </label>
-                </div>
-                <form onSubmit={(event) => void saveStory(event)} className="space-y-3">
-                  <input
-                    value={storyTitle}
-                    onChange={(event) => setStoryTitle(event.target.value)}
-                    placeholder="Título de la nota"
-                    className={inputClass}
-                  />
-                  <textarea
-                    required
-                    value={storyBody}
-                    onChange={(event) => setStoryBody(event.target.value)}
-                    placeholder="Historia, gol, partido, cómo viene jugando…"
-                    className={`${inputClass} min-h-28`}
-                  />
-                  <button type="submit" disabled={busy} className="mf-btn-gph">
-                    Guardar historia
-                  </button>
-                </form>
-              </div>
-            ) : MEMBERSHIP_CHECKOUT_DISABLED ? (
-              <p className="mt-4 text-sm text-mf-text-secondary">
-                Piloto activo: no hace falta renovar.{" "}
-                <Link href="/fut/pagar?sku=diagnosis" className="font-semibold text-mf-gph hover:underline">
-                  Diagnóstico GPH
-                </Link>{" "}
-                si lo necesitas.
-              </p>
-            ) : (
-              <Link href="/fut/pagar?sku=membership" className="mf-btn-gph mt-4">
-                Renovar año
-              </Link>
-            )}
-            <ul className="mt-6 space-y-4">
-              {child.materials.length === 0 ? (
-                <li className="text-sm text-mf-text-muted">Aún no hay material.</li>
-              ) : (
-                child.materials.map((item) => (
-                  <li key={item.id} className="rounded-lg bg-mf-canvas px-4 py-3">
-                    <p className="text-xs font-semibold uppercase tracking-[0.12em] text-mf-gph">
-                      {item.kind === "story" ? "Historia" : item.kind === "photo" ? "Foto" : "Video"}
-                    </p>
-                    <p className="mt-1 text-sm font-semibold text-mf-gph-ink">{item.title}</p>
-                    {item.body ? (
-                      <p className="mt-1 text-sm leading-6 text-mf-text-secondary">{item.body}</p>
-                    ) : null}
-                    {item.kind === "photo" && item.url ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={item.url} alt="" className="mt-3 max-h-80 rounded-lg" />
-                    ) : null}
-                    {item.kind === "video" && item.url ? (
-                      <video
-                        src={item.url}
-                        controls
-                        playsInline
-                        className="mt-3 max-h-80 w-full rounded-lg bg-black"
-                      />
-                    ) : null}
-                  </li>
-                ))
-              )}
-            </ul>
-          </section>
-
-          <section className="rounded-xl border border-mf-border bg-mf-canvas p-5">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-brand">
-              MiFicha · torneo
-            </p>
-            <p className="mt-2 text-sm leading-6 text-mf-text-secondary">
-              Partidos y stats oficiales llegarán aquí cuando la ficha del torneo esté
-              abierta. Mientras tanto, esta ficha del tutor ya sirve para presentar.
-            </p>
-          </section>
-
-          <section className="rounded-xl border border-mf-border bg-white p-5">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
-              GPH
-            </p>
-            <p className="mt-2 text-sm leading-6 text-mf-text-secondary">
-              El diagnóstico lo escribe el evaluador. Si quieres una sesión,{" "}
-              <Link href="/fut/evaluaciones" className="font-semibold text-mf-gph hover:underline">
-                agenda por WhatsApp
-              </Link>
-              .
-            </p>
-          </section>
+        <div ref={childPanelRef} className="scroll-mt-24">
+          <TutorBuilderPanel
+            child={child}
+            form={form}
+            setForm={setForm}
+            busy={busy}
+            linkBusy={linkBusy}
+            copied={copied}
+            linkSuggestions={linkSuggestions}
+            storyTitle={storyTitle}
+            storyBody={storyBody}
+            setStoryTitle={setStoryTitle}
+            setStoryBody={setStoryBody}
+            onSaveProfile={(event) => void saveChild(event)}
+            onSaveStory={(event) => void saveStory(event)}
+            onFile={(kind, file) => void onFile(kind, file)}
+            onCopyShare={() => void copyShare()}
+            onLinkPlayer={(playerId) => void linkPlayer(playerId)}
+            onUnlinkPlayer={() => void unlinkPlayer()}
+          />
         </div>
       ) : null}
     </div>
