@@ -15,6 +15,8 @@ export interface LedgerDiagnosis {
   playerName: string;
   billable: boolean;
   collected: boolean;
+  /** Entra al reparto GPH×MiFicha (fecha ≥ acuerdo). */
+  inAgreement: boolean;
   mifichaShareMxn: number;
   gphShareMxn: number;
 }
@@ -71,7 +73,7 @@ export async function loadPartnershipLedger(admin: SupabaseClient): Promise<Part
   const paid = orders.filter((row) => row.status === "paid");
   const diagnosisProduct = FAMILY_PRODUCTS.diagnosis;
 
-  const diagnoses = await listDiagnosesSince(admin, paid);
+  const diagnoses = await listDiagnosesForLedger(admin, paid);
 
   const collected = {
     total: paid.reduce((sum, row) => sum + row.amount_mxn, 0),
@@ -80,7 +82,7 @@ export async function loadPartnershipLedger(admin: SupabaseClient): Promise<Part
     diagnosisCount: paid.filter((row) => row.sku === "diagnosis").length,
     membershipCount: paid.filter((row) => row.sku === "membership").length,
   };
-  const pending = diagnoses.filter((row) => row.billable && !row.collected);
+  const pending = diagnoses.filter((row) => row.inAgreement && row.billable && !row.collected);
 
   return {
     cutoff: PARTNERSHIP_EFFECTIVE_ON,
@@ -95,12 +97,12 @@ export async function loadPartnershipLedger(admin: SupabaseClient): Promise<Part
   };
 }
 
-async function listDiagnosesSince(admin: SupabaseClient, paid: FamilyOrderRow[]) {
+async function listDiagnosesForLedger(admin: SupabaseClient, paid: FamilyOrderRow[]) {
   const { data, error } = await admin
     .from("player_diagnoses")
-    .select("id, player_id, kind, evaluated_at, evaluator_name")
-    .gte("evaluated_at", PARTNERSHIP_EFFECTIVE_ON)
+    .select("id, player_id, kind, evaluated_at, evaluator_name, created_at")
     .order("evaluated_at", { ascending: false })
+    .order("created_at", { ascending: false })
     .limit(400);
 
   if (error || !data) return [];
@@ -126,21 +128,27 @@ async function listDiagnosesSince(admin: SupabaseClient, paid: FamilyOrderRow[])
   return data.map((row) => {
     const kind = (row.kind as DiagnosisKind) ?? "inicial";
     const billable = kind === "inicial";
+    const evaluatedAt = dayOf(String(row.evaluated_at || row.created_at));
+    const inAgreement = inPartnership(evaluatedAt);
     const playerName = names.get(String(row.player_id)) || "Jugador";
-    const match = billable
-      ? unusedPaid.find((order) => !used.has(order.id) && namesMatch(playerName, order.player_name ?? ""))
-      : undefined;
+    const match =
+      billable && inAgreement
+        ? unusedPaid.find(
+            (order) => !used.has(order.id) && namesMatch(playerName, order.player_name ?? ""),
+          )
+        : undefined;
     if (match) used.add(match.id);
     return {
       id: String(row.id),
-      evaluatedAt: dayOf(String(row.evaluated_at)),
+      evaluatedAt,
       kind,
       evaluatorName: String(row.evaluator_name ?? ""),
       playerName,
       billable,
       collected: Boolean(match),
-      mifichaShareMxn: billable ? FAMILY_PRODUCTS.diagnosis.mifichaShareMxn : 0,
-      gphShareMxn: billable ? FAMILY_PRODUCTS.diagnosis.gphShareMxn : 0,
+      inAgreement,
+      mifichaShareMxn: billable && inAgreement ? FAMILY_PRODUCTS.diagnosis.mifichaShareMxn : 0,
+      gphShareMxn: billable && inAgreement ? FAMILY_PRODUCTS.diagnosis.gphShareMxn : 0,
     } satisfies LedgerDiagnosis;
   });
 }

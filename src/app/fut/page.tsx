@@ -1,5 +1,4 @@
 import { SiteFooter, SiteHeader } from "@/components/marketing/site-header";
-import { HomeAudienceSection } from "@/components/marketing/home-audience-section";
 import { HomeCtaBand } from "@/components/marketing/home-cta-band";
 import { HomeHero } from "@/components/marketing/home-hero";
 import { HomeHowItWorks } from "@/components/marketing/home-how-it-works";
@@ -48,7 +47,6 @@ export default async function Home() {
         <OpportunitiesSection />
         <HomeHowItWorks />
         <HomeGphAllianceBand />
-        <HomeAudienceSection />
         <VerifiedAcademiesShowcase
           academies={showcaseAcademies}
           playerCount={playerCount}

@@ -418,6 +418,23 @@ export async function updateTutorChildLink(
   return roster[index];
 }
 
+/** Mapa player_id → ficha tutor ligada, para una academia. */
+export async function listTutorLinksByAcademy(admin: SupabaseClient, academyId: string) {
+  const roster = (await readJson<TutorChild>(admin, ROSTER)).map(normalizeChild);
+  return roster
+    .filter(
+      (child) =>
+        child.linked_academy_id === academyId && Boolean(child.linked_player_id),
+    )
+    .map((child) => ({
+      player_id: child.linked_player_id as string,
+      tutor_child_id: child.id,
+      player_name: child.player_name,
+      share_token: child.share_token,
+      guardian_email: child.guardian_email,
+    }));
+}
+
 export async function getTutorChildByShareToken(admin: SupabaseClient, token: string) {
   const clean = token.trim().toLowerCase();
   if (!clean) return null;

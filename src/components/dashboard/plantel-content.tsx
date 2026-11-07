@@ -39,6 +39,7 @@ import {
   isProfileComplete,
   positionOptions,
 } from "@/lib/player-utils";
+import { diagnosisAuthedFetch } from "@/lib/player-diagnosis-client";
 import { supabase } from "@/lib/supabase";
 import type { Player, PlayerPosition } from "@/types/database";
 
@@ -60,12 +61,13 @@ export function PlantelContent() {
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [page, setPage] = useState(1);
   const [gphPlayerIds, setGphPlayerIds] = useState<Set<string>>(new Set());
+  const [tutorLinkedIds, setTutorLinkedIds] = useState<Set<string>>(new Set());
 
   const loadPlayers = useCallback(async () => {
     if (!academy) return;
 
     setLoading(true);
-    const [{ data }, diagnosesResult] = await Promise.all([
+    const [{ data }, diagnosesResult, linksResult] = await Promise.all([
       supabase
         .from("players")
         .select("*")
@@ -87,6 +89,9 @@ export function PlantelContent() {
         .from("player_diagnoses")
         .select("player_id")
         .eq("academy_id", academy.id),
+      diagnosisAuthedFetch(
+        `/fut/api/tutor/academy-links?academy_id=${encodeURIComponent(academy.id)}`,
+      ).catch(() => ({ links: [] as Array<{ player_id: string }> })),
     ]);
 
     setPlayers(data ?? []);
@@ -97,6 +102,8 @@ export function PlantelContent() {
     } else {
       setGphPlayerIds(new Set());
     }
+    const links = (linksResult.links as Array<{ player_id: string }> | undefined) ?? [];
+    setTutorLinkedIds(new Set(links.map((row) => String(row.player_id))));
     setLoading(false);
   }, [academy]);
 
@@ -396,6 +403,11 @@ export function PlantelContent() {
                             <div className="mt-0.5 flex flex-wrap items-center gap-1.5">
                               {gphPlayerIds.has(player.id) ? (
                                 <GphEvaluationBadge asSpan />
+                              ) : null}
+                              {tutorLinkedIds.has(player.id) ? (
+                                <span className="rounded-full bg-mf-gph-soft px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-mf-gph">
+                                  Tutor ligado
+                                </span>
                               ) : null}
                               {!isProfileComplete(player) ? (
                                 <p className="text-xs text-amber-600">Incompleto</p>

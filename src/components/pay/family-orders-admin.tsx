@@ -120,11 +120,12 @@ export function FamilyOrdersAdmin() {
         <div>
           <h2 className="text-lg font-semibold text-mf-text">Diagnósticos</h2>
           <p className="mt-1 text-sm text-mf-text-secondary">
-            El seguimiento y la revaloración no generan otros $600: el año ya viene incluido en la
+            Se listan todos. Solo los del {formatDay(ledger.cutoff)} en adelante entran al
+            reparto. Seguimiento/revaloración no generan otros $600: el año ya va en la
             evaluación de {FAMILY_PRODUCTS.diagnosis.priceLabel}.
           </p>
         </div>
-        <DiagnosisTable rows={ledger.diagnoses} />
+        <DiagnosisTable rows={ledger.diagnoses} cutoff={ledger.cutoff} />
       </section>
     </div>
   );
@@ -169,7 +170,13 @@ function OrderTable({ rows }: { rows: FamilyOrderRow[] }) {
   );
 }
 
-function DiagnosisTable({ rows }: { rows: LedgerDiagnosis[] }) {
+function DiagnosisTable({
+  rows,
+  cutoff,
+}: {
+  rows: LedgerDiagnosis[];
+  cutoff: string;
+}) {
   return (
     <div className="overflow-x-auto rounded-xl border border-mf-border bg-white">
       <table className="min-w-full text-left text-sm">
@@ -192,25 +199,34 @@ function DiagnosisTable({ rows }: { rows: LedgerDiagnosis[] }) {
                   {row.playerName}
                 </Link>
                 <span className="block text-xs text-mf-text-muted">{row.evaluatorName}</span>
+                {!row.inAgreement ? (
+                  <span className="mt-1 inline-block rounded-full bg-mf-canvas px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-mf-text-muted">
+                    Antes del {formatDay(cutoff)}
+                  </span>
+                ) : null}
               </td>
               <td className="px-4 py-3">{DIAGNOSIS_KIND_LABELS[row.kind]}</td>
               <td className="px-4 py-3 tabular-nums">
-                {row.billable ? formatMxn(row.mifichaShareMxn) : "—"}
+                {row.inAgreement && row.billable ? formatMxn(row.mifichaShareMxn) : "—"}
               </td>
               <td className="px-4 py-3 tabular-nums">
-                {row.billable ? formatMxn(row.gphShareMxn) : "—"}
+                {row.inAgreement && row.billable ? formatMxn(row.gphShareMxn) : "—"}
               </td>
               <td className="px-4 py-3">
-                {!row.billable ? "Incluido" : row.collected ? "Pagado" : "Sin cobro"}
+                {!row.inAgreement
+                  ? "Fuera de acuerdo"
+                  : !row.billable
+                    ? "Incluido"
+                    : row.collected
+                      ? "Pagado"
+                      : "Sin cobro"}
               </td>
             </tr>
           ))}
         </tbody>
       </table>
       {rows.length === 0 ? (
-        <p className="px-4 py-6 text-sm text-mf-text-muted">
-          No hay diagnósticos desde esta fecha.
-        </p>
+        <p className="px-4 py-6 text-sm text-mf-text-muted">Aún no hay diagnósticos registrados.</p>
       ) : null}
     </div>
   );
