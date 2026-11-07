@@ -29,19 +29,6 @@ const ACCOUNTS = [
     primary: false,
   },
   {
-    id: "gph",
-    title: "Evaluador / GPH",
-    forWho: "Staff autorizado",
-    status: "Privado",
-    canDo: [
-      "Crear y ver diagnósticos",
-      "Administrar visorías y ganancias",
-    ],
-    href: "/fut/evaluaciones",
-    cta: "Ver evaluaciones",
-    primary: false,
-  },
-  {
     id: "link",
     title: "Solo con un link",
     forWho: "Padres con ficha de torneo",
