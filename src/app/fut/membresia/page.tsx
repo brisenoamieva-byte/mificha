@@ -2,11 +2,15 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { SiteFooter, SiteHeader } from "@/components/marketing/site-header";
 import { FAMILY_PRODUCTS } from "@/lib/gph-commerce";
+import {
+  MEMBERSHIP_OFFER,
+  MEMBERSHIP_STATUS_LABEL,
+} from "@/lib/membership-offer";
 
 export const metadata: Metadata = {
   title: "Membresía anual | MiFicha",
   description:
-    "Membresía anual $1,200 MXN: el tutor lleva el seguimiento del hijo con videos, fotos e historia en MiFicha.",
+    "MiFicha $1,200 al año: seguimiento del jugador, visorías de Primera, convocatorias, eventos con descuento y especialización acotada.",
 };
 
 export default function MembresiaPage() {
@@ -16,44 +20,43 @@ export default function MembresiaPage() {
       <main className="flex-1">
         <section className="mx-auto max-w-3xl px-4 py-14 sm:px-6">
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
-            Familias
+            Familias · {FAMILY_PRODUCTS.membership.priceLabel} al año
           </p>
           <h1 className="mt-3 text-3xl font-semibold tracking-tight text-mf-text sm:text-4xl">
-            El seguimiento de tu hijo, un año
+            {MEMBERSHIP_OFFER.headline}
           </h1>
           <p className="mt-4 rounded-lg bg-mf-gph-soft px-4 py-3 text-sm leading-7 text-mf-gph-ink">
-            <span className="font-semibold">Piloto gratuito ahora.</span> Puedes entrar
-            como tutor, subir material y generar la ficha presentable sin pagar los{" "}
-            {FAMILY_PRODUCTS.membership.priceLabel}. El cobro anual se activa después del
-            piloto.
+            {MEMBERSHIP_OFFER.pilotNote}
           </p>
           <p className="mt-4 text-sm leading-7 text-mf-text-secondary">
-            Cuando el piloto cierre, la membresía será {FAMILY_PRODUCTS.membership.priceLabel}{" "}
-            MXN al año. Entras como papá, mamá o tutor y armas la ficha: videos, fotos e
-            historia para universidades, visorías o clubes.
+            {MEMBERSHIP_OFFER.summary}
           </p>
-          <ul className="mt-8 space-y-4 text-sm leading-7 text-mf-text-secondary">
-            <li>
-              <span className="font-semibold text-mf-text">Tú subes el material. </span>
-              Clips, fotos, goles y notas del jugador. Queda en su ficha, no en el feed
-              de nadie.
-            </li>
-            <li>
-              <span className="font-semibold text-mf-text">Un lugar para el año. </span>
-              Partidos, visorías y, si lo contratas, el diagnóstico GPH se leen sobre la
-              misma ficha.
-            </li>
-            <li>
-              <span className="font-semibold text-mf-text">Privado por defecto. </span>
-              El tutor decide si esa ficha se comparte con un club. Los menores no se
-              publican solos.
-            </li>
-            <li>
-              <span className="font-semibold text-mf-text">La evaluación ya incluye el año. </span>
-              Si pagas el diagnóstico GPH ({FAMILY_PRODUCTS.diagnosis.priceLabel}), no
-              vuelves a pagar estos {FAMILY_PRODUCTS.membership.priceLabel}.
-            </li>
-          </ul>
+
+          <ol className="mt-8 space-y-4">
+            {MEMBERSHIP_OFFER.benefits.map((item, index) => (
+              <li
+                key={item.id}
+                className="rounded-xl border border-mf-border bg-white px-4 py-4"
+              >
+                <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-mf-gph">
+                  {String(index + 1).padStart(2, "0")} · {MEMBERSHIP_STATUS_LABEL[item.status]}
+                </p>
+                <h2 className="mt-1.5 text-base font-semibold text-mf-gph-ink">{item.title}</h2>
+                <p className="mt-1 text-sm leading-6 text-mf-text-secondary">{item.detail}</p>
+              </li>
+            ))}
+          </ol>
+
+          <p className="mt-6 text-sm leading-7 text-mf-text-secondary">
+            <span className="font-semibold text-mf-text">Especialización. </span>
+            {MEMBERSHIP_OFFER.specializationLimit}
+          </p>
+          <p className="mt-2 text-sm leading-7 text-mf-text-secondary">
+            <span className="font-semibold text-mf-text">Diagnóstico GPH. </span>
+            Si pagas la evaluación ({FAMILY_PRODUCTS.diagnosis.priceLabel}), ya incluye
+            estos 12 meses: no vuelves a pagar la membresía.
+          </p>
+
           <div className="mt-8 flex flex-wrap gap-3">
             <Link href="/fut/tutor" className="mf-btn-gph">
               Entrar al piloto de tutor
@@ -62,7 +65,10 @@ export default function MembresiaPage() {
               Pagar membresía {FAMILY_PRODUCTS.membership.priceLabel}
             </Link>
             <Link href="/fut/visorias" className="mf-btn-gph-ghost">
-              Registrar visoría
+              Visorías
+            </Link>
+            <Link href="/fut/evaluaciones" className="mf-btn-gph-ghost">
+              Diagnóstico GPH
             </Link>
           </div>
         </section>

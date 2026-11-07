@@ -54,7 +54,7 @@ export const FAMILY_PRODUCTS = {
     priceLabel: "$1,200",
     period: "MXN · 12 meses",
     description:
-      "Un año de plataforma: ficha del jugador, convocatorias y beneficios GPH. Sin evaluación.",
+      "Seguimiento digital, avisos de visorías de Primera, convocatorias curadas, eventos con descuento y 1 ciclo de especialización al mes. Sin evaluación.",
     includesMembershipDays: 365,
     mifichaShareMxn: GPH_PARTNERSHIP.mifichaShareMxn,
     gphShareMxn: 600,

@@ -9,9 +9,33 @@ La plataforma no es el producto único: es el canal para vender y operar el nego
 
 ## Fuentes de ingreso (en este orden de trabajo)
 
-1. **Entrenamientos** — sesiones, camps, convocatorias de training GPH. La membresía puede incluir entrenamiento gratis; el extra se cobra.
-2. **Anualidad de plataforma** — membresía **anual $1,200 MXN** (no mensual). Ficha, visibilidad, beneficios GPH.
-3. **Diagnósticos GPH** — evaluación **$2,900 MXN e incluye 12 meses de MiFicha**. Cobro en `/fut/pagar` con Mercado Pago.
+1. **Entrenamientos** — sesiones, camps, convocatorias de training GPH. La membresía incluye especialización **acotada** (1 ciclo/mes o el cupo publicado); el extra se cobra.
+2. **Anualidad de plataforma** — **$1,200 MXN al año**. Producto de familia: seguimiento + acceso a oportunidades. No es red social.
+3. **Diagnósticos GPH** — evaluación **$2,900 MXN e incluye 12 meses de MiFicha**. Vive en Evaluaciones, no en la página de visorías. Cobro en `/fut/pagar`.
+
+## Qué compra la familia con $1,200
+
+Promesa pública (membresía):
+
+1. Seguimiento digital del desarrollo del jugador (ficha, material del tutor, después torneo + GPH).
+2. Convocatorias a torneos de alto nivel (curadas, no mural abierto).
+3. Fechas de visorías con equipos de Primera División (como Querétaro · Chivas / Santos).
+4. Eventos deportivos con descuento de miembro.
+5. Entrenamiento de especialización gratis **con límite** (1 ciclo/mes o cupo GPH); el resto se cotiza.
+
+Operación:
+
+- Cuenta del tutor ligada al jugador. Un tutor puede tener más de un hijo.
+- Ficha privada. El tutor sube video, foto y notas; puede generar ficha presentable (universidades, visorías, clubes).
+- **Piloto:** hoy el tutor puede armar ficha sin cobro (`TUTOR_PILOT_FREE`). Al cerrar el piloto, sin membresía vigente no hay carga de material.
+- La evaluación GPH ($2,900) ya incluye ese mismo año: no se cobra membresía otra vez.
+- Consentimiento del tutor para menores. Compartir con clubes es permiso aparte.
+
+## Tres bloques en la ficha (no se mezclan)
+
+1. **Material del tutor** — lo escribe y sube papá, mamá o tutor: videos, fotos, historia. GPH no lo edita.
+2. **MiFicha** — lo arma la plataforma: identidad, partidos, stats, historial. El tutor lo ve; no lo reescribe.
+3. **GPH** — lo escribe el evaluador: diagnóstico, etapa, plan. El tutor lo ve; no lo edita.
 
 ## Acuerdo GPH × MiFicha (6 nov 2026)
 
@@ -19,17 +43,16 @@ La plataforma no es el producto único: es el canal para vender y operar el nego
 - Plataforma: **José Ricardo Briseño Amieva (MiFicha)**.
 - Por cada evaluación cobrada ($2,900): MiFicha **$600**, GPH **$2,300**.
 - Por cada membresía sola ($1,200): MiFicha **$600**, GPH **$600**.
-- El dinero entra por Mercado Pago de MiFicha; el split se registra en cobros para liquidar a GPH. No hay precio socio $2,200: la evaluación ya trae el año de plataforma.
-4. **Eventos** — visorías, jornadas, clínicas. El registro en sitio es captura; el ingreso es cupo, add-ons o upsell a diagnóstico/membresía/entrenamiento, no “el form gratis” como fin.
-5. **Patrocinios** — marcas en eventos, fichas, convocatoria. Inventario claro (logo, mención, presencia).
-6. **Fees por organización de torneos** — MiFicha/GPH cobra por armar, inscribir y operar torneos (calendario, convocatorias, cobro).
-7. **Publicidad en la plataforma** — espacios pagados dentro del producto (home, ficha, visorías, calendario). Distinto a patrocinio de evento.
+- El dinero entra por Mercado Pago de MiFicha; el split se registra en cobros. No hay precio socio $2,200.
+
+4. **Eventos** — visorías, jornadas, clínicas. El registro en sitio es captura; el ingreso es cupo, add-ons o upsell.
+5. **Patrocinios** — marcas en eventos, fichas, convocatoria.
+6. **Fees por organización de torneos** — armar, inscribir y operar torneos.
+7. **Publicidad en la plataforma** — espacios pagados dentro del producto.
 
 ## Cómo lograrlo en producto
 
-- Funnel: evento/visoría gratis o barato → tutor en WhatsApp y en DB → anualidad + diagnóstico + entrenamientos.
-- No construir como red social. Construir como operación que cobra: registro, cobro, lista, confirmación, entrega (PDF, horario, sede).
-- Visorías y calendario de torneos alimentan (4) y (6); no sustituyen (2) ni (3).
-- Padres subiendo videos/goles sirve a ficha y a visores; el pago sigue siendo anualidad, diagnóstico o evento.
-- Copy y pricing deben empujar anualidad y diagnóstico, no suscripción mensual.
-- Al diseñar UI, deja gancho visible a membresía, diagnóstico y entrenamientos cerca de registros de evento.
+- Funnel: visoría/evento gratis → tutor en DB → anualidad + diagnóstico + entrenamientos.
+- No construir como red social ni marketplace de scouts.
+- Copy de membresía debe listar los 5 beneficios de arriba; no vender “todo gratis para siempre”.
+- Al diseñar UI, deja gancho a membresía, diagnóstico, visorías y entrenamientos cerca de registros de evento.

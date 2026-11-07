@@ -81,7 +81,7 @@ export const MARKETING_NAV: NavSection[] = [
       {
         href: "/fut/membresia",
         label: "Membresía anual",
-        description: "Familias: $1,200 al año · pagar en línea",
+        description: "Seguimiento, visorías, torneos y especialización · $1,200",
       },
     ],
   },
