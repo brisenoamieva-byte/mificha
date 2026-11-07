@@ -115,6 +115,20 @@ export function tutorSharePath(token: string) {
   return `/fut/f/${token}`;
 }
 
+/** Posiciones más usadas en ficha de tutor (texto libre almacenado). */
+export const TUTOR_POSITION_OPTIONS = [
+  "Portero",
+  "Defensa central",
+  "Lateral derecho",
+  "Lateral izquierdo",
+  "Mediocampista defensivo",
+  "Mediocampista",
+  "Mediocampista ofensivo",
+  "Extremo derecho",
+  "Extremo izquierdo",
+  "Delantero",
+] as const;
+
 async function ensureOpsBucket(admin: SupabaseClient) {
   const { data } = await admin.storage.listBuckets();
   if (data?.some((bucket) => bucket.name === OPS_BUCKET)) return;

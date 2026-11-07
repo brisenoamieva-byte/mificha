@@ -7,6 +7,7 @@ import { supabase } from "@/lib/supabase";
 import {
   TUTOR_PILOT_FREE,
   TUTOR_PILOT_LABEL,
+  TUTOR_POSITION_OPTIONS,
   tutorSharePath,
   type TutorMaterialKind,
 } from "@/lib/tutor-family";
@@ -453,12 +454,22 @@ export function TutorWorkspace() {
             </label>
             <label className="block text-sm font-medium text-mf-text">
               Posición
-              <input
+              <select
                 value={form.position}
                 onChange={(event) => setForm((current) => ({ ...current, position: event.target.value }))}
                 className={inputClass}
-                placeholder="Delantero, medio…"
-              />
+              >
+                <option value="">Selecciona…</option>
+                {TUTOR_POSITION_OPTIONS.map((position) => (
+                  <option key={position} value={position}>
+                    {position}
+                  </option>
+                ))}
+                {form.position &&
+                !(TUTOR_POSITION_OPTIONS as readonly string[]).includes(form.position) ? (
+                  <option value={form.position}>{form.position}</option>
+                ) : null}
+              </select>
             </label>
             <label className="block text-sm font-medium text-mf-text">
               Club o academia
