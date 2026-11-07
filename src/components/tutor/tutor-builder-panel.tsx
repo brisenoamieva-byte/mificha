@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Check, Circle, Copy, ExternalLink, ImagePlus, Video } from "lucide-react";
 import { TutorPublicFicha } from "@/components/tutor/tutor-public-ficha";
 import {
@@ -104,18 +104,41 @@ export function TutorBuilderPanel({
   onLinkPlayer,
   onUnlinkPlayer,
 }: TutorBuilderPanelProps) {
+  const draftProfile = useMemo(
+    () => ({
+      birth_date: form.birth_date || null,
+      position: form.position || null,
+      club: form.club || null,
+      school: form.school || null,
+      city: form.city || null,
+      height_cm: form.height_cm ? Number(form.height_cm) : null,
+      dominant_foot: form.dominant_foot || null,
+      bio: form.bio || null,
+      goals: form.goals || null,
+    }),
+    [form],
+  );
+
   const progress = useMemo(
     () =>
       buildTutorProgress({
-        player_name: child.player_name,
-        profile: child.profile,
+        player_name: form.player_name || child.player_name,
+        profile: draftProfile,
         materials: child.materials,
       }),
-    [child],
+    [child.materials, child.player_name, draftProfile, form.player_name],
   );
   const [step, setStep] = useState<TutorBuilderStepId>(progress.next.id);
+  const lastSavedKey = useRef(`${child.id}:${child.materials.length}:${child.player_name}`);
   const shareHref = child.share_token ? tutorSharePath(child.share_token) : null;
   const showAcademy = Boolean(child.linked_player_id) || linkSuggestions.length > 0;
+
+  useEffect(() => {
+    const key = `${child.id}:${child.materials.length}:${child.player_name}:${child.profile.bio ?? ""}:${child.profile.position ?? ""}`;
+    if (lastSavedKey.current === key) return;
+    lastSavedKey.current = key;
+    setStep(progress.next.id);
+  }, [child, progress.next.id]);
 
   const previewChild: TutorChild = {
     id: child.id,
@@ -126,17 +149,7 @@ export function TutorBuilderPanel({
     membership_until: child.membership_until,
     source_folios: [],
     share_token: child.share_token,
-    profile: {
-      birth_date: form.birth_date || null,
-      position: form.position || null,
-      club: form.club || null,
-      school: form.school || null,
-      city: form.city || null,
-      height_cm: form.height_cm ? Number(form.height_cm) : null,
-      dominant_foot: form.dominant_foot || null,
-      bio: form.bio || null,
-      goals: form.goals || null,
-    },
+    profile: draftProfile,
     created_at: "",
     linked_player_id: child.linked_player_id ?? null,
     linked_academy_id: child.linked_academy_id ?? null,
@@ -433,6 +446,12 @@ export function TutorBuilderPanel({
             />
             {child.active ? (
               <>
+                {progress.photos === 0 ? (
+                  <p className="rounded-xl border border-mf-gph/30 bg-mf-gph-soft px-4 py-3 text-sm leading-6 text-mf-gph-ink">
+                    La portada necesita al menos una foto clara de frente. Es el paso que
+                    más profesionaliza la ficha.
+                  </p>
+                ) : null}
                 <div className="flex flex-wrap gap-3">
                   <label className="mf-btn-gph cursor-pointer">
                     <ImagePlus className="h-4 w-4" />

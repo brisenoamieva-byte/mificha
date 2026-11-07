@@ -59,11 +59,11 @@ export function EvaluacionesPageContent() {
               Agendar por WhatsApp
               <ArrowRight className="h-4 w-4" />
             </a>
-            <Link href="/fut/pagar?sku=diagnosis" className="mf-btn-gph-ghost">
-              Pagar evaluación
-            </Link>
             <Link href="/fut/tutor" className="mf-btn-gph-ghost">
               Cuenta de tutor
+            </Link>
+            <Link href="/fut/pagar?sku=diagnosis" className="mf-btn-gph-ghost">
+              Ver pago
             </Link>
           </>
         }

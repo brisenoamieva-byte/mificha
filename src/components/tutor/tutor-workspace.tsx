@@ -8,7 +8,6 @@ import {
   TUTOR_CITY_OPTIONS,
   TUTOR_PILOT_FREE,
   TUTOR_PILOT_LABEL,
-  TUTOR_POSITION_OPTIONS,
   tutorSharePath,
   type TutorMaterialKind,
 } from "@/lib/tutor-family";
@@ -114,7 +113,6 @@ export function TutorWorkspace() {
   const [storyBody, setStoryBody] = useState("");
   const [busy, setBusy] = useState(false);
   const [form, setForm] = useState(emptyForm);
-  const [editing, setEditing] = useState(false);
   const [copied, setCopied] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const [linkSuggestions, setLinkSuggestions] = useState<LinkSuggestion[]>([]);
@@ -168,7 +166,7 @@ export function TutorWorkspace() {
   const child = children.find((item) => item.id === selectedId) ?? null;
 
   useEffect(() => {
-    if (!child || editing) return;
+    if (!child) return;
     setForm({
       player_name: child.player_name,
       birth_date: child.profile.birth_date ?? "",
@@ -181,10 +179,10 @@ export function TutorWorkspace() {
       bio: child.profile.bio ?? "",
       goals: child.profile.goals ?? "",
     });
-  }, [child, editing]);
+  }, [child]);
 
   useEffect(() => {
-    if (!child || editing || child.linked_player_id) {
+    if (!child || child.linked_player_id) {
       setLinkSuggestions([]);
       return;
     }
@@ -200,7 +198,7 @@ export function TutorWorkspace() {
     return () => {
       cancelled = true;
     };
-  }, [child, editing]);
+  }, [child]);
 
   async function linkPlayer(playerId: string) {
     if (!child) return;
@@ -274,7 +272,7 @@ export function TutorWorkspace() {
     setBusy(true);
     setError(null);
     setNotice(null);
-    const wasEditing = editing;
+    const updating = Boolean(child);
     try {
       if (phone) {
         try {
@@ -303,9 +301,8 @@ export function TutorWorkspace() {
       const createdId = payload.child?.id ?? null;
       await load(phone, createdId);
       if (createdId) setSelectedId(createdId);
-      setEditing(false);
       setNotice(
-        wasEditing || child
+        updating
           ? "Ficha actualizada. La vista previa ya refleja los cambios."
           : "Ficha creada. Sigue los pasos para completarla.",
       );
@@ -516,7 +513,6 @@ export function TutorWorkspace() {
                 type="button"
                 onClick={() => {
                   setSelectedId(item.id);
-                  setEditing(false);
                   setNotice(null);
                   setError(null);
                 }}
@@ -533,7 +529,6 @@ export function TutorWorkspace() {
               type="button"
               onClick={() => {
                 setSelectedId(null);
-                setEditing(false);
                 setForm(emptyForm);
                 setNotice(null);
                 setError(null);
@@ -550,70 +545,41 @@ export function TutorWorkspace() {
         </p>
       )}
 
-      {!child || editing || children.length === 0 ? (
+      {!child || children.length === 0 ? (
         <form
           onSubmit={(event) => void saveChild(event)}
-          className="space-y-4 rounded-xl border border-mf-border bg-white p-5"
+          className="mx-auto max-w-lg space-y-4 rounded-2xl border border-mf-border bg-white p-5 sm:p-6"
         >
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
-              {editing ? "Editar ficha" : "Nuevo jugador"}
+              Nuevo jugador
             </p>
+            <h2 className="mt-1 text-xl font-semibold text-mf-gph-ink">Empieza con el nombre</h2>
             <p className="mt-1 text-sm text-mf-text-secondary">
-              Datos para presentar en visorías, universidades o clubes.
+              Luego el constructor te pide el resto paso a paso.
             </p>
           </div>
+          <label className="block text-sm font-medium text-mf-text">
+            Nombre completo
+            <input
+              required
+              value={form.player_name}
+              onChange={(event) =>
+                setForm((current) => ({ ...current, player_name: event.target.value }))
+              }
+              className={inputClass}
+              placeholder="Ej. Diego Briseño"
+            />
+          </label>
           <div className="grid gap-4 sm:grid-cols-2">
-            <label className="block text-sm font-medium text-mf-text sm:col-span-2">
-              Nombre completo
-              <input
-                required
-                value={form.player_name}
-                onChange={(event) => setForm((current) => ({ ...current, player_name: event.target.value }))}
-                className={inputClass}
-              />
-            </label>
             <label className="block text-sm font-medium text-mf-text">
               Fecha de nacimiento
               <input
                 type="date"
                 value={form.birth_date}
-                onChange={(event) => setForm((current) => ({ ...current, birth_date: event.target.value }))}
-                className={inputClass}
-              />
-            </label>
-            <label className="block text-sm font-medium text-mf-text">
-              Posición
-              <select
-                value={form.position}
-                onChange={(event) => setForm((current) => ({ ...current, position: event.target.value }))}
-                className={inputClass}
-              >
-                <option value="">Selecciona…</option>
-                {TUTOR_POSITION_OPTIONS.map((position) => (
-                  <option key={position} value={position}>
-                    {position}
-                  </option>
-                ))}
-                {form.position &&
-                !(TUTOR_POSITION_OPTIONS as readonly string[]).includes(form.position) ? (
-                  <option value={form.position}>{form.position}</option>
-                ) : null}
-              </select>
-            </label>
-            <label className="block text-sm font-medium text-mf-text">
-              Club o academia
-              <input
-                value={form.club}
-                onChange={(event) => setForm((current) => ({ ...current, club: event.target.value }))}
-                className={inputClass}
-              />
-            </label>
-            <label className="block text-sm font-medium text-mf-text">
-              Escuela
-              <input
-                value={form.school}
-                onChange={(event) => setForm((current) => ({ ...current, school: event.target.value }))}
+                onChange={(event) =>
+                  setForm((current) => ({ ...current, birth_date: event.target.value }))
+                }
                 className={inputClass}
               />
             </label>
@@ -621,7 +587,9 @@ export function TutorWorkspace() {
               Ciudad
               <select
                 value={form.city}
-                onChange={(event) => setForm((current) => ({ ...current, city: event.target.value }))}
+                onChange={(event) =>
+                  setForm((current) => ({ ...current, city: event.target.value }))
+                }
                 className={inputClass}
               >
                 <option value="">Selecciona…</option>
@@ -630,78 +598,19 @@ export function TutorWorkspace() {
                     {city}
                   </option>
                 ))}
-                {form.city && !(TUTOR_CITY_OPTIONS as readonly string[]).includes(form.city) ? (
-                  <option value={form.city}>{form.city}</option>
-                ) : null}
               </select>
-            </label>
-            <label className="block text-sm font-medium text-mf-text">
-              Estatura (cm)
-              <input
-                inputMode="numeric"
-                value={form.height_cm}
-                onChange={(event) => setForm((current) => ({ ...current, height_cm: event.target.value }))}
-                className={inputClass}
-              />
-            </label>
-            <label className="block text-sm font-medium text-mf-text">
-              Pie dominante
-              <select
-                value={form.dominant_foot}
-                onChange={(event) =>
-                  setForm((current) => ({
-                    ...current,
-                    dominant_foot: event.target.value as typeof form.dominant_foot,
-                  }))
-                }
-                className={inputClass}
-              >
-                <option value="">Opcional</option>
-                <option value="right">Diestro</option>
-                <option value="left">Zurdo</option>
-                <option value="both">Ambidiestro</option>
-              </select>
-            </label>
-            <label className="block text-sm font-medium text-mf-text sm:col-span-2">
-              Presentación
-              <textarea
-                value={form.bio}
-                onChange={(event) => setForm((current) => ({ ...current, bio: event.target.value }))}
-                className={`${inputClass} min-h-24`}
-                placeholder="Quién es, cómo juega, trayectoria breve…"
-              />
-            </label>
-            <label className="block text-sm font-medium text-mf-text sm:col-span-2">
-              Objetivo
-              <textarea
-                value={form.goals}
-                onChange={(event) => setForm((current) => ({ ...current, goals: event.target.value }))}
-                className={`${inputClass} min-h-20`}
-                placeholder="Universidad, visoría, club, siguiente paso…"
-              />
             </label>
           </div>
           {error ? (
             <p className="rounded-lg bg-mf-danger-soft px-3 py-2 text-sm text-mf-danger">{error}</p>
           ) : null}
-          <div className="flex flex-wrap gap-2">
-            <button type="submit" disabled={busy} className="mf-btn-gph">
-              {busy ? "Guardando…" : editing ? "Guardar cambios" : "Crear ficha"}
-            </button>
-            {editing ? (
-              <button
-                type="button"
-                className="mf-btn-gph-ghost"
-                onClick={() => setEditing(false)}
-              >
-                Cancelar
-              </button>
-            ) : null}
-          </div>
+          <button type="submit" disabled={busy} className="mf-btn-gph w-full justify-center">
+            {busy ? "Creando…" : "Crear ficha y continuar"}
+          </button>
         </form>
       ) : null}
 
-      {child && !editing ? (
+      {child ? (
         <div ref={childPanelRef} className="scroll-mt-24">
           <TutorBuilderPanel
             child={child}

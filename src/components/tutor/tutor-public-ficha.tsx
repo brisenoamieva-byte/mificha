@@ -103,7 +103,7 @@ export function TutorPublicFicha({
         </div>
       </div>
 
-      {(profile.bio || profile.goals) && !compact ? (
+      {profile.bio || profile.goals ? (
         <div className="border-b border-mf-border px-5 py-5 sm:px-7">
           {profile.bio ? (
             <p className="text-sm leading-7 text-mf-text-secondary">{profile.bio}</p>
@@ -174,7 +174,9 @@ export function TutorPublicFicha({
 
       {!photos.length && !videos.length && !stories.length && !profile.bio ? (
         <p className="px-5 py-8 text-center text-sm text-mf-text-muted sm:px-7">
-          Completa los pasos de la izquierda para armar esta ficha.
+          {compact
+            ? "Completa los pasos de la derecha para armar esta ficha."
+            : "El tutor aún está armando esta ficha."}
         </p>
       ) : null}
     </article>

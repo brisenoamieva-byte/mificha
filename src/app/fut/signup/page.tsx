@@ -15,13 +15,13 @@ export default function SignUpPage() {
       title="Crea tu cuenta de academia"
       subtitle={
         <WithBrandName>
-          Gratis para academias en Querétaro. Carga plantel; MiFicha sincroniza el acta
-          del torneo cuando tu organizador activa la temporada.
+          Para colegios y clubes. Si eres padre, crea la ficha en la cuenta de tutor
+          (piloto gratis).
         </WithBrandName>
       }
       footer={
         <>
-          <Link href="/fut/tutor" className="text-mf-brand hover:underline">
+          <Link href="/fut/tutor" className="font-semibold text-mf-brand hover:underline">
             ¿Eres padre? Crear cuenta de tutor
           </Link>
           <span className="mx-2 text-mf-text-muted">·</span>

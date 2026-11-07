@@ -103,8 +103,10 @@ export default function TerminosPage() {
           separada.
         </LegalParagraph>
         <LegalParagraph>
-          Los pagos en línea, cuando apliquen, se procesan por Stripe. Puedes cancelar
-          conforme a las opciones del panel o contactando a {LEGAL_ENTITY.contactEmail}.
+          Los pagos en línea, cuando apliquen, se procesan por Mercado Pago u otro
+          procesador indicado en el checkout. También puedes coordinar por WhatsApp.
+          Puedes cancelar conforme a las opciones del panel o contactando a{" "}
+          {LEGAL_ENTITY.contactEmail}.
         </LegalParagraph>
       </LegalSection>
 
