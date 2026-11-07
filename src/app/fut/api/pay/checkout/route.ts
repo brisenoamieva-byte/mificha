@@ -15,7 +15,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         error:
-          "La membresía está gratis en el piloto. Entra en /fut/tutor sin pagar. Solo el diagnóstico GPH se cobra.",
+          "La membresía está gratis en el piloto. Entra como tutor sin pagar. Solo el diagnóstico GPH se cobra.",
       },
       { status: 400 },
     );
@@ -25,7 +25,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         error:
-          "Aún no está conectado Mercado Pago. Configura MERCADOPAGO_ACCESS_TOKEN en Vercel o escríbenos por WhatsApp.",
+          "El cobro en línea aún no está activo. Agenda el diagnóstico por WhatsApp.",
       },
       { status: 503 },
     );

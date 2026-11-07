@@ -102,42 +102,55 @@ export function FamilyCheckout({
 
       <div className="grid gap-8 lg:grid-cols-[0.92fr_1.08fr] lg:items-start">
         <div className="grid gap-3">
-          {(Object.values(FAMILY_PRODUCTS) as (typeof FAMILY_PRODUCTS)[FamilySku][]).map((item) => {
+          {(
+            Object.values(FAMILY_PRODUCTS) as (typeof FAMILY_PRODUCTS)[FamilySku][]
+          )
+            .filter(
+              (item) =>
+                !(MEMBERSHIP_CHECKOUT_DISABLED && item.sku === "membership"),
+            )
+            .map((item) => {
             const selected = item.sku === sku;
-            const isMembershipPilot = MEMBERSHIP_CHECKOUT_DISABLED && item.sku === "membership";
             return (
-              <button
+              <div
                 key={item.sku}
-                type="button"
-                onClick={() => setSku(item.sku)}
                 className={
                   selected
                     ? "rounded-xl border border-mf-gph bg-mf-gph-soft px-5 py-5 text-left"
-                    : "rounded-xl border border-mf-border bg-white px-5 py-5 text-left hover:border-mf-gph/40"
+                    : "rounded-xl border border-mf-border bg-white px-5 py-5 text-left"
                 }
               >
                 <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
-                  {item.sku === "diagnosis"
-                    ? "Se paga"
-                    : isMembershipPilot
-                      ? "Gratis en piloto"
-                      : "Solo plataforma"}
+                  Se paga
                 </p>
                 <p className="mt-2 text-lg font-semibold tracking-tight text-mf-gph-ink">
                   {item.publicName}
                 </p>
                 <p className="mt-1 text-3xl font-semibold tracking-tight text-mf-gph">
-                  {isMembershipPilot ? "Gratis" : formatMxn(item.priceMxn)}
+                  {formatMxn(item.priceMxn)}
                 </p>
-                <p className="mt-1 text-xs text-mf-text-muted">
-                  {isMembershipPilot
-                    ? "Sin cobro mientras dure el piloto · valor de lista " + item.priceLabel
-                    : item.period}
-                </p>
+                <p className="mt-1 text-xs text-mf-text-muted">{item.period}</p>
                 <p className="mt-3 text-sm leading-6 text-mf-text-secondary">{item.description}</p>
-              </button>
+              </div>
             );
           })}
+          {MEMBERSHIP_CHECKOUT_DISABLED ? (
+            <div className="rounded-xl border border-dashed border-mf-border bg-white px-5 py-5">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-text-muted">
+                Gratis en piloto
+              </p>
+              <p className="mt-2 text-lg font-semibold tracking-tight text-mf-gph-ink">
+                {FAMILY_PRODUCTS.membership.publicName}
+              </p>
+              <p className="mt-1 text-sm leading-6 text-mf-text-secondary">
+                Sin cobro por ahora.{" "}
+                <Link href="/fut/tutor" className="font-semibold text-mf-gph hover:underline">
+                  Entra como tutor
+                </Link>{" "}
+                · lista {FAMILY_PRODUCTS.membership.priceLabel}/año al cerrar el piloto.
+              </p>
+            </div>
+          ) : null}
         </div>
 
         {membershipBlocked ? (

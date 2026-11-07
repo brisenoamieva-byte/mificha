@@ -41,8 +41,8 @@ export const MIFICH_OPPORTUNITIES: OpportunityItem[] = [
     detail:
       "Incluida en membresía con límite de 1 ciclo al mes. Extra se cotiza aparte.",
     status: "proximamente",
-    href: "/fut/membresia",
-    cta: "Ver membresía",
+    href: "/fut/tutor",
+    cta: "Entrar al piloto",
   },
   {
     id: "torneos-alto-nivel",
@@ -53,8 +53,8 @@ export const MIFICH_OPPORTUNITIES: OpportunityItem[] = [
     detail:
       "Avisos curados por GPH/MiFicha cuando haya convocatoria publicada.",
     status: "proximamente",
-    href: "/fut/membresia",
-    cta: "Cómo funciona",
+    href: "/fut/tutor",
+    cta: "Crear cuenta de tutor",
   },
   {
     id: "eventos-descuento",
@@ -64,7 +64,7 @@ export const MIFICH_OPPORTUNITIES: OpportunityItem[] = [
     place: "Querétaro y sedes GPH",
     detail: "Precio de miembro cuando haya cupo publicado.",
     status: "proximamente",
-    href: "/fut/membresia",
-    cta: "Ver beneficios",
+    href: "/fut/tutor",
+    cta: "Entrar como tutor",
   },
 ];

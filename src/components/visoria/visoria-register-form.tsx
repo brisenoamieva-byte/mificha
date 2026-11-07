@@ -92,14 +92,19 @@ export function VisoriaRegisterForm() {
           Guardamos a {playerName.trim() || "el jugador"}. Te confirmamos por WhatsApp el
           día, la sede y el horario. Lleva una identificación del tutor el día del evento.
         </p>
-        <a
-          href={visoriaContactWhatsAppHref()}
-          className="mf-btn-gph mt-5"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Escribir a GPH
-        </a>
+        <div className="mt-5 flex flex-wrap gap-3">
+          <a
+            href={visoriaContactWhatsAppHref()}
+            className="mf-btn-gph"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Escribir a GPH
+          </a>
+          <Link href="/fut/tutor" className="mf-btn-gph-ghost">
+            Armar ficha del tutor
+          </Link>
+        </div>
       </div>
     );
   }

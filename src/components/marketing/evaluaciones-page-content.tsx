@@ -124,8 +124,8 @@ export function EvaluacionesPageContent() {
               Diagnóstico + seguimiento en MiFicha
             </h2>
             <p className="mt-2 text-sm leading-7 text-mf-text-secondary">
-              Agenda por WhatsApp o paga en línea. El informe queda en tu cuenta; conviene
-              tener la ficha del tutor lista para el seguimiento.
+              Agenda por WhatsApp. El informe queda en tu cuenta; conviene tener la ficha
+              del tutor lista para el seguimiento.
             </p>
           </div>
           <ol className="mt-8 grid gap-3 sm:grid-cols-3 sm:gap-4">
@@ -239,8 +239,8 @@ export function HomeGphAllianceBand() {
         </h2>
         <p className="mt-3 max-w-2xl text-sm leading-7 text-white/75 sm:text-base">
           Diagnóstico presencial abierto: {DIAGNOSIS_PRODUCT.publicPriceLabel}, incluye 12
-          meses de MiFicha. Agenda por WhatsApp o paga en línea. La ficha del tutor ya está
-          gratis en el piloto.
+          meses de MiFicha. Agenda por WhatsApp. La ficha del tutor ya está gratis en el
+          piloto.
         </p>
         <div className="mt-6 flex flex-wrap items-center gap-3">
           <a

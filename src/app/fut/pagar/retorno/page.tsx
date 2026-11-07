@@ -78,22 +78,38 @@ export default async function PagoRetornoPage({
               ) : null}
               <div className="mt-6 flex flex-wrap gap-3">
                 {paid ? (
-                  <a
-                    href={diagnosisWhatsAppHref()}
-                    className="mf-btn-gph"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Avisar a GPH
-                  </a>
-                ) : (
-                  <Link href="/fut/pagar" className="mf-btn-gph">
-                    Volver a pagar
+                  <>
+                    <a
+                      href={diagnosisWhatsAppHref()}
+                      className="mf-btn-gph"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Avisar a GPH
+                    </a>
+                    <Link href="/fut/tutor" className="mf-btn-gph-ghost">
+                      Ir a mi cuenta de tutor
+                    </Link>
+                  </>
+                ) : pending ? (
+                  <Link href="/fut/tutor" className="mf-btn-gph-ghost">
+                    Ir a tutor
                   </Link>
+                ) : (
+                  <>
+                    <a
+                      href={diagnosisWhatsAppHref()}
+                      className="mf-btn-gph"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Coordinar por WhatsApp
+                    </a>
+                    <Link href="/fut/pagar?sku=diagnosis" className="mf-btn-gph-ghost">
+                      Reintentar pago
+                    </Link>
+                  </>
                 )}
-                <Link href="/fut/membresia" className="mf-btn-gph-ghost">
-                  Ver membresía
-                </Link>
               </div>
             </div>
           </div>

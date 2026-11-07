@@ -14,6 +14,7 @@ import {
   DEMO_EXPLORE_PLAYERS,
   filterDemoExploreAcademy,
   filterDemoExplorePlayers,
+  isMarketingPlaceholderAcademy,
   normalizeExplorePlayerName,
   type ExploreDemoPlayer,
 } from "@/lib/explore-demo-data";
@@ -115,7 +116,7 @@ export function ExploreDirectory({
 
   const displayAcademies = useMemo(() => {
     const realAcademies = filtered.academies.filter(
-      (academy) => academy.slug !== DEMO_EXPLORE_ACADEMY.slug,
+      (academy) => !isMarketingPlaceholderAcademy(academy),
     );
     const includeDemo = filterDemoExploreAcademy(query, state, city);
 
@@ -303,7 +304,11 @@ export function ExploreDirectory({
                           </p>
                         ) : null}
                       </div>
-                      {academy.is_certified ? (
+                      {academy.slug === DEMO_EXPLORE_ACADEMY.slug ? (
+                        <span className="hidden shrink-0 text-[11px] font-medium text-mf-text-muted sm:inline-flex">
+                          Ejemplo
+                        </span>
+                      ) : academy.is_certified ? (
                         <span className="hidden shrink-0 items-center gap-1 text-[11px] font-medium text-mf-accent-dark sm:inline-flex">
                           <Award className="h-3.5 w-3.5" />
                           Certificada

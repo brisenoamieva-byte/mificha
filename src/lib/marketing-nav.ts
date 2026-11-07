@@ -39,7 +39,7 @@ export const MARKETING_NAV: NavSection[] = [
       {
         href: "/fut/padres",
         label: "Padres",
-        description: "Explicación + registro de tutor",
+        description: "Cómo funciona MiFicha para la familia",
       },
       {
         href: "/fut/evaluaciones",
@@ -49,7 +49,7 @@ export const MARKETING_NAV: NavSection[] = [
       {
         href: "/fut/visorias",
         label: "Visorías Querétaro",
-        description: "26 y 27 de noviembre · registro abierto",
+        description: "26 y 27 de noviembre 2026 · registro abierto",
       },
     ],
   },

@@ -64,7 +64,7 @@ export const DIAGNOSIS_PRODUCT = {
   subtitle:
     "Se contratan aparte de la academia. En el piloto, la ficha del tutor ya está gratis; la evaluación se agenda y se paga.",
   footnote:
-    "Metodología GPH · incluye 12 meses de mificha.mx · pago con Mercado Pago o WhatsApp.",
+    "Metodología GPH · incluye 12 meses de mificha.mx · agenda y paga por WhatsApp (cobro en línea cuando esté activo).",
   memberPriceLabel: "$1,200",
   publicPriceLabel: "$2,900",
   checkoutHref: "/fut/pagar?sku=diagnosis",
