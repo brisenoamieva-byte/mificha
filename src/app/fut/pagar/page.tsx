@@ -48,24 +48,11 @@ export default async function PagarPage({
           <h1 className="mt-2 text-3xl font-semibold tracking-[-0.03em] text-mf-gph-ink sm:text-4xl">
             {playerName
               ? `Diagnóstico GPH para ${playerName}`
-              : MEMBERSHIP_CHECKOUT_DISABLED
-                ? "Diagnóstico GPH · membresía gratis en piloto"
-                : "Paga aquí. Un año de plataforma."}
+              : "Pagar diagnóstico GPH"}
           </h1>
           <p className="mt-3 max-w-2xl text-sm leading-7 text-mf-text-secondary">
-            {MEMBERSHIP_CHECKOUT_DISABLED ? (
-              <>
-                Evaluación GPH {FAMILY_PRODUCTS.diagnosis.priceLabel} (incluye 12 meses de
-                MiFicha). La membresía sola no se cobra mientras dure el piloto: entra como
-                tutor sin pagar.
-              </>
-            ) : (
-              <>
-                Evaluación GPH {FAMILY_PRODUCTS.diagnosis.priceLabel} (incluye 12 meses de
-                MiFicha) o membresía sola {FAMILY_PRODUCTS.membership.priceLabel}. Cobro con
-                Mercado Pago.
-              </>
-            )}
+            Evaluación GPH {FAMILY_PRODUCTS.diagnosis.priceLabel} · incluye 12 meses de
+            MiFicha. Cobro con Mercado Pago o por WhatsApp.
           </p>
           <div className="mt-10">
             <FamilyCheckout

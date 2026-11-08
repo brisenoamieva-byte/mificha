@@ -91,16 +91,6 @@ export function FamilyCheckout({
 
   return (
     <div className="space-y-6">
-      {MEMBERSHIP_CHECKOUT_DISABLED ? (
-        <p className="rounded-xl border border-mf-gph/30 bg-mf-gph-soft px-4 py-3 text-sm leading-6 text-mf-gph-ink">
-          <span className="font-semibold">Piloto:</span> la membresía anual no se cobra. Usa{" "}
-          <Link href="/fut/tutor" className="font-semibold underline">
-            el espacio de tutor
-          </Link>{" "}
-          gratis. Aquí solo se paga el <span className="font-semibold">diagnóstico GPH</span>{" "}
-          ({FAMILY_PRODUCTS.diagnosis.priceLabel}), que ya incluye 12 meses de plataforma.
-        </p>
-      ) : null}
       {!mercadoPagoReady ? (
         <p className="rounded-xl border border-mf-border bg-white px-4 py-3 text-sm leading-6 text-mf-text-secondary">
           El cobro en línea con Mercado Pago aún se está activando. Mientras tanto, agenda el
@@ -142,23 +132,6 @@ export function FamilyCheckout({
               </div>
             );
           })}
-          {MEMBERSHIP_CHECKOUT_DISABLED ? (
-            <div className="rounded-xl border border-dashed border-mf-border bg-white px-5 py-5">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-text-muted">
-                Gratis en piloto
-              </p>
-              <p className="mt-2 text-lg font-semibold tracking-tight text-mf-gph-ink">
-                {FAMILY_PRODUCTS.membership.publicName}
-              </p>
-              <p className="mt-1 text-sm leading-6 text-mf-text-secondary">
-                Sin cobro por ahora.{" "}
-                <Link href="/fut/tutor" className="font-semibold text-mf-gph hover:underline">
-                  Entra como tutor
-                </Link>{" "}
-                · lista {FAMILY_PRODUCTS.membership.priceLabel}/año al cerrar el piloto.
-              </p>
-            </div>
-          ) : null}
         </div>
 
         {membershipBlocked ? (
