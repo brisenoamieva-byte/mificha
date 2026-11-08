@@ -1,7 +1,12 @@
 import { randomBytes, randomUUID } from "crypto";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { listFamilyOrders, type FamilyOrderRow } from "@/lib/family-orders";
-import { mintPublicCode, normalizePublicCode } from "@/lib/public-player-code";
+import {
+  collectUsedPublicCodes,
+  ensureTutorPublicCodes,
+  mintPublicCode,
+  normalizePublicCode,
+} from "@/lib/public-player-code";
 
 const OPS_BUCKET = "mificha-ops";
 const ROSTER = "families/roster.json";
@@ -120,20 +125,31 @@ function normalizeChild(raw: TutorChild): TutorChild {
   };
 }
 
-function assignMissingPublicCodes(roster: TutorChild[]): {
+async function assignMissingPublicCodes(
+  admin: SupabaseClient,
+  roster: TutorChild[],
+): Promise<{
   roster: TutorChild[];
   changed: boolean;
-} {
-  const used = new Set(
-    roster
-      .map((child) => normalizePublicCode(child.public_code))
-      .filter((code): code is string => Boolean(code)),
+}> {
+  const missing = roster.filter((child) => !normalizePublicCode(child.public_code));
+  if (missing.length === 0) return { roster, changed: false };
+
+  const preferred: Record<string, string | null | undefined> = {};
+  for (const child of roster) {
+    preferred[child.id] = child.public_code;
+  }
+  const assigned = await ensureTutorPublicCodes(
+    admin,
+    roster.map((child) => child.id),
+    preferred,
   );
   let changed = false;
   const next = roster.map((child) => {
-    if (normalizePublicCode(child.public_code)) return child;
+    const code = assigned[child.id];
+    if (!code || normalizePublicCode(child.public_code) === code) return child;
     changed = true;
-    return { ...child, public_code: mintPublicCode(used) };
+    return { ...child, public_code: code };
   });
   return { roster: next, changed };
 }
@@ -143,7 +159,7 @@ async function loadRoster(admin: SupabaseClient): Promise<{
   changed: boolean;
 }> {
   const base = (await readJson<TutorChild>(admin, ROSTER)).map(normalizeChild);
-  return assignMissingPublicCodes(base);
+  return assignMissingPublicCodes(admin, base);
 }
 
 export function membershipIsActive(until: string | null | undefined) {
@@ -244,11 +260,7 @@ export async function syncTutorChildren(
   const loaded = await loadRoster(admin);
   let roster = loaded.roster;
   let changed = loaded.changed;
-  const usedCodes = new Set(
-    roster
-      .map((child) => normalizePublicCode(child.public_code))
-      .filter((code): code is string => Boolean(code)),
-  );
+  const usedCodes = await collectUsedPublicCodes(admin);
 
   for (const order of matched) {
     const playerName = (order.player_name ?? "").trim() || "Jugador";
@@ -279,8 +291,12 @@ export async function syncTutorChildren(
       }
       continue;
     }
+    const childId = randomUUID();
+    const codes = await ensureTutorPublicCodes(admin, [childId]);
+    const publicCode = codes[childId] ?? mintPublicCode(usedCodes);
+    usedCodes.add(publicCode);
     roster.unshift({
-      id: randomUUID(),
+      id: childId,
       guardian_user_id: user.id,
       guardian_email: email,
       guardian_phone: phone || null,
@@ -288,7 +304,7 @@ export async function syncTutorChildren(
       membership_until: order.membership_until,
       source_folios: [order.folio],
       share_token: newShareToken(),
-      public_code: mintPublicCode(usedCodes),
+      public_code: publicCode,
       profile: emptyProfile(),
       created_at: new Date().toISOString(),
       linked_player_id: null,
@@ -365,14 +381,15 @@ export async function syncTutorChildren(
         continue;
       }
 
-      const code =
-        preferredCode && !usedCodes.has(preferredCode)
-          ? preferredCode
-          : mintPublicCode(usedCodes);
-      if (preferredCode) usedCodes.add(preferredCode);
+      const childId = randomUUID();
+      const codes = await ensureTutorPublicCodes(admin, [childId], {
+        [childId]: preferredCode,
+      });
+      const code = codes[childId] ?? mintPublicCode(usedCodes);
+      usedCodes.add(code);
 
       roster.unshift({
-        id: randomUUID(),
+        id: childId,
         guardian_user_id: user.id,
         guardian_email: (reg.guardian_email ?? email).trim().toLowerCase() || email,
         guardian_phone: phone,
@@ -408,7 +425,7 @@ export async function syncTutorChildren(
     }
     return child;
   });
-  const assigned = assignMissingPublicCodes(roster);
+  const assigned = await assignMissingPublicCodes(admin, roster);
   roster = assigned.roster;
   if (assigned.changed) changed = true;
 
@@ -436,14 +453,13 @@ export async function createTutorChild(
   );
   if (duplicate) throw new Error("Ese jugador ya está en tu cuenta.");
 
-  const usedCodes = new Set(
-    roster
-      .map((child) => normalizePublicCode(child.public_code))
-      .filter((code): code is string => Boolean(code)),
-  );
+  const childId = randomUUID();
+  const codes = await ensureTutorPublicCodes(admin, [childId]);
+  const publicCode = codes[childId];
+  if (!publicCode) throw new Error("No se pudo asignar un código único.");
 
   const child: TutorChild = {
-    id: randomUUID(),
+    id: childId,
     guardian_user_id: user.id,
     guardian_email: email,
     guardian_phone: phone || null,
@@ -451,7 +467,7 @@ export async function createTutorChild(
     membership_until: TUTOR_PILOT_FREE ? "2099-12-31" : null,
     source_folios: [],
     share_token: newShareToken(),
-    public_code: mintPublicCode(usedCodes),
+    public_code: publicCode,
     profile: {
       birth_date: input.birth_date?.trim() || null,
       position: input.position?.trim() || null,
@@ -576,15 +592,22 @@ export async function setTutorChildPublicCode(
 ) {
   const code = normalizePublicCode(publicCode);
   if (!code) throw new Error("Código de jugador inválido.");
-  const { roster, changed } = await loadRoster(admin);
+  const { roster } = await loadRoster(admin);
   const index = roster.findIndex(
     (child) => child.id === childId && child.guardian_user_id === userId,
   );
   if (index < 0) throw new Error("No encontramos a ese jugador.");
-  const taken = roster.find(
+  const takenLocal = roster.find(
     (child, i) => i !== index && normalizePublicCode(child.public_code) === code,
   );
-  if (taken) throw new Error("Ese código ya está en uso.");
+  if (takenLocal) throw new Error("Ese código ya está en uso.");
+
+  const assigned = await ensureTutorPublicCodes(admin, [childId], {
+    [childId]: code,
+  });
+  if (assigned[childId] !== code) {
+    throw new Error("Ese código ya está en uso por otro jugador.");
+  }
   roster[index] = { ...roster[index], public_code: code };
   await writeJson(admin, ROSTER, roster);
   return roster[index];
