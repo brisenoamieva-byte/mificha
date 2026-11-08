@@ -1,11 +1,7 @@
 import type { Metadata } from "next";
 import { SiteFooter, SiteHeader } from "@/components/marketing/site-header";
 import { FamilyCheckout } from "@/components/pay/family-checkout";
-import {
-  FAMILY_PRODUCTS,
-  MEMBERSHIP_CHECKOUT_DISABLED,
-  type FamilySku,
-} from "@/lib/gph-commerce";
+import { type FamilySku } from "@/lib/gph-commerce";
 import { isMercadoPagoConfigured } from "@/lib/mercadopago";
 
 export const metadata: Metadata = {
@@ -49,10 +45,6 @@ export default async function PagarPage({
               ? `Diagnóstico GPH para ${playerName}`
               : "Pagar diagnóstico GPH"}
           </h1>
-          <p className="mt-3 max-w-2xl text-sm leading-7 text-mf-text-secondary">
-            Evaluación GPH {FAMILY_PRODUCTS.diagnosis.priceLabel} · incluye 12 meses de
-            MiFicha. Cobro con Mercado Pago o por WhatsApp.
-          </p>
           <div className="mt-10">
             <FamilyCheckout
               initialSku={sku}
