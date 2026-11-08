@@ -186,7 +186,9 @@ export async function insertVisoriaRegistration(
     .select("*")
     .single();
 
-  if (!error && data) return data as VisoriaRegistrationRow;
+  if (!error && data) {
+    return attachPublicCode(admin, data as VisoriaRegistrationRow);
+  }
 
   if (error && (error.message.includes("duplicate") || error.code === "23505")) {
     const dup = new Error(
@@ -224,7 +226,19 @@ export async function insertVisoriaRegistration(
   };
   rows.unshift(row);
   await writeStorageRows(admin, rows);
-  return row;
+  return attachPublicCode(admin, row);
+}
+
+async function attachPublicCode(
+  admin: SupabaseClient,
+  row: VisoriaRegistrationRow,
+): Promise<VisoriaRegistrationRow> {
+  const { ensureVisoriaPublicCodes } = await import("@/lib/public-player-code");
+  const codes = await ensureVisoriaPublicCodes(admin, [row.id]);
+  return {
+    ...row,
+    public_code: codes[row.id] ?? row.public_code ?? null,
+  };
 }
 
 async function withPublicCodes(

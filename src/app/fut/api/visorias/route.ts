@@ -20,6 +20,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       ok: true,
       folio: row.folio,
+      public_code: row.public_code ?? null,
       player_full_name: row.player_full_name,
       attend_thursday: row.attend_thursday,
       attend_friday: row.attend_friday,

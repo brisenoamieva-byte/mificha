@@ -36,6 +36,7 @@ export function VisoriaRegisterForm() {
   const [honeypot, setHoneypot] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [folio, setFolio] = useState<string | null>(null);
+  const [publicCode, setPublicCode] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   async function onSubmit(event: React.FormEvent) {
@@ -66,12 +67,17 @@ export function VisoriaRegisterForm() {
           honeypot,
         }),
       });
-      const payload = (await response.json()) as { error?: string; folio?: string };
+      const payload = (await response.json()) as {
+        error?: string;
+        folio?: string;
+        public_code?: string | null;
+      };
       if (!response.ok || !payload.folio) {
         setError(payload.error ?? "No se pudo guardar. Intenta de nuevo.");
         return;
       }
       setFolio(payload.folio);
+      setPublicCode(payload.public_code ?? null);
     } catch {
       setError("Error de red. Revisa tu conexión e intenta otra vez.");
     } finally {
@@ -85,9 +91,21 @@ export function VisoriaRegisterForm() {
         <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
           Registro listo
         </p>
-        <h3 className="mt-2 font-mono text-3xl font-semibold tracking-tight text-mf-gph-ink">
-          {folio}
-        </h3>
+        {publicCode ? (
+          <>
+            <p className="mt-3 text-sm font-medium text-mf-text-secondary">
+              Código del jugador
+            </p>
+            <h3 className="mt-1 font-mono text-3xl font-semibold tracking-tight text-mf-gph">
+              {publicCode}
+            </h3>
+            <p className="mt-1 text-xs text-mf-text-muted">Folio del evento: {folio}</p>
+          </>
+        ) : (
+          <h3 className="mt-2 font-mono text-3xl font-semibold tracking-tight text-mf-gph-ink">
+            {folio}
+          </h3>
+        )}
         <p className="mt-3 text-sm leading-7 text-mf-text-secondary">
           Guardamos a {playerName.trim() || "el jugador"}. Te confirmamos por WhatsApp el
           día, la sede y el horario. Lleva una identificación del tutor el día del evento.
