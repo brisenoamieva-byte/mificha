@@ -212,6 +212,16 @@ export function TutorBuilderPanel({
               style={{ width: `${progress.percent}%` }}
             />
           </div>
+          {progress.photos === 0 ? (
+            <button
+              type="button"
+              onClick={() => setStep("material")}
+              className="mf-btn-gph mt-4 w-full sm:w-auto"
+            >
+              <ImagePlus className="h-4 w-4" />
+              Subir foto de portada
+            </button>
+          ) : null}
         </div>
 
         <TutorPublicFicha
@@ -235,8 +245,37 @@ export function TutorBuilderPanel({
             Completa paso a paso
           </h2>
           <p className="mt-2 text-sm leading-6 text-mf-text-secondary">
-            Cada dato alimenta la vista previa. Cuando esté lista, compartes un solo link.
+            Toca cada paso para editarlo. Las fotos y videos se suben en{" "}
+            <button
+              type="button"
+              className="font-semibold text-mf-gph underline-offset-2 hover:underline"
+              onClick={() => setStep("material")}
+            >
+              Subir foto y video
+            </button>
+            .
           </p>
+
+          {progress.photos === 0 ? (
+            <button
+              type="button"
+              onClick={() => setStep("material")}
+              className="mt-4 flex w-full items-center gap-3 rounded-xl border border-mf-gph/35 bg-mf-gph-soft px-4 py-4 text-left transition hover:border-mf-gph"
+            >
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-mf-gph text-white">
+                <ImagePlus className="h-5 w-5" />
+              </span>
+              <span className="min-w-0">
+                <span className="block text-sm font-semibold text-mf-gph-ink">
+                  Subir contenido de {child.player_name}
+                </span>
+                <span className="mt-0.5 block text-xs leading-5 text-mf-text-secondary">
+                  Foto de portada, video o nota. Toca aquí para abrir la carga.
+                </span>
+              </span>
+            </button>
+          ) : null}
+
           <ol className="mt-5 space-y-2">
             {progress.steps.map((item) => (
               <li key={item.id}>
@@ -247,17 +286,21 @@ export function TutorBuilderPanel({
                     "flex w-full items-start gap-3 rounded-xl border px-3 py-3 text-left transition",
                     step === item.id
                       ? "border-mf-gph bg-mf-gph-soft"
-                      : "border-mf-border bg-mf-canvas hover:border-mf-gph/35",
+                      : item.id === "material" && !item.done
+                        ? "border-mf-gph/40 bg-white shadow-sm hover:border-mf-gph"
+                        : "border-mf-border bg-mf-canvas hover:border-mf-gph/35",
                   )}
                 >
                   <span className="mt-0.5 text-mf-gph">
                     {item.done ? (
                       <Check className="h-4 w-4" />
+                    ) : item.id === "material" ? (
+                      <ImagePlus className="h-4 w-4" />
                     ) : (
                       <Circle className="h-4 w-4 text-mf-text-muted" />
                     )}
                   </span>
-                  <span className="min-w-0">
+                  <span className="min-w-0 flex-1">
                     <span className="block text-sm font-semibold text-mf-gph-ink">
                       {item.label}
                     </span>
@@ -265,6 +308,11 @@ export function TutorBuilderPanel({
                       {item.hint}
                     </span>
                   </span>
+                  {item.id === "material" && !item.done ? (
+                    <span className="mt-0.5 shrink-0 text-[10px] font-semibold uppercase tracking-[0.12em] text-mf-gph">
+                      Aquí
+                    </span>
+                  ) : null}
                 </button>
               </li>
             ))}
@@ -451,30 +499,39 @@ export function TutorBuilderPanel({
               </>
             ) : null}
 
-            <button type="submit" disabled={busy} className="mf-btn-gph">
-              {busy ? "Guardando…" : "Guardar y actualizar ficha"}
-            </button>
+            <div className="flex flex-wrap gap-3">
+              <button type="submit" disabled={busy} className="mf-btn-gph">
+                {busy ? "Guardando…" : "Guardar y actualizar ficha"}
+              </button>
+              <button
+                type="button"
+                className="mf-btn-gph-ghost"
+                onClick={() => setStep("material")}
+              >
+                <ImagePlus className="h-4 w-4" />
+                Ir a subir foto y video
+              </button>
+            </div>
           </form>
         )}
 
         {step === "material" ? (
           <section className="space-y-4 rounded-2xl border border-mf-border bg-white p-5">
             <StepHeading
-              title="Material visual"
-              detail="Fotos y videos alimentan la portada y la galería de la ficha."
+              title="Aquí subes el contenido"
+              detail="Foto de portada, video de jugadas o una nota. Todo queda en la ficha de tu hijo."
             />
             {child.active ? (
               <>
-                {progress.photos === 0 ? (
-                  <p className="rounded-xl border border-mf-gph/30 bg-mf-gph-soft px-4 py-3 text-sm leading-6 text-mf-gph-ink">
-                    La portada necesita al menos una foto clara de frente. Es el paso que
-                    más profesionaliza la ficha.
-                  </p>
-                ) : null}
-                <div className="flex flex-wrap gap-3">
-                  <label className="mf-btn-gph cursor-pointer">
-                    <ImagePlus className="h-4 w-4" />
-                    Agregar foto
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-mf-gph/40 bg-mf-gph-soft px-4 py-8 text-center transition hover:border-mf-gph hover:bg-mf-gph-soft/80">
+                    <ImagePlus className="h-8 w-8 text-mf-gph" />
+                    <span className="text-sm font-semibold text-mf-gph-ink">
+                      Subir foto de portada
+                    </span>
+                    <span className="text-xs text-mf-text-secondary">
+                      JPG o PNG · de frente, clara
+                    </span>
                     <input
                       type="file"
                       accept="image/*"
@@ -482,9 +539,14 @@ export function TutorBuilderPanel({
                       onChange={(event) => void onFile("photo", event.target.files?.[0])}
                     />
                   </label>
-                  <label className="mf-btn-gph-ghost cursor-pointer">
-                    <Video className="h-4 w-4" />
-                    Agregar video
+                  <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-mf-border bg-mf-canvas px-4 py-8 text-center transition hover:border-mf-gph/50">
+                    <Video className="h-8 w-8 text-mf-gph" />
+                    <span className="text-sm font-semibold text-mf-gph-ink">
+                      Subir video
+                    </span>
+                    <span className="text-xs text-mf-text-secondary">
+                      MP4 u otro formato corto
+                    </span>
                     <input
                       type="file"
                       accept="video/*"

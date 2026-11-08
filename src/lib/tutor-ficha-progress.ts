@@ -58,8 +58,8 @@ export function buildTutorProgress(input: TutorProgressInput) {
     },
     {
       id: "material",
-      label: "Material",
-      hint: "Al menos una foto y un video o nota",
+      label: "Subir foto y video",
+      hint: "Aquí cargas la foto de portada, videos y notas",
       done: photos > 0 && (videos > 0 || stories > 0),
       weight: 20,
     },
