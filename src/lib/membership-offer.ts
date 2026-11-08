@@ -52,5 +52,5 @@ export const MEMBERSHIP_OFFER = {
 export const MEMBERSHIP_STATUS_LABEL = {
   piloto: "En piloto",
   vivo: "Disponible",
-  membresia: "En calendario",
+  membresia: "En desarrollo",
 } as const;

@@ -16,7 +16,7 @@ export interface OpportunityItem {
 
 export const OPPORTUNITY_STATUS_LABEL: Record<OpportunityStatus, string> = {
   abierta: "Abierta",
-  proximamente: "Por publicar",
+  proximamente: "En desarrollo",
 };
 
 export const MIFICH_OPPORTUNITIES: OpportunityItem[] = [
