@@ -1,5 +1,12 @@
 import Link from "next/link";
-import { ArrowRight, ClipboardList, LineChart, MessageCircle } from "lucide-react";
+import {
+  ArrowRight,
+  Check,
+  ClipboardList,
+  LineChart,
+  MessageCircle,
+  Target,
+} from "lucide-react";
 import { MarketingPageHero } from "@/components/marketing/marketing-page-hero";
 import { AllianceLockup, GphLogo } from "@/components/ui/gph-logo";
 import { BrandWordmark, WithBrandName } from "@/components/ui/brand-wordmark";
@@ -15,9 +22,9 @@ import { cn } from "@/lib/utils";
 const STEPS = [
   {
     icon: MessageCircle,
-    title: "Contrata la evaluación",
+    title: "Agenda o paga",
     description:
-      "Escríbenos por WhatsApp. Coordinamos fecha, sede y si es un jugador o un grupo.",
+      "WhatsApp para fecha y sede, o paga en línea. Coordinamos si es un jugador o un grupo.",
   },
   {
     icon: ClipboardList,
@@ -29,7 +36,7 @@ const STEPS = [
     icon: LineChart,
     title: "Ficha y seguimiento",
     description:
-      "Etapa, lectura de entrenador y plan quedan en mificha.mx. Tú y la familia lo consultan cuando haga falta.",
+      "El informe queda en mificha.mx. La familia consulta etapa, objetivos y avance cuando haga falta.",
   },
 ] as const;
 
@@ -40,12 +47,12 @@ export function EvaluacionesPageContent() {
     <>
       <MarketingPageHero
         eyebrow={`${GPH_ALLIANCE.shortLabel} · ${CURRENT_SEASON_LABEL}`}
-        title="Evalúa a tu hijo. Sigue el avance en MiFicha."
+        title="Diagnóstico GPH: mide, orienta y da seguimiento."
         description={
           <WithBrandName>
-            GPH evalúa y el resultado queda en MiFicha: el diagnóstico, la ficha y
-            el plan viven en un mismo lugar. No necesitas que la academia esté
-            inscrita para contratar una evaluación.
+            Una sesión presencial con metodología GPH. Sales con etapa de desarrollo,
+            fortalezas, objetivos claros y el informe en MiFicha — para entrenar con
+            rumbo, no a ciegas.
           </WithBrandName>
         }
         actions={
@@ -59,30 +66,78 @@ export function EvaluacionesPageContent() {
               Agendar por WhatsApp
               <ArrowRight className="h-4 w-4" />
             </a>
-            <Link href="/fut/tutor" className="mf-btn-gph-ghost">
-              Cuenta de tutor
-            </Link>
             <Link href="/fut/pagar?sku=diagnosis" className="mf-btn-gph-ghost">
-              Ver pago
+              Pagar diagnóstico
+            </Link>
+            <Link href="/fut/d/demo" className="mf-btn-gph-ghost">
+              Ver ejemplo
             </Link>
           </>
         }
         aside={
           <div className="mf-card p-6 sm:p-8">
             <AllianceLockup size="lg" showCaption />
-            <ul className="mt-5 space-y-2 text-sm text-mf-text-secondary">
-              {["Sesión presencial", "Ficha visual", "Lectura de entrenador y plan"].map(
-                (item) => (
-                  <li key={item} className="flex gap-2">
-                    <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-mf-gph" />
-                    {item}
-                  </li>
-                ),
-              )}
+            <p className="mt-4 text-sm font-semibold text-mf-gph-ink">
+              {DIAGNOSIS_PRODUCT.publicPriceLabel} · incluye 12 meses de MiFicha
+            </p>
+            <ul className="mt-4 space-y-2 text-sm text-mf-text-secondary">
+              {[
+                "Sesión presencial",
+                "Ficha visual + lectura de entrenador",
+                "3 a 5 objetivos de desarrollo",
+                "Informe en mificha.mx",
+              ].map((item) => (
+                <li key={item} className="flex gap-2">
+                  <Check className="mt-0.5 h-4 w-4 shrink-0 text-mf-gph" />
+                  {item}
+                </li>
+              ))}
             </ul>
           </div>
         }
       />
+
+      <section className="border-b border-mf-border bg-white">
+        <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
+          <div className="grid gap-10 lg:grid-cols-2 lg:gap-14">
+            <div>
+              <p className="mf-marketing-eyebrow">Qué incluye</p>
+              <h2 className="mt-3 text-2xl font-semibold tracking-[-0.02em] text-mf-text">
+                Lo que recibes con el diagnóstico
+              </h2>
+              <ul className="mt-6 space-y-3">
+                {DIAGNOSIS_PRODUCT.whatYouGet.map((item) => (
+                  <li key={item} className="flex gap-3 text-sm leading-6 text-mf-text-secondary">
+                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-mf-gph" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <p className="mf-marketing-eyebrow">Alcance</p>
+              <h2 className="mt-3 text-2xl font-semibold tracking-[-0.02em] text-mf-text">
+                Para qué sirve (y qué no promete)
+              </h2>
+              <ul className="mt-6 space-y-3">
+                {DIAGNOSIS_PRODUCT.scope.map((item) => (
+                  <li key={item} className="flex gap-3 text-sm leading-6 text-mf-text-secondary">
+                    <Target className="mt-0.5 h-4 w-4 shrink-0 text-mf-gph" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-6 text-sm leading-7 text-mf-text-secondary">
+                Conviene tener la{" "}
+                <Link href="/fut/tutor" className="font-semibold text-mf-gph hover:underline">
+                  ficha del tutor
+                </Link>{" "}
+                lista: el informe y el material del hijo viven en el mismo expediente.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
 
       <section
         id="agendar"
@@ -170,12 +225,6 @@ export function EvaluacionesPageContent() {
                 <p className="mt-2 text-3xl font-semibold tracking-tight text-mf-gph">
                   {plan.priceLabel}
                 </p>
-                {plan.id === "individual" ? (
-                  <p className="mt-1 text-xs font-semibold text-mf-gph">
-                    Incluye 12 meses de MiFicha. En el piloto, la ficha del tutor ya está
-                    gratis sin pagar membresía.
-                  </p>
-                ) : null}
                 <p className="mt-1 text-xs font-medium text-mf-text-muted">{plan.period}</p>
                 <p className="mt-4 text-sm leading-7 text-mf-text-secondary">
                   {plan.description}
@@ -196,7 +245,7 @@ export function EvaluacionesPageContent() {
                 Agendar por WhatsApp
               </a>
               <Link href="/fut/pagar?sku=diagnosis" className="mf-btn-gph-ghost">
-                Pagar evaluación
+                Pagar diagnóstico
               </Link>
               <Link href="/fut/tutor" className="mf-btn-gph-ghost">
                 Crear cuenta de tutor

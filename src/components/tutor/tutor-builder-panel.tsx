@@ -587,7 +587,7 @@ export function TutorBuilderPanel({
                   href={`/fut/pagar?sku=diagnosis&player=${encodeURIComponent(child.player_name)}`}
                   className="mf-btn-gph"
                 >
-                  Contratar diagnóstico
+                  Pagar diagnóstico
                 </Link>
                 <Link href="/fut/evaluaciones" className="mf-btn-gph-ghost">
                   Ver detalle

@@ -62,12 +62,25 @@ export const ORGANIZER_PRICING = {
 export const DIAGNOSIS_PRODUCT = {
   title: "Evaluaciones",
   subtitle:
-    "Se contratan aparte de la academia. En el piloto, la ficha del tutor ya está gratis; la evaluación se agenda y se paga.",
+    "Sesión presencial con metodología GPH. El informe, la etapa y el plan quedan en mificha.mx para que la familia dé seguimiento.",
   footnote:
-    "Metodología GPH · incluye 12 meses de mificha.mx · agenda y paga por WhatsApp (cobro en línea cuando esté activo).",
+    "Metodología GPH · incluye 12 meses de mificha.mx · pago con Mercado Pago o WhatsApp.",
   memberPriceLabel: "$1,200",
   publicPriceLabel: "$2,900",
   checkoutHref: "/fut/pagar?sku=diagnosis",
+  whatYouGet: [
+    "Sesión presencial con pruebas de técnica, táctica, físico, mental y hábitos",
+    "Calificación 1–5 y etapa de desarrollo (punto de partida claro, sin etiquetas)",
+    "Ficha visual + lectura de entrenador con 3 a 5 objetivos concretos",
+    "Informe digital ligado a la ficha del jugador en mificha.mx",
+    "12 meses de acceso a MiFicha para seguimiento y material del tutor",
+  ],
+  scope: [
+    "Sirve para orientar el entrenamiento en casa y con la academia",
+    "Útil antes de visorías, cambios de categoría o decisiones de temporada",
+    "No promete beca, selección ni contrato: mide y prioriza el desarrollo",
+    "No requiere que la academia esté inscrita en MiFicha para contratarlo",
+  ],
   plans: [
     {
       id: "individual",
@@ -75,7 +88,7 @@ export const DIAGNOSIS_PRODUCT = {
       priceLabel: "$2,900",
       period: "MXN · evaluación + 12 meses MiFicha",
       description:
-        "Diagnóstico GPH (sesión, ficha y lectura de entrenador). Incluye un año de acceso a MiFicha; en el piloto la ficha del tutor ya está gratis sin pagar membresía sola.",
+        "Diagnóstico GPH completo: sesión, ficha, lectura de entrenador y un año de plataforma para dar seguimiento.",
     },
     {
       id: "grupo",
