@@ -8,8 +8,6 @@ export const MEMBERSHIP_OFFER = {
     "Expediente del hijo y acceso a visorías, torneos, eventos y entrenamiento con GPH — en una sola cuenta.",
   priceLabel: "$1,200",
   pricePeriod: "MXN al año",
-  pilotNote:
-    "Piloto: la membresía anual ($1,200) está gratis. Arma la ficha del tutor sin cobro. Lo que sí se paga hoy es el diagnóstico GPH ($2,900), que incluye el año de plataforma.",
   specializationLimit:
     "1 ciclo de especialización al mes (o el cupo que publique GPH). Extra se cotiza aparte.",
   benefits: [

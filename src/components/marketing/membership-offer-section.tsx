@@ -34,9 +34,6 @@ export function MembershipOfferSection({
         <p className="mt-3 max-w-2xl text-sm leading-7 text-mf-text-secondary">
           {MEMBERSHIP_OFFER.summary}
         </p>
-        <p className="mt-3 max-w-2xl text-sm leading-7 text-mf-gph-ink">
-          {MEMBERSHIP_OFFER.pilotNote}
-        </p>
 
         <ul className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {MEMBERSHIP_OFFER.benefits.map((item) => (

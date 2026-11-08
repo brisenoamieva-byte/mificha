@@ -34,9 +34,6 @@ export default function MembresiaPage() {
               {MEMBERSHIP_OFFER.headlineHook}
             </span>
           </h1>
-          <p className="mt-4 rounded-lg bg-mf-gph-soft px-4 py-3 text-sm leading-7 text-mf-gph-ink">
-            {MEMBERSHIP_OFFER.pilotNote}
-          </p>
           <p className="mt-4 text-sm leading-7 text-mf-text-secondary">
             {MEMBERSHIP_OFFER.summary}
           </p>
