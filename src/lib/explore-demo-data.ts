@@ -209,9 +209,17 @@ export function isDemoAcademySlug(slug: string) {
 }
 
 export function isMarketingPlaceholderAcademy(
-  academy: Pick<DirectoryAcademy, "slug">,
+  academy: Pick<DirectoryAcademy, "slug" | "name">,
 ) {
-  return academy.slug === DEMO_ACADEMY_SLUG || academy.slug === SEED_ACADEMY_SLUG;
+  const slug = academy.slug ?? "";
+  const name = ("name" in academy ? academy.name : "") ?? "";
+  return (
+    slug === DEMO_ACADEMY_SLUG ||
+    slug === SEED_ACADEMY_SLUG ||
+    slug.startsWith("eliminada-") ||
+    slug === "rickys-fut" ||
+    /eliminada/i.test(name)
+  );
 }
 
 export function filterDemoExploreAcademy(
