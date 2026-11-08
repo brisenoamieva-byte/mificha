@@ -35,6 +35,7 @@ function positionLabel(value: string | null) {
 function cellText(row: VisoriaRegistrationRow) {
   return [
     row.folio,
+    row.public_code,
     row.player_full_name,
     row.category,
     row.birth_date,
@@ -119,6 +120,7 @@ export function VisoriaAdminList() {
   async function downloadExcel() {
     const XLSX = await import("xlsx");
     const sheetRows = visible.map((row) => ({
+      Código: row.public_code ?? "",
       Folio: row.folio,
       Jugador: row.player_full_name,
       Categoría: row.category,
@@ -196,7 +198,7 @@ export function VisoriaAdminList() {
         <input
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          placeholder="Buscar jugador, tutor, WhatsApp, club, NUI…"
+          placeholder="Buscar código MF-, jugador, tutor, WhatsApp, club…"
           className="mf-input min-w-[16rem] flex-1"
         />
         <select
@@ -233,6 +235,7 @@ export function VisoriaAdminList() {
         <table className="min-w-[1100px] text-left text-sm">
           <thead>
             <tr className="border-b border-mf-border text-[11px] text-mf-text-muted">
+              <th className="sticky top-0 bg-white px-3 py-2 font-medium">Código</th>
               {header("player_full_name", "Jugador")}
               {header("category", "Cat.")}
               {header("birth_date", "Nacimiento")}
@@ -248,13 +251,16 @@ export function VisoriaAdminList() {
           <tbody>
             {visible.length === 0 ? (
               <tr>
-                <td colSpan={10} className="px-3 py-8 text-center text-mf-text-muted">
+                <td colSpan={11} className="px-3 py-8 text-center text-mf-text-muted">
                   Ninguna fila coincide con el filtro.
                 </td>
               </tr>
             ) : (
               visible.map((row) => (
                 <tr key={row.id} className="border-t border-mf-border-subtle align-top">
+                  <td className="px-3 py-2 font-mono text-xs font-semibold tracking-wide text-mf-gph">
+                    {row.public_code ?? "—"}
+                  </td>
                   <td className="px-3 py-2">
                     <p className="font-medium">{row.player_full_name}</p>
                     <p className="text-[11px] text-mf-text-muted">{positionLabel(row.position)}</p>

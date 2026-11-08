@@ -300,6 +300,105 @@ export async function syncTutorChildren(
     changed = true;
   }
 
+  // Inscritos a visorías con el mismo WhatsApp → ficha tutor (sin meterlos a plantel).
+  if (phone) {
+    const { listVisoriaRegistrations } = await import("@/lib/visoria-server");
+    const { VISORIA_POSITIONS } = await import("@/lib/visoria-event");
+    const regs = await listVisoriaRegistrations(admin).catch(() => []);
+    const matchedRegs = regs.filter(
+      (row) => phoneKey(row.guardian_phone) === phone,
+    );
+    for (const reg of matchedRegs) {
+      const playerName = (reg.player_full_name ?? "").trim();
+      if (playerName.length < 2) continue;
+      const key = nameKey(playerName);
+      const existing = roster.find(
+        (child) =>
+          child.guardian_user_id === user.id && nameKey(child.player_name) === key,
+      );
+      const positionLabel =
+        VISORIA_POSITIONS.find((item) => item.value === reg.position)?.label ??
+        reg.position;
+      const preferredCode = normalizePublicCode(reg.public_code);
+      if (existing) {
+        if (reg.folio && !existing.source_folios.includes(reg.folio)) {
+          existing.source_folios.push(reg.folio);
+          changed = true;
+        }
+        if (!existing.guardian_phone && phone) {
+          existing.guardian_phone = phone;
+          changed = true;
+        }
+        if (reg.guardian_email && !existing.guardian_email) {
+          existing.guardian_email = reg.guardian_email.trim().toLowerCase();
+          changed = true;
+        }
+        if (preferredCode && !existing.public_code) {
+          if (!usedCodes.has(preferredCode)) {
+            existing.public_code = preferredCode;
+            usedCodes.add(preferredCode);
+            changed = true;
+          }
+        }
+        const profile = existing.profile ?? emptyProfile();
+        let profileChanged = false;
+        if (!profile.birth_date && reg.birth_date) {
+          profile.birth_date = reg.birth_date;
+          profileChanged = true;
+        }
+        if (!profile.position && positionLabel) {
+          profile.position = positionLabel;
+          profileChanged = true;
+        }
+        if (!profile.club && reg.current_club) {
+          profile.club = reg.current_club;
+          profileChanged = true;
+        }
+        if (!profile.city && reg.city) {
+          profile.city = reg.city;
+          profileChanged = true;
+        }
+        if (profileChanged) {
+          existing.profile = profile;
+          changed = true;
+        }
+        continue;
+      }
+
+      const code =
+        preferredCode && !usedCodes.has(preferredCode)
+          ? preferredCode
+          : mintPublicCode(usedCodes);
+      if (preferredCode) usedCodes.add(preferredCode);
+
+      roster.unshift({
+        id: randomUUID(),
+        guardian_user_id: user.id,
+        guardian_email: (reg.guardian_email ?? email).trim().toLowerCase() || email,
+        guardian_phone: phone,
+        player_name: playerName,
+        membership_until: TUTOR_PILOT_FREE ? "2099-12-31" : null,
+        source_folios: reg.folio ? [reg.folio] : [],
+        share_token: newShareToken(),
+        public_code: code,
+        profile: {
+          ...emptyProfile(),
+          birth_date: reg.birth_date || null,
+          position: positionLabel || null,
+          club: reg.current_club || null,
+          city: reg.city || null,
+        },
+        created_at: new Date().toISOString(),
+        linked_player_id: null,
+        linked_academy_id: null,
+        linked_academy_name: null,
+        linked_player_slug: null,
+        linked_at: null,
+      });
+      changed = true;
+    }
+  }
+
   // Persist share_token / profile / public_code backfill for older rows.
   roster = roster.map((child) => {
     if (child.guardian_user_id !== user.id) return child;

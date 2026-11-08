@@ -227,6 +227,22 @@ export async function insertVisoriaRegistration(
   return row;
 }
 
+async function withPublicCodes(
+  admin: SupabaseClient,
+  rows: VisoriaRegistrationRow[],
+): Promise<VisoriaRegistrationRow[]> {
+  if (rows.length === 0) return rows;
+  const { ensureVisoriaPublicCodes } = await import("@/lib/public-player-code");
+  const codes = await ensureVisoriaPublicCodes(
+    admin,
+    rows.map((row) => row.id),
+  );
+  return rows.map((row) => ({
+    ...row,
+    public_code: codes[row.id] ?? row.public_code ?? null,
+  }));
+}
+
 export async function listVisoriaRegistrations(
   admin: SupabaseClient,
   eventId = VISORIA_EVENT_ID,
@@ -246,12 +262,13 @@ export async function listVisoriaRegistrations(
 
   if (!error) {
     const tableRows = (data ?? []) as VisoriaRegistrationRow[];
-    if (tableRows.length > 0) return tableRows;
+    if (tableRows.length > 0) return withPublicCodes(admin, tableRows);
     const fromFile = await stored();
-    return fromFile.length > 0 ? fromFile : tableRows;
+    const rows = fromFile.length > 0 ? fromFile : tableRows;
+    return withPublicCodes(admin, rows);
   }
   if (!isMissingTable(error)) throw new Error(error.message);
-  return stored();
+  return withPublicCodes(admin, await stored());
 }
 
 export async function canManageVisorias(

@@ -88,6 +88,8 @@ export interface VisoriaRegistrationRow {
   years_training?: number | null;
   nui?: string | null;
   created_at: string;
+  /** Código corto MiFicha (MF-XXXX), asignado al listar/backfill. */
+  public_code?: string | null;
 }
 
 export const VISORIA_POSITIONS: { value: VisoriaPosition; label: string }[] = [

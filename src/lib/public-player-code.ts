@@ -108,6 +108,75 @@ export async function ensurePlayerPublicCodes(
   return result;
 }
 
+const VISORIA_CODES = "visorias/public-codes.json";
+
+export async function readVisoriaPublicCodeMap(
+  admin: SupabaseClient,
+): Promise<Record<string, string>> {
+  const { data, error } = await admin.storage.from(OPS_BUCKET).download(VISORIA_CODES);
+  if (error || !data) return {};
+  try {
+    const parsed = JSON.parse(await data.text()) as Record<string, string>;
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return {};
+    const out: Record<string, string> = {};
+    for (const [id, code] of Object.entries(parsed)) {
+      const normalized = normalizePublicCode(code);
+      if (id && normalized) out[id] = normalized;
+    }
+    return out;
+  } catch {
+    return {};
+  }
+}
+
+async function writeVisoriaPublicCodeMap(
+  admin: SupabaseClient,
+  map: Record<string, string>,
+) {
+  await ensureOpsBucket(admin);
+  const body = new Blob([JSON.stringify(map)], { type: "application/json" });
+  const { error } = await admin.storage
+    .from(OPS_BUCKET)
+    .upload(VISORIA_CODES, body, { upsert: true, contentType: "application/json" });
+  if (error) throw new Error(error.message);
+}
+
+/** Códigos MF-XXXX para inscritos a visorías (mismo formato que plantel/tutor). */
+export async function ensureVisoriaPublicCodes(
+  admin: SupabaseClient,
+  registrationIds: string[],
+  extraUsed: Iterable<string> = [],
+): Promise<Record<string, string>> {
+  const map = await readVisoriaPublicCodeMap(admin);
+  const playerMap = await readPlayerPublicCodeMap(admin);
+  const used = new Set<string>([
+    ...Object.values(map),
+    ...Object.values(playerMap),
+    ...Array.from(extraUsed)
+      .map((code) => normalizePublicCode(code))
+      .filter((code): code is string => Boolean(code)),
+  ]);
+  let changed = false;
+  const result: Record<string, string> = {};
+
+  for (const id of registrationIds) {
+    if (!id) continue;
+    const existing = normalizePublicCode(map[id]);
+    if (existing) {
+      result[id] = existing;
+      used.add(existing);
+      continue;
+    }
+    const code = mintPublicCode(used);
+    map[id] = code;
+    result[id] = code;
+    changed = true;
+  }
+
+  if (changed) await writeVisoriaPublicCodeMap(admin, map);
+  return result;
+}
+
 /** Unifica el mismo código entre ficha tutor y jugador de academia. */
 export async function bindPlayerPublicCode(
   admin: SupabaseClient,
