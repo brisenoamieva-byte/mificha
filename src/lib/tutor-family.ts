@@ -1,6 +1,7 @@
 import { randomBytes, randomUUID } from "crypto";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { listFamilyOrders, type FamilyOrderRow } from "@/lib/family-orders";
+import { mintPublicCode, normalizePublicCode } from "@/lib/public-player-code";
 
 const OPS_BUCKET = "mificha-ops";
 const ROSTER = "families/roster.json";
@@ -33,6 +34,8 @@ export interface TutorChild {
   membership_until: string | null;
   source_folios: string[];
   share_token: string;
+  /** Código corto visible (ej. MF-A3K9), mismo en tutor y academia. */
+  public_code: string;
   profile: TutorChildProfile;
   created_at: string;
   /** Vínculo opcional con jugador de plantel (misma persona). */
@@ -104,6 +107,7 @@ function normalizeChild(raw: TutorChild): TutorChild {
   return {
     ...raw,
     share_token: raw.share_token || newShareToken(),
+    public_code: normalizePublicCode(raw.public_code) ?? "",
     profile: {
       ...emptyProfile(),
       ...(raw.profile ?? {}),
@@ -114,6 +118,32 @@ function normalizeChild(raw: TutorChild): TutorChild {
     linked_player_slug: raw.linked_player_slug ?? null,
     linked_at: raw.linked_at ?? null,
   };
+}
+
+function assignMissingPublicCodes(roster: TutorChild[]): {
+  roster: TutorChild[];
+  changed: boolean;
+} {
+  const used = new Set(
+    roster
+      .map((child) => normalizePublicCode(child.public_code))
+      .filter((code): code is string => Boolean(code)),
+  );
+  let changed = false;
+  const next = roster.map((child) => {
+    if (normalizePublicCode(child.public_code)) return child;
+    changed = true;
+    return { ...child, public_code: mintPublicCode(used) };
+  });
+  return { roster: next, changed };
+}
+
+async function loadRoster(admin: SupabaseClient): Promise<{
+  roster: TutorChild[];
+  changed: boolean;
+}> {
+  const base = (await readJson<TutorChild>(admin, ROSTER)).map(normalizeChild);
+  return assignMissingPublicCodes(base);
 }
 
 export function membershipIsActive(until: string | null | undefined) {
@@ -211,8 +241,14 @@ export async function syncTutorChildren(
   const phone = phoneKey(phoneRaw);
   const orders = await listFamilyOrders(admin);
   const matched = orders.filter((order) => orderMatchesGuardian(order, email, phone));
-  let roster = (await readJson<TutorChild>(admin, ROSTER)).map(normalizeChild);
-  let changed = false;
+  const loaded = await loadRoster(admin);
+  let roster = loaded.roster;
+  let changed = loaded.changed;
+  const usedCodes = new Set(
+    roster
+      .map((child) => normalizePublicCode(child.public_code))
+      .filter((code): code is string => Boolean(code)),
+  );
 
   for (const order of matched) {
     const playerName = (order.player_name ?? "").trim() || "Jugador";
@@ -252,6 +288,7 @@ export async function syncTutorChildren(
       membership_until: order.membership_until,
       source_folios: [order.folio],
       share_token: newShareToken(),
+      public_code: mintPublicCode(usedCodes),
       profile: emptyProfile(),
       created_at: new Date().toISOString(),
       linked_player_id: null,
@@ -263,15 +300,18 @@ export async function syncTutorChildren(
     changed = true;
   }
 
-  // Persist share_token / profile backfill for older rows of this guardian.
+  // Persist share_token / profile / public_code backfill for older rows.
   roster = roster.map((child) => {
     if (child.guardian_user_id !== user.id) return child;
-    if (!child.share_token || !child.profile) {
+    if (!child.share_token || !child.profile || !child.public_code) {
       changed = true;
       return normalizeChild(child);
     }
     return child;
   });
+  const assigned = assignMissingPublicCodes(roster);
+  roster = assigned.roster;
+  if (assigned.changed) changed = true;
 
   if (changed) await writeJson(admin, ROSTER, roster);
   return roster
@@ -289,12 +329,19 @@ export async function createTutorChild(
 
   const email = (user.email ?? "").trim().toLowerCase();
   const phone = phoneKey(input.guardian_phone);
-  const roster = (await readJson<TutorChild>(admin, ROSTER)).map(normalizeChild);
+  const loaded = await loadRoster(admin);
+  const roster = loaded.roster;
   const duplicate = roster.find(
     (child) =>
       child.guardian_user_id === user.id && nameKey(child.player_name) === nameKey(playerName),
   );
   if (duplicate) throw new Error("Ese jugador ya está en tu cuenta.");
+
+  const usedCodes = new Set(
+    roster
+      .map((child) => normalizePublicCode(child.public_code))
+      .filter((code): code is string => Boolean(code)),
+  );
 
   const child: TutorChild = {
     id: randomUUID(),
@@ -305,6 +352,7 @@ export async function createTutorChild(
     membership_until: TUTOR_PILOT_FREE ? "2099-12-31" : null,
     source_folios: [],
     share_token: newShareToken(),
+    public_code: mintPublicCode(usedCodes),
     profile: {
       birth_date: input.birth_date?.trim() || null,
       position: input.position?.trim() || null,
@@ -334,7 +382,8 @@ export async function updateTutorChild(
   childId: string,
   input: TutorChildInput,
 ) {
-  const roster = (await readJson<TutorChild>(admin, ROSTER)).map(normalizeChild);
+  const loaded = await loadRoster(admin);
+  const roster = loaded.roster;
   const index = roster.findIndex(
     (child) => child.id === childId && child.guardian_user_id === userId,
   );
@@ -387,7 +436,8 @@ export async function getTutorChild(
   userId: string,
   childId: string,
 ) {
-  const roster = (await readJson<TutorChild>(admin, ROSTER)).map(normalizeChild);
+  const { roster, changed } = await loadRoster(admin);
+  if (changed) await writeJson(admin, ROSTER, roster);
   return (
     roster.find((child) => child.id === childId && child.guardian_user_id === userId) ??
     null
@@ -408,7 +458,7 @@ export async function updateTutorChildLink(
     linked_at: string | null;
   },
 ) {
-  const roster = (await readJson<TutorChild>(admin, ROSTER)).map(normalizeChild);
+  const { roster } = await loadRoster(admin);
   const index = roster.findIndex(
     (child) => child.id === childId && child.guardian_user_id === userId,
   );
@@ -418,9 +468,33 @@ export async function updateTutorChildLink(
   return roster[index];
 }
 
+/** Fija el código público del hijo tutor (p. ej. al unificar con academia). */
+export async function setTutorChildPublicCode(
+  admin: SupabaseClient,
+  userId: string,
+  childId: string,
+  publicCode: string,
+) {
+  const code = normalizePublicCode(publicCode);
+  if (!code) throw new Error("Código de jugador inválido.");
+  const { roster, changed } = await loadRoster(admin);
+  const index = roster.findIndex(
+    (child) => child.id === childId && child.guardian_user_id === userId,
+  );
+  if (index < 0) throw new Error("No encontramos a ese jugador.");
+  const taken = roster.find(
+    (child, i) => i !== index && normalizePublicCode(child.public_code) === code,
+  );
+  if (taken) throw new Error("Ese código ya está en uso.");
+  roster[index] = { ...roster[index], public_code: code };
+  await writeJson(admin, ROSTER, roster);
+  return roster[index];
+}
+
 /** Mapa player_id → ficha tutor ligada, para una academia. */
 export async function listTutorLinksByAcademy(admin: SupabaseClient, academyId: string) {
-  const roster = (await readJson<TutorChild>(admin, ROSTER)).map(normalizeChild);
+  const { roster, changed } = await loadRoster(admin);
+  if (changed) await writeJson(admin, ROSTER, roster);
   return roster
     .filter(
       (child) =>
@@ -431,14 +505,32 @@ export async function listTutorLinksByAcademy(admin: SupabaseClient, academyId: 
       tutor_child_id: child.id,
       player_name: child.player_name,
       share_token: child.share_token,
+      public_code: child.public_code,
       guardian_email: child.guardian_email,
     }));
 }
 
+export async function listTutorPublicCodes(admin: SupabaseClient): Promise<string[]> {
+  const { roster, changed } = await loadRoster(admin);
+  if (changed) await writeJson(admin, ROSTER, roster);
+  return roster
+    .map((child) => normalizePublicCode(child.public_code))
+    .filter((code): code is string => Boolean(code));
+}
+
 export async function getTutorChildByShareToken(admin: SupabaseClient, token: string) {
-  const clean = token.trim().toLowerCase();
-  if (!clean) return null;
-  const roster = (await readJson<TutorChild>(admin, ROSTER)).map(normalizeChild);
+  const raw = token.trim();
+  if (!raw) return null;
+  const { roster, changed } = await loadRoster(admin);
+  if (changed) await writeJson(admin, ROSTER, roster);
+  const asCode = normalizePublicCode(raw);
+  if (asCode) {
+    const byCode = roster.find(
+      (child) => normalizePublicCode(child.public_code) === asCode,
+    );
+    if (byCode) return byCode;
+  }
+  const clean = raw.toLowerCase();
   return roster.find((child) => child.share_token === clean) ?? null;
 }
 

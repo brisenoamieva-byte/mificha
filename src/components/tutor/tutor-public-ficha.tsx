@@ -71,6 +71,11 @@ export function TutorPublicFicha({
             <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
               {child.player_name}
             </h1>
+            {child.public_code ? (
+              <p className="mt-2 font-mono text-sm font-semibold tracking-wide text-mf-accent-bright">
+                {child.public_code}
+              </p>
+            ) : null}
             <p className="mt-2 text-sm font-medium text-white/75">
               {position}
               {meta.length ? ` · ${meta.join(" · ")}` : ""}

@@ -26,6 +26,7 @@ export interface TutorBuilderChild {
   player_name: string;
   membership_until: string | null;
   share_token: string;
+  public_code: string;
   active: boolean;
   linked_player_id?: string | null;
   linked_academy_id?: string | null;
@@ -81,6 +82,7 @@ interface TutorBuilderPanelProps {
   onSaveStory: (event: React.FormEvent) => void;
   onFile: (kind: "photo" | "video", file: File | undefined) => void;
   onCopyShare: () => void;
+  onCopyPublicCode: () => void;
   onLinkPlayer: (playerId: string) => void;
   onUnlinkPlayer: () => void;
 }
@@ -101,6 +103,7 @@ export function TutorBuilderPanel({
   onSaveStory,
   onFile,
   onCopyShare,
+  onCopyPublicCode,
   onLinkPlayer,
   onUnlinkPlayer,
 }: TutorBuilderPanelProps) {
@@ -130,7 +133,10 @@ export function TutorBuilderPanel({
   );
   const [step, setStep] = useState<TutorBuilderStepId>(progress.next.id);
   const lastSavedKey = useRef(`${child.id}:${child.materials.length}:${child.player_name}`);
-  const shareHref = child.share_token ? tutorSharePath(child.share_token) : null;
+  const shareHref =
+    child.public_code || child.share_token
+      ? tutorSharePath(child.public_code || child.share_token)
+      : null;
   const showAcademy = Boolean(child.linked_player_id) || linkSuggestions.length > 0;
 
   useEffect(() => {
@@ -149,6 +155,7 @@ export function TutorBuilderPanel({
     membership_until: child.membership_until,
     source_folios: [],
     share_token: child.share_token,
+    public_code: child.public_code || "",
     profile: draftProfile,
     created_at: "",
     linked_player_id: child.linked_player_id ?? null,
@@ -174,18 +181,30 @@ export function TutorBuilderPanel({
                 {progress.statusLabel} · {progress.percent}% completa
               </p>
             </div>
-            {shareHref ? (
-              <div className="flex flex-wrap gap-2">
-                <Link href={shareHref} target="_blank" className="mf-btn-gph-ghost">
-                  <ExternalLink className="h-4 w-4" />
-                  Abrir
-                </Link>
-                <button type="button" className="mf-btn-gph" onClick={onCopyShare}>
-                  <Copy className="h-4 w-4" />
-                  {copied ? "Copiado" : "Copiar link"}
+            <div className="flex flex-wrap items-center gap-2">
+              {child.public_code ? (
+                <button
+                  type="button"
+                  className="rounded-lg border border-mf-gph/30 bg-mf-gph-soft px-3 py-2 font-mono text-sm font-bold tracking-wide text-mf-gph"
+                  onClick={onCopyPublicCode}
+                  title="Copiar código del jugador"
+                >
+                  {child.public_code}
                 </button>
-              </div>
-            ) : null}
+              ) : null}
+              {shareHref ? (
+                <>
+                  <Link href={shareHref} target="_blank" className="mf-btn-gph-ghost">
+                    <ExternalLink className="h-4 w-4" />
+                    Abrir
+                  </Link>
+                  <button type="button" className="mf-btn-gph" onClick={onCopyShare}>
+                    <Copy className="h-4 w-4" />
+                    {copied ? "Copiado" : "Copiar link"}
+                  </button>
+                </>
+              ) : null}
+            </div>
           </div>
           <div className="mt-4 h-2 overflow-hidden rounded-full bg-mf-canvas">
             <div
@@ -562,6 +581,28 @@ export function TutorBuilderPanel({
                 ? "Ya se ve presentable."
                 : `Siguiente: ${progress.next.label.toLowerCase()}.`}
             </p>
+            {child.public_code ? (
+              <div className="rounded-xl border border-mf-border bg-mf-canvas px-4 py-4">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-mf-gph">
+                  Código del jugador
+                </p>
+                <p className="mt-2 font-mono text-2xl font-bold tracking-wide text-mf-gph-ink">
+                  {child.public_code}
+                </p>
+                <p className="mt-2 text-sm leading-6 text-mf-text-secondary">
+                  Úsalo con la academia o por WhatsApp. Es el mismo si ya está ligado al
+                  plantel.
+                </p>
+                <button
+                  type="button"
+                  className="mf-btn-gph-ghost mt-3"
+                  onClick={onCopyPublicCode}
+                >
+                  <Copy className="h-4 w-4" />
+                  {copied ? "Código copiado" : "Copiar código"}
+                </button>
+              </div>
+            ) : null}
             {shareHref ? (
               <div className="flex flex-wrap gap-2">
                 <Link href={shareHref} target="_blank" className="mf-btn-gph">

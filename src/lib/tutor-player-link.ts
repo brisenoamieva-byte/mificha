@@ -1,6 +1,9 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { bindPlayerPublicCode } from "@/lib/public-player-code";
 import {
   getTutorChildForGuardian,
+  listTutorPublicCodes,
+  setTutorChildPublicCode,
   updateTutorChildLink,
   type TutorChild,
 } from "@/lib/tutor-family";
@@ -152,6 +155,17 @@ export async function linkTutorChildToPlayer(
     linked_player_slug: String(player.slug ?? ""),
     linked_at: new Date().toISOString(),
   });
+
+  const used = await listTutorPublicCodes(admin);
+  const canonical = await bindPlayerPublicCode(
+    admin,
+    String(player.id),
+    updated.public_code,
+    used,
+  );
+  if (canonical !== updated.public_code) {
+    return setTutorChildPublicCode(admin, userId, childId, canonical);
+  }
 
   return updated;
 }

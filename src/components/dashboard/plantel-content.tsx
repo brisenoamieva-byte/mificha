@@ -62,6 +62,7 @@ export function PlantelContent() {
   const [page, setPage] = useState(1);
   const [gphPlayerIds, setGphPlayerIds] = useState<Set<string>>(new Set());
   const [tutorLinkedIds, setTutorLinkedIds] = useState<Set<string>>(new Set());
+  const [playerCodes, setPlayerCodes] = useState<Record<string, string>>({});
 
   const loadPlayers = useCallback(async () => {
     if (!academy) return;
@@ -91,7 +92,10 @@ export function PlantelContent() {
         .eq("academy_id", academy.id),
       diagnosisAuthedFetch(
         `/fut/api/tutor/academy-links?academy_id=${encodeURIComponent(academy.id)}`,
-      ).catch(() => ({ links: [] as Array<{ player_id: string }> })),
+      ).catch(() => ({
+        links: [] as Array<{ player_id: string }>,
+        codes: {} as Record<string, string>,
+      })),
     ]);
 
     setPlayers(data ?? []);
@@ -104,6 +108,9 @@ export function PlantelContent() {
     }
     const links = (linksResult.links as Array<{ player_id: string }> | undefined) ?? [];
     setTutorLinkedIds(new Set(links.map((row) => String(row.player_id))));
+    setPlayerCodes(
+      (linksResult.codes as Record<string, string> | undefined) ?? {},
+    );
     setLoading(false);
   }, [academy]);
 
@@ -400,6 +407,11 @@ export function PlantelContent() {
                             <p className="font-medium text-slate-900">
                               {player.first_name} {player.last_name}
                             </p>
+                            {playerCodes[player.id] ? (
+                              <p className="mt-0.5 font-mono text-xs font-semibold tracking-wide text-mf-gph">
+                                {playerCodes[player.id]}
+                              </p>
+                            ) : null}
                             <div className="mt-0.5 flex flex-wrap items-center gap-1.5">
                               {gphPlayerIds.has(player.id) ? (
                                 <GphEvaluationBadge asSpan />

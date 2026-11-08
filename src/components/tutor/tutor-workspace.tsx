@@ -28,6 +28,7 @@ interface TutorChildCard {
   player_name: string;
   membership_until: string | null;
   share_token: string;
+  public_code: string;
   active: boolean;
   linked_player_id?: string | null;
   linked_academy_id?: string | null;
@@ -380,9 +381,17 @@ export function TutorWorkspace() {
   }
 
   async function copyShare() {
-    if (!child?.share_token) return;
-    const url = `${window.location.origin}${tutorSharePath(child.share_token)}`;
+    if (!child?.share_token && !child?.public_code) return;
+    const access = child.public_code || child.share_token;
+    const url = `${window.location.origin}${tutorSharePath(access)}`;
     await navigator.clipboard.writeText(url);
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 2000);
+  }
+
+  async function copyPublicCode() {
+    if (!child?.public_code) return;
+    await navigator.clipboard.writeText(child.public_code);
     setCopied(true);
     window.setTimeout(() => setCopied(false), 2000);
   }
@@ -628,6 +637,7 @@ export function TutorWorkspace() {
             onSaveStory={(event) => void saveStory(event)}
             onFile={(kind, file) => void onFile(kind, file)}
             onCopyShare={() => void copyShare()}
+            onCopyPublicCode={() => void copyPublicCode()}
             onLinkPlayer={(playerId) => void linkPlayer(playerId)}
             onUnlinkPlayer={() => void unlinkPlayer()}
           />
