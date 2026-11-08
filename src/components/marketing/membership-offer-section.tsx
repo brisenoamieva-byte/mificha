@@ -3,7 +3,10 @@ import {
   MEMBERSHIP_OFFER,
   MEMBERSHIP_STATUS_LABEL,
 } from "@/lib/membership-offer";
-import { FAMILY_PRODUCTS, MEMBERSHIP_CHECKOUT_DISABLED } from "@/lib/gph-commerce";
+import {
+  FAMILY_PRICING_COPY,
+  MEMBERSHIP_CHECKOUT_DISABLED,
+} from "@/lib/gph-commerce";
 
 export function MembershipOfferSection({
   id = "membresia",
@@ -19,9 +22,7 @@ export function MembershipOfferSection({
     >
       <div className={`mx-auto max-w-6xl px-4 sm:px-6 ${compact ? "py-10" : "py-12 sm:py-16"}`}>
         <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
-          {MEMBERSHIP_CHECKOUT_DISABLED
-            ? `Membresía · gratis en piloto · lista ${FAMILY_PRODUCTS.membership.priceLabel}`
-            : `Membresía anual · ${FAMILY_PRODUCTS.membership.priceLabel}`}
+          {FAMILY_PRICING_COPY.eyebrow}
         </p>
         <h2 className="mt-2 max-w-2xl text-2xl font-semibold tracking-[-0.02em] text-mf-gph-ink sm:text-3xl">
           <span className="block text-lg font-medium text-mf-text-secondary sm:text-xl">
@@ -33,6 +34,9 @@ export function MembershipOfferSection({
         </h2>
         <p className="mt-3 max-w-2xl text-sm leading-7 text-mf-text-secondary">
           {MEMBERSHIP_OFFER.summary}
+        </p>
+        <p className="mt-3 max-w-2xl text-sm font-medium leading-7 text-mf-gph-ink">
+          {FAMILY_PRICING_COPY.today}
         </p>
 
         <ul className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -51,16 +55,16 @@ export function MembershipOfferSection({
         </ul>
 
         <p className="mt-5 text-xs leading-6 text-mf-text-muted">
-          Especialización: {MEMBERSHIP_OFFER.specializationLimit} La evaluación GPH (
-          {FAMILY_PRODUCTS.diagnosis.priceLabel}) ya incluye estos 12 meses.
+          Especialización: {MEMBERSHIP_OFFER.specializationLimit}
+          {MEMBERSHIP_CHECKOUT_DISABLED ? ` ${FAMILY_PRICING_COPY.laterNote}` : null}
         </p>
 
         <div className="mt-6 flex flex-wrap gap-3">
           <Link href="/fut/tutor" className="mf-btn-gph">
-            Entrar al piloto de tutor
+            Crear ficha de tutor
           </Link>
-          <Link href="/fut/membresia" className="mf-btn-gph-ghost">
-            Ver membresía
+          <Link href="/fut/pagar?sku=diagnosis" className="mf-btn-gph-ghost">
+            Pagar diagnóstico
           </Link>
           <Link href="/fut/visorias" className="mf-btn-gph-ghost">
             Visorías

@@ -34,7 +34,7 @@ export const MARKETING_NAV: NavSection[] = [
       {
         href: "/fut/tutor",
         label: "Soy tutor",
-        description: "Piloto gratis: ficha con fotos, videos e historia",
+        description: "Arma la ficha con fotos, videos e historia · sin costo hoy",
       },
       {
         href: "/fut/padres",
@@ -44,7 +44,7 @@ export const MARKETING_NAV: NavSection[] = [
       {
         href: "/fut/evaluaciones",
         label: "Evaluaciones GPH",
-        description: "Diagnóstico $2,900 · seguimiento en MiFicha",
+        description: "$2,900 · diagnóstico GPH + 12 meses de MiFicha",
       },
       {
         href: "/fut/visorias",
@@ -76,12 +76,12 @@ export const MARKETING_NAV: NavSection[] = [
       {
         href: "/fut/pagar?sku=diagnosis",
         label: "Pagar diagnóstico",
-        description: "Evaluación GPH $2,900 (incluye 1 año). Membresía gratis en piloto",
+        description: "Ficha tutor sin costo. Diagnóstico GPH $2,900 (incluye 12 meses).",
       },
       {
         href: "/fut/membresia",
         label: "Membresía anual",
-        description: "Piloto gratis · precio de lista $1,200 al cerrar",
+        description: "Qué incluye el seguimiento y las oportunidades",
       },
     ],
   },

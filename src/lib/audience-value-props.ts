@@ -38,10 +38,10 @@ export const AUDIENCE_VALUE_PROPS: AudienceValueProp[] = [
     title: "Padres y tutores",
     headline: "Seguimiento del hijo + puertas a oportunidades.",
     reasons: [
-      "Piloto: arma la ficha con fotos, videos e historia.",
+      "Arma la ficha hoy sin costo: fotos, videos e historia.",
       "Avisos de visorías con Primera y convocatorias curadas.",
       "Eventos con descuento y especialización GPH acotada.",
-      "Diagnóstico GPH opcional; incluye el año de MiFicha.",
+      "Opcional: diagnóstico GPH $2,900 (incluye 12 meses de MiFicha).",
       "Privado: tú decides con quién compartir la ficha.",
     ],
     href: "/fut/tutor",

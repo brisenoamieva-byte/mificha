@@ -15,7 +15,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         error:
-          "La membresía está gratis en el piloto. Entra como tutor sin pagar. Solo el diagnóstico GPH se cobra.",
+          "Hoy la ficha del tutor no se cobra. Entra en /fut/tutor. Lo único que se paga ahora es el diagnóstico GPH ($2,900).",
       },
       { status: 400 },
     );

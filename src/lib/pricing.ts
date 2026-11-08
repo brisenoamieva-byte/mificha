@@ -64,7 +64,7 @@ export const DIAGNOSIS_PRODUCT = {
   subtitle:
     "Sesión presencial con metodología GPH. El informe, la etapa y el plan quedan en mificha.mx para que la familia dé seguimiento.",
   footnote:
-    "Metodología GPH · incluye 12 meses de mificha.mx · pago con Mercado Pago o WhatsApp.",
+    "$2,900 · sesión GPH + 12 meses de MiFicha · Mercado Pago o WhatsApp.",
   memberPriceLabel: "$1,200",
   publicPriceLabel: "$2,900",
   checkoutHref: "/fut/pagar?sku=diagnosis",

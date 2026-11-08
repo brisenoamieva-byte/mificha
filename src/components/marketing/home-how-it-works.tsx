@@ -6,7 +6,7 @@ const STEPS = [
     icon: Users,
     step: "1",
     title: "Cuenta de tutor",
-    description: "La familia crea su cuenta y arma la ficha del hijo (piloto gratis).",
+    description: "La familia crea su cuenta y arma la ficha del hijo sin costo.",
   },
   {
     icon: FileCheck,

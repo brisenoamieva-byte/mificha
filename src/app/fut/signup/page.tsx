@@ -16,7 +16,7 @@ export default function SignUpPage() {
       subtitle={
         <WithBrandName>
           Para colegios y clubes. Si eres padre, crea la ficha en la cuenta de tutor
-          (piloto gratis).
+          (sin costo hoy).
         </WithBrandName>
       }
       footer={

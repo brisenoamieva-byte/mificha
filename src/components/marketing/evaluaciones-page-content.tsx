@@ -287,9 +287,8 @@ export function HomeGphAllianceBand() {
           Diagnósticos GPH. Ya se pueden contratar.
         </h2>
         <p className="mt-3 max-w-2xl text-sm leading-7 text-white/75 sm:text-base">
-          Diagnóstico presencial abierto: {DIAGNOSIS_PRODUCT.publicPriceLabel}, incluye 12
-          meses de MiFicha. Agenda por WhatsApp. La ficha del tutor ya está gratis en el
-          piloto.
+          {DIAGNOSIS_PRODUCT.publicPriceLabel}: sesión presencial + 12 meses de MiFicha.
+          Agenda por WhatsApp. La ficha del tutor se puede armar sin costo.
         </p>
         <div className="mt-6 flex flex-wrap items-center gap-3">
           <a

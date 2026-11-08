@@ -9,7 +9,7 @@ const MATERIALS = "families/materials.json";
 
 /** Piloto gratuito: sin cobro de $1,200. Apagar cuando se active la membresía. */
 export const TUTOR_PILOT_FREE = true;
-export const TUTOR_PILOT_LABEL = "Piloto gratuito · sin cobro de membresía";
+export const TUTOR_PILOT_LABEL = "Ficha sin costo hoy · lo único que se paga es el diagnóstico GPH";
 
 export type TutorMaterialKind = "photo" | "video" | "story";
 
