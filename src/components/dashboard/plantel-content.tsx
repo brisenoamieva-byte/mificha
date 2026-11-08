@@ -39,6 +39,7 @@ import {
   isProfileComplete,
   positionOptions,
 } from "@/lib/player-utils";
+import { hasPublicConsent } from "@/lib/privacy";
 import { diagnosisAuthedFetch } from "@/lib/player-diagnosis-client";
 import { supabase } from "@/lib/supabase";
 import type { Player, PlayerPosition } from "@/types/database";
@@ -464,14 +465,29 @@ export function PlantelContent() {
                             publicConsentAt={player.public_consent_at}
                             compact
                           />
-                          <Link
-                            href={`/fut/j/${player.slug}`}
-                            target="_blank"
-                            className="rounded-lg p-2 text-[#1B4F8C] hover:bg-slate-100"
-                            title="Ver ficha"
-                          >
-                            <ExternalLink className="h-4 w-4" />
-                          </Link>
+                          {hasPublicConsent(player) ? (
+                            <Link
+                              href={`/fut/j/${player.slug}`}
+                              target="_blank"
+                              className="rounded-lg p-2 text-[#1B4F8C] hover:bg-slate-100"
+                              title="Ver ficha pública"
+                            >
+                              <ExternalLink className="h-4 w-4" />
+                            </Link>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                toast.info(
+                                  "La ficha pública aún no está activa. Edita el jugador, marca consentimiento parental y ficha accesible por link.",
+                                )
+                              }
+                              className="rounded-lg p-2 text-slate-400 hover:bg-slate-100"
+                              title="Ficha aún no pública"
+                            >
+                              <ExternalLink className="h-4 w-4" />
+                            </button>
+                          )}
                           <button
                             type="button"
                             onClick={() => {
