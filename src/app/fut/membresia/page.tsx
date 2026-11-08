@@ -27,7 +27,12 @@ export default function MembresiaPage() {
               : `Familias · ${FAMILY_PRODUCTS.membership.priceLabel} al año`}
           </p>
           <h1 className="mt-3 text-3xl font-semibold tracking-tight text-mf-text sm:text-4xl">
-            {MEMBERSHIP_OFFER.headline}
+            <span className="block text-lg font-medium text-mf-text-secondary sm:text-xl">
+              {MEMBERSHIP_OFFER.headlineLead}
+            </span>
+            <span className="mt-1 block text-3xl font-bold tracking-[-0.03em] text-mf-gph sm:text-5xl">
+              {MEMBERSHIP_OFFER.headlineHook}
+            </span>
           </h1>
           <p className="mt-4 rounded-lg bg-mf-gph-soft px-4 py-3 text-sm leading-7 text-mf-gph-ink">
             {MEMBERSHIP_OFFER.pilotNote}

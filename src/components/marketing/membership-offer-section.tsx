@@ -24,7 +24,12 @@ export function MembershipOfferSection({
             : `Membresía anual · ${FAMILY_PRODUCTS.membership.priceLabel}`}
         </p>
         <h2 className="mt-2 max-w-2xl text-2xl font-semibold tracking-[-0.02em] text-mf-gph-ink sm:text-3xl">
-          {MEMBERSHIP_OFFER.headline}
+          <span className="block text-lg font-medium text-mf-text-secondary sm:text-xl">
+            {MEMBERSHIP_OFFER.headlineLead}
+          </span>
+          <span className="mt-1 block text-3xl font-bold tracking-[-0.03em] text-mf-gph sm:text-4xl">
+            {MEMBERSHIP_OFFER.headlineHook}
+          </span>
         </h2>
         <p className="mt-3 max-w-2xl text-sm leading-7 text-mf-text-secondary">
           {MEMBERSHIP_OFFER.summary}

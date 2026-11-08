@@ -2,6 +2,8 @@
 
 export const MEMBERSHIP_OFFER = {
   headline: "Seguimiento del jugador + puertas a oportunidades reales",
+  headlineLead: "Seguimiento del jugador +",
+  headlineHook: "puertas a oportunidades reales",
   summary:
     "Expediente del hijo y acceso a visorías, torneos, eventos y entrenamiento con GPH — en una sola cuenta.",
   priceLabel: "$1,200",
