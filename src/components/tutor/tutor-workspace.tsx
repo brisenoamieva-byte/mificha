@@ -42,6 +42,11 @@ interface TutorChildCard {
   linked_at?: string | null;
   linked_performance?: TutorLinkedPerformance | null;
   seasons?: TutorSeasonStat[];
+  view_stats?: {
+    total_views: number;
+    unique_visitors: number;
+    views_last_7_days: number;
+  } | null;
   profile: {
     birth_date: string | null;
     position: string | null;

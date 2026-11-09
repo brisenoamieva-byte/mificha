@@ -5,6 +5,7 @@ import {
   membershipIsActive,
   syncTutorChildren,
 } from "@/lib/tutor-family";
+import { getTutorFichaViewStats } from "@/lib/tutor-ficha-views";
 import { fetchTutorLinkedPerformance } from "@/lib/tutor-linked-performance";
 import { createSupabaseAdminClient } from "@/lib/supabase-admin";
 import { getAuthedSupabaseClient } from "@/lib/supabase-server";
@@ -29,6 +30,7 @@ export async function GET(request: Request) {
         materials: await listTutorMaterials(admin, child),
         seasons: await listTutorSeasons(admin, child),
         linked_performance: await fetchTutorLinkedPerformance(admin, child),
+        view_stats: await getTutorFichaViewStats(admin, child.id),
       })),
     );
     return NextResponse.json({ children: detailed });

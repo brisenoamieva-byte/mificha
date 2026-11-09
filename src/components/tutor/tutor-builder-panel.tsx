@@ -49,6 +49,11 @@ export interface TutorBuilderChild {
   linked_at?: string | null;
   linked_performance?: TutorLinkedPerformance | null;
   seasons?: TutorSeasonStat[];
+  view_stats?: {
+    total_views: number;
+    unique_visitors: number;
+    views_last_7_days: number;
+  } | null;
   profile: TutorChild["profile"];
   materials: Array<{
     id: string;
@@ -956,6 +961,25 @@ export function TutorBuilderPanel({
                 </Link>
               </div>
             ) : null}
+            {child.view_stats && child.view_stats.total_views > 0 ? (
+              <p className="text-sm leading-6 text-mf-text-secondary">
+                Vistas del link:{" "}
+                <span className="font-semibold text-mf-gph-ink">
+                  {child.view_stats.total_views}
+                </span>
+                {child.view_stats.views_last_7_days > 0
+                  ? ` · ${child.view_stats.views_last_7_days} esta semana`
+                  : ""}
+                {child.view_stats.unique_visitors > 0
+                  ? ` · ${child.view_stats.unique_visitors} visitantes`
+                  : ""}
+                .
+              </p>
+            ) : (
+              <p className="text-sm leading-6 text-mf-text-secondary">
+                Cuando alguien abra el link, aquí verás las visitas.
+              </p>
+            )}
             <div className="rounded-xl border border-mf-gph/25 bg-mf-gph-soft px-4 py-4">
               <p className="text-sm font-semibold text-mf-gph-ink">
                 ¿Quieres el diagnóstico GPH de {child.player_name}?
