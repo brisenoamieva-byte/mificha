@@ -177,6 +177,21 @@ export function tutorSharePath(token: string) {
   return `/fut/f/${token}`;
 }
 
+/** Atajos para capturar torneos sin pensar el nombre desde cero. */
+export const TUTOR_TOURNAMENT_PRESETS = [
+  "Liga Municipal Querétaro",
+  "Liga Estatal Querétaro",
+  "Copa IDA",
+  "Torneo escolar",
+  "Amistosos / invitacionales",
+] as const;
+
+export function defaultTutorSeasonLabel(now = new Date()) {
+  const year = now.getFullYear();
+  const month = now.getMonth();
+  return month >= 7 ? `Apertura ${year}` : `Clausura ${year}`;
+}
+
 /** Posiciones más usadas en ficha de tutor (texto libre almacenado). */
 export const TUTOR_POSITION_OPTIONS = [
   "Portero",

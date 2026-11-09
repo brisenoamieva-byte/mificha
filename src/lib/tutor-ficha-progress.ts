@@ -74,24 +74,25 @@ export function buildTutorProgress(input: TutorProgressInput) {
       label: "Subir foto y video",
       hint: "Aquí cargas la foto de portada, videos y notas",
       done: photos > 0 && (videos > 0 || stories > 0),
-      weight: 20,
+      weight: 15,
     },
     {
       id: "rendimiento",
       label: "Rendimiento",
       hint: input.hasLinkedAcademy
         ? "Academia ligada · puedes sumar torneos previos"
-        : "Torneos, minutos, goles y asistencias",
+        : "Al menos un torneo con partidos o minutos",
       done: Boolean(input.hasLinkedAcademy) || hasManualStats,
-      weight: 15,
+      weight: 20,
     },
     {
       id: "compartir",
       label: "Lista para compartir",
-      hint: "Con link presentable para visorías",
+      hint: "Foto + historia + números (o academia ligada)",
       done:
         Boolean(input.player_name.trim() && profile.position && profile.bio?.trim()) &&
-        photos > 0,
+        photos > 0 &&
+        (Boolean(input.hasLinkedAcademy) || hasManualStats),
       weight: 10,
     },
   ];

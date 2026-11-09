@@ -5,8 +5,10 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Check, Circle, Copy, ExternalLink, ImagePlus, Video } from "lucide-react";
 import { TutorPublicFicha } from "@/components/tutor/tutor-public-ficha";
 import {
+  defaultTutorSeasonLabel,
   TUTOR_CITY_OPTIONS,
   TUTOR_POSITION_OPTIONS,
+  TUTOR_TOURNAMENT_PRESETS,
   tutorSharePath,
   type TutorChild,
   type TutorMaterialKind,
@@ -21,16 +23,20 @@ import { MEMBERSHIP_CHECKOUT_DISABLED } from "@/lib/gph-commerce";
 import type { TutorLinkedPerformance } from "@/lib/tutor-linked-performance";
 import { cn } from "@/lib/utils";
 
-const emptySeasonForm = {
-  tournament_name: "",
-  season_label: "",
-  team_name: "",
-  matches: "",
-  goals: "",
-  assists: "",
-  minutes: "",
-  notes: "",
-};
+function buildEmptySeasonForm(club?: string | null) {
+  return {
+    tournament_name: "",
+    season_label: defaultTutorSeasonLabel(),
+    team_name: (club ?? "").trim(),
+    matches: "",
+    goals: "",
+    assists: "",
+    minutes: "",
+    notes: "",
+  };
+}
+
+const emptySeasonForm = buildEmptySeasonForm();
 
 const inputClass =
   "mf-input mt-1 focus:!border-mf-gph focus:!shadow-[0_0_0_3px_color-mix(in_srgb,var(--mf-gph)_16%,transparent)]";
@@ -140,8 +146,11 @@ export function TutorBuilderPanel({
   onLinkPlayer,
   onUnlinkPlayer,
 }: TutorBuilderPanelProps) {
-  const [seasonForm, setSeasonForm] = useState(emptySeasonForm);
+  const [seasonForm, setSeasonForm] = useState(() =>
+    buildEmptySeasonForm(child.profile.club || form.club),
+  );
   const [editingSeasonId, setEditingSeasonId] = useState<string | null>(null);
+  const isGoalkeeper = /portero/i.test(form.position || child.profile.position || "");
 
   const draftProfile = useMemo(
     () => ({
@@ -741,6 +750,12 @@ export function TutorBuilderPanel({
               className="space-y-3 rounded-xl bg-mf-canvas p-4"
               onSubmit={(event) => {
                 event.preventDefault();
+                if (
+                  !Number(seasonForm.matches || 0) &&
+                  !Number(seasonForm.minutes || 0)
+                ) {
+                  return;
+                }
                 onSaveSeason(
                   {
                     tournament_name: seasonForm.tournament_name,
@@ -754,13 +769,40 @@ export function TutorBuilderPanel({
                   },
                   editingSeasonId,
                 );
-                setSeasonForm(emptySeasonForm);
+                setSeasonForm(buildEmptySeasonForm(form.club || child.profile.club));
                 setEditingSeasonId(null);
               }}
             >
               <p className="text-sm font-semibold text-mf-gph-ink">
                 {editingSeasonId ? "Editar torneo" : "Agregar torneo o temporada"}
               </p>
+              {!editingSeasonId ? (
+                <div className="flex flex-wrap gap-2">
+                  {TUTOR_TOURNAMENT_PRESETS.map((preset) => (
+                    <button
+                      key={preset}
+                      type="button"
+                      className={cn(
+                        "rounded-lg border px-2.5 py-1.5 text-xs font-semibold transition",
+                        seasonForm.tournament_name === preset
+                          ? "border-mf-gph bg-mf-gph-soft text-mf-gph-ink"
+                          : "border-mf-border bg-white text-mf-text-secondary hover:border-mf-gph/40 hover:text-mf-gph-ink",
+                      )}
+                      onClick={() =>
+                        setSeasonForm((prev) => ({
+                          ...prev,
+                          tournament_name: preset,
+                          season_label: prev.season_label || defaultTutorSeasonLabel(),
+                          team_name:
+                            prev.team_name || form.club || child.profile.club || "",
+                        }))
+                      }
+                    >
+                      {preset}
+                    </button>
+                  ))}
+                </div>
+              ) : null}
               <input
                 required
                 value={seasonForm.tournament_name}
@@ -770,7 +812,7 @@ export function TutorBuilderPanel({
                     tournament_name: event.target.value,
                   }))
                 }
-                placeholder="Torneo / liga (ej. Liga Municipal Sub-13)"
+                placeholder="Torneo / liga"
                 className={inputClass}
               />
               <div className="grid gap-3 sm:grid-cols-2">
@@ -782,7 +824,7 @@ export function TutorBuilderPanel({
                       season_label: event.target.value,
                     }))
                   }
-                  placeholder="Temporada (ej. 2025-2026)"
+                  placeholder="Temporada (ej. Apertura 2026)"
                   className={inputClass}
                 />
                 <input
@@ -801,8 +843,8 @@ export function TutorBuilderPanel({
                 {(
                   [
                     ["matches", "Partidos"],
-                    ["goals", "Goles"],
-                    ["assists", "Asistencias"],
+                    ["goals", isGoalkeeper ? "Goles (opc.)" : "Goles"],
+                    ["assists", isGoalkeeper ? "Asist. (opc.)" : "Asistencias"],
                     ["minutes", "Minutos"],
                   ] as const
                 ).map(([key, label]) => (
@@ -812,6 +854,7 @@ export function TutorBuilderPanel({
                       type="number"
                       min={0}
                       inputMode="numeric"
+                      required={key === "matches" || key === "minutes" ? false : undefined}
                       value={seasonForm[key]}
                       onChange={(event) =>
                         setSeasonForm((prev) => ({
@@ -824,16 +867,32 @@ export function TutorBuilderPanel({
                   </label>
                 ))}
               </div>
+              <p className="text-xs leading-5 text-mf-text-muted">
+                {isGoalkeeper
+                  ? "Para portero basta con partidos y minutos; en notas puedes poner atajadas o penales."
+                  : "Indica al menos partidos o minutos para que cuente en la ficha."}
+              </p>
               <textarea
                 value={seasonForm.notes}
                 onChange={(event) =>
                   setSeasonForm((prev) => ({ ...prev, notes: event.target.value }))
                 }
-                placeholder="Nota opcional (ej. campeón de goleo, titular, etc.)"
+                placeholder={
+                  isGoalkeeper
+                    ? "Nota (ej. atajó 2 penales en semifinal Copa IDA)"
+                    : "Nota opcional (ej. campeón de goleo, titular)"
+                }
                 className={`${inputClass} min-h-20`}
               />
               <div className="flex flex-wrap gap-2">
-                <button type="submit" disabled={busy} className="mf-btn-gph">
+                <button
+                  type="submit"
+                  disabled={
+                    busy ||
+                    (!Number(seasonForm.matches || 0) && !Number(seasonForm.minutes || 0))
+                  }
+                  className="mf-btn-gph"
+                >
                   {editingSeasonId ? "Guardar cambios" : "Agregar a la ficha"}
                 </button>
                 {editingSeasonId ? (
@@ -842,7 +901,9 @@ export function TutorBuilderPanel({
                     className="mf-btn-gph-ghost"
                     onClick={() => {
                       setEditingSeasonId(null);
-                      setSeasonForm(emptySeasonForm);
+                      setSeasonForm(
+                        buildEmptySeasonForm(form.club || child.profile.club),
+                      );
                     }}
                   >
                     Cancelar
@@ -917,15 +978,33 @@ export function TutorBuilderPanel({
           <section className="space-y-4 rounded-2xl border border-mf-border bg-white p-5">
             <StepHeading
               title="Compartir la ficha"
-              detail="Cuando la portada tenga datos y foto, el link ya sirve para visorías."
+              detail="Ideal: foto, historia y al menos un torneo (o academia ligada)."
             />
             <p className="text-sm leading-7 text-mf-text-secondary">
               Completitud actual:{" "}
               <span className="font-semibold text-mf-gph-ink">{progress.percent}%</span>.{" "}
-              {progress.percent >= 70
-                ? "Ya se ve presentable."
+              {progress.percent >= 90
+                ? "Lista para presentar."
                 : `Siguiente: ${progress.next.label.toLowerCase()}.`}
             </p>
+            {!child.linked_player_id && seasons.length === 0 ? (
+              <div className="rounded-xl border border-mf-gph/25 bg-mf-gph-soft px-4 py-3">
+                <p className="text-sm font-semibold text-mf-gph-ink">
+                  Falta rendimiento en el link público
+                </p>
+                <p className="mt-1 text-sm leading-6 text-mf-text-secondary">
+                  Sin torneos, el visor solo ve historia y material. Agrega al menos un
+                  torneo con partidos o minutos.
+                </p>
+                <button
+                  type="button"
+                  className="mf-btn-gph mt-3"
+                  onClick={() => setStep("rendimiento")}
+                >
+                  Capturar torneo
+                </button>
+              </div>
+            ) : null}
             {child.public_code ? (
               <div className="rounded-xl border border-mf-border bg-mf-canvas px-4 py-4">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-mf-gph">
