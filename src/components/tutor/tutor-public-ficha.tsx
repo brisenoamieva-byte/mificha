@@ -251,6 +251,11 @@ export function TutorPublicFicha({
               : "Rendimiento registrado por el tutor"
           }
         />
+      ) : !performance && !compact ? (
+        <p className="rounded-2xl border border-dashed border-mf-border bg-white/70 px-4 py-3 text-center text-sm text-mf-text-muted print:hidden">
+          Aún sin stats de torneo en esta ficha. El material y la historia del tutor sí
+          están arriba.
+        </p>
       ) : null}
       <p className="tutor-ficha-print-url hidden text-center text-xs text-mf-text-muted print:block">
         mificha.mx · ficha de {child.player_name}
