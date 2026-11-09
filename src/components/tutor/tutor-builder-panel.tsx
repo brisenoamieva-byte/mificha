@@ -319,7 +319,7 @@ export function TutorBuilderPanel({
             <button
               type="button"
               onClick={() => setStep("material")}
-              className="mt-4 flex w-full items-center gap-3 rounded-xl border border-mf-gph/35 bg-mf-gph-soft px-4 py-4 text-left transition hover:border-mf-gph"
+              className="mt-4 flex w-full cursor-pointer items-center gap-3 rounded-xl border border-mf-gph/35 bg-mf-gph-soft px-4 py-4 text-left transition hover:border-mf-gph hover:bg-white hover:shadow-sm"
             >
               <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-mf-gph text-white">
                 <ImagePlus className="h-5 w-5" />
@@ -342,12 +342,12 @@ export function TutorBuilderPanel({
                   type="button"
                   onClick={() => setStep(item.id)}
                   className={cn(
-                    "flex w-full items-start gap-3 rounded-xl border px-3 py-3 text-left transition",
+                    "flex w-full cursor-pointer items-start gap-3 rounded-xl border px-3 py-3 text-left transition duration-150",
                     step === item.id
-                      ? "border-mf-gph bg-mf-gph-soft"
+                      ? "border-mf-gph bg-mf-gph-soft shadow-sm ring-1 ring-mf-gph/25"
                       : item.id === "material" && !item.done
-                        ? "border-mf-gph/40 bg-white shadow-sm hover:border-mf-gph"
-                        : "border-mf-border bg-mf-canvas hover:border-mf-gph/35",
+                        ? "border-mf-gph/40 bg-white shadow-sm hover:border-mf-gph hover:bg-mf-gph-soft hover:shadow-md"
+                        : "border-mf-border bg-mf-canvas hover:border-mf-gph hover:bg-mf-gph-soft hover:shadow-sm",
                   )}
                 >
                   <span className="mt-0.5 text-mf-gph">
@@ -367,7 +367,11 @@ export function TutorBuilderPanel({
                       {item.hint}
                     </span>
                   </span>
-                  {item.id === "material" && !item.done ? (
+                  {step === item.id ? (
+                    <span className="mt-0.5 shrink-0 text-[10px] font-semibold uppercase tracking-[0.12em] text-mf-gph">
+                      Editando
+                    </span>
+                  ) : item.id === "material" && !item.done ? (
                     <span className="mt-0.5 shrink-0 text-[10px] font-semibold uppercase tracking-[0.12em] text-mf-gph">
                       Aquí
                     </span>
