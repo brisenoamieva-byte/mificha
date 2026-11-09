@@ -47,6 +47,11 @@ export const MARKETING_NAV: NavSection[] = [
         description: "$2,030 (−30%) · diagnóstico GPH + 12 meses de MiFicha",
       },
       {
+        href: "/fut/cracks",
+        label: "CRACKS try outs",
+        description: "Noviembre · Colegio San Javier · solicita liga de registro",
+      },
+      {
         href: "/fut/visorias",
         label: "Visorías Querétaro",
         description: "26 y 27 de noviembre 2026 · registro abierto",

@@ -94,6 +94,20 @@ export function VisoriaLanding() {
           </dl>
         </section>
 
+        <section className="mx-auto max-w-6xl px-4 pt-10 sm:px-6">
+          <div className="rounded-xl border border-[#fda4af] bg-[#fff1f2] px-5 py-4 sm:px-6">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#e11d2e]">
+              También · CRACKS academia
+            </p>
+            <p className="mt-1 text-sm leading-6 text-mf-text-secondary">
+              Try outs durante todo noviembre en Colegio San Javier · 6:30 a 8:00 p. m.
+            </p>
+            <Link href="/fut/cracks" className="mt-3 inline-flex text-sm font-semibold text-[#e11d2e] hover:underline">
+              Ver convocatoria CRACKS
+            </Link>
+          </div>
+        </section>
+
         <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
           <div className="rounded-xl bg-white px-5 py-5 ring-1 ring-mf-border sm:px-6">
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
