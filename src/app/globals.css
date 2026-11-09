@@ -289,7 +289,9 @@ body {
   .demo-ficha-document,
   .demo-ficha-document *,
   .diagnosis-report,
-  .diagnosis-report * {
+  .diagnosis-report *,
+  .tutor-ficha-print,
+  .tutor-ficha-print * {
     visibility: visible;
   }
 
@@ -324,6 +326,35 @@ body {
     max-width: none !important;
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
+  }
+
+  .tutor-ficha-print {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    width: 100%;
+    max-width: none !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .tutor-ficha-print article,
+  .tutor-ficha-print section {
+    box-shadow: none !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .tutor-ficha-print video {
+    display: none !important;
+  }
+
+  .tutor-ficha-print-url {
+    display: block !important;
+    margin-top: 0.35in;
   }
 
   .diagnosis-report details {

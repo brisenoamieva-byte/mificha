@@ -19,7 +19,7 @@ export function GphPublicStrip({ summary, href }: GphPublicStripProps) {
     summary.globalScore != null ? summary.globalScore.toFixed(1) : null;
 
   return (
-    <div className="mt-4 flex flex-col gap-3 rounded-xl border border-mf-gph/25 bg-mf-gph-soft/70 px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between print:hidden">
+    <div className="mt-4 flex flex-col gap-3 rounded-xl border border-mf-gph/25 bg-mf-gph-soft/70 px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between">
       <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-2">
           <GphEvaluationBadge asSpan />
@@ -35,7 +35,7 @@ export function GphPublicStrip({ summary, href }: GphPublicStripProps) {
       </div>
       <Link
         href={href}
-        className="inline-flex items-center justify-center gap-1.5 rounded-full bg-mf-gph px-4 py-2 text-sm font-semibold text-white hover:bg-[#d63a00]"
+        className="inline-flex items-center justify-center gap-1.5 rounded-full bg-mf-gph px-4 py-2 text-sm font-semibold text-white hover:bg-[#d63a00] print:hidden"
       >
         Ver evaluación
         <ArrowRight className="h-4 w-4" aria-hidden />

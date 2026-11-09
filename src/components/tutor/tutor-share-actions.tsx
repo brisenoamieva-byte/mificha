@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Copy, MessageCircle } from "lucide-react";
+import { Copy, MessageCircle, Printer } from "lucide-react";
 
 export function TutorShareActions({
   playerName,
@@ -78,6 +78,14 @@ export function TutorShareActions({
             {copied === "code" ? "Código copiado" : "Copiar código"}
           </button>
         ) : null}
+        <button
+          type="button"
+          onClick={() => window.print()}
+          className="inline-flex items-center justify-center gap-2 rounded-lg border border-mf-border bg-white px-4 py-2.5 text-sm font-semibold text-mf-gph hover:bg-mf-gph-soft"
+        >
+          <Printer className="h-4 w-4" />
+          Imprimir / PDF
+        </button>
       </div>
     </div>
   );

@@ -65,7 +65,7 @@ export function TutorPublicFicha({
   const position = profile.position || "Posición por definir";
 
   return (
-    <div className="space-y-4">
+    <div className="tutor-ficha-print space-y-4">
       <article className="overflow-hidden rounded-2xl border border-mf-border bg-white shadow-[0_24px_60px_-28px_rgba(15,45,82,0.45)]">
         <div className="relative overflow-hidden bg-gradient-to-br from-[#0a1f3d] via-[#123d68] to-[#0f2d52] px-5 py-6 text-white sm:px-7 sm:py-7">
           <div
@@ -125,7 +125,7 @@ export function TutorPublicFicha({
         </div>
 
         {featuredVideo?.url ? (
-          <section className="border-b border-mf-border px-5 py-5 sm:px-7">
+          <section className="border-b border-mf-border px-5 py-5 sm:px-7 print:hidden">
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-mf-text-muted">
               Video destacado
             </p>
@@ -140,6 +140,12 @@ export function TutorPublicFicha({
               <p className="mt-2 text-sm text-mf-text-secondary">{featuredVideo.title}</p>
             ) : null}
           </section>
+        ) : null}
+        {featuredVideo?.url ? (
+          <p className="hidden border-b border-mf-border px-5 py-3 text-sm text-mf-text-secondary print:block sm:px-7">
+            Video destacado disponible en el link digital de MiFicha
+            {child.public_code ? ` (${child.public_code})` : ""}.
+          </p>
         ) : null}
 
         {profile.bio || profile.goals ? (
@@ -173,7 +179,7 @@ export function TutorPublicFicha({
         ) : null}
 
         {!compact && extraVideos.length ? (
-          <section className="border-b border-mf-border px-5 py-5 sm:px-7">
+          <section className="border-b border-mf-border px-5 py-5 sm:px-7 print:hidden">
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-mf-text-muted">
               Más videos
             </p>
@@ -231,6 +237,10 @@ export function TutorPublicFicha({
           }
         />
       ) : null}
+      <p className="tutor-ficha-print-url hidden text-center text-xs text-mf-text-muted print:block">
+        mificha.mx · ficha de {child.player_name}
+        {child.public_code ? ` · ${child.public_code}` : ""}
+      </p>
     </div>
   );
 }
