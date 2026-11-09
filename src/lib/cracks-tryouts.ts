@@ -38,16 +38,6 @@ export const CRACKS_TRYOUTS = {
     { label: "Sub-15", years: "2011–2012" },
     { label: "Sub-17", years: "2009–2010" },
   ],
-  audios: [
-    {
-      src: "/partners/cracks-tryouts-queretaro-nov-2026-audio-1.mp3",
-      label: "Mensaje 1 · invitación a try outs",
-    },
-    {
-      src: "/partners/cracks-tryouts-queretaro-nov-2026-audio-2.mp3",
-      label: "Mensaje 2 · detalles de registro",
-    },
-  ],
 } as const;
 
 export function cracksTryoutsPublicUrl(baseUrl?: string) {

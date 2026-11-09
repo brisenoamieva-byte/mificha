@@ -140,32 +140,6 @@ export function CracksTryoutsLanding() {
           </div>
         </section>
 
-        <section className="border-y border-mf-border bg-white">
-          <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#e11d2e]">
-              Audios
-            </p>
-            <h2 className="mt-2 text-2xl font-semibold tracking-tight text-mf-gph-ink sm:text-3xl">
-              Escucha la invitación
-            </h2>
-            <div className="mt-6 grid gap-4 lg:grid-cols-2">
-              {CRACKS_TRYOUTS.audios.map((audio) => (
-                <figure
-                  key={audio.src}
-                  className="rounded-2xl border border-mf-border bg-mf-canvas px-4 py-4 sm:px-5"
-                >
-                  <figcaption className="text-sm font-semibold text-mf-gph-ink">
-                    {audio.label}
-                  </figcaption>
-                  <audio controls preload="metadata" className="mt-3 w-full">
-                    <source src={audio.src} type="audio/mpeg" />
-                  </audio>
-                </figure>
-              ))}
-            </div>
-          </div>
-        </section>
-
         <section className="mx-auto max-w-3xl px-4 py-12 sm:px-6 sm:py-16">
           <div className="overflow-hidden rounded-2xl border border-[#fda4af] bg-white shadow-[0_12px_32px_-20px_rgba(225,29,72,0.45)]">
             <div className="bg-[#fff1f2] px-5 py-3">
