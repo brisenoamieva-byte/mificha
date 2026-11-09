@@ -15,7 +15,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         error:
-          "Hoy la ficha del tutor no se cobra. Entra en /fut/tutor. Lo único que se paga ahora es el diagnóstico GPH ($2,900).",
+          "Hoy la ficha del tutor no se cobra. Entra en /fut/tutor. Lo único que se paga ahora es el diagnóstico GPH ($2,030, −30% sobre $2,900).",
       },
       { status: 400 },
     );

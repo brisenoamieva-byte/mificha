@@ -41,7 +41,7 @@ export const AUDIENCE_VALUE_PROPS: AudienceValueProp[] = [
       "Arma la ficha hoy sin costo: fotos, videos e historia.",
       "Avisos de visorías con Primera y convocatorias curadas.",
       "Eventos con descuento y especialización GPH acotada.",
-      "Opcional: diagnóstico GPH $2,900 (incluye 12 meses de MiFicha).",
+      "Opcional: diagnóstico GPH $2,030 (−30% sobre $2,900, incluye 12 meses de MiFicha).",
       "Privado: tú decides con quién compartir la ficha.",
     ],
     href: "/fut/tutor",

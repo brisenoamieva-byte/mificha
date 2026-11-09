@@ -16,6 +16,7 @@ import {
   GPH_WHATSAPP_DISPLAY,
   diagnosisWhatsAppHref,
 } from "@/lib/gph-alliance";
+import { DiagnosisPromoPrice } from "@/components/marketing/diagnosis-promo-price";
 import { DIAGNOSIS_PRODUCT } from "@/lib/pricing";
 import { cn } from "@/lib/utils";
 
@@ -75,24 +76,29 @@ export function EvaluacionesPageContent() {
           </>
         }
         aside={
-          <div className="mf-card p-6 sm:p-8">
-            <AllianceLockup size="lg" showCaption />
-            <p className="mt-4 text-sm font-semibold text-mf-gph-ink">
-              {DIAGNOSIS_PRODUCT.publicPriceLabel} · incluye 12 meses de MiFicha
-            </p>
-            <ul className="mt-4 space-y-2 text-sm text-mf-text-secondary">
-              {[
-                "Sesión presencial",
-                "Ficha visual + lectura de entrenador",
-                "3 a 5 objetivos de desarrollo",
-                "Informe en mificha.mx",
-              ].map((item) => (
-                <li key={item} className="flex gap-2">
-                  <Check className="mt-0.5 h-4 w-4 shrink-0 text-mf-gph" />
-                  {item}
-                </li>
-              ))}
-            </ul>
+          <div className="mf-card overflow-hidden p-0 sm:p-0">
+            <div className="bg-[#fff1f2] px-5 py-3 sm:px-8">
+              <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#e11d48]">
+                {DIAGNOSIS_PRODUCT.promoHeadline}
+              </p>
+            </div>
+            <div className="p-6 sm:p-8">
+              <AllianceLockup size="lg" showCaption />
+              <DiagnosisPromoPrice className="mt-5" size="lg" />
+              <ul className="mt-5 space-y-2 text-sm text-mf-text-secondary">
+                {[
+                  "Sesión presencial",
+                  "Ficha visual + lectura de entrenador",
+                  "3 a 5 objetivos de desarrollo",
+                  "Informe en mificha.mx",
+                ].map((item) => (
+                  <li key={item} className="flex gap-2">
+                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-mf-gph" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         }
       />
@@ -219,13 +225,29 @@ export function EvaluacionesPageContent() {
             {DIAGNOSIS_PRODUCT.plans.map((plan) => (
               <article
                 key={plan.id}
-                className="flex flex-col rounded-xl border border-mf-border bg-white p-5 sm:p-6"
+                className={cn(
+                  "flex flex-col rounded-xl border bg-white p-5 sm:p-6",
+                  "promo" in plan && plan.promo
+                    ? "border-[#fda4af] shadow-[0_10px_30px_-18px_rgba(225,29,72,0.45)]"
+                    : "border-mf-border",
+                )}
               >
-                <p className="text-sm font-semibold text-mf-text">{plan.label}</p>
-                <p className="mt-2 text-3xl font-semibold tracking-tight text-mf-gph">
-                  {plan.priceLabel}
-                </p>
-                <p className="mt-1 text-xs font-medium text-mf-text-muted">{plan.period}</p>
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p className="text-sm font-semibold text-mf-text">{plan.label}</p>
+                  {"promo" in plan && plan.promo ? (
+                    <span className="rounded-md bg-[#e11d48] px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-white">
+                      −{DIAGNOSIS_PRODUCT.discountPercent}%
+                    </span>
+                  ) : null}
+                </div>
+                {"promo" in plan && plan.promo ? (
+                  <DiagnosisPromoPrice className="mt-3" size="md" showCaption={false} />
+                ) : (
+                  <p className="mt-2 text-3xl font-semibold tracking-tight text-mf-gph">
+                    {plan.priceLabel}
+                  </p>
+                )}
+                <p className="mt-2 text-xs font-medium text-mf-text-muted">{plan.period}</p>
                 <p className="mt-4 text-sm leading-7 text-mf-text-secondary">
                   {plan.description}
                 </p>
@@ -286,9 +308,10 @@ export function HomeGphAllianceBand() {
         <h2 className="mt-2 max-w-2xl text-2xl font-semibold tracking-[-0.02em] text-white sm:text-3xl">
           Diagnósticos GPH. Ya se pueden contratar.
         </h2>
+        <DiagnosisPromoPrice className="mt-5" size="lg" tone="dark" />
         <p className="mt-3 max-w-2xl text-sm leading-7 text-white/75 sm:text-base">
-          {DIAGNOSIS_PRODUCT.publicPriceLabel}: sesión presencial + 12 meses de MiFicha.
-          Agenda por WhatsApp. La ficha del tutor se puede armar sin costo.
+          Sesión presencial + 12 meses de MiFicha. Agenda por WhatsApp. La ficha del tutor
+          se puede armar sin costo.
         </p>
         <div className="mt-6 flex flex-wrap items-center gap-3">
           <a

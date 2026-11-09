@@ -44,7 +44,7 @@ export const MARKETING_NAV: NavSection[] = [
       {
         href: "/fut/evaluaciones",
         label: "Evaluaciones GPH",
-        description: "$2,900 · diagnóstico GPH + 12 meses de MiFicha",
+        description: "$2,030 (−30%) · diagnóstico GPH + 12 meses de MiFicha",
       },
       {
         href: "/fut/visorias",
@@ -76,7 +76,7 @@ export const MARKETING_NAV: NavSection[] = [
       {
         href: "/fut/pagar?sku=diagnosis",
         label: "Pagar diagnóstico",
-        description: "Ficha tutor sin costo. Diagnóstico GPH $2,900 (incluye 12 meses).",
+        description: "Ficha tutor sin costo. Diagnóstico GPH $2,030 (−30%, incluye 12 meses).",
       },
       {
         href: "/fut/membresia",

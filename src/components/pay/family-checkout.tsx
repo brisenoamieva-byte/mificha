@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { diagnosisWhatsAppHref } from "@/lib/gph-alliance";
+import { DiagnosisPromoPrice } from "@/components/marketing/diagnosis-promo-price";
 import {
   FAMILY_PRODUCTS,
   MEMBERSHIP_CHECKOUT_DISABLED,
-  formatMxn,
   type FamilySku,
 } from "@/lib/gph-commerce";
 
@@ -84,18 +84,20 @@ export function FamilyCheckout({
       ) : null}
 
       <div className="grid gap-8 lg:grid-cols-[0.92fr_1.08fr] lg:items-start">
-        <div className="rounded-xl border border-mf-gph bg-mf-gph-soft px-5 py-5">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
-            Se paga
-          </p>
-          <p className="mt-2 text-lg font-semibold tracking-tight text-mf-gph-ink">
-            {product.publicName}
-          </p>
-          <p className="mt-1 text-3xl font-semibold tracking-tight text-mf-gph">
-            {formatMxn(product.priceMxn)}
-          </p>
-          <p className="mt-1 text-xs text-mf-text-muted">{product.period}</p>
-          <p className="mt-3 text-sm leading-6 text-mf-text-secondary">{product.description}</p>
+        <div className="overflow-hidden rounded-xl border border-[#fda4af] bg-white shadow-[0_12px_32px_-20px_rgba(225,29,72,0.55)]">
+          <div className="bg-[#fff1f2] px-5 py-3">
+            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#e11d48]">
+              Se paga hoy · promoción
+            </p>
+          </div>
+          <div className="bg-mf-gph-soft/40 px-5 py-5">
+            <p className="text-lg font-semibold tracking-tight text-mf-gph-ink">
+              {product.publicName}
+            </p>
+            <DiagnosisPromoPrice className="mt-3" size="lg" tone="gph" />
+            <p className="mt-2 text-xs text-mf-text-muted">{product.period}</p>
+            <p className="mt-3 text-sm leading-6 text-mf-text-secondary">{product.description}</p>
+          </div>
         </div>
 
         <form
@@ -109,7 +111,10 @@ export function FamilyCheckout({
                 {mercadoPagoReady ? "Pago con Mercado Pago" : "Diagnóstico GPH"}
               </p>
               <h2 className="mt-2 text-xl font-semibold tracking-tight text-mf-gph-ink">
-                {product.publicName} · {product.priceLabel}
+                {product.publicName} · {product.priceLabel}{" "}
+                <span className="text-sm font-bold text-[#e11d48]">
+                  (−{product.discountPercent}%)
+                </span>
               </h2>
               <p className="mt-1 text-sm text-mf-text-secondary">
                 {mercadoPagoReady

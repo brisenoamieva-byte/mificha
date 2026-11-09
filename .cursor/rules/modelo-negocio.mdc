@@ -11,7 +11,7 @@ La plataforma no es el producto único: es el canal para vender y operar el nego
 
 1. **Entrenamientos** — sesiones, camps, convocatorias de training GPH. La membresía incluye especialización **acotada** (1 ciclo/mes o el cupo publicado); el extra se cobra.
 2. **Anualidad de plataforma** — **$1,200 MXN al año**. Producto de familia: seguimiento + acceso a oportunidades. No es red social.
-3. **Diagnósticos GPH** — evaluación **$2,900 MXN e incluye 12 meses de MiFicha**. Vive en Evaluaciones, no en la página de visorías. Cobro en `/fut/pagar`.
+3. **Diagnósticos GPH** — lista **$2,900**; promo vigente **−30% → $2,030 MXN** e incluye 12 meses de MiFicha. Vive en Evaluaciones, no en la página de visorías. Cobro en `/fut/pagar`.
 
 ## Qué compra la familia con $1,200
 
@@ -28,7 +28,7 @@ Operación:
 - Cuenta del tutor ligada al jugador. Un tutor puede tener más de un hijo.
 - Ficha privada. El tutor sube video, foto y notas; puede generar ficha presentable (universidades, visorías, clubes).
 - **Piloto:** hoy el tutor puede armar ficha sin cobro (`TUTOR_PILOT_FREE`). Al cerrar el piloto, sin membresía vigente no hay carga de material.
-- La evaluación GPH ($2,900) ya incluye ese mismo año: no se cobra membresía otra vez.
+- La evaluación GPH (promo $2,030 / lista $2,900) ya incluye ese mismo año: no se cobra membresía otra vez.
 - Consentimiento del tutor para menores. Compartir con clubes es permiso aparte.
 
 ## Tres bloques en la ficha (no se mezclan)
@@ -41,7 +41,7 @@ Operación:
 
 - Opera evaluaciones: **Gustavo Reyes (GPH)**.
 - Plataforma: **José Ricardo Briseño Amieva (MiFicha)**.
-- Por cada evaluación cobrada ($2,900): MiFicha **$600**, GPH **$2,300**.
+- Por cada evaluación cobrada (promo $2,030): MiFicha **$600**, GPH **$1,430**. Lista de referencia $2,900 (split histórico $600 / $2,300).
 - Por cada membresía sola ($1,200): MiFicha **$600**, GPH **$600**.
 - El dinero entra por Mercado Pago de MiFicha; el split se registra en cobros. No hay precio socio $2,200.
 

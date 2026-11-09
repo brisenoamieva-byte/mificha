@@ -7,7 +7,7 @@ import { isMercadoPagoConfigured } from "@/lib/mercadopago";
 export const metadata: Metadata = {
   title: "Pagar diagnóstico GPH | MiFicha",
   description:
-    "Paga la evaluación GPH ($2,900, incluye 1 año de MiFicha) con Mercado Pago o WhatsApp.",
+    "Paga la evaluación GPH con 30% de descuento ($2,030, antes $2,900; incluye 1 año de MiFicha) con Mercado Pago o WhatsApp.",
 };
 
 function parseSku(value: string | string[] | undefined): FamilySku | undefined {

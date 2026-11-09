@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowRight, Check, MessageCircle } from "lucide-react";
+import { DiagnosisPromoPrice } from "@/components/marketing/diagnosis-promo-price";
 import { AllianceLockup } from "@/components/ui/gph-logo";
 import { diagnosisWhatsAppHref, GPH_WHATSAPP_DISPLAY } from "@/lib/gph-alliance";
 import { DIAGNOSIS_PRODUCT } from "@/lib/pricing";
@@ -36,14 +37,15 @@ export function DiagnosisHireCard({
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0 max-w-xl">
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
-              Diagnóstico GPH · {DIAGNOSIS_PRODUCT.publicPriceLabel}
+              Diagnóstico GPH · promoción
             </p>
             <h2 className="mt-2 text-xl font-semibold tracking-tight text-mf-gph-ink">
               {name
                 ? `¿Quieres el diagnóstico de ${name}?`
                 : "Contratar diagnóstico GPH"}
             </h2>
-            <p className="mt-2 text-sm leading-7 text-mf-text-secondary">
+            <DiagnosisPromoPrice className="mt-3" size="md" />
+            <p className="mt-3 text-sm leading-7 text-mf-text-secondary">
               Mide el punto de partida, identifica fortalezas y deja objetivos concretos
               en la ficha. No promete beca ni selección: orienta el desarrollo.
             </p>

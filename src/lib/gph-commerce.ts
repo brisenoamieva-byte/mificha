@@ -7,6 +7,22 @@ export const PARTNERSHIP_EFFECTIVE_ON = "2026-11-06";
  */
 export const MEMBERSHIP_CHECKOUT_DISABLED = true;
 
+/** Precio de lista del diagnóstico GPH (antes del descuento). */
+export const DIAGNOSIS_LIST_PRICE_MXN = 2900;
+
+/** Promoción vigente sobre evaluaciones GPH. */
+export const DIAGNOSIS_PROMO = {
+  discountPercent: 30,
+  listPriceMxn: DIAGNOSIS_LIST_PRICE_MXN,
+  /** 2900 × 0.70 */
+  priceMxn: 2030,
+  badge: "30% de descuento",
+  badgeShort: "-30%",
+  headline: "Promoción: 30% de descuento",
+} as const;
+
+export const DIAGNOSIS_PROMO_PRICE_MXN = DIAGNOSIS_PROMO.priceMxn;
+
 /**
  * Copy de precios para familias — una sola historia, sin mezclar
  * “cuesta / gratis / incluido en diagnóstico” en la misma frase.
@@ -17,12 +33,12 @@ export const FAMILY_PRICING_COPY = {
     : "Familias · membresía anual",
   /** Explicación completa (sección membresía, página). */
   today:
-    "Hoy puedes armar la ficha del tutor sin pagar. Lo único que se cobra ahora es el diagnóstico GPH ($2,900): evaluación presencial + 12 meses de MiFicha.",
+    "Hoy puedes armar la ficha del tutor sin pagar. Lo único que se cobra ahora es el diagnóstico GPH: de $2,900 a $2,030 (−30%), evaluación presencial + 12 meses de MiFicha.",
   /** Una línea (nav, pies, cards). */
   todayShort:
-    "Ficha tutor sin costo. Diagnóstico GPH $2,900 (incluye 12 meses).",
+    "Ficha tutor sin costo. Diagnóstico GPH $2,030 (−30% sobre $2,900, incluye 12 meses).",
   diagnosis:
-    "$2,900 · diagnóstico GPH + 12 meses de MiFicha",
+    "$2,030 (−30%) · diagnóstico GPH + 12 meses de MiFicha",
   /** Solo pie discreto; no va en el hero. */
   laterNote:
     "Más adelante la membresía sola será $1,200 al año. Si pagaste el diagnóstico, ese año ya viene incluido.",
@@ -38,6 +54,14 @@ export const GPH_PARTNERSHIP = {
 } as const;
 
 export type FamilySku = "diagnosis" | "membership";
+
+export function formatMxn(amount: number) {
+  return new Intl.NumberFormat("es-MX", {
+    style: "currency",
+    currency: "MXN",
+    maximumFractionDigits: 0,
+  }).format(amount);
+}
 
 export interface FamilyOrderRow {
   id: string;
@@ -64,14 +88,19 @@ export const FAMILY_PRODUCTS = {
     sku: "diagnosis" as const,
     title: "Evaluación GPH + 1 año MiFicha",
     publicName: "Evaluación GPH",
-    priceMxn: 2900,
-    priceLabel: "$2,900",
+    listPriceMxn: DIAGNOSIS_PROMO.listPriceMxn,
+    listPriceLabel: "$2,900",
+    priceMxn: DIAGNOSIS_PROMO.priceMxn,
+    priceLabel: "$2,030",
+    discountPercent: DIAGNOSIS_PROMO.discountPercent,
+    promoBadge: DIAGNOSIS_PROMO.badge,
     period: "MXN · sesión + 12 meses de plataforma",
     description:
-      "Diagnóstico GPH de tu hijo (sesión, ficha y lectura de entrenador) e incluye 12 meses de acceso a MiFicha.",
+      "Diagnóstico GPH de tu hijo (sesión, ficha y lectura de entrenador) e incluye 12 meses de acceso a MiFicha. Promoción −30% por tiempo limitado.",
     includesMembershipDays: 365,
     mifichaShareMxn: GPH_PARTNERSHIP.mifichaShareMxn,
-    gphShareMxn: 2300,
+    /** Resto del cobro promocional para GPH (2030 − 600). */
+    gphShareMxn: DIAGNOSIS_PROMO.priceMxn - GPH_PARTNERSHIP.mifichaShareMxn,
   },
   membership: {
     sku: "membership" as const,
@@ -91,12 +120,4 @@ export const FAMILY_PRODUCTS = {
 export function familyProduct(sku: string) {
   if (sku === "diagnosis" || sku === "membership") return FAMILY_PRODUCTS[sku];
   return null;
-}
-
-export function formatMxn(amount: number) {
-  return new Intl.NumberFormat("es-MX", {
-    style: "currency",
-    currency: "MXN",
-    maximumFractionDigits: 0,
-  }).format(amount);
 }

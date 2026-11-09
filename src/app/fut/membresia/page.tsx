@@ -72,7 +72,7 @@ export default function MembresiaPage() {
               Crear ficha de tutor
             </Link>
             <Link href="/fut/pagar?sku=diagnosis" className="mf-btn-gph-ghost">
-              Pagar diagnóstico $2,900
+              Pagar diagnóstico $2,030 (−30%)
             </Link>
             <Link href="/fut/visorias" className="mf-btn-gph-ghost">
               Visorías

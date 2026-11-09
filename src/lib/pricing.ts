@@ -1,5 +1,7 @@
 /** Modelo comercial MiFicha — academias gratis; organizador paga la temporada. */
 
+import { DIAGNOSIS_PROMO, FAMILY_PRODUCTS } from "@/lib/gph-commerce";
+
 export const ACADEMY_ACCESS = {
   headline: "Gratis para academias",
   summary:
@@ -58,15 +60,18 @@ export const ORGANIZER_PRICING = {
   ] satisfies OrganizerPricingPlan[],
 } as const;
 
-/** Evaluaciones GPH — $2,900 incluye 12 meses de MiFicha. Split interno: MiFicha $600. */
+/** Evaluaciones GPH — promo −30% sobre $2,900. Incluye 12 meses de MiFicha. */
 export const DIAGNOSIS_PRODUCT = {
   title: "Evaluaciones",
   subtitle:
     "Sesión presencial con metodología GPH. El informe, la etapa y el plan quedan en mificha.mx para que la familia dé seguimiento.",
-  footnote:
-    "$2,900 · sesión GPH + 12 meses de MiFicha · Mercado Pago o WhatsApp.",
+  footnote: `${FAMILY_PRODUCTS.diagnosis.priceLabel} (−${DIAGNOSIS_PROMO.discountPercent}% sobre ${FAMILY_PRODUCTS.diagnosis.listPriceLabel}) · sesión GPH + 12 meses de MiFicha · Mercado Pago o WhatsApp.`,
   memberPriceLabel: "$1,200",
-  publicPriceLabel: "$2,900",
+  listPriceLabel: FAMILY_PRODUCTS.diagnosis.listPriceLabel,
+  publicPriceLabel: FAMILY_PRODUCTS.diagnosis.priceLabel,
+  discountPercent: DIAGNOSIS_PROMO.discountPercent,
+  promoBadge: DIAGNOSIS_PROMO.badge,
+  promoHeadline: DIAGNOSIS_PROMO.headline,
   checkoutHref: "/fut/pagar?sku=diagnosis",
   whatYouGet: [
     "Sesión presencial con pruebas de técnica, táctica, físico, mental y hábitos",
@@ -85,10 +90,12 @@ export const DIAGNOSIS_PRODUCT = {
     {
       id: "individual",
       label: "Jugador",
-      priceLabel: "$2,900",
+      listPriceLabel: FAMILY_PRODUCTS.diagnosis.listPriceLabel,
+      priceLabel: FAMILY_PRODUCTS.diagnosis.priceLabel,
+      promo: true,
       period: "MXN · evaluación + 12 meses MiFicha",
       description:
-        "Diagnóstico GPH completo: sesión, ficha, lectura de entrenador y un año de plataforma para dar seguimiento.",
+        "Diagnóstico GPH completo: sesión, ficha, lectura de entrenador y un año de plataforma para dar seguimiento. Promoción −30% por tiempo limitado.",
     },
     {
       id: "grupo",
@@ -98,7 +105,7 @@ export const DIAGNOSIS_PRODUCT = {
       description:
         "Varios jugadores en una misma sesión. Cada uno queda con su ficha y plan en la plataforma.",
     },
-  ] satisfies OrganizerPricingPlan[],
+  ],
 } as const;
 
 export const SCOUT_PRICING = {
