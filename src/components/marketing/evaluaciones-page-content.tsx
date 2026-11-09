@@ -241,7 +241,7 @@ export function EvaluacionesPageContent() {
                   ) : null}
                 </div>
                 {"promo" in plan && plan.promo ? (
-                  <DiagnosisPromoPrice className="mt-3" size="md" showCaption={false} />
+                  <DiagnosisPromoPrice className="mt-3" size="md" />
                 ) : (
                   <p className="mt-2 text-3xl font-semibold tracking-tight text-mf-gph">
                     {plan.priceLabel}

@@ -7,12 +7,10 @@ type PromoTone = "light" | "dark" | "gph";
 export function DiagnosisPromoPrice({
   size = "md",
   tone = "light",
-  showCaption = true,
   className,
 }: {
   size?: PromoSize;
   tone?: PromoTone;
-  showCaption?: boolean;
   className?: string;
 }) {
   const list = formatMxn(FAMILY_PRODUCTS.diagnosis.listPriceMxn);
@@ -35,8 +33,6 @@ export function DiagnosisPromoPrice({
         : "text-mf-text-muted";
   const saleColor =
     tone === "dark" ? "text-white" : tone === "gph" ? "text-mf-gph-ink" : "text-mf-gph-ink";
-  const captionColor =
-    tone === "dark" ? "text-white/70" : "text-mf-text-secondary";
 
   return (
     <div className={cn("min-w-0", className)}>
@@ -83,15 +79,6 @@ export function DiagnosisPromoPrice({
           <span className="sr-only"> precio promocional</span>
         </p>
       </div>
-
-      {showCaption ? (
-        <p className={cn("mt-2 text-sm leading-6", captionColor)}>
-          Evaluación GPH + 12 meses de MiFicha · ahorras{" "}
-          <span className="font-semibold text-[#e11d48]">
-            {formatMxn(FAMILY_PRODUCTS.diagnosis.listPriceMxn - FAMILY_PRODUCTS.diagnosis.priceMxn)}
-          </span>
-        </p>
-      ) : null}
     </div>
   );
 }
