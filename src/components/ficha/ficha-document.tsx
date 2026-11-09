@@ -6,6 +6,7 @@ import QRCode from "react-qr-code";
 import { FichaCoachBlock, hasFichaCoachContent } from "@/components/ficha/ficha-coach-block";
 import { FichaSeasonBlock } from "@/components/ficha/ficha-season-block";
 import { GphEvaluationBadge } from "@/components/ui/gph-evaluation-badge";
+import { PlayerCategoryBadge } from "@/components/ui/player-category-badge";
 import { PlayerPortraitImage } from "@/components/ui/player-portrait-image";
 import { BrandWordmark } from "@/components/ui/brand-wordmark";
 import { FICHA_COPY, computeSeasonSummary } from "@/lib/ficha-content";
@@ -131,17 +132,18 @@ export function FichaDocument({
             <h1 className="text-lg font-semibold leading-tight tracking-tight text-mf-text sm:text-[1.35rem]">
               {model.fullName}
             </h1>
-            <p className="mt-1 text-sm text-mf-text-secondary">
-              {model.age != null ? `${model.age} años · ` : ""}
-              {model.categoryLabel}
-            </p>
-            <p className="mt-0.5 text-sm text-mf-text-secondary">
+            <p className="mt-1 text-sm font-medium text-mf-text">
               {model.positionLabel}
               {model.secondaryPositionLabel
                 ? ` · también ${model.secondaryPositionLabel.toLowerCase()}`
                 : null}
+              {model.age != null ? ` · ${model.age} años` : ""}
+              {model.generationYear != null ? ` · Gen. ${model.generationYear}` : ""}
             </p>
-            <p className="mt-0.5 text-sm text-mf-text-secondary">{model.academyName}</p>
+            <div className="mt-2">
+              <PlayerCategoryBadge birthDate={model.birthDate} />
+            </div>
+            <p className="mt-1.5 text-sm text-mf-text-secondary">{model.academyName}</p>
             {model.metaLine ? (
               <p className="mt-1 text-xs text-mf-text-muted">{model.metaLine}</p>
             ) : null}

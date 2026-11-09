@@ -1,4 +1,5 @@
 import { getPositionLabel } from "@/lib/dashboard-utils";
+import { formatPlayerCategory } from "@/lib/player-category";
 import { getProtectedProfileTitle } from "@/lib/privacy";
 import type { PublicPlayerData } from "@/lib/public-player";
 import type { PlayerPosition } from "@/types/database";
@@ -22,6 +23,7 @@ export interface OgPlayerSharePayload {
   academyName: string;
   seasonName: string | null;
   positionLabel: string;
+  categoryLabel: string;
   stats: {
     matches: number;
     goals: number;
@@ -49,6 +51,10 @@ export function buildOgPlayerSharePayload(data: PublicPlayerData): OgPlayerShare
     academyName: player.academies?.name ?? "Academia verificada",
     seasonName: currentSeasonName,
     positionLabel: getPositionLabel(player.position),
+    categoryLabel: formatPlayerCategory(player.birth_date).replace(
+      " · Generación ",
+      " · Gen. ",
+    ),
     stats: {
       matches: stats.total_matches,
       goals: stats.total_goals,
@@ -60,7 +66,11 @@ export function buildOgPlayerSharePayload(data: PublicPlayerData): OgPlayerShare
 }
 
 export function buildOgPlayerImageAlt(payload: OgPlayerSharePayload) {
-  return `${payload.title} · Ficha verificada · MiFicha`;
+  const category =
+    payload.categoryLabel && payload.categoryLabel !== "Sin categoría"
+      ? ` · ${payload.categoryLabel}`
+      : "";
+  return `${payload.title}${category} · Ficha verificada · MiFicha`;
 }
 
 /** Fetch mínimo para OG: sin GPH, videos ni historial completo. */
@@ -131,6 +141,10 @@ export async function fetchOgPlayerSharePayload(
     academyName: player.academies?.name ?? "Academia verificada",
     seasonName,
     positionLabel: getPositionLabel(asPlayerPosition(player.position)),
+    categoryLabel: formatPlayerCategory(player.birth_date).replace(
+      " · Generación ",
+      " · Gen. ",
+    ),
     stats: {
       matches: Number(stats.total_matches) || 0,
       goals: Number(stats.total_goals) || 0,

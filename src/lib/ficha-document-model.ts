@@ -3,7 +3,11 @@ import { DEMO_FICHA_PREVIEW } from "@/lib/demo-ficha-preview";
 import { computeSeasonSummary } from "@/lib/ficha-content";
 import { getAchievementDefinition } from "@/lib/player-achievements";
 import { computeParticipationBreakdown } from "@/lib/player-visual-profile";
-import { formatPlayerCategory } from "@/lib/player-category";
+import {
+  formatPlayerCategory,
+  getPlayerGeneration,
+  isUnknownBirthDate,
+} from "@/lib/player-category";
 import type { PublicPlayerData } from "@/lib/public-player";
 import { CURRENT_SEASON_LABEL } from "@/lib/marketing-season";
 import type { MatchPerformanceRow } from "@/lib/performance-analytics";
@@ -33,6 +37,8 @@ export interface FichaDocumentModel {
   seasonLabel: string;
   fullName: string;
   age: number | null;
+  birthDate: string | null;
+  generationYear: number | null;
   categoryLabel: string;
   positionLabel: string;
   secondaryPositionLabel?: string | null;
@@ -105,6 +111,8 @@ export function buildDemoFichaDocument(): FichaDocumentModel {
     seasonLabel: demo.seasonLabel,
     fullName: demo.fullName,
     age: demo.age,
+    birthDate: demo.birthDate,
+    generationYear: getPlayerGeneration(demo.birthDate),
     categoryLabel: demo.category,
     positionLabel: demo.positionLabel,
     secondaryPositionLabel: demo.secondaryLabel,
@@ -177,6 +185,10 @@ export function buildPublicFichaDocument(data: PublicPlayerData): FichaDocumentM
     seasonLabel: currentSeasonName ?? CURRENT_SEASON_LABEL,
     fullName: `${player.first_name} ${player.last_name}`,
     age,
+    birthDate: player.birth_date,
+    generationYear: isUnknownBirthDate(player.birth_date)
+      ? null
+      : getPlayerGeneration(player.birth_date!),
     categoryLabel: formatPlayerCategory(player.birth_date),
     positionLabel,
     secondaryPositionLabel,

@@ -117,6 +117,9 @@ export default async function Image({
             </div>
             <div style={{ fontSize: 26, opacity: 0.78 }}>
               {payload.academyName} · {payload.positionLabel}
+              {payload.categoryLabel && payload.categoryLabel !== "Sin categoría"
+                ? ` · ${payload.categoryLabel}`
+                : ""}
               {payload.seasonName ? ` · ${payload.seasonName}` : ""}
             </div>
           </div>
