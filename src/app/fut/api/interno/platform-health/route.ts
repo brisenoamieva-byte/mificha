@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
-import { isResendProductionReady } from "@/lib/email/resend-config";
+import {
+  getResendFromEmail,
+  isResendProductionReady,
+} from "@/lib/email/resend-config";
+import { isMercadoPagoConfigured } from "@/lib/mercadopago";
 import { canAccessPitchDeck } from "@/lib/pitch-access";
 import { createSupabaseAdminClient } from "@/lib/supabase-admin";
 import { getAuthedSupabaseClient } from "@/lib/supabase-server";
@@ -39,6 +43,13 @@ export async function GET(request: Request) {
 
   const profileViewsKnown = profileViewsOk !== null;
 
+  const from = getResendFromEmail();
+  const fromIsDev = !from || from.includes("resend.dev");
+  const hasResendKey = Boolean(
+    process.env.RESEND_API_KEY?.trim() &&
+      process.env.RESEND_API_KEY.trim() !== "re_...",
+  );
+
   return NextResponse.json({
     sql: {
       matchSchedule: scheduleKnown ? matchStatusOk && kickoffOk : null,
@@ -47,6 +58,22 @@ export async function GET(request: Request) {
     },
     resend: {
       ready: isResendProductionReady(),
+      hasKey: hasResendKey,
+      fromIsDev,
+      fromDomain: from.includes("@")
+        ? from.replace(/^.*@/, "").replace(/>.*$/, "").trim()
+        : null,
+      hint: isResendProductionReady()
+        ? null
+        : fromIsDev
+          ? "RESEND_FROM_EMAIL sigue en resend.dev. Usa un dominio verificado en la misma cuenta Resend de la API key (mificha.mx está registrado en otra cuenta)."
+          : "Configura RESEND_FROM_EMAIL con un dominio verificado en esta cuenta Resend.",
+    },
+    mercadoPago: {
+      ready: isMercadoPagoConfigured(),
+      hint: isMercadoPagoConfigured()
+        ? null
+        : "Falta MERCADOPAGO_ACCESS_TOKEN en este entorno.",
     },
     launchFree: process.env.NEXT_PUBLIC_LAUNCH_FREE !== "false",
     checksAvailable: scheduleKnown && guardianKnown && profileViewsKnown,

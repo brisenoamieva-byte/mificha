@@ -96,6 +96,8 @@ export const FOUNDER_DEMO_PRECHECK = [
   "Pitch ensayado (6 slides · /fut/interno/pitch · tecla F)",
   "One-pager listo (/fut/interno/demo-one-pager)",
   "Un ensayo completo del guión antes de la llamada",
+  "Mercado Pago: checkout de diagnóstico $2,030 responde",
+  "Resend: dominio mificha.mx en la misma cuenta de la API key (no otra)",
 ] as const;
 
 export interface FounderDemoStep {

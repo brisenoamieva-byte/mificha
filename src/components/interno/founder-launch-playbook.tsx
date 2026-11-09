@@ -10,6 +10,7 @@ import {
   MessageCircle,
   Sparkles,
 } from "lucide-react";
+import { PlatformOpsStatus } from "@/components/interno/platform-ops-status";
 import {
   buildFounderOutreachMessage,
   FOUNDER_CONVERSION_CRITERIA,
@@ -80,6 +81,8 @@ export function FounderLaunchPlaybook() {
       </header>
 
       <main className="mx-auto max-w-3xl space-y-6 px-6 py-8 sm:px-10">
+        <PlatformOpsStatus />
+
         <section className="rounded-2xl border border-sky-400/25 bg-sky-500/[0.08] p-5">
           <h2 className="text-base font-semibold">Guión · demo 15 min</h2>
           <ol className="mt-4 space-y-3">

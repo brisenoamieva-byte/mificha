@@ -13,4 +13,4 @@ export function isResendProductionReady() {
 }
 
 export const RESEND_NOT_READY_HINT =
-  "Los reportes por email requieren dominio verificado en Resend. Los avisos post-partido y el link de bienvenida funcionan desde Plantel → Avisos a tutores (email o WhatsApp automático).";
+  "Los reportes por email requieren dominio verificado en la misma cuenta Resend de RESEND_API_KEY. Si mificha.mx ya está en otra cuenta Resend, transfiere el dominio o cambia la API key. Mientras tanto, los avisos post-partido también pueden salir por WhatsApp desde Plantel → Avisos a tutores.";
