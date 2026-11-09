@@ -1,5 +1,7 @@
 import { GphLogo } from "@/components/ui/gph-logo";
+import { PlayerCategoryBadge } from "@/components/ui/player-category-badge";
 import { TutorCareerSummaryCard } from "@/components/tutor/tutor-career-summary";
+import { formatPlayerCategory } from "@/lib/player-category";
 import { PLAYER_CODE_SHORT } from "@/lib/player-public-code-copy";
 import type { TutorLinkedPerformance } from "@/lib/tutor-linked-performance";
 import type { TutorChild, TutorMaterial, TutorSeasonStat } from "@/lib/tutor-family";
@@ -67,7 +69,12 @@ export function TutorPublicFicha({
   const placeLine =
     [profile.club || profile.school, profile.city].filter(Boolean).join(" · ") ||
     "Club y ciudad por definir";
+  const categoryLabel = formatPlayerCategory(profile.birth_date);
   const heroStats = [
+    {
+      label: "Categoría",
+      value: categoryLabel === "Sin categoría" ? "—" : categoryLabel.replace(" · Generación ", " · Gen. "),
+    },
     {
       label: "Pie",
       value: profile.dominant_foot ? FOOT_LABEL[profile.dominant_foot] : "—",
@@ -75,15 +82,6 @@ export function TutorPublicFicha({
     {
       label: "Estatura",
       value: profile.height_cm ? `${profile.height_cm} cm` : "—",
-    },
-    {
-      label: profile.school && profile.club ? "Escuela" : birthYear ? "Nacimiento" : "Escuela",
-      value:
-        profile.school && profile.club
-          ? profile.school
-          : birthYear
-            ? birthYear
-            : profile.school || "—",
     },
     {
       label: "Código",
@@ -110,8 +108,15 @@ export function TutorPublicFicha({
               <p className="mt-2 text-base font-semibold text-white">
                 {position}
                 {age != null ? ` · ${age} años` : ""}
+                {birthYear ? ` · Gen. ${birthYear}` : ""}
               </p>
-              <p className="mt-1 text-sm font-medium text-white/75">{placeLine}</p>
+              <div className="mt-2.5">
+                <PlayerCategoryBadge
+                  birthDate={profile.birth_date}
+                  className="bg-white/95 text-mf-gph-ink ring-1 ring-white/40"
+                />
+              </div>
+              <p className="mt-2 text-sm font-medium text-white/75">{placeLine}</p>
             </div>
             <div className="flex shrink-0 flex-col items-end gap-3">
               <div className="rounded-md bg-white px-2 py-1.5">
