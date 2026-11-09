@@ -47,6 +47,8 @@ interface TutorChildCard {
     unique_visitors: number;
     views_last_7_days: number;
   } | null;
+  explore_opt_in?: boolean;
+  explore_opt_in_at?: string | null;
   profile: {
     birth_date: string | null;
     position: string | null;
@@ -351,6 +353,35 @@ export function TutorWorkspace() {
       await load(phone);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "No se guardó la nota.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function toggleExploreOptIn(enabled: boolean) {
+    if (!child) return;
+    setBusy(true);
+    setError(null);
+    setNotice(null);
+    try {
+      await authed("/fut/api/tutor/children", {
+        method: "POST",
+        body: JSON.stringify({
+          action: "explore_opt_in",
+          child_id: child.id,
+          explore_opt_in: enabled,
+        }),
+      });
+      await load(phone);
+      setNotice(
+        enabled
+          ? "Listo: la ficha puede aparecer en Explorar."
+          : "Listo: la ficha ya no aparece en Explorar. El link directo sigue activo.",
+      );
+    } catch (err: unknown) {
+      setError(
+        err instanceof Error ? err.message : "No se pudo actualizar Explorar.",
+      );
     } finally {
       setBusy(false);
     }
@@ -731,6 +762,7 @@ export function TutorWorkspace() {
             onDeleteSeason={(id) => void deleteSeason(id)}
             onCopyShare={() => void copyShare()}
             onCopyPublicCode={() => void copyPublicCode()}
+            onToggleExploreOptIn={(enabled) => void toggleExploreOptIn(enabled)}
             onLinkPlayer={(playerId) => void linkPlayer(playerId)}
             onUnlinkPlayer={() => void unlinkPlayer()}
           />

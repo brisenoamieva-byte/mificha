@@ -64,12 +64,14 @@ export function TutorCareerSummaryCard({
   className,
   title = "Resumen de carrera",
   onAddTournament,
+  exploreOptIn,
 }: {
   seasons?: TutorSeasonStat[] | null;
   performance?: TutorLinkedPerformance | null;
   className?: string;
   title?: string;
   onAddTournament?: () => void;
+  exploreOptIn?: boolean;
 }) {
   const summary = buildTutorCareerSummary({ seasons, performance });
   const hasNumbers =
@@ -108,6 +110,11 @@ export function TutorCareerSummaryCard({
                     .filter(Boolean)
                     .join(" · ")
                 : "Aquí se acumulan torneos, partidos y minutos de la ficha."}
+              {typeof exploreOptIn === "boolean"
+                ? exploreOptIn
+                  ? " · visible en Explorar"
+                  : " · solo con link"
+                : ""}
             </p>
           </div>
           {onAddTournament ? (

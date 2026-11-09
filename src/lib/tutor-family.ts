@@ -50,6 +50,12 @@ export interface TutorChild {
   linked_academy_name: string | null;
   linked_player_slug: string | null;
   linked_at: string | null;
+  /**
+   * Opt-in explícito: si es true, la ficha puede listarse en /fut/explorar.
+   * El link /fut/f/… sigue funcionando aunque esté en false.
+   */
+  explore_opt_in: boolean;
+  explore_opt_in_at: string | null;
 }
 
 export interface TutorMaterial {
@@ -127,6 +133,8 @@ function normalizeChild(raw: TutorChild): TutorChild {
     linked_academy_name: raw.linked_academy_name ?? null,
     linked_player_slug: raw.linked_player_slug ?? null,
     linked_at: raw.linked_at ?? null,
+    explore_opt_in: Boolean(raw.explore_opt_in),
+    explore_opt_in_at: raw.explore_opt_in_at ?? null,
   };
 }
 
@@ -332,6 +340,8 @@ export async function syncTutorChildren(
       linked_academy_name: null,
       linked_player_slug: null,
       linked_at: null,
+      explore_opt_in: false,
+      explore_opt_in_at: null,
     });
     changed = true;
   }
@@ -453,6 +463,8 @@ export async function syncTutorChildren(
         linked_academy_name: null,
         linked_player_slug: null,
         linked_at: null,
+        explore_opt_in: false,
+        explore_opt_in_at: null,
       });
       changed = true;
     }
@@ -527,6 +539,8 @@ export async function createTutorChild(
     linked_academy_name: null,
     linked_player_slug: null,
     linked_at: null,
+    explore_opt_in: false,
+    explore_opt_in_at: null,
   };
   roster.unshift(child);
   await writeJson(admin, ROSTER, roster);
@@ -639,6 +653,28 @@ export async function updateTutorChildLink(
   );
   if (index < 0) throw new Error("No encontramos a ese jugador.");
   roster[index] = { ...roster[index], ...link };
+  await writeJson(admin, ROSTER, roster);
+  return roster[index];
+}
+
+/** Activa o apaga el listado de la ficha en Explorar (opt-in). */
+export async function updateTutorExploreOptIn(
+  admin: SupabaseClient,
+  userId: string,
+  childId: string,
+  exploreOptIn: boolean,
+) {
+  const { roster } = await loadRoster(admin);
+  const index = roster.findIndex(
+    (child) => child.id === childId && child.guardian_user_id === userId,
+  );
+  if (index < 0) throw new Error("No encontramos a ese jugador.");
+  const now = new Date().toISOString();
+  roster[index] = {
+    ...roster[index],
+    explore_opt_in: Boolean(exploreOptIn),
+    explore_opt_in_at: exploreOptIn ? now : null,
+  };
   await writeJson(admin, ROSTER, roster);
   return roster[index];
 }
@@ -1143,6 +1179,8 @@ export async function seedTutorFromVisoriaRegistration(
     linked_academy_name: null,
     linked_player_slug: null,
     linked_at: null,
+    explore_opt_in: false,
+    explore_opt_in_at: null,
   };
   roster.unshift(child);
   await writeJson(admin, ROSTER, roster);

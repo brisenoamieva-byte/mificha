@@ -78,6 +78,7 @@ export async function fetchTutorDirectoryPlayers(
   ]);
 
   const candidates = roster.filter((child) => {
+    if (!child.explore_opt_in) return false;
     const code = normalizePublicCode(child.public_code);
     if (!code) return false;
     if (!child.player_name?.trim()) return false;

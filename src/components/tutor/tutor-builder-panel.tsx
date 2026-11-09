@@ -62,6 +62,8 @@ export interface TutorBuilderChild {
     unique_visitors: number;
     views_last_7_days: number;
   } | null;
+  explore_opt_in?: boolean;
+  explore_opt_in_at?: string | null;
   profile: TutorChild["profile"];
   materials: Array<{
     id: string;
@@ -122,6 +124,7 @@ interface TutorBuilderPanelProps {
   onCopyPublicCode: () => void;
   onLinkPlayer: (playerId: string) => void;
   onUnlinkPlayer: () => void;
+  onToggleExploreOptIn: (enabled: boolean) => void;
 }
 
 export function TutorBuilderPanel({
@@ -146,6 +149,7 @@ export function TutorBuilderPanel({
   onDeleteSeason,
   onCopyShare,
   onCopyPublicCode,
+  onToggleExploreOptIn,
   onLinkPlayer,
   onUnlinkPlayer,
 }: TutorBuilderPanelProps) {
@@ -222,6 +226,8 @@ export function TutorBuilderPanel({
     linked_academy_name: child.linked_academy_name ?? null,
     linked_player_slug: child.linked_player_slug ?? null,
     linked_at: child.linked_at ?? null,
+    explore_opt_in: Boolean(child.explore_opt_in),
+    explore_opt_in_at: child.explore_opt_in_at ?? null,
   };
 
   return (
@@ -302,6 +308,7 @@ export function TutorBuilderPanel({
           seasons={seasons}
           performance={child.linked_performance ?? null}
           title="Dashboard del alumno"
+          exploreOptIn={Boolean(child.explore_opt_in)}
           onAddTournament={() => setStep("rendimiento")}
         />
 
@@ -1041,6 +1048,53 @@ export function TutorBuilderPanel({
                 </Link>
               </div>
             ) : null}
+
+            <div className="rounded-xl border border-mf-border bg-mf-canvas px-4 py-4">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-semibold text-mf-gph-ink">
+                    Aparecer en Explorar
+                  </p>
+                  <p className="mt-1 text-sm leading-6 text-mf-text-secondary">
+                    Si lo activas, la ficha puede verse en el directorio público de
+                    MiFicha. El link directo sigue funcionando aunque esté apagado.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={Boolean(child.explore_opt_in)}
+                  disabled={busy}
+                  onClick={() => onToggleExploreOptIn(!child.explore_opt_in)}
+                  className={cn(
+                    "relative h-8 w-14 shrink-0 rounded-full transition",
+                    child.explore_opt_in ? "bg-mf-gph" : "bg-mf-border",
+                  )}
+                >
+                  <span
+                    className={cn(
+                      "absolute top-1 h-6 w-6 rounded-full bg-white shadow transition",
+                      child.explore_opt_in ? "left-7" : "left-1",
+                    )}
+                  />
+                </button>
+              </div>
+              <p className="mt-3 text-xs font-medium text-mf-text-muted">
+                {child.explore_opt_in
+                  ? "Visible en Explorar (si la ficha tiene contenido suficiente)."
+                  : "Solo visible con el link o el código MF-."}
+              </p>
+              {child.explore_opt_in ? (
+                <Link
+                  href="/fut/explorar"
+                  target="_blank"
+                  className="mt-3 inline-flex text-sm font-semibold text-mf-gph hover:underline"
+                >
+                  Ver Explorar
+                </Link>
+              ) : null}
+            </div>
+
             {child.view_stats && child.view_stats.total_views > 0 ? (
               <p className="text-sm leading-6 text-mf-text-secondary">
                 Vistas del link:{" "}

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import {
   createTutorChild,
   updateTutorChild,
+  updateTutorExploreOptIn,
   type TutorChildInput,
 } from "@/lib/tutor-family";
 import { createSupabaseAdminClient } from "@/lib/supabase-admin";
@@ -43,8 +44,19 @@ export async function POST(request: Request) {
   const body = (await request.json().catch(() => ({}))) as Record<string, unknown>;
   try {
     const admin = createSupabaseAdminClient();
-    const input = parseInput(body);
     const childId = body.child_id ? String(body.child_id) : "";
+
+    if (childId && typeof body.explore_opt_in === "boolean" && body.action === "explore_opt_in") {
+      const child = await updateTutorExploreOptIn(
+        admin,
+        user.id,
+        childId,
+        body.explore_opt_in,
+      );
+      return NextResponse.json({ ok: true, child });
+    }
+
+    const input = parseInput(body);
     const child = childId
       ? await updateTutorChild(admin, user.id, childId, input)
       : await createTutorChild(admin, user, input);
