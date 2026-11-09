@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Copy, MessageCircle, Printer, Share2 } from "lucide-react";
+import { PLAYER_CODE_SHORT } from "@/lib/player-public-code-copy";
 
 export function TutorShareActions({
   playerName,
@@ -68,9 +69,16 @@ export function TutorShareActions({
         <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
           Compartir
         </p>
-        <p className="mt-0.5 truncate text-sm text-mf-text-secondary">
-          Link o código para visores y universidades
-          {publicCode ? ` · ${publicCode}` : ""}
+        <p className="mt-0.5 text-sm text-mf-text-secondary">
+          {publicCode ? (
+            <>
+              <span className="font-mono font-semibold text-mf-gph-ink">{publicCode}</span>
+              {" · "}
+              {PLAYER_CODE_SHORT}
+            </>
+          ) : (
+            "Link listo para visores, universidades o academias"
+          )}
         </p>
       </div>
       <div className="flex flex-wrap gap-2">

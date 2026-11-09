@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { PlayerPublicCodeCard } from "@/components/public/player-public-code-card";
 import { LEGAL_ROUTES } from "@/lib/legal";
 import {
   VISORIA_EVENT,
@@ -92,15 +93,10 @@ export function VisoriaRegisterForm() {
           Registro listo
         </p>
         {publicCode ? (
-          <>
-            <p className="mt-3 text-sm font-medium text-mf-text-secondary">
-              Código del jugador
-            </p>
-            <h3 className="mt-1 font-mono text-3xl font-semibold tracking-tight text-mf-gph">
-              {publicCode}
-            </h3>
-            <p className="mt-1 text-xs text-mf-text-muted">Folio del evento: {folio}</p>
-          </>
+          <div className="mt-4">
+            <PlayerPublicCodeCard code={publicCode} />
+            <p className="mt-2 text-xs text-mf-text-muted">Folio del evento: {folio}</p>
+          </div>
         ) : (
           <h3 className="mt-2 font-mono text-3xl font-semibold tracking-tight text-mf-gph-ink">
             {folio}
@@ -112,18 +108,11 @@ export function VisoriaRegisterForm() {
         </p>
         {publicCode ? (
           <p className="mt-3 text-sm leading-7 text-mf-text-secondary">
-            Es la llave del jugador en MiFicha.{" "}
-            <Link
-              href={`/fut/f/${publicCode}`}
-              className="font-semibold text-mf-gph hover:underline"
-            >
-              Abrir {publicCode}
-            </Link>
-            {" · "}
+            Con ese mismo código puedes{" "}
             <Link href="/fut/tutor" className="font-semibold text-mf-gph hover:underline">
               completar foto e historia
-            </Link>
-            .
+            </Link>{" "}
+            en la ficha del tutor.
           </p>
         ) : null}
         <div className="mt-5 flex flex-wrap gap-3">

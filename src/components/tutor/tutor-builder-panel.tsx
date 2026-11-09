@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Check, Circle, Copy, ExternalLink, ImagePlus, Video } from "lucide-react";
+import { PlayerPublicCodeCard } from "@/components/public/player-public-code-card";
 import { TutorPublicFicha } from "@/components/tutor/tutor-public-ficha";
 import {
   defaultTutorSeasonLabel,
@@ -243,7 +244,7 @@ export function TutorBuilderPanel({
                   type="button"
                   className="rounded-lg border border-mf-gph/30 bg-mf-gph-soft px-3 py-2 font-mono text-sm font-bold tracking-wide text-mf-gph"
                   onClick={onCopyPublicCode}
-                  title="Copiar código del jugador"
+                  title="Código de jugador: tu número en toda MiFicha. Clic para copiar."
                 >
                   {child.public_code}
                 </button>
@@ -1006,26 +1007,12 @@ export function TutorBuilderPanel({
               </div>
             ) : null}
             {child.public_code ? (
-              <div className="rounded-xl border border-mf-border bg-mf-canvas px-4 py-4">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-mf-gph">
-                  Código del jugador
-                </p>
-                <p className="mt-2 font-mono text-2xl font-bold tracking-wide text-mf-gph-ink">
-                  {child.public_code}
-                </p>
-                <p className="mt-2 text-sm leading-6 text-mf-text-secondary">
-                  Úsalo con la academia o por WhatsApp. Es el mismo si ya está ligado al
-                  plantel.
-                </p>
-                <button
-                  type="button"
-                  className="mf-btn-gph-ghost mt-3"
-                  onClick={onCopyPublicCode}
-                >
-                  <Copy className="h-4 w-4" />
-                  {copied ? "Código copiado" : "Copiar código"}
-                </button>
-              </div>
+              <PlayerPublicCodeCard
+                code={child.public_code}
+                onCopy={onCopyPublicCode}
+                copied={copied}
+                showOpenLink={Boolean(shareHref)}
+              />
             ) : null}
             {shareHref ? (
               <div className="flex flex-wrap gap-2">

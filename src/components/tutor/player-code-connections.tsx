@@ -1,5 +1,9 @@
 import Link from "next/link";
 import type { PublicCodeResolution } from "@/lib/public-code-resolve";
+import {
+  PLAYER_CODE_EYEBROW,
+  PLAYER_CODE_SHORT,
+} from "@/lib/player-public-code-copy";
 import { cn } from "@/lib/utils";
 
 export function PlayerCodeConnections({
@@ -55,7 +59,7 @@ export function PlayerCodeConnections({
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
-            Un código · varias puertas
+            {PLAYER_CODE_EYEBROW}
           </p>
           <p className="mt-1 text-sm text-mf-text-secondary">
             {code ? (
@@ -64,8 +68,12 @@ export function PlayerCodeConnections({
                 {" · "}
               </>
             ) : null}
+            {PLAYER_CODE_SHORT}
+          </p>
+          <p className="mt-1 text-xs text-mf-text-muted">
             {activeCount} conexión{activeCount === 1 ? "" : "es"} activa
-            {activeCount === 1 ? "" : "s"} en MiFicha
+            {activeCount === 1 ? "" : "s"} ahora · ficha, academia y visoría usan el mismo
+            número.
           </p>
         </div>
       </div>

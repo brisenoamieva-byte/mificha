@@ -1,6 +1,7 @@
 import { GphLogo } from "@/components/ui/gph-logo";
 import { TutorManualStats } from "@/components/tutor/tutor-manual-stats";
 import { TutorPerformanceBridge } from "@/components/tutor/tutor-performance-bridge";
+import { PLAYER_CODE_SHORT } from "@/lib/player-public-code-copy";
 import type { TutorLinkedPerformance } from "@/lib/tutor-linked-performance";
 import type { TutorChild, TutorMaterial, TutorSeasonStat } from "@/lib/tutor-family";
 
@@ -137,6 +138,11 @@ export function TutorPublicFicha({
               <Stat key={stat.label} label={stat.label} value={stat.value} />
             ))}
           </div>
+          {child.public_code ? (
+            <p className="relative mt-3 text-xs leading-5 text-white/60 print:hidden">
+              {PLAYER_CODE_SHORT}
+            </p>
+          ) : null}
         </div>
 
         {featuredVideo?.url ? (

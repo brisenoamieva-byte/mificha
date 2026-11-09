@@ -1,5 +1,9 @@
 import Link from "next/link";
 import type { PublicCodeResolution } from "@/lib/public-code-resolve";
+import {
+  PLAYER_CODE_EYEBROW,
+  PLAYER_CODE_HEADLINE,
+} from "@/lib/player-public-code-copy";
 
 export function PublicCodeStub({ resolution }: { resolution: PublicCodeResolution }) {
   const name =
@@ -13,7 +17,7 @@ export function PublicCodeStub({ resolution }: { resolution: PublicCodeResolutio
     <article className="overflow-hidden rounded-2xl border border-mf-border bg-white shadow-[var(--mf-shadow)]">
       <div className="bg-gradient-to-br from-[#0a1f3d] via-[#123d68] to-[#0f2d52] px-5 py-7 text-white sm:px-7">
         <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-mf-accent-bright">
-          Código MiFicha
+          {PLAYER_CODE_EYEBROW}
         </p>
         <h1 className="mt-2 text-3xl font-semibold tracking-tight">{name}</h1>
         {code ? (
@@ -22,8 +26,8 @@ export function PublicCodeStub({ resolution }: { resolution: PublicCodeResolutio
           </p>
         ) : null}
         <p className="mt-3 max-w-xl text-sm leading-7 text-white/75">
-          Este código ya conecta módulos en MiFicha. Completa la ficha del tutor para
-          sumar foto, historia y material presentable.
+          {PLAYER_CODE_HEADLINE} Completa la ficha del tutor para sumar foto, historia y
+          material presentable.
         </p>
       </div>
       <div className="space-y-3 px-5 py-5 sm:px-7">
