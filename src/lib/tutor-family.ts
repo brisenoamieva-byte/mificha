@@ -60,6 +60,10 @@ export interface TutorMaterial {
   body: string | null;
   storage_path: string | null;
   created_at: string;
+  /** Foto principal del hero. */
+  is_cover?: boolean;
+  /** Video que aparece primero en la ficha. */
+  is_featured?: boolean;
 }
 
 export type TutorChildInput = {
@@ -526,13 +530,31 @@ export async function updateTutorChild(
   return roster[index];
 }
 
+function compareTutorMaterials(a: TutorMaterial, b: TutorMaterial) {
+  const aCover = a.kind === "photo" && Boolean(a.is_cover);
+  const bCover = b.kind === "photo" && Boolean(b.is_cover);
+  if (aCover !== bCover) return aCover ? -1 : 1;
+
+  const aFeatured = a.kind === "video" && Boolean(a.is_featured);
+  const bFeatured = b.kind === "video" && Boolean(b.is_featured);
+  if (aFeatured !== bFeatured) return aFeatured ? -1 : 1;
+
+  // Fotos antes que videos/notas para que la portada lidera la lista visual.
+  const kindRank = (kind: TutorMaterialKind) =>
+    kind === "photo" ? 0 : kind === "video" ? 1 : 2;
+  const byKind = kindRank(a.kind) - kindRank(b.kind);
+  if (byKind !== 0) return byKind;
+
+  return b.created_at.localeCompare(a.created_at);
+}
+
 export async function listTutorMaterials(admin: SupabaseClient, child: TutorChild) {
   const rows = await readJson<TutorMaterial>(admin, MATERIALS);
   const mine = rows
     .filter(
       (row) => row.child_id === child.id && row.guardian_user_id === child.guardian_user_id,
     )
-    .sort((a, b) => b.created_at.localeCompare(a.created_at));
+    .sort(compareTutorMaterials);
 
   const withUrls = await Promise.all(
     mine.map(async (row) => {
@@ -709,6 +731,20 @@ export async function commitTutorUpload(
     throw new Error("Archivo inválido.");
   }
   const rows = await readJson<TutorMaterial>(admin, MATERIALS);
+  const hasCover = rows.some(
+    (row) =>
+      row.child_id === child.id &&
+      row.guardian_user_id === child.guardian_user_id &&
+      row.kind === "photo" &&
+      row.is_cover,
+  );
+  const hasFeatured = rows.some(
+    (row) =>
+      row.child_id === child.id &&
+      row.guardian_user_id === child.guardian_user_id &&
+      row.kind === "video" &&
+      row.is_featured,
+  );
   const row: TutorMaterial = {
     id: randomUUID(),
     child_id: child.id,
@@ -718,8 +754,119 @@ export async function commitTutorUpload(
     body: null,
     storage_path: input.path,
     created_at: new Date().toISOString(),
+    is_cover: input.kind === "photo" ? !hasCover : false,
+    is_featured: input.kind === "video" ? !hasFeatured : false,
   };
   rows.unshift(row);
   await writeJson(admin, MATERIALS, rows);
   return row;
+}
+
+function ownMaterialIndex(
+  rows: TutorMaterial[],
+  child: TutorChild,
+  materialId: string,
+) {
+  return rows.findIndex(
+    (row) =>
+      row.id === materialId &&
+      row.child_id === child.id &&
+      row.guardian_user_id === child.guardian_user_id,
+  );
+}
+
+export async function deleteTutorMaterial(
+  admin: SupabaseClient,
+  child: TutorChild,
+  materialId: string,
+) {
+  const rows = await readJson<TutorMaterial>(admin, MATERIALS);
+  const index = ownMaterialIndex(rows, child, materialId);
+  if (index < 0) throw new Error("No encontramos ese material.");
+  const [removed] = rows.splice(index, 1);
+  await writeJson(admin, MATERIALS, rows);
+
+  if (removed.storage_path) {
+    await admin.storage.from(OPS_BUCKET).remove([removed.storage_path]);
+  }
+
+  // Si borramos la portada/featured, promociona el más reciente del mismo tipo.
+  if (removed.kind === "photo" && removed.is_cover) {
+    const nextPhoto = rows
+      .filter(
+        (row) =>
+          row.child_id === child.id &&
+          row.guardian_user_id === child.guardian_user_id &&
+          row.kind === "photo",
+      )
+      .sort((a, b) => b.created_at.localeCompare(a.created_at))[0];
+    if (nextPhoto) {
+      for (const row of rows) {
+        if (row.child_id !== child.id || row.kind !== "photo") continue;
+        row.is_cover = row.id === nextPhoto.id;
+      }
+      await writeJson(admin, MATERIALS, rows);
+    }
+  }
+  if (removed.kind === "video" && removed.is_featured) {
+    const nextVideo = rows
+      .filter(
+        (row) =>
+          row.child_id === child.id &&
+          row.guardian_user_id === child.guardian_user_id &&
+          row.kind === "video",
+      )
+      .sort((a, b) => b.created_at.localeCompare(a.created_at))[0];
+    if (nextVideo) {
+      for (const row of rows) {
+        if (row.child_id !== child.id || row.kind !== "video") continue;
+        row.is_featured = row.id === nextVideo.id;
+      }
+      await writeJson(admin, MATERIALS, rows);
+    }
+  }
+
+  return { ok: true as const, id: materialId };
+}
+
+export async function setTutorPhotoCover(
+  admin: SupabaseClient,
+  child: TutorChild,
+  materialId: string,
+) {
+  const rows = await readJson<TutorMaterial>(admin, MATERIALS);
+  const index = ownMaterialIndex(rows, child, materialId);
+  if (index < 0) throw new Error("No encontramos esa foto.");
+  if (rows[index].kind !== "photo") {
+    throw new Error("Solo una foto puede ser portada.");
+  }
+  for (const row of rows) {
+    if (row.child_id !== child.id || row.guardian_user_id !== child.guardian_user_id) {
+      continue;
+    }
+    if (row.kind === "photo") row.is_cover = row.id === materialId;
+  }
+  await writeJson(admin, MATERIALS, rows);
+  return rows[index];
+}
+
+export async function setTutorFeaturedVideo(
+  admin: SupabaseClient,
+  child: TutorChild,
+  materialId: string,
+) {
+  const rows = await readJson<TutorMaterial>(admin, MATERIALS);
+  const index = ownMaterialIndex(rows, child, materialId);
+  if (index < 0) throw new Error("No encontramos ese video.");
+  if (rows[index].kind !== "video") {
+    throw new Error("Solo un video puede ser el destacado.");
+  }
+  for (const row of rows) {
+    if (row.child_id !== child.id || row.guardian_user_id !== child.guardian_user_id) {
+      continue;
+    }
+    if (row.kind === "video") row.is_featured = row.id === materialId;
+  }
+  await writeJson(admin, MATERIALS, rows);
+  return rows[index];
 }

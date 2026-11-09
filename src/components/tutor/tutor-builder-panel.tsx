@@ -43,6 +43,8 @@ export interface TutorBuilderChild {
     body: string | null;
     url: string | null;
     created_at: string;
+    is_cover?: boolean;
+    is_featured?: boolean;
   }>;
 }
 
@@ -83,6 +85,9 @@ interface TutorBuilderPanelProps {
   onSaveProfile: (event: React.FormEvent) => void;
   onSaveStory: (event: React.FormEvent) => void;
   onFile: (kind: "photo" | "video", file: File | undefined) => void;
+  onDeleteMaterial: (materialId: string) => void;
+  onSetCover: (materialId: string) => void;
+  onSetFeaturedVideo: (materialId: string) => void;
   onCopyShare: () => void;
   onCopyPublicCode: () => void;
   onLinkPlayer: (playerId: string) => void;
@@ -104,6 +109,9 @@ export function TutorBuilderPanel({
   onSaveProfile,
   onSaveStory,
   onFile,
+  onDeleteMaterial,
+  onSetCover,
+  onSetFeaturedVideo,
   onCopyShare,
   onCopyPublicCode,
   onLinkPlayer,
@@ -521,7 +529,7 @@ export function TutorBuilderPanel({
           <section className="space-y-4 rounded-2xl border border-mf-border bg-white p-5">
             <StepHeading
               title="Aquí subes el contenido"
-              detail="Foto de portada, video de jugadas o una nota. Todo queda en la ficha de tu hijo."
+              detail="Sube fotos y videos, elige portada y video destacado, o elimina lo que no quieras mostrar."
             />
             {child.active ? (
               <>
@@ -602,14 +610,54 @@ export function TutorBuilderPanel({
               ) : (
                 child.materials.map((item) => (
                   <li key={item.id} className="rounded-xl border border-mf-border px-4 py-3">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-mf-gph">
-                      {item.kind === "story"
-                        ? "Nota"
-                        : item.kind === "photo"
-                          ? "Foto"
-                          : "Video"}
-                    </p>
-                    <p className="mt-1 text-sm font-semibold text-mf-gph-ink">{item.title}</p>
+                    <div className="flex flex-wrap items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-mf-gph">
+                          {item.kind === "story"
+                            ? "Nota"
+                            : item.kind === "photo"
+                              ? item.is_cover
+                                ? "Foto · portada"
+                                : "Foto"
+                              : item.is_featured
+                                ? "Video · destacado"
+                                : "Video"}
+                        </p>
+                        <p className="mt-1 text-sm font-semibold text-mf-gph-ink">
+                          {item.title}
+                        </p>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {item.kind === "photo" && !item.is_cover ? (
+                          <button
+                            type="button"
+                            disabled={busy}
+                            onClick={() => onSetCover(item.id)}
+                            className="rounded-lg border border-mf-border px-2.5 py-1.5 text-xs font-semibold text-mf-gph hover:bg-mf-gph-soft"
+                          >
+                            Usar de portada
+                          </button>
+                        ) : null}
+                        {item.kind === "video" && !item.is_featured ? (
+                          <button
+                            type="button"
+                            disabled={busy}
+                            onClick={() => onSetFeaturedVideo(item.id)}
+                            className="rounded-lg border border-mf-border px-2.5 py-1.5 text-xs font-semibold text-mf-gph hover:bg-mf-gph-soft"
+                          >
+                            Destacar video
+                          </button>
+                        ) : null}
+                        <button
+                          type="button"
+                          disabled={busy}
+                          onClick={() => onDeleteMaterial(item.id)}
+                          className="rounded-lg border border-mf-border px-2.5 py-1.5 text-xs font-semibold text-mf-danger hover:bg-mf-danger-soft"
+                        >
+                          Eliminar
+                        </button>
+                      </div>
+                    </div>
                     {item.body ? (
                       <p className="mt-1 text-sm leading-6 text-mf-text-secondary">{item.body}</p>
                     ) : null}

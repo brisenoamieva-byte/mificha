@@ -52,9 +52,13 @@ export function TutorPublicFicha({
   const photos = materials.filter((item) => item.kind === "photo" && item.url);
   const videos = materials.filter((item) => item.kind === "video" && item.url);
   const stories = materials.filter((item) => item.kind === "story");
-  const cover = photos[0]?.url ?? null;
-  const featuredVideo = videos[0] ?? null;
-  const extraVideos = videos.slice(1);
+  const coverPhoto =
+    photos.find((item) => item.is_cover) ?? photos[0] ?? null;
+  const cover = coverPhoto?.url ?? null;
+  const featuredVideo =
+    videos.find((item) => item.is_featured) ?? videos[0] ?? null;
+  const galleryPhotos = photos.filter((item) => item.id !== coverPhoto?.id);
+  const extraVideos = videos.filter((item) => item.id !== featuredVideo?.id);
   const position = profile.position || "Posición por definir";
 
   return (
@@ -149,13 +153,13 @@ export function TutorPublicFicha({
           </div>
         ) : null}
 
-        {!compact && photos.length > 1 ? (
+        {!compact && galleryPhotos.length ? (
           <section className="border-b border-mf-border px-5 py-5 sm:px-7">
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-mf-text-muted">
               Galería
             </p>
             <div className="mt-3 grid gap-3 sm:grid-cols-2">
-              {photos.slice(1).map((item) => (
+              {galleryPhotos.map((item) => (
                 <figure key={item.id} className="overflow-hidden rounded-xl bg-mf-canvas">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={item.url!} alt={item.title} className="h-48 w-full object-cover" />

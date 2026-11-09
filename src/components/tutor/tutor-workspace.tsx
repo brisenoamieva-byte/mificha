@@ -22,6 +22,8 @@ interface MaterialItem {
   body: string | null;
   url: string | null;
   created_at: string;
+  is_cover?: boolean;
+  is_featured?: boolean;
 }
 
 interface TutorChildCard {
@@ -382,6 +384,36 @@ export function TutorWorkspace() {
     }
   }
 
+  async function manageMaterial(
+    action: "delete" | "set_cover" | "set_featured",
+    materialId: string,
+  ) {
+    if (!child) return;
+    if (action === "delete") {
+      const ok = window.confirm("¿Eliminar este material de la ficha?");
+      if (!ok) return;
+    }
+    setBusy(true);
+    setError(null);
+    try {
+      await authed("/fut/api/tutor/materials", {
+        method: "POST",
+        body: JSON.stringify({
+          action,
+          child_id: child.id,
+          material_id: materialId,
+        }),
+      });
+      await load(phone);
+    } catch (err: unknown) {
+      setError(
+        err instanceof Error ? err.message : "No se pudo actualizar el material.",
+      );
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function copyShare() {
     if (!child?.share_token && !child?.public_code) return;
     const access = child.public_code || child.share_token;
@@ -638,6 +670,9 @@ export function TutorWorkspace() {
             onSaveProfile={(event) => void saveChild(event)}
             onSaveStory={(event) => void saveStory(event)}
             onFile={(kind, file) => void onFile(kind, file)}
+            onDeleteMaterial={(id) => void manageMaterial("delete", id)}
+            onSetCover={(id) => void manageMaterial("set_cover", id)}
+            onSetFeaturedVideo={(id) => void manageMaterial("set_featured", id)}
             onCopyShare={() => void copyShare()}
             onCopyPublicCode={() => void copyPublicCode()}
             onLinkPlayer={(playerId) => void linkPlayer(playerId)}

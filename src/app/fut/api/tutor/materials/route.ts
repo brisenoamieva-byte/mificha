@@ -2,8 +2,11 @@ import { NextResponse } from "next/server";
 import {
   addTutorStory,
   commitTutorUpload,
+  deleteTutorMaterial,
   getTutorChild,
   prepareTutorUpload,
+  setTutorFeaturedVideo,
+  setTutorPhotoCover,
 } from "@/lib/tutor-family";
 import { createSupabaseAdminClient } from "@/lib/supabase-admin";
 import { getAuthedSupabaseClient } from "@/lib/supabase-server";
@@ -23,6 +26,7 @@ export async function POST(request: Request) {
   const body = (await request.json().catch(() => ({}))) as {
     action?: string;
     child_id?: string;
+    material_id?: string;
     kind?: string;
     title?: string;
     body?: string;
@@ -63,6 +67,33 @@ export async function POST(request: Request) {
         title: String(body.title ?? ""),
         path: String(body.path ?? ""),
       });
+      return NextResponse.json({ ok: true, material: row });
+    }
+
+    if (body.action === "delete") {
+      const result = await deleteTutorMaterial(
+        admin,
+        child,
+        String(body.material_id ?? ""),
+      );
+      return NextResponse.json(result);
+    }
+
+    if (body.action === "set_cover") {
+      const row = await setTutorPhotoCover(
+        admin,
+        child,
+        String(body.material_id ?? ""),
+      );
+      return NextResponse.json({ ok: true, material: row });
+    }
+
+    if (body.action === "set_featured") {
+      const row = await setTutorFeaturedVideo(
+        admin,
+        child,
+        String(body.material_id ?? ""),
+      );
       return NextResponse.json({ ok: true, material: row });
     }
 
