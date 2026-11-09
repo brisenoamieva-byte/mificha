@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { listTutorMaterials, membershipIsActive, syncTutorChildren } from "@/lib/tutor-family";
+import { fetchTutorLinkedPerformance } from "@/lib/tutor-linked-performance";
 import { createSupabaseAdminClient } from "@/lib/supabase-admin";
 import { getAuthedSupabaseClient } from "@/lib/supabase-server";
 
@@ -21,6 +22,7 @@ export async function GET(request: Request) {
         ...child,
         active: membershipIsActive(child.membership_until),
         materials: await listTutorMaterials(admin, child),
+        linked_performance: await fetchTutorLinkedPerformance(admin, child),
       })),
     );
     return NextResponse.json({ children: detailed });

@@ -4,9 +4,12 @@ import { notFound } from "next/navigation";
 import { SiteFooter, SiteHeader } from "@/components/marketing/site-header";
 import { DiagnosisHireCard } from "@/components/public/diagnosis-hire-card";
 import { TutorPublicFicha } from "@/components/tutor/tutor-public-ficha";
+import { TutorShareActions } from "@/components/tutor/tutor-share-actions";
+import { fetchTutorLinkedPerformance } from "@/lib/tutor-linked-performance";
 import {
   getTutorChildByShareToken,
   listTutorMaterials,
+  tutorSharePath,
 } from "@/lib/tutor-family";
 import { createSupabaseAdminClient } from "@/lib/supabase-admin";
 
@@ -20,9 +23,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     const admin = createSupabaseAdminClient();
     const child = await getTutorChildByShareToken(admin, token);
     if (!child) return { title: "Ficha | MiFicha", robots: { index: false } };
+    const bits = [
+      child.profile.position,
+      child.profile.club,
+      child.profile.city,
+    ].filter(Boolean);
     return {
       title: `${child.player_name} · Ficha | MiFicha`,
-      description: `Ficha de presentación de ${child.player_name}. Material del tutor en MiFicha.`,
+      description:
+        bits.length > 0
+          ? `Ficha de ${child.player_name}: ${bits.join(" · ")}. Material del tutor, rendimiento y seguimiento en MiFicha.`
+          : `Ficha de presentación de ${child.player_name}. Material del tutor en MiFicha.`,
       robots: { index: false, follow: false },
     };
   } catch {
@@ -42,6 +53,8 @@ export default async function TutorShareFichaPage({ params }: PageProps) {
   const child = await getTutorChildByShareToken(admin, token);
   if (!child) notFound();
   const materials = await listTutorMaterials(admin, child);
+  const performance = await fetchTutorLinkedPerformance(admin, child);
+  const sharePath = tutorSharePath(child.public_code || child.share_token);
 
   return (
     <div className="flex min-h-dvh flex-col bg-mf-canvas">
@@ -53,11 +66,27 @@ export default async function TutorShareFichaPage({ params }: PageProps) {
             Crear la tuya
           </Link>
         </p>
-        <TutorPublicFicha child={child} materials={materials} />
-        <DiagnosisHireCard playerName={child.player_name} className="mt-6" />
+        <TutorShareActions
+          playerName={child.player_name}
+          sharePath={sharePath}
+          publicCode={child.public_code}
+        />
+        <div className="mt-4">
+          <TutorPublicFicha
+            child={child}
+            materials={materials}
+            performance={performance}
+          />
+        </div>
+        {!performance?.gph ? (
+          <DiagnosisHireCard playerName={child.player_name} className="mt-6" />
+        ) : null}
         <p className="mt-6 text-center text-xs leading-6 text-mf-text-muted print:hidden">
-          Material que el tutor eligió compartir. El informe GPH queda ligado a esta ficha
-          cuando se contrata.
+          Material del tutor
+          {performance
+            ? " · rendimiento de academia ligada y evaluación GPH cuando existen"
+            : " · liga la academia para mostrar stats de torneo aquí"}
+          .
         </p>
       </main>
       <SiteFooter />

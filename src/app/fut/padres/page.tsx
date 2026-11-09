@@ -32,8 +32,8 @@ export default function PadresPage() {
               Empieza con tu cuenta de tutor
             </h2>
             <p className="text-sm leading-7 text-mf-text-secondary">
-              Ahí armas la ficha, subes material y, cuando haya torneo, verás las stats en el
-              mismo lugar.
+              Ahí armas la ficha, subes fotos y videos, y compartes un solo link. Si ligas la
+              academia, el mismo link muestra stats de torneo y la evaluación GPH.
             </p>
             <Link href="/fut/tutor" className="mf-btn-gph self-start">
               Crear cuenta de tutor

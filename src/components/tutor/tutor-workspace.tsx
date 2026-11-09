@@ -11,6 +11,7 @@ import {
   tutorSharePath,
   type TutorMaterialKind,
 } from "@/lib/tutor-family";
+import type { TutorLinkedPerformance } from "@/lib/tutor-linked-performance";
 
 const PHONE_STORAGE_KEY = "mificha.tutor.phone";
 
@@ -35,6 +36,7 @@ interface TutorChildCard {
   linked_academy_name?: string | null;
   linked_player_slug?: string | null;
   linked_at?: string | null;
+  linked_performance?: TutorLinkedPerformance | null;
   profile: {
     birth_date: string | null;
     position: string | null;

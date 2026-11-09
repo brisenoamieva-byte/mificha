@@ -6,27 +6,27 @@ const TYPES = [
     title: "Ficha del tutor",
     status: "Piloto gratis",
     detail:
-      "Fotos, videos e historia que armas tú. Sirve para visorías, universidades y clubes.",
+      "Fotos, videos e historia. Un solo link para compartir con visores, universidades y clubes.",
     href: "/fut/tutor",
     cta: "Entrar como tutor",
     live: true,
   },
   {
     id: "torneo",
-    title: "Ficha de torneo",
-    status: "En desarrollo",
+    title: "Stats de torneo",
+    status: "Con academia ligada",
     detail:
-      "Stats oficiales después del partido. Se verán en tu cuenta de tutor cuando la academia publique la jornada.",
+      "Partidos, minutos, goles y asistencias. Si ligas el plantel, aparecen en el mismo link del tutor.",
     href: "/fut/tutor",
-    cta: "Crear cuenta de tutor",
-    live: false,
+    cta: "Ligar academia",
+    live: true,
   },
   {
     id: "gph",
     title: "Informe GPH",
     status: "Disponible",
     detail:
-      "Diagnóstico del evaluador (técnica, físico, mental). Se agenda y se paga aparte.",
+      "Diagnóstico del evaluador. Cuando exista, también se resume en el link que compartes.",
     href: "/fut/evaluaciones",
     cta: "Ver evaluaciones",
     live: true,
@@ -44,8 +44,8 @@ export function FichaTypesSection() {
           Tres cosas distintas, un mismo expediente
         </h2>
         <p className="mt-3 max-w-2xl text-sm leading-7 text-mf-text-secondary">
-          Ficha del tutor, stats de torneo e informe GPH. Si tu hijo ya está en un plantel,
-          en el espacio de tutor puedes ligarlo con su academia.
+          Material del tutor, stats de torneo e informe GPH en un expediente. Si ligas la
+          academia, el mismo link que compartes resume lo oficial.
         </p>
 
         <ul className="mt-8 grid gap-3 md:grid-cols-3">

@@ -16,6 +16,7 @@ import {
   type TutorBuilderStepId,
 } from "@/lib/tutor-ficha-progress";
 import { MEMBERSHIP_CHECKOUT_DISABLED } from "@/lib/gph-commerce";
+import type { TutorLinkedPerformance } from "@/lib/tutor-linked-performance";
 import { cn } from "@/lib/utils";
 
 const inputClass =
@@ -33,6 +34,7 @@ export interface TutorBuilderChild {
   linked_academy_name?: string | null;
   linked_player_slug?: string | null;
   linked_at?: string | null;
+  linked_performance?: TutorLinkedPerformance | null;
   profile: TutorChild["profile"];
   materials: Array<{
     id: string;
@@ -232,7 +234,7 @@ export function TutorBuilderPanel({
             guardian_user_id: "",
             storage_path: null,
           }))}
-          compact
+          performance={child.linked_performance ?? null}
         />
       </div>
 
@@ -712,6 +714,8 @@ export function TutorBuilderPanel({
                   <span className="font-semibold text-mf-gph-ink">
                     {child.linked_academy_name}
                   </span>
+                  . En el link que compartes aparecen minutos, goles, asistencias y la
+                  evaluación GPH cuando existan
                   {child.linked_player_slug ? (
                     <>
                       {" "}
@@ -725,6 +729,7 @@ export function TutorBuilderPanel({
                       </Link>
                     </>
                   ) : null}
+                  .
                 </p>
                 <button
                   type="button"
