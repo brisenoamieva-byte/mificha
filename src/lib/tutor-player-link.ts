@@ -1,5 +1,9 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { bindPlayerPublicCode } from "@/lib/public-player-code";
+import {
+  bindPlayerPublicCode,
+  normalizePublicCode,
+  readPlayerPublicCodeMap,
+} from "@/lib/public-player-code";
 import {
   getTutorChildForGuardian,
   listTutorPublicCodes,
@@ -42,58 +46,146 @@ export interface TutorLinkSuggestion {
   player_name: string;
   slug: string;
   reason: string;
+  /** Match por código MF tiene prioridad para el CTA. */
+  match: "code" | "contact";
 }
 
-/** Candidatos de plantel que parecen ser el mismo hijo (nombre + contacto tutor). */
+async function hydratePlayerSuggestion(
+  admin: SupabaseClient,
+  playerId: string,
+  reason: string,
+  match: "code" | "contact",
+): Promise<TutorLinkSuggestion | null> {
+  const { data: player, error } = await admin
+    .from("players")
+    .select("id, first_name, last_name, slug, academy_id, academies(name)")
+    .eq("id", playerId)
+    .maybeSingle();
+  if (error || !player) {
+    const plain = await admin
+      .from("players")
+      .select("id, first_name, last_name, slug, academy_id")
+      .eq("id", playerId)
+      .maybeSingle();
+    if (plain.error || !plain.data) return null;
+    const { data: academy } = await admin
+      .from("academies")
+      .select("id, name")
+      .eq("id", plain.data.academy_id)
+      .maybeSingle();
+    return {
+      player_id: String(plain.data.id),
+      academy_id: String(plain.data.academy_id),
+      academy_name: academy?.name || "Academia",
+      player_name: `${plain.data.first_name ?? ""} ${plain.data.last_name ?? ""}`.trim(),
+      slug: String(plain.data.slug ?? ""),
+      reason,
+      match,
+    };
+  }
+
+  const academyRel = player.academies as { name?: string } | { name?: string }[] | null;
+  const academyName = Array.isArray(academyRel)
+    ? academyRel[0]?.name
+    : academyRel?.name;
+
+  return {
+    player_id: String(player.id),
+    academy_id: String(player.academy_id),
+    academy_name: academyName || "Academia",
+    player_name: `${player.first_name ?? ""} ${player.last_name ?? ""}`.trim(),
+    slug: String(player.slug ?? ""),
+    reason,
+    match,
+  };
+}
+
+/** Candidatos de plantel: primero mismo código MF, luego contacto+nombre. */
 export async function suggestAcademyPlayersForChild(
   admin: SupabaseClient,
   child: TutorChild,
 ): Promise<TutorLinkSuggestion[]> {
+  if (child.linked_player_id) return [];
+
+  const byId = new Map<string, TutorLinkSuggestion>();
+  const code = normalizePublicCode(child.public_code);
+
+  if (code) {
+    const playerMap = await readPlayerPublicCodeMap(admin);
+    const playerId = Object.entries(playerMap).find(
+      ([, value]) => normalizePublicCode(value) === code,
+    )?.[0];
+    if (playerId) {
+      const suggestion = await hydratePlayerSuggestion(
+        admin,
+        playerId,
+        `Mismo código ${code}`,
+        "code",
+      );
+      if (suggestion) byId.set(suggestion.player_id, suggestion);
+    }
+  }
+
   const email = child.guardian_email.trim().toLowerCase();
   const phone = phoneKey(child.guardian_phone);
-  if (!email && !phone) return [];
+  if (email || phone) {
+    const filters: string[] = [];
+    if (email) filters.push(`guardian_email.eq.${email}`);
+    if (phone) filters.push(`guardian_phone.eq.${phone}`);
 
-  const filters: string[] = [];
-  if (email) filters.push(`guardian_email.eq.${email}`);
-  if (phone) filters.push(`guardian_phone.eq.${phone}`);
-
-  const { data: players, error } = await admin
-    .from("players")
-    .select(
-      "id, first_name, last_name, slug, academy_id, guardian_email, guardian_phone, academies(name)",
-    )
-    .or(filters.join(","))
-    .limit(40);
-
-  if (error) {
-    // Fallback without join if relationship name differs
-    const plain = await admin
+    const { data: players, error } = await admin
       .from("players")
-      .select("id, first_name, last_name, slug, academy_id, guardian_email, guardian_phone")
+      .select(
+        "id, first_name, last_name, slug, academy_id, guardian_email, guardian_phone, academies(name)",
+      )
       .or(filters.join(","))
       .limit(40);
-    if (plain.error) throw new Error(plain.error.message);
-    return enrichSuggestions(admin, child, plain.data ?? []);
+
+    const rows = error
+      ? (
+          await admin
+            .from("players")
+            .select(
+              "id, first_name, last_name, slug, academy_id, guardian_email, guardian_phone",
+            )
+            .or(filters.join(","))
+            .limit(40)
+        ).data ?? []
+      : players ?? [];
+
+    if (error) {
+      const enriched = await enrichSuggestions(admin, child, rows as Array<Record<string, unknown>>);
+      for (const item of enriched) {
+        if (!byId.has(item.player_id)) byId.set(item.player_id, item);
+      }
+    } else {
+      for (const row of rows) {
+        const playerName = `${row.first_name ?? ""} ${row.last_name ?? ""}`.trim();
+        if (!namesLikelySame(child.player_name, playerName)) continue;
+        const id = String(row.id);
+        if (byId.has(id)) continue;
+        const academyRel = (row as { academies?: { name?: string } | { name?: string }[] | null })
+          .academies;
+        const academyName = Array.isArray(academyRel)
+          ? academyRel[0]?.name
+          : academyRel?.name;
+        byId.set(id, {
+          player_id: id,
+          academy_id: String(row.academy_id),
+          academy_name: academyName || "Academia",
+          player_name: playerName,
+          slug: String(row.slug ?? ""),
+          reason: "Mismo contacto de tutor y nombre parecido",
+          match: "contact",
+        });
+      }
+    }
   }
 
-  const suggestions: TutorLinkSuggestion[] = [];
-  for (const row of players ?? []) {
-    const playerName = `${row.first_name ?? ""} ${row.last_name ?? ""}`.trim();
-    if (!namesLikelySame(child.player_name, playerName)) continue;
-    const academyRel = row.academies as { name?: string } | { name?: string }[] | null;
-    const academyName = Array.isArray(academyRel)
-      ? academyRel[0]?.name
-      : academyRel?.name;
-    suggestions.push({
-      player_id: String(row.id),
-      academy_id: String(row.academy_id),
-      academy_name: academyName || "Academia",
-      player_name: playerName,
-      slug: String(row.slug ?? ""),
-      reason: "Mismo contacto de tutor y nombre parecido",
-    });
-  }
-  return suggestions;
+  return [...byId.values()].sort((a, b) => {
+    if (a.match === b.match) return a.player_name.localeCompare(b.player_name);
+    return a.match === "code" ? -1 : 1;
+  });
 }
 
 async function enrichSuggestions(
@@ -121,6 +213,7 @@ async function enrichSuggestions(
       player_name: playerName,
       slug: String(row.slug ?? ""),
       reason: "Mismo contacto de tutor y nombre parecido",
+      match: "contact",
     });
   }
   return suggestions;

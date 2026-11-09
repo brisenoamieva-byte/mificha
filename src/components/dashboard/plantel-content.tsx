@@ -41,6 +41,7 @@ import {
 } from "@/lib/player-utils";
 import { hasPublicConsent } from "@/lib/privacy";
 import { diagnosisAuthedFetch } from "@/lib/player-diagnosis-client";
+import { PLAYER_CODE_SHORT } from "@/lib/player-public-code-copy";
 import { supabase } from "@/lib/supabase";
 import type { Player, PlayerPosition } from "@/types/database";
 
@@ -342,6 +343,13 @@ export function PlantelContent() {
           </select>
         </div>
 
+        {Object.keys(playerCodes).length > 0 ? (
+          <p className="text-xs leading-5 text-slate-500">
+            El código <span className="font-mono font-semibold text-mf-gph">MF-…</span> bajo
+            cada nombre: {PLAYER_CODE_SHORT}
+          </p>
+        ) : null}
+
         <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
           {loading ? (
             <div className="space-y-4 p-6">
@@ -409,7 +417,10 @@ export function PlantelContent() {
                               {player.first_name} {player.last_name}
                             </p>
                             {playerCodes[player.id] ? (
-                              <p className="mt-0.5 font-mono text-xs font-semibold tracking-wide text-mf-gph">
+                              <p
+                                className="mt-0.5 font-mono text-xs font-semibold tracking-wide text-mf-gph"
+                                title="Código de jugador: el mismo número en ficha tutor, visorías y academia"
+                              >
                                 {playerCodes[player.id]}
                               </p>
                             ) : null}

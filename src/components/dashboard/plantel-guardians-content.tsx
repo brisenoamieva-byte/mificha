@@ -17,6 +17,8 @@ import { PlayerAvatar } from "@/components/ui/player-avatar";
 import { toast } from "@/components/ui/toast";
 import { getGuardianNotificationReadiness } from "@/lib/guardian-readiness";
 import type { GuardianNotificationResult } from "@/lib/guardian-notifications";
+import { diagnosisAuthedFetch } from "@/lib/player-diagnosis-client";
+import { PLAYER_CODE_SHORT } from "@/lib/player-public-code-copy";
 import {
   buildPlayerShareUrl,
   buildPlayerWhatsAppShareUrl,
@@ -27,6 +29,7 @@ import type { Player } from "@/types/database";
 export function PlantelGuardiansContent() {
   const { academy } = useDashboard();
   const [players, setPlayers] = useState<Player[]>([]);
+  const [playerCodes, setPlayerCodes] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [lastSummary, setLastSummary] = useState<{
@@ -39,13 +42,19 @@ export function PlantelGuardiansContent() {
     if (!academy) return;
 
     setLoading(true);
-    const { data } = await supabase
-      .from("players")
-      .select("*")
-      .eq("academy_id", academy.id)
-      .order("last_name", { ascending: true });
+    const [{ data }, linksResult] = await Promise.all([
+      supabase
+        .from("players")
+        .select("*")
+        .eq("academy_id", academy.id)
+        .order("last_name", { ascending: true }),
+      diagnosisAuthedFetch(
+        `/fut/api/tutor/academy-links?academy_id=${encodeURIComponent(academy.id)}`,
+      ).catch(() => ({ codes: {} as Record<string, string> })),
+    ]);
 
     setPlayers(data ?? []);
+    setPlayerCodes((linksResult.codes as Record<string, string> | undefined) ?? {});
     setLoading(false);
   }, [academy]);
 
@@ -204,6 +213,9 @@ export function PlantelGuardiansContent() {
             Consentimiento + ficha pública + WhatsApp o email del tutor + avisos
             activados
           </p>
+          {Object.keys(playerCodes).length > 0 ? (
+            <p className="mt-2 text-xs text-slate-500">{PLAYER_CODE_SHORT}</p>
+          ) : null}
         </div>
 
         {loading ? (
@@ -232,6 +244,11 @@ export function PlantelGuardiansContent() {
                     <p className="truncate font-medium text-slate-900">
                       {player.first_name} {player.last_name}
                     </p>
+                    {playerCodes[player.id] ? (
+                      <p className="mt-0.5 font-mono text-xs font-semibold tracking-wide text-[#1B4F8C]">
+                        {playerCodes[player.id]}
+                      </p>
+                    ) : null}
                     <p className="truncate text-xs text-slate-500">
                       {player.guardian_name?.trim() || "Sin nombre de tutor"}
                       {player.guardian_phone?.trim()

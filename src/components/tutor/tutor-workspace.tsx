@@ -68,6 +68,7 @@ interface LinkSuggestion {
   player_name: string;
   slug: string;
   reason: string;
+  match?: "code" | "contact";
 }
 
 const inputClass =

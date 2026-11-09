@@ -81,6 +81,7 @@ export interface TutorLinkSuggestion {
   player_name: string;
   slug: string;
   reason: string;
+  match?: "code" | "contact";
 }
 
 interface TutorBuilderPanelProps {
@@ -1111,7 +1112,12 @@ export function TutorBuilderPanel({
                 {linkSuggestions.map((item) => (
                   <li
                     key={item.player_id}
-                    className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-mf-canvas px-3 py-3"
+                    className={cn(
+                      "flex flex-wrap items-center justify-between gap-2 rounded-lg px-3 py-3",
+                      item.match === "code"
+                        ? "border border-mf-gph/30 bg-mf-gph-soft"
+                        : "bg-mf-canvas",
+                    )}
                   >
                     <div>
                       <p className="text-sm font-semibold text-mf-gph-ink">{item.player_name}</p>
@@ -1125,7 +1131,11 @@ export function TutorBuilderPanel({
                       onClick={() => onLinkPlayer(item.player_id)}
                       className="mf-btn-gph"
                     >
-                      {linkBusy ? "Ligando…" : "Es el mismo"}
+                      {linkBusy
+                        ? "Ligando…"
+                        : item.match === "code"
+                          ? "Usar mismo código"
+                          : "Es el mismo"}
                     </button>
                   </li>
                 ))}
