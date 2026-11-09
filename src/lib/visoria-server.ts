@@ -235,10 +235,18 @@ async function attachPublicCode(
 ): Promise<VisoriaRegistrationRow> {
   const { ensureVisoriaPublicCodes } = await import("@/lib/public-player-code");
   const codes = await ensureVisoriaPublicCodes(admin, [row.id]);
-  return {
+  const publicCode = codes[row.id] ?? row.public_code ?? null;
+  const withCode = {
     ...row,
-    public_code: codes[row.id] ?? row.public_code ?? null,
+    public_code: publicCode,
   };
+  try {
+    const { seedTutorFromVisoriaRegistration } = await import("@/lib/tutor-family");
+    await seedTutorFromVisoriaRegistration(admin, withCode);
+  } catch {
+    /* la inscripción no debe fallar si el seed de ficha falla */
+  }
+  return withCode;
 }
 
 async function withPublicCodes(

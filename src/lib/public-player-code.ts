@@ -394,10 +394,15 @@ export async function ensureTutorPublicCodes(
     const preferred = normalizePublicCode(preferredByChild[childId] ?? null);
     if (preferred) {
       const owner = registry[preferred];
-      if (!owner || (owner.kind === "tutor" && owner.id === childId)) {
+      // Libre, ya de este tutor, o código de visoría del mismo jugador → unificar.
+      const canAdopt =
+        !owner ||
+        (owner.kind === "tutor" && owner.id === childId) ||
+        owner.kind === "visoria";
+      if (canAdopt) {
         result[childId] = preferred;
         used.add(preferred);
-        if (!owner) {
+        if (!owner || owner.kind === "visoria" || owner.id !== childId) {
           registry[preferred] = {
             kind: "tutor",
             id: childId,

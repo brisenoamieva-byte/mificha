@@ -112,11 +112,18 @@ export function VisoriaRegisterForm() {
         </p>
         {publicCode ? (
           <p className="mt-3 text-sm leading-7 text-mf-text-secondary">
-            Guárdalo: es el mismo código que usa la{" "}
+            Es la llave del jugador en MiFicha.{" "}
+            <Link
+              href={`/fut/f/${publicCode}`}
+              className="font-semibold text-mf-gph hover:underline"
+            >
+              Abrir {publicCode}
+            </Link>
+            {" · "}
             <Link href="/fut/tutor" className="font-semibold text-mf-gph hover:underline">
-              ficha del tutor
-            </Link>{" "}
-            (foto, videos e historia para la visoría).
+              completar foto e historia
+            </Link>
+            .
           </p>
         ) : null}
         <div className="mt-5 flex flex-wrap gap-3">

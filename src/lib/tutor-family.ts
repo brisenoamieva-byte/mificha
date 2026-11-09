@@ -348,15 +348,26 @@ export async function syncTutorChildren(
       const playerName = (reg.player_full_name ?? "").trim();
       if (playerName.length < 2) continue;
       const key = nameKey(playerName);
-      const existing = roster.find(
-        (child) =>
-          child.guardian_user_id === user.id && nameKey(child.player_name) === key,
-      );
+      const existing =
+        roster.find(
+          (child) =>
+            child.guardian_user_id === user.id && nameKey(child.player_name) === key,
+        ) ??
+        roster.find(
+          (child) =>
+            isPendingVisoriaGuardian(child.guardian_user_id) &&
+            nameKey(child.player_name) === key &&
+            phoneKey(child.guardian_phone) === phone,
+        );
       const positionLabel =
         VISORIA_POSITIONS.find((item) => item.value === reg.position)?.label ??
         reg.position;
       const preferredCode = normalizePublicCode(reg.public_code);
       if (existing) {
+        if (isPendingVisoriaGuardian(existing.guardian_user_id)) {
+          existing.guardian_user_id = user.id;
+          changed = true;
+        }
         if (reg.folio && !existing.source_folios.includes(reg.folio)) {
           existing.source_folios.push(reg.folio);
           changed = true;
@@ -369,8 +380,19 @@ export async function syncTutorChildren(
           existing.guardian_email = reg.guardian_email.trim().toLowerCase();
           changed = true;
         }
-        if (preferredCode && !existing.public_code) {
-          if (!usedCodes.has(preferredCode)) {
+        if (preferredCode) {
+          const currentCode = normalizePublicCode(existing.public_code);
+          if (currentCode !== preferredCode) {
+            const codes = await ensureTutorPublicCodes(admin, [existing.id], {
+              [existing.id]: preferredCode,
+            });
+            const adopted = normalizePublicCode(codes[existing.id] ?? null);
+            if (adopted === preferredCode) {
+              existing.public_code = preferredCode;
+              usedCodes.add(preferredCode);
+              changed = true;
+            }
+          } else if (!currentCode) {
             existing.public_code = preferredCode;
             usedCodes.add(preferredCode);
             changed = true;
@@ -1037,4 +1059,92 @@ export function summarizeTutorSeasons(seasons: TutorSeasonStat[]) {
     }),
     { matches: 0, goals: 0, assists: 0, minutes: 0 },
   );
+}
+
+export function isPendingVisoriaGuardian(guardianUserId: string) {
+  return guardianUserId.startsWith("pending:visoria:");
+}
+
+/**
+ * Tras registrar visoría: deja una ficha tutor mínima con el mismo MF-…
+ * para que `/fut/f/{código}` ya abra algo presentable.
+ */
+export async function seedTutorFromVisoriaRegistration(
+  admin: SupabaseClient,
+  reg: {
+    id: string;
+    folio: string;
+    player_full_name: string;
+    birth_date: string | null;
+    position: string | null;
+    current_club: string | null;
+    city: string | null;
+    guardian_phone: string;
+    guardian_email: string | null;
+    public_code?: string | null;
+  },
+) {
+  const code = normalizePublicCode(reg.public_code);
+  if (!code) return null;
+
+  const { VISORIA_POSITIONS } = await import("@/lib/visoria-event");
+  const positionLabel =
+    VISORIA_POSITIONS.find((item) => item.value === reg.position)?.label ??
+    reg.position;
+
+  const loaded = await loadRoster(admin);
+  let roster = loaded.roster;
+  let changed = loaded.changed;
+
+  const byCode = roster.find(
+    (child) => normalizePublicCode(child.public_code) === code,
+  );
+  if (byCode) return byCode;
+
+  const phone = phoneKey(reg.guardian_phone);
+  const key = nameKey(reg.player_full_name);
+  const pendingSame = roster.find(
+    (child) =>
+      isPendingVisoriaGuardian(child.guardian_user_id) &&
+      nameKey(child.player_name) === key &&
+      phoneKey(child.guardian_phone) === phone,
+  );
+  if (pendingSame) {
+    if (normalizePublicCode(pendingSame.public_code) !== code) {
+      pendingSame.public_code = code;
+      changed = true;
+    }
+    if (changed) await writeJson(admin, ROSTER, roster);
+    return pendingSame;
+  }
+
+  const childId = randomUUID();
+  await ensureTutorPublicCodes(admin, [childId], { [childId]: code });
+  const child: TutorChild = {
+    id: childId,
+    guardian_user_id: `pending:visoria:${reg.id}`,
+    guardian_email: (reg.guardian_email ?? "").trim().toLowerCase(),
+    guardian_phone: phone || null,
+    player_name: reg.player_full_name.trim(),
+    membership_until: TUTOR_PILOT_FREE ? "2099-12-31" : null,
+    source_folios: reg.folio ? [reg.folio] : [],
+    share_token: newShareToken(),
+    public_code: code,
+    profile: {
+      ...emptyProfile(),
+      birth_date: reg.birth_date || null,
+      position: positionLabel || null,
+      club: reg.current_club || null,
+      city: reg.city || null,
+    },
+    created_at: new Date().toISOString(),
+    linked_player_id: null,
+    linked_academy_id: null,
+    linked_academy_name: null,
+    linked_player_slug: null,
+    linked_at: null,
+  };
+  roster.unshift(child);
+  await writeJson(admin, ROSTER, roster);
+  return child;
 }
