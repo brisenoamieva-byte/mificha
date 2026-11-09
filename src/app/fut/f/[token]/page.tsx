@@ -90,43 +90,47 @@ export default async function TutorShareFichaPage({ params }: PageProps) {
   const materials = await listTutorMaterials(admin, child);
   const seasons = await listTutorSeasons(admin, child);
   const performance = await fetchTutorLinkedPerformance(admin, child);
-  const sharePath = tutorSharePath(child.public_code || child.share_token);
+  const access = child.public_code || child.share_token;
+  const sharePath = tutorSharePath(access);
+  const absoluteUrl = buildTutorShareAbsoluteUrl(access);
 
   return (
     <div className="flex min-h-dvh flex-col bg-mf-canvas">
-      <TutorFichaViewTracker token={child.public_code || child.share_token || token} />
+      <TutorFichaViewTracker token={access || token} />
       <SiteHeader actionHref="/fut/tutor" actionLabel="Soy tutor" />
-      <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-10 sm:px-6 sm:py-14">
-        <p className="mb-4 text-center text-sm text-mf-text-muted print:hidden">
-          Ficha armada por el tutor ·{" "}
-          <Link href="/fut/tutor" className="font-semibold text-mf-gph hover:underline">
-            Crear la tuya
-          </Link>
-        </p>
-        <TutorShareActions
-          playerName={child.player_name}
-          sharePath={sharePath}
-          publicCode={child.public_code}
+      <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-8 sm:px-6 sm:py-12">
+        <TutorPublicFicha
+          child={child}
+          materials={materials}
+          performance={performance}
+          seasons={seasons}
         />
-        <div className="mt-4">
-          <TutorPublicFicha
-            child={child}
-            materials={materials}
-            performance={performance}
-            seasons={seasons}
+        <div className="mt-5">
+          <TutorShareActions
+            playerName={child.player_name}
+            sharePath={sharePath}
+            absoluteUrl={absoluteUrl}
+            publicCode={child.public_code}
           />
         </div>
         {!performance?.gph ? (
-          <DiagnosisHireCard playerName={child.player_name} className="mt-6" />
+          <DiagnosisHireCard
+            playerName={child.player_name}
+            className="mt-5"
+            compact
+          />
         ) : null}
         <p className="mt-6 text-center text-xs leading-6 text-mf-text-muted print:hidden">
-          Material del tutor
+          Ficha armada por el tutor
           {performance
-            ? " · rendimiento de academia ligada y evaluación GPH cuando existen"
+            ? " · incluye rendimiento de academia ligada"
             : seasons.length
-              ? " · rendimiento capturado por el tutor"
-              : " · agrega torneos en tu cuenta o liga la academia"}
-          .
+              ? " · con rendimiento capturado por la familia"
+              : ""}
+          {" · "}
+          <Link href="/fut/tutor" className="font-semibold text-mf-gph hover:underline">
+            Crear la tuya
+          </Link>
         </p>
       </main>
       <SiteFooter />

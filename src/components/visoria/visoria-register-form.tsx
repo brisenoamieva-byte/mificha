@@ -110,6 +110,15 @@ export function VisoriaRegisterForm() {
           Guardamos a {playerName.trim() || "el jugador"}. Te confirmamos por WhatsApp el
           día, la sede y el horario. Lleva una identificación del tutor el día del evento.
         </p>
+        {publicCode ? (
+          <p className="mt-3 text-sm leading-7 text-mf-text-secondary">
+            Guárdalo: es el mismo código que usa la{" "}
+            <Link href="/fut/tutor" className="font-semibold text-mf-gph hover:underline">
+              ficha del tutor
+            </Link>{" "}
+            (foto, videos e historia para la visoría).
+          </p>
+        ) : null}
         <div className="mt-5 flex flex-wrap gap-3">
           <a
             href={visoriaContactWhatsAppHref()}

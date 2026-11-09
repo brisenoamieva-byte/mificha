@@ -63,6 +63,33 @@ export function TutorPublicFicha({
   const galleryPhotos = photos.filter((item) => item.id !== coverPhoto?.id);
   const extraVideos = videos.filter((item) => item.id !== featuredVideo?.id);
   const position = profile.position || "Posición por definir";
+  const birthYear = profile.birth_date?.slice(0, 4) || null;
+  const placeLine =
+    [profile.club || profile.school, profile.city].filter(Boolean).join(" · ") ||
+    "Club y ciudad por definir";
+  const heroStats = [
+    {
+      label: "Pie",
+      value: profile.dominant_foot ? FOOT_LABEL[profile.dominant_foot] : "—",
+    },
+    {
+      label: "Estatura",
+      value: profile.height_cm ? `${profile.height_cm} cm` : "—",
+    },
+    {
+      label: profile.school && profile.club ? "Escuela" : birthYear ? "Nacimiento" : "Escuela",
+      value:
+        profile.school && profile.club
+          ? profile.school
+          : birthYear
+            ? birthYear
+            : profile.school || "—",
+    },
+    {
+      label: "Código",
+      value: child.public_code || "—",
+    },
+  ] as const;
 
   return (
     <div className="tutor-ficha-print space-y-4">
@@ -80,19 +107,11 @@ export function TutorPublicFicha({
               <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
                 {child.player_name}
               </h1>
-              {child.public_code ? (
-                <p className="mt-2 font-mono text-sm font-semibold tracking-wide text-mf-accent-bright">
-                  {child.public_code}
-                </p>
-              ) : null}
               <p className="mt-2 text-base font-semibold text-white">
                 {position}
                 {age != null ? ` · ${age} años` : ""}
               </p>
-              <p className="mt-1 text-sm font-medium text-white/75">
-                {[profile.club || profile.school, profile.city].filter(Boolean).join(" · ") ||
-                  "Club y ciudad por definir"}
-              </p>
+              <p className="mt-1 text-sm font-medium text-white/75">{placeLine}</p>
             </div>
             <div className="flex shrink-0 flex-col items-end gap-3">
               <div className="rounded-md bg-white px-2 py-1.5">
@@ -103,10 +122,10 @@ export function TutorPublicFicha({
                 <img
                   src={cover}
                   alt=""
-                  className="h-24 w-24 rounded-2xl border-2 border-white/30 object-cover shadow-lg sm:h-28 sm:w-28"
+                  className="h-28 w-28 rounded-2xl border-2 border-white/30 object-cover shadow-lg sm:h-32 sm:w-32"
                 />
               ) : (
-                <div className="flex h-24 w-24 items-center justify-center rounded-2xl border border-dashed border-white/25 bg-white/5 text-xs font-semibold uppercase tracking-wide text-white/50 sm:h-28 sm:w-28">
+                <div className="flex h-28 w-28 items-center justify-center rounded-2xl border border-dashed border-white/25 bg-white/5 text-xs font-semibold uppercase tracking-wide text-white/50 sm:h-32 sm:w-32">
                   Sin foto
                 </div>
               )}
@@ -114,13 +133,9 @@ export function TutorPublicFicha({
           </div>
 
           <div className="relative mt-5 grid grid-cols-2 gap-2 sm:grid-cols-4">
-            <Stat
-              label="Pie"
-              value={profile.dominant_foot ? FOOT_LABEL[profile.dominant_foot] : "—"}
-            />
-            <Stat label="Estatura" value={profile.height_cm ? `${profile.height_cm} cm` : "—"} />
-            <Stat label="Club" value={profile.club || "—"} />
-            <Stat label="Ciudad" value={profile.city || "—"} />
+            {heroStats.map((stat) => (
+              <Stat key={stat.label} label={stat.label} value={stat.value} />
+            ))}
           </div>
         </div>
 
@@ -163,7 +178,7 @@ export function TutorPublicFicha({
         ) : null}
 
         {!compact && galleryPhotos.length ? (
-          <section className="border-b border-mf-border px-5 py-5 sm:px-7">
+          <section className="border-b border-mf-border px-5 py-5 sm:px-7 print:hidden">
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-mf-text-muted">
               Galería
             </p>

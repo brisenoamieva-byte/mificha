@@ -4,6 +4,7 @@ import { buildOgTutorSharePayload } from "@/lib/og-tutor-share";
 import { getTutorChildByShareToken } from "@/lib/tutor-family";
 import { createSupabaseAdminClient } from "@/lib/supabase-admin";
 
+export const runtime = "nodejs";
 export const alt = "Ficha tutor MiFicha";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
