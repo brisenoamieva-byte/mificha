@@ -9,6 +9,7 @@ import { fetchTutorLinkedPerformance } from "@/lib/tutor-linked-performance";
 import {
   getTutorChildByShareToken,
   listTutorMaterials,
+  listTutorSeasons,
   tutorSharePath,
 } from "@/lib/tutor-family";
 import { createSupabaseAdminClient } from "@/lib/supabase-admin";
@@ -53,6 +54,7 @@ export default async function TutorShareFichaPage({ params }: PageProps) {
   const child = await getTutorChildByShareToken(admin, token);
   if (!child) notFound();
   const materials = await listTutorMaterials(admin, child);
+  const seasons = await listTutorSeasons(admin, child);
   const performance = await fetchTutorLinkedPerformance(admin, child);
   const sharePath = tutorSharePath(child.public_code || child.share_token);
 
@@ -76,6 +78,7 @@ export default async function TutorShareFichaPage({ params }: PageProps) {
             child={child}
             materials={materials}
             performance={performance}
+            seasons={seasons}
           />
         </div>
         {!performance?.gph ? (
@@ -85,7 +88,9 @@ export default async function TutorShareFichaPage({ params }: PageProps) {
           Material del tutor
           {performance
             ? " · rendimiento de academia ligada y evaluación GPH cuando existen"
-            : " · liga la academia para mostrar stats de torneo aquí"}
+            : seasons.length
+              ? " · rendimiento capturado por el tutor"
+              : " · agrega torneos en tu cuenta o liga la academia"}
           .
         </p>
       </main>

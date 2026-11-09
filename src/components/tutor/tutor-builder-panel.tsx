@@ -10,6 +10,8 @@ import {
   tutorSharePath,
   type TutorChild,
   type TutorMaterialKind,
+  type TutorSeasonInput,
+  type TutorSeasonStat,
 } from "@/lib/tutor-family";
 import {
   buildTutorProgress,
@@ -18,6 +20,17 @@ import {
 import { MEMBERSHIP_CHECKOUT_DISABLED } from "@/lib/gph-commerce";
 import type { TutorLinkedPerformance } from "@/lib/tutor-linked-performance";
 import { cn } from "@/lib/utils";
+
+const emptySeasonForm = {
+  tournament_name: "",
+  season_label: "",
+  team_name: "",
+  matches: "",
+  goals: "",
+  assists: "",
+  minutes: "",
+  notes: "",
+};
 
 const inputClass =
   "mf-input mt-1 focus:!border-mf-gph focus:!shadow-[0_0_0_3px_color-mix(in_srgb,var(--mf-gph)_16%,transparent)]";
@@ -35,6 +48,7 @@ export interface TutorBuilderChild {
   linked_player_slug?: string | null;
   linked_at?: string | null;
   linked_performance?: TutorLinkedPerformance | null;
+  seasons?: TutorSeasonStat[];
   profile: TutorChild["profile"];
   materials: Array<{
     id: string;
@@ -88,6 +102,8 @@ interface TutorBuilderPanelProps {
   onDeleteMaterial: (materialId: string) => void;
   onSetCover: (materialId: string) => void;
   onSetFeaturedVideo: (materialId: string) => void;
+  onSaveSeason: (input: TutorSeasonInput, seasonId?: string | null) => void;
+  onDeleteSeason: (seasonId: string) => void;
   onCopyShare: () => void;
   onCopyPublicCode: () => void;
   onLinkPlayer: (playerId: string) => void;
@@ -112,11 +128,16 @@ export function TutorBuilderPanel({
   onDeleteMaterial,
   onSetCover,
   onSetFeaturedVideo,
+  onSaveSeason,
+  onDeleteSeason,
   onCopyShare,
   onCopyPublicCode,
   onLinkPlayer,
   onUnlinkPlayer,
 }: TutorBuilderPanelProps) {
+  const [seasonForm, setSeasonForm] = useState(emptySeasonForm);
+  const [editingSeasonId, setEditingSeasonId] = useState<string | null>(null);
+
   const draftProfile = useMemo(
     () => ({
       birth_date: form.birth_date || null,
@@ -132,14 +153,25 @@ export function TutorBuilderPanel({
     [form],
   );
 
+  const seasons = child.seasons ?? [];
+
   const progress = useMemo(
     () =>
       buildTutorProgress({
         player_name: form.player_name || child.player_name,
         profile: draftProfile,
         materials: child.materials,
+        seasons,
+        hasLinkedAcademy: Boolean(child.linked_player_id),
       }),
-    [child.materials, child.player_name, draftProfile, form.player_name],
+    [
+      child.linked_player_id,
+      child.materials,
+      child.player_name,
+      draftProfile,
+      form.player_name,
+      seasons,
+    ],
   );
   const [step, setStep] = useState<TutorBuilderStepId>(progress.next.id);
   const lastSavedKey = useRef(`${child.id}:${child.materials.length}:${child.player_name}`);
@@ -243,6 +275,7 @@ export function TutorBuilderPanel({
             storage_path: null,
           }))}
           performance={child.linked_performance ?? null}
+          seasons={seasons}
         />
       </div>
 
@@ -673,6 +706,201 @@ export function TutorBuilderPanel({
                         className="mt-3 max-h-56 w-full rounded-lg bg-black"
                       />
                     ) : null}
+                  </li>
+                ))
+              )}
+            </ul>
+          </section>
+        ) : null}
+
+        {step === "rendimiento" ? (
+          <section className="space-y-4 rounded-2xl border border-mf-border bg-white p-5">
+            <StepHeading
+              title="Rendimiento"
+              detail={
+                child.linked_player_id
+                  ? "Ya hay academia ligada: las stats oficiales salen en el link. Aquí puedes sumar torneos previos u otros equipos."
+                  : "Sin academia aún: captura torneos, minutos, goles y asistencias para que un visor vea números en tu link."
+              }
+            />
+
+            {child.linked_performance ? (
+              <p className="rounded-xl bg-mf-gph-soft px-4 py-3 text-sm leading-6 text-mf-gph-ink">
+                Academia ligada
+                {child.linked_academy_name ? ` · ${child.linked_academy_name}` : ""}.
+                El link público ya puede mostrar el bloque oficial de torneo.
+              </p>
+            ) : null}
+
+            <form
+              className="space-y-3 rounded-xl bg-mf-canvas p-4"
+              onSubmit={(event) => {
+                event.preventDefault();
+                onSaveSeason(
+                  {
+                    tournament_name: seasonForm.tournament_name,
+                    season_label: seasonForm.season_label,
+                    team_name: seasonForm.team_name || null,
+                    matches: Number(seasonForm.matches || 0),
+                    goals: Number(seasonForm.goals || 0),
+                    assists: Number(seasonForm.assists || 0),
+                    minutes: Number(seasonForm.minutes || 0),
+                    notes: seasonForm.notes || null,
+                  },
+                  editingSeasonId,
+                );
+                setSeasonForm(emptySeasonForm);
+                setEditingSeasonId(null);
+              }}
+            >
+              <p className="text-sm font-semibold text-mf-gph-ink">
+                {editingSeasonId ? "Editar torneo" : "Agregar torneo o temporada"}
+              </p>
+              <input
+                required
+                value={seasonForm.tournament_name}
+                onChange={(event) =>
+                  setSeasonForm((prev) => ({
+                    ...prev,
+                    tournament_name: event.target.value,
+                  }))
+                }
+                placeholder="Torneo / liga (ej. Liga Municipal Sub-13)"
+                className={inputClass}
+              />
+              <div className="grid gap-3 sm:grid-cols-2">
+                <input
+                  value={seasonForm.season_label}
+                  onChange={(event) =>
+                    setSeasonForm((prev) => ({
+                      ...prev,
+                      season_label: event.target.value,
+                    }))
+                  }
+                  placeholder="Temporada (ej. 2025-2026)"
+                  className={inputClass}
+                />
+                <input
+                  value={seasonForm.team_name}
+                  onChange={(event) =>
+                    setSeasonForm((prev) => ({
+                      ...prev,
+                      team_name: event.target.value,
+                    }))
+                  }
+                  placeholder="Equipo / club"
+                  className={inputClass}
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                {(
+                  [
+                    ["matches", "Partidos"],
+                    ["goals", "Goles"],
+                    ["assists", "Asistencias"],
+                    ["minutes", "Minutos"],
+                  ] as const
+                ).map(([key, label]) => (
+                  <label key={key} className="text-xs font-medium text-mf-text-secondary">
+                    {label}
+                    <input
+                      type="number"
+                      min={0}
+                      inputMode="numeric"
+                      value={seasonForm[key]}
+                      onChange={(event) =>
+                        setSeasonForm((prev) => ({
+                          ...prev,
+                          [key]: event.target.value,
+                        }))
+                      }
+                      className={inputClass}
+                    />
+                  </label>
+                ))}
+              </div>
+              <textarea
+                value={seasonForm.notes}
+                onChange={(event) =>
+                  setSeasonForm((prev) => ({ ...prev, notes: event.target.value }))
+                }
+                placeholder="Nota opcional (ej. campeón de goleo, titular, etc.)"
+                className={`${inputClass} min-h-20`}
+              />
+              <div className="flex flex-wrap gap-2">
+                <button type="submit" disabled={busy} className="mf-btn-gph">
+                  {editingSeasonId ? "Guardar cambios" : "Agregar a la ficha"}
+                </button>
+                {editingSeasonId ? (
+                  <button
+                    type="button"
+                    className="mf-btn-gph-ghost"
+                    onClick={() => {
+                      setEditingSeasonId(null);
+                      setSeasonForm(emptySeasonForm);
+                    }}
+                  >
+                    Cancelar
+                  </button>
+                ) : null}
+              </div>
+            </form>
+
+            <ul className="space-y-3">
+              {seasons.length === 0 ? (
+                <li className="text-sm text-mf-text-muted">
+                  Aún no hay torneos capturados. Agrega al menos uno con partidos o minutos.
+                </li>
+              ) : (
+                seasons.map((row) => (
+                  <li
+                    key={row.id}
+                    className="rounded-xl border border-mf-border px-4 py-3"
+                  >
+                    <div className="flex flex-wrap items-start justify-between gap-2">
+                      <div>
+                        <p className="text-sm font-semibold text-mf-gph-ink">
+                          {row.tournament_name}
+                        </p>
+                        <p className="mt-0.5 text-xs text-mf-text-muted">
+                          {[row.season_label, row.team_name].filter(Boolean).join(" · ")}
+                        </p>
+                        <p className="mt-2 text-sm tabular-nums text-mf-text-secondary">
+                          {row.matches} PJ · {row.goals} G · {row.assists} A · {row.minutes}{" "}
+                          min
+                        </p>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        <button
+                          type="button"
+                          disabled={busy}
+                          className="rounded-lg border border-mf-border px-2.5 py-1.5 text-xs font-semibold text-mf-gph hover:bg-mf-gph-soft"
+                          onClick={() => {
+                            setEditingSeasonId(row.id);
+                            setSeasonForm({
+                              tournament_name: row.tournament_name,
+                              season_label: row.season_label,
+                              team_name: row.team_name ?? "",
+                              matches: String(row.matches || ""),
+                              goals: String(row.goals || ""),
+                              assists: String(row.assists || ""),
+                              minutes: String(row.minutes || ""),
+                              notes: row.notes ?? "",
+                            });
+                          }}
+                        >
+                          Editar
+                        </button>
+                        <button
+                          type="button"
+                          disabled={busy}
+                          className="rounded-lg border border-mf-border px-2.5 py-1.5 text-xs font-semibold text-mf-danger hover:bg-mf-danger-soft"
+                          onClick={() => onDeleteSeason(row.id)}
+                        >
+                          Eliminar
+                        </button>
+                      </div>
+                    </div>
                   </li>
                 ))
               )}

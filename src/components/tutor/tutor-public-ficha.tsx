@@ -1,7 +1,8 @@
 import { GphLogo } from "@/components/ui/gph-logo";
+import { TutorManualStats } from "@/components/tutor/tutor-manual-stats";
 import { TutorPerformanceBridge } from "@/components/tutor/tutor-performance-bridge";
 import type { TutorLinkedPerformance } from "@/lib/tutor-linked-performance";
-import type { TutorChild, TutorMaterial } from "@/lib/tutor-family";
+import type { TutorChild, TutorMaterial, TutorSeasonStat } from "@/lib/tutor-family";
 
 type MaterialWithUrl = TutorMaterial & { url: string | null };
 
@@ -41,11 +42,13 @@ export function TutorPublicFicha({
   materials,
   compact = false,
   performance = null,
+  seasons = [],
 }: {
   child: TutorChild;
   materials: MaterialWithUrl[];
   compact?: boolean;
   performance?: TutorLinkedPerformance | null;
+  seasons?: TutorSeasonStat[];
 }) {
   const profile = child.profile;
   const age = ageFromBirth(profile.birth_date);
@@ -218,6 +221,16 @@ export function TutorPublicFicha({
       </article>
 
       {performance ? <TutorPerformanceBridge performance={performance} /> : null}
+      {seasons.length ? (
+        <TutorManualStats
+          seasons={seasons}
+          eyebrow={
+            performance
+              ? "También registrado por el tutor"
+              : "Rendimiento registrado por el tutor"
+          }
+        />
+      ) : null}
     </div>
   );
 }

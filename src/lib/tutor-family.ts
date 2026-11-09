@@ -11,6 +11,7 @@ import {
 const OPS_BUCKET = "mificha-ops";
 const ROSTER = "families/roster.json";
 const MATERIALS = "families/materials.json";
+const SEASONS = "families/tutor-seasons.json";
 
 /** Piloto gratuito: sin cobro de $1,200. Apagar cuando se active la membresía. */
 export const TUTOR_PILOT_FREE = true;
@@ -869,4 +870,143 @@ export async function setTutorFeaturedVideo(
   }
   await writeJson(admin, MATERIALS, rows);
   return rows[index];
+}
+
+/** Temporada / torneo capturado por el tutor (sin academia). */
+export interface TutorSeasonStat {
+  id: string;
+  child_id: string;
+  guardian_user_id: string;
+  tournament_name: string;
+  season_label: string;
+  team_name: string | null;
+  matches: number;
+  goals: number;
+  assists: number;
+  minutes: number;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export type TutorSeasonInput = {
+  tournament_name: string;
+  season_label?: string;
+  team_name?: string | null;
+  matches?: number;
+  goals?: number;
+  assists?: number;
+  minutes?: number;
+  notes?: string | null;
+};
+
+function nonNegInt(value: unknown, fallback = 0) {
+  const n = Number(value);
+  if (!Number.isFinite(n) || n < 0) return fallback;
+  return Math.min(Math.round(n), 99999);
+}
+
+function normalizeSeason(raw: TutorSeasonStat): TutorSeasonStat {
+  return {
+    ...raw,
+    tournament_name: String(raw.tournament_name ?? "").trim(),
+    season_label: String(raw.season_label ?? "").trim(),
+    team_name: raw.team_name?.trim() || null,
+    matches: nonNegInt(raw.matches),
+    goals: nonNegInt(raw.goals),
+    assists: nonNegInt(raw.assists),
+    minutes: nonNegInt(raw.minutes),
+    notes: raw.notes?.trim() || null,
+  };
+}
+
+export async function listTutorSeasons(admin: SupabaseClient, child: TutorChild) {
+  const rows = await readJson<TutorSeasonStat>(admin, SEASONS);
+  return rows
+    .filter(
+      (row) =>
+        row.child_id === child.id && row.guardian_user_id === child.guardian_user_id,
+    )
+    .map(normalizeSeason)
+    .sort((a, b) => b.updated_at.localeCompare(a.updated_at));
+}
+
+export async function upsertTutorSeason(
+  admin: SupabaseClient,
+  child: TutorChild,
+  input: TutorSeasonInput,
+  seasonId?: string | null,
+) {
+  assertCanUpload(child);
+  const tournament = input.tournament_name.trim();
+  if (!tournament) throw new Error("Indica el torneo o competencia.");
+
+  const rows = await readJson<TutorSeasonStat>(admin, SEASONS);
+  const now = new Date().toISOString();
+  const payload = {
+    tournament_name: tournament,
+    season_label: (input.season_label ?? "").trim() || "Temporada actual",
+    team_name: input.team_name?.trim() || null,
+    matches: nonNegInt(input.matches),
+    goals: nonNegInt(input.goals),
+    assists: nonNegInt(input.assists),
+    minutes: nonNegInt(input.minutes),
+    notes: input.notes?.trim() || null,
+    updated_at: now,
+  };
+
+  if (seasonId) {
+    const index = rows.findIndex(
+      (row) =>
+        row.id === seasonId &&
+        row.child_id === child.id &&
+        row.guardian_user_id === child.guardian_user_id,
+    );
+    if (index < 0) throw new Error("No encontramos ese registro.");
+    rows[index] = normalizeSeason({ ...rows[index], ...payload });
+    await writeJson(admin, SEASONS, rows);
+    return rows[index];
+  }
+
+  const row = normalizeSeason({
+    id: randomUUID(),
+    child_id: child.id,
+    guardian_user_id: child.guardian_user_id,
+    created_at: now,
+    ...payload,
+  });
+  rows.unshift(row);
+  await writeJson(admin, SEASONS, rows);
+  return row;
+}
+
+export async function deleteTutorSeason(
+  admin: SupabaseClient,
+  child: TutorChild,
+  seasonId: string,
+) {
+  const rows = await readJson<TutorSeasonStat>(admin, SEASONS);
+  const next = rows.filter(
+    (row) =>
+      !(
+        row.id === seasonId &&
+        row.child_id === child.id &&
+        row.guardian_user_id === child.guardian_user_id
+      ),
+  );
+  if (next.length === rows.length) throw new Error("No encontramos ese registro.");
+  await writeJson(admin, SEASONS, next);
+  return { ok: true as const, id: seasonId };
+}
+
+export function summarizeTutorSeasons(seasons: TutorSeasonStat[]) {
+  return seasons.reduce(
+    (acc, row) => ({
+      matches: acc.matches + row.matches,
+      goals: acc.goals + row.goals,
+      assists: acc.assists + row.assists,
+      minutes: acc.minutes + row.minutes,
+    }),
+    { matches: 0, goals: 0, assists: 0, minutes: 0 },
+  );
 }

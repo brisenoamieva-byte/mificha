@@ -10,6 +10,8 @@ import {
   TUTOR_PILOT_LABEL,
   tutorSharePath,
   type TutorMaterialKind,
+  type TutorSeasonInput,
+  type TutorSeasonStat,
 } from "@/lib/tutor-family";
 import type { TutorLinkedPerformance } from "@/lib/tutor-linked-performance";
 
@@ -39,6 +41,7 @@ interface TutorChildCard {
   linked_player_slug?: string | null;
   linked_at?: string | null;
   linked_performance?: TutorLinkedPerformance | null;
+  seasons?: TutorSeasonStat[];
   profile: {
     birth_date: string | null;
     position: string | null;
@@ -414,6 +417,51 @@ export function TutorWorkspace() {
     }
   }
 
+  async function saveSeason(input: TutorSeasonInput, seasonId?: string | null) {
+    if (!child) return;
+    setBusy(true);
+    setError(null);
+    try {
+      await authed("/fut/api/tutor/seasons", {
+        method: "POST",
+        body: JSON.stringify({
+          action: "save",
+          child_id: child.id,
+          season_id: seasonId ?? undefined,
+          ...input,
+        }),
+      });
+      await load(phone);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "No se guardó el torneo.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function deleteSeason(seasonId: string) {
+    if (!child) return;
+    const ok = window.confirm("¿Eliminar este torneo de la ficha?");
+    if (!ok) return;
+    setBusy(true);
+    setError(null);
+    try {
+      await authed("/fut/api/tutor/seasons", {
+        method: "POST",
+        body: JSON.stringify({
+          action: "delete",
+          child_id: child.id,
+          season_id: seasonId,
+        }),
+      });
+      await load(phone);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "No se eliminó el torneo.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function copyShare() {
     if (!child?.share_token && !child?.public_code) return;
     const access = child.public_code || child.share_token;
@@ -673,6 +721,8 @@ export function TutorWorkspace() {
             onDeleteMaterial={(id) => void manageMaterial("delete", id)}
             onSetCover={(id) => void manageMaterial("set_cover", id)}
             onSetFeaturedVideo={(id) => void manageMaterial("set_featured", id)}
+            onSaveSeason={(input, seasonId) => void saveSeason(input, seasonId)}
+            onDeleteSeason={(id) => void deleteSeason(id)}
             onCopyShare={() => void copyShare()}
             onCopyPublicCode={() => void copyPublicCode()}
             onLinkPlayer={(playerId) => void linkPlayer(playerId)}

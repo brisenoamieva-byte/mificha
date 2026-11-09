@@ -1,16 +1,23 @@
-import type { TutorChildProfile, TutorMaterialKind } from "@/lib/tutor-family";
+import type {
+  TutorChildProfile,
+  TutorMaterialKind,
+  TutorSeasonStat,
+} from "@/lib/tutor-family";
 
 export type TutorBuilderStepId =
   | "identidad"
   | "cancha"
   | "historia"
   | "material"
+  | "rendimiento"
   | "compartir";
 
 export interface TutorProgressInput {
   player_name: string;
   profile: TutorChildProfile;
   materials: Array<{ kind: TutorMaterialKind }>;
+  seasons?: Array<Pick<TutorSeasonStat, "matches" | "minutes" | "tournament_name">>;
+  hasLinkedAcademy?: boolean;
 }
 
 export interface TutorProgressStep {
@@ -26,6 +33,12 @@ export function buildTutorProgress(input: TutorProgressInput) {
   const photos = input.materials.filter((item) => item.kind === "photo").length;
   const videos = input.materials.filter((item) => item.kind === "video").length;
   const stories = input.materials.filter((item) => item.kind === "story").length;
+  const seasons = input.seasons ?? [];
+  const hasManualStats = seasons.some(
+    (row) =>
+      Boolean(row.tournament_name?.trim()) &&
+      (Number(row.matches) > 0 || Number(row.minutes) > 0),
+  );
 
   const steps: TutorProgressStep[] = [
     {
@@ -35,7 +48,7 @@ export function buildTutorProgress(input: TutorProgressInput) {
       done: Boolean(
         input.player_name.trim() && profile.birth_date && profile.city,
       ),
-      weight: 25,
+      weight: 20,
     },
     {
       id: "cancha",
@@ -47,14 +60,14 @@ export function buildTutorProgress(input: TutorProgressInput) {
           profile.height_cm &&
           (profile.club || profile.school),
       ),
-      weight: 25,
+      weight: 20,
     },
     {
       id: "historia",
       label: "Historia",
       hint: "Presentación y objetivo",
       done: Boolean(profile.bio?.trim() && profile.goals?.trim()),
-      weight: 20,
+      weight: 15,
     },
     {
       id: "material",
@@ -62,6 +75,15 @@ export function buildTutorProgress(input: TutorProgressInput) {
       hint: "Aquí cargas la foto de portada, videos y notas",
       done: photos > 0 && (videos > 0 || stories > 0),
       weight: 20,
+    },
+    {
+      id: "rendimiento",
+      label: "Rendimiento",
+      hint: input.hasLinkedAcademy
+        ? "Academia ligada · puedes sumar torneos previos"
+        : "Torneos, minutos, goles y asistencias",
+      done: Boolean(input.hasLinkedAcademy) || hasManualStats,
+      weight: 15,
     },
     {
       id: "compartir",
