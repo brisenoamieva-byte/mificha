@@ -14,25 +14,42 @@ import {
 } from "@/lib/player-category";
 import { fetchPublicDirectory } from "@/lib/public-directory";
 import { fetchPublicUpcomingMatches } from "@/lib/public-schedule";
+import { createSupabaseAdminClient } from "@/lib/supabase-admin";
+import { fetchTutorDirectoryPlayers } from "@/lib/tutor-directory";
 
 export const metadata: Metadata = {
   title: "Explorar talento | MiFicha",
   description:
-    "Directorio de jugadores y academias con ficha verificada. Filtra por categoría, posición y ciudad.",
+    "Directorio de jugadores: fichas de academia verificadas y fichas armadas por tutores. Filtra por categoría, posición y ciudad.",
 };
 
 export default async function ExplorarPage() {
-  const [data, weeklyStats, upcomingMatches] = await Promise.all([
+  const [data, weeklyStats, upcomingMatches, tutorPlayers] = await Promise.all([
     fetchPublicDirectory().catch(() => ({ academies: [], players: [] })),
     fetchWeeklyCompetitionData().catch(() => emptyWeeklyCompetitionData()),
     fetchPublicUpcomingMatches().catch(() => []),
+    (async () => {
+      try {
+        const admin = createSupabaseAdminClient();
+        return await fetchTutorDirectoryPlayers(admin);
+      } catch {
+        return [];
+      }
+    })(),
   ]);
 
-  const playerCount = countExploreDirectoryPlayers(data);
-  const academyCount = countExploreDirectoryAcademies(data);
+  const academySlugs = new Set(data.players.map((player) => player.slug));
+  const mergedPlayers = [
+    ...data.players,
+    ...tutorPlayers.filter((player) => !academySlugs.has(player.slug)),
+  ];
+  const directory = { ...data, players: mergedPlayers };
+
+  const playerCount = countExploreDirectoryPlayers(directory);
+  const academyCount = countExploreDirectoryAcademies(directory);
   const weeklyActiveCount = weeklyStats.ranked.length;
   const initialCategoryFilter = getDefaultCategoryFilter(
-    collectBirthDatesFromDirectory(data.players, weeklyStats.performances),
+    collectBirthDatesFromDirectory(directory.players, weeklyStats.performances),
   );
 
   return (
@@ -54,7 +71,7 @@ export default async function ExplorarPage() {
           className="scroll-mt-20 mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:py-14"
         >
           <ExploreDirectory
-            data={data}
+            data={directory}
             weeklyPerformances={weeklyStats.performances}
             rankedPerformances={weeklyStats.ranked}
             risingPerformances={weeklyStats.rising}

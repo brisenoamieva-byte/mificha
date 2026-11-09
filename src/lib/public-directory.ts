@@ -29,6 +29,9 @@ export interface DirectoryPlayer {
   photo_url: string | null;
   video_url?: string | null;
   has_gph_evaluation?: boolean;
+  /** academy = plantel certificado; tutor = ficha armada por la familia */
+  source?: "academy" | "tutor";
+  public_code?: string | null;
   academies: {
     name: string;
     city: string | null;
@@ -210,6 +213,8 @@ export function filterDirectory(
       player.academies?.name,
       player.academies?.city,
       player.slug,
+      player.public_code,
+      player.source === "tutor" ? "tutor ficha" : "",
     ]
       .filter(Boolean)
       .join(" ")

@@ -19,8 +19,13 @@ type ExplorePlayerCardProps = {
 
 export function ExplorePlayerCard({ player, className }: ExplorePlayerCardProps) {
   const demo = isExploreDemoPlayer(player);
-  const fullName = `${player.first_name} ${player.last_name}`;
-  const href = demo ? player.example_href : `/fut/j/${player.slug}`;
+  const isTutor = !demo && player.source === "tutor";
+  const fullName = `${player.first_name} ${player.last_name}`.trim();
+  const href = demo
+    ? player.example_href
+    : isTutor && player.public_code
+      ? `/fut/f/${player.public_code}`
+      : `/fut/j/${player.slug}`;
   const stats = demo ? player.season_stats : null;
   const location = [player.academies?.city, player.academies?.state]
     .filter(Boolean)
@@ -64,6 +69,9 @@ export function ExplorePlayerCard({ player, className }: ExplorePlayerCardProps)
             </p>
             <p className="mt-0.5 text-xs text-mf-text-secondary">
               {getPositionLabel(player.position)}
+              {isTutor && player.public_code ? (
+                <span className="font-mono text-mf-gph"> · {player.public_code}</span>
+              ) : null}
             </p>
           </div>
           <PlayerCategoryBadge birthDate={player.birth_date} compact />
@@ -84,10 +92,17 @@ export function ExplorePlayerCard({ player, className }: ExplorePlayerCardProps)
         )}
 
         <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px]">
-          <span className="inline-flex items-center gap-1 font-medium text-emerald-700">
-            <ShieldCheck className="h-3 w-3 shrink-0" aria-hidden />
-            Verificada
-          </span>
+          {isTutor ? (
+            <span className="inline-flex items-center gap-1 font-medium text-mf-gph">
+              <ShieldCheck className="h-3 w-3 shrink-0" aria-hidden />
+              Ficha tutor
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-1 font-medium text-emerald-700">
+              <ShieldCheck className="h-3 w-3 shrink-0" aria-hidden />
+              Verificada
+            </span>
+          )}
           {player.has_gph_evaluation ? <GphEvaluationBadge asSpan /> : null}
           {player.video_url ? (
             <span className="inline-flex items-center gap-1 font-medium text-violet-700">
@@ -96,7 +111,7 @@ export function ExplorePlayerCard({ player, className }: ExplorePlayerCardProps)
             </span>
           ) : null}
           <span className="truncate text-mf-text-muted">
-            {player.academies?.name ?? "Academia"}
+            {player.academies?.name ?? (isTutor ? "Ficha tutor" : "Academia")}
           </span>
           {location ? (
             <span className="inline-flex items-center gap-0.5 text-mf-text-muted">
