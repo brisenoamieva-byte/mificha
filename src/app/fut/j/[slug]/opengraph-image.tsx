@@ -14,7 +14,11 @@ function BrandMark() {
   );
 }
 
-function FallbackCard(message = "Ficha técnica verificada") {
+function FallbackCard({
+  message = "Ficha técnica verificada",
+}: {
+  message?: string;
+}) {
   return (
     <div
       style={{

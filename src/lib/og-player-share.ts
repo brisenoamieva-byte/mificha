@@ -1,6 +1,21 @@
 import { getPositionLabel } from "@/lib/dashboard-utils";
 import { getProtectedProfileTitle } from "@/lib/privacy";
 import type { PublicPlayerData } from "@/lib/public-player";
+import type { PlayerPosition } from "@/types/database";
+
+const POSITIONS = new Set<PlayerPosition>([
+  "goalkeeper",
+  "defender",
+  "midfielder",
+  "forward",
+]);
+
+function asPlayerPosition(value: string | null | undefined): PlayerPosition {
+  if (value && POSITIONS.has(value as PlayerPosition)) {
+    return value as PlayerPosition;
+  }
+  return "midfielder";
+}
 
 export interface OgPlayerSharePayload {
   title: string;
@@ -115,12 +130,12 @@ export async function fetchOgPlayerSharePayload(
     ),
     academyName: player.academies?.name ?? "Academia verificada",
     seasonName,
-    positionLabel: getPositionLabel(player.position),
+    positionLabel: getPositionLabel(asPlayerPosition(player.position)),
     stats: {
-      matches: stats.total_matches ?? 0,
-      goals: stats.total_goals ?? 0,
-      assists: stats.total_assists ?? 0,
-      minutes: stats.total_minutes ?? 0,
+      matches: Number(stats.total_matches) || 0,
+      goals: Number(stats.total_goals) || 0,
+      assists: Number(stats.total_assists) || 0,
+      minutes: Number(stats.total_minutes) || 0,
     },
     initials: `${player.first_name.charAt(0)}${player.last_name.charAt(0)}`.toUpperCase(),
   };
