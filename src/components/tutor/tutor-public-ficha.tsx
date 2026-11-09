@@ -1,6 +1,5 @@
 import { GphLogo } from "@/components/ui/gph-logo";
-import { TutorManualStats } from "@/components/tutor/tutor-manual-stats";
-import { TutorPerformanceBridge } from "@/components/tutor/tutor-performance-bridge";
+import { TutorCareerSummaryCard } from "@/components/tutor/tutor-career-summary";
 import { PLAYER_CODE_SHORT } from "@/lib/player-public-code-copy";
 import type { TutorLinkedPerformance } from "@/lib/tutor-linked-performance";
 import type { TutorChild, TutorMaterial, TutorSeasonStat } from "@/lib/tutor-family";
@@ -247,17 +246,13 @@ export function TutorPublicFicha({
         ) : null}
       </article>
 
-      {performance ? <TutorPerformanceBridge performance={performance} /> : null}
-      {seasons.length ? (
-        <TutorManualStats
+      {!compact && (performance || seasons.length) ? (
+        <TutorCareerSummaryCard
           seasons={seasons}
-          eyebrow={
-            performance
-              ? "También registrado por el tutor"
-              : "Rendimiento registrado por el tutor"
-          }
+          performance={performance}
+          title="Resumen de carrera"
         />
-      ) : !performance && !compact ? (
+      ) : !compact ? (
         <p className="rounded-2xl border border-dashed border-mf-border bg-white/70 px-4 py-3 text-center text-sm text-mf-text-muted print:hidden">
           Aún sin stats de torneo en esta ficha. El material y la historia del tutor sí
           están arriba.

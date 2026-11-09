@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Check, Circle, Copy, ExternalLink, ImagePlus, Video } from "lucide-react";
 import { PlayerPublicCodeCard } from "@/components/public/player-public-code-card";
+import { TutorCareerSummaryCard } from "@/components/tutor/tutor-career-summary";
 import { TutorPublicFicha } from "@/components/tutor/tutor-public-ficha";
 import {
   defaultTutorSeasonLabel,
@@ -284,6 +285,7 @@ export function TutorBuilderPanel({
 
         <TutorPublicFicha
           child={previewChild}
+          compact
           materials={child.materials.map((item) => ({
             ...item,
             child_id: child.id,
@@ -296,6 +298,13 @@ export function TutorBuilderPanel({
       </div>
 
       <div className="space-y-4">
+        <TutorCareerSummaryCard
+          seasons={seasons}
+          performance={child.linked_performance ?? null}
+          title="Dashboard del alumno"
+          onAddTournament={() => setStep("rendimiento")}
+        />
+
         <section className="rounded-2xl border border-mf-border bg-white p-5">
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
             Armar ficha
