@@ -678,11 +678,9 @@ export async function listTutorPublicCodes(admin: SupabaseClient): Promise<strin
     .filter((code): code is string => Boolean(code));
 }
 
-export async function getTutorChildByShareToken(admin: SupabaseClient, token: string) {
+function findChildByShareAccess(roster: TutorChild[], token: string) {
   const raw = token.trim();
   if (!raw) return null;
-  const { roster, changed } = await loadRoster(admin);
-  if (changed) await writeJson(admin, ROSTER, roster);
   const asCode = normalizePublicCode(raw);
   if (asCode) {
     const byCode = roster.find(
@@ -692,6 +690,21 @@ export async function getTutorChildByShareToken(admin: SupabaseClient, token: st
   }
   const clean = raw.toLowerCase();
   return roster.find((child) => child.share_token === clean) ?? null;
+}
+
+export async function getTutorChildByShareToken(admin: SupabaseClient, token: string) {
+  const { roster, changed } = await loadRoster(admin);
+  if (changed) await writeJson(admin, ROSTER, roster);
+  return findChildByShareAccess(roster, token);
+}
+
+/** Solo lectura: para OG/metadata sin mutar códigos ni roster. */
+export async function peekTutorChildByShareToken(
+  admin: SupabaseClient,
+  token: string,
+) {
+  const roster = (await readJson<TutorChild>(admin, ROSTER)).map(normalizeChild);
+  return findChildByShareAccess(roster, token);
 }
 
 export async function addTutorStory(

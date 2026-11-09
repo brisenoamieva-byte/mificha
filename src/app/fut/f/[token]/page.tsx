@@ -16,6 +16,7 @@ import {
   getTutorChildByShareToken,
   listTutorMaterials,
   listTutorSeasons,
+  peekTutorChildByShareToken,
   tutorSharePath,
 } from "@/lib/tutor-family";
 import { createSupabaseAdminClient } from "@/lib/supabase-admin";
@@ -28,7 +29,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { token } = await params;
   try {
     const admin = createSupabaseAdminClient();
-    const child = await getTutorChildByShareToken(admin, token);
+    const child = await peekTutorChildByShareToken(admin, token);
     if (!child) return { title: "Ficha | MiFicha", robots: { index: false } };
     const bits = [
       child.profile.position,
