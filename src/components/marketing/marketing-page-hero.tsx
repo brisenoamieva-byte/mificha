@@ -11,10 +11,12 @@ interface MarketingStat {
 }
 
 interface MarketingPageHeroProps {
-  eyebrow: string;
+  eyebrow?: string;
   title: string;
   description: ReactNode;
   actions?: ReactNode;
+  /** Bloque bajo los CTAs, dentro de la columna de copy. */
+  belowActions?: ReactNode;
   stats?: MarketingStat[];
   aside?: ReactNode;
   asideAlign?: "center" | "start";
@@ -29,6 +31,7 @@ export function MarketingPageHero({
   title,
   description,
   actions,
+  belowActions,
   stats,
   aside,
   asideAlign = "center",
@@ -54,28 +57,39 @@ export function MarketingPageHero({
       />
       <div
         className={cn(
-          "relative mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14 lg:py-20",
+          "relative mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14 lg:py-16",
           twoColumn &&
-            "grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12",
-          twoColumn &&
-            (asideAlign === "start" ? "lg:items-start" : "lg:items-center"),
+            "grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-10 lg:items-start",
+          twoColumn && asideAlign === "center" && "lg:items-center",
         )}
       >
-        <div className={cn(twoColumn && "self-start", twoColumn ? "max-w-xl" : "max-w-3xl")}>
-          <p className="mf-marketing-eyebrow">{eyebrow}</p>
-          <h1 className="mt-4 text-[2rem] font-semibold leading-[1.08] tracking-[-0.035em] text-mf-text sm:text-[2.5rem] lg:text-[2.75rem]">
+        <div className={cn(twoColumn ? "max-w-xl" : "max-w-3xl")}>
+          {eyebrow ? <p className="mf-marketing-eyebrow">{eyebrow}</p> : null}
+          <h1
+            className={cn(
+              "text-[2rem] font-semibold leading-[1.08] tracking-[-0.035em] text-mf-text sm:text-[2.5rem] lg:text-[2.65rem]",
+              eyebrow ? "mt-4" : "mt-0",
+            )}
+          >
             {title}
           </h1>
           <p className="mt-4 text-base leading-7 text-mf-text-secondary sm:mt-5 sm:text-[1.0625rem] sm:leading-8">
             {description}
           </p>
-          {actions ? <div className="mt-6 flex flex-wrap gap-3 sm:mt-8">{actions}</div> : null}
+          {actions ? (
+            <div className="mt-6 flex flex-wrap gap-3 sm:mt-7">{actions}</div>
+          ) : null}
+          {belowActions ? (
+            <div className="mt-5 sm:mt-6">{belowActions}</div>
+          ) : null}
           {stats && stats.length > 0 ? (
             <dl
               className={cn(
                 "grid gap-4 border-t border-mf-border-subtle pt-8",
-                stats.length === 3 ? "grid-cols-3" : "grid-cols-2 sm:grid-cols-4",
-                actions ? "mt-10" : "mt-8",
+                stats.length === 3
+                  ? "grid-cols-3"
+                  : "grid-cols-2 sm:grid-cols-4",
+                actions || belowActions ? "mt-10" : "mt-8",
               )}
             >
               {stats.map((item) => (
@@ -103,7 +117,9 @@ export function MarketingPageHero({
             priority={photoPriority}
           />
         ) : hasAside ? (
-          <div className={cn("min-w-0 lg:justify-self-end", asideClassName)}>{aside}</div>
+          <div className={cn("min-w-0 lg:justify-self-end", asideClassName)}>
+            {aside}
+          </div>
         ) : null}
       </div>
     </section>

@@ -136,9 +136,10 @@ export function EvaluacionesPageContent() {
               <p className="mt-6 text-sm leading-7 text-mf-text-secondary">
                 Conviene tener la{" "}
                 <Link href="/fut/tutor" className="font-semibold text-mf-gph hover:underline">
-                  ficha del tutor
+                  ficha del jugador
                 </Link>{" "}
-                lista: el informe y el material del hijo viven en el mismo expediente.
+                lista (la arma el tutor): el informe y el material del hijo viven en el
+                mismo expediente.
               </p>
             </div>
           </div>
@@ -292,31 +293,36 @@ export function EvaluacionesPageContent() {
   );
 }
 
-/** Banda en home: diagnósticos GPH ya contratables; ficha de torneo aparte. */
+/** Banda en home: refuerzo corto; el precio vive en el hero. */
 export function HomeGphAllianceBand() {
   const whatsapp = diagnosisWhatsAppHref();
 
   return (
     <section id="diagnosticos-gph" className="scroll-mt-24 border-t border-mf-border bg-mf-gph-ink">
-      <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-12">
-        <div className="inline-block rounded-md bg-white px-2 py-1.5">
-          <AllianceLockup size="md" />
+      <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10 lg:flex-row lg:items-center lg:justify-between">
+        <div className="min-w-0 max-w-2xl">
+          <div className="inline-block rounded-md bg-white px-2 py-1.5">
+            <AllianceLockup size="sm" />
+          </div>
+          <p className="mt-4 text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph-hot">
+            Disponible ahora
+          </p>
+          <h2 className="mt-2 text-xl font-semibold tracking-[-0.02em] text-white sm:text-2xl">
+            ¿Listo para el diagnóstico GPH?
+          </h2>
+          <p className="mt-2 text-sm leading-7 text-white/75">
+            Sesión presencial, informe en la ficha y 12 meses de plataforma. El detalle de
+            precio está arriba en el hero.
+          </p>
         </div>
-        <p className="mt-4 text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph-hot">
-          Disponible ahora
-        </p>
-        <h2 className="mt-2 max-w-2xl text-2xl font-semibold tracking-[-0.02em] text-white sm:text-3xl">
-          Diagnósticos GPH. Ya se pueden contratar.
-        </h2>
-        <DiagnosisPromoPrice className="mt-5" size="lg" tone="dark" />
-        <p className="mt-3 max-w-2xl text-sm leading-7 text-white/75 sm:text-base">
-          Sesión presencial + 12 meses de MiFicha. Agenda por WhatsApp. La ficha del tutor
-          se puede armar sin costo.
-        </p>
-        <div className="mt-6 flex flex-wrap items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          <Link href="/fut/pagar?sku=diagnosis" className="mf-btn-gph">
+            Continuar al pago
+            <ArrowRight className="h-4 w-4" />
+          </Link>
           <a
             href={whatsapp}
-            className="mf-btn-gph"
+            className="inline-flex items-center justify-center gap-2 rounded-full border border-white/25 px-5 py-2.5 text-sm font-semibold text-white hover:bg-white/10"
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -328,13 +334,6 @@ export function HomeGphAllianceBand() {
             className="inline-flex items-center justify-center gap-2 rounded-full border border-white/25 px-5 py-2.5 text-sm font-semibold text-white hover:bg-white/10"
           >
             Ver detalle
-            <ArrowRight className="h-4 w-4" />
-          </Link>
-          <Link
-            href="/fut/d/demo"
-            className="inline-flex items-center justify-center gap-2 rounded-full border border-white/25 px-5 py-2.5 text-sm font-semibold text-white hover:bg-white/10"
-          >
-            Ver ejemplo
           </Link>
         </div>
       </div>

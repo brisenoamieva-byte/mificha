@@ -3,7 +3,7 @@ import { buildOgTutorSharePayload } from "@/lib/og-tutor-share";
 import { peekTutorChildByShareToken } from "@/lib/tutor-family";
 import { createSupabaseAdminClient } from "@/lib/supabase-admin";
 
-export const alt = "Ficha tutor MiFicha";
+export const alt = "Ficha del jugador MiFicha";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 

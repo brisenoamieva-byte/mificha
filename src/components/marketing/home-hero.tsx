@@ -1,33 +1,28 @@
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
 import { HomeFichaPreview } from "@/components/marketing/home-ficha-preview";
+import { HomeHeroGphOffer } from "@/components/marketing/home-hero-gph-offer";
 import { MarketingPageHero } from "@/components/marketing/marketing-page-hero";
 import { WithBrandName } from "@/components/ui/brand-wordmark";
 
 export function HomeHero() {
   return (
     <MarketingPageHero
-      eyebrow="Piloto abierto · Querétaro"
-      title="La ficha de tu hijo, lista para visorías y seguimiento"
+      title="La ficha de futbol de tu hijo, lista para visorías"
       description={
         <>
           <WithBrandName>
-            Seguimiento del jugador, visorías de Primera, convocatorias y especialización.
-            Piloto de tutor abierto sin cobro; el diagnóstico GPH ya se agenda.
+            Seguimiento futbolistico, visorías de Primera, convocatorias y especialización.
+            El ingreso de hoy es el diagnóstico GPH; la ficha del jugador la arma el tutor en
+            la plataforma.
           </WithBrandName>
         </>
       }
       actions={
-        <>
-          <Link href="/fut/tutor" className="mf-btn-gph">
-            Entrar como tutor
-            <ArrowRight className="h-4 w-4" />
-          </Link>
-          <Link href="#diagnosticos-gph" className="mf-btn-accent">
-            Diagnóstico GPH
-          </Link>
-        </>
+        <Link href="/fut/tutor" className="mf-btn-accent">
+          Entrar como tutor
+        </Link>
       }
+      belowActions={<HomeHeroGphOffer />}
       aside={<HomeFichaPreview />}
       asideAlign="start"
       className="demo-ficha-hero"

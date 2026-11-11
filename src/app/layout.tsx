@@ -19,14 +19,14 @@ const inter = Inter({
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "MiFicha · Tu ficha deportiva",
+  title: "MiFicha · Ficha de futbol",
   description:
-    "Ficha deportiva de fútbol: planteles, torneos escolares y evaluación GPH.",
+    "Plataforma de futbol para familias: ficha del jugador, visorías, torneos y diagnóstico GPH.",
   metadataBase: new URL(appUrl),
   openGraph: {
-    title: "MiFicha · Tu ficha deportiva",
+    title: "MiFicha · Ficha de futbol",
     description:
-      "Ficha deportiva de fútbol: planteles, torneos escolares y evaluación GPH.",
+      "Plataforma de futbol para familias: ficha del jugador, visorías, torneos y diagnóstico GPH.",
     url: appUrl,
     siteName: "MiFicha",
     locale: "es_MX",
@@ -36,15 +36,15 @@ export const metadata: Metadata = {
         url: BRAND_OG_IMAGE,
         width: 1200,
         height: 630,
-        alt: "MiFicha",
+        alt: "MiFicha · futbol",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "MiFicha · Tu ficha deportiva",
+    title: "MiFicha · Ficha de futbol",
     description:
-      "Ficha deportiva de fútbol: planteles, torneos escolares y evaluación GPH.",
+      "Plataforma de futbol para familias: ficha del jugador, visorías, torneos y diagnóstico GPH.",
     images: [BRAND_OG_IMAGE],
   },
 };

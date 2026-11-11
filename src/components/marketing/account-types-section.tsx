@@ -5,7 +5,7 @@ const ACCOUNTS = [
     id: "tutor",
     title: "Cuenta de tutor (papá/mamá)",
     forWho: "Familias",
-    status: "Piloto gratis",
+    status: "En la plataforma",
     canDo: [
       "Dar de alta a tu hijo y armar su ficha (fotos, videos, historia)",
       "Compartir un link presentable para visorías o universidades",
@@ -30,6 +30,21 @@ const ACCOUNTS = [
   },
 ] as const;
 
+const LAYERS = [
+  {
+    title: "Ficha del jugador",
+    detail: "Fotos, videos e historia; la controla el tutor.",
+  },
+  {
+    title: "Stats de torneo",
+    detail: "Partidos y minutos cuando ligas la academia.",
+  },
+  {
+    title: "Informe GPH",
+    detail: "Diagnóstico del evaluador en el mismo expediente.",
+  },
+] as const;
+
 export function AccountTypesSection() {
   return (
     <section id="tipos-de-cuenta" className="scroll-mt-24 border-b border-mf-border bg-white">
@@ -41,7 +56,8 @@ export function AccountTypesSection() {
           Qué cuenta necesitas
         </h2>
         <p className="mt-3 max-w-2xl text-sm leading-7 text-mf-text-secondary">
-          Elige tu entrada según tu rol. El mismo correo puede usarse en más de uno.
+          Elige tu entrada según tu rol. La ficha del jugador, los stats de torneo y el
+          informe GPH viven en el mismo expediente.
         </p>
 
         <ul className="mt-8 grid gap-3 lg:grid-cols-2">
@@ -54,8 +70,8 @@ export function AccountTypesSection() {
                 <span
                   className={
                     item.primary
-                      ? "rounded-full bg-mf-gph px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-white"
-                      : "rounded-full bg-white px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-mf-text-muted"
+                      ? "rounded-md bg-mf-gph px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-white"
+                      : "rounded-md bg-white px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-mf-text-muted"
                   }
                 >
                   {item.status}
@@ -73,11 +89,22 @@ export function AccountTypesSection() {
               <Link
                 href={item.href}
                 className={
-                  item.primary ? "mf-btn-gph mt-4 self-start" : "mf-btn-gph-ghost mt-4 self-start"
+                  item.primary
+                    ? "mf-btn-gph mt-4 self-start"
+                    : "mf-btn-gph-ghost mt-4 self-start"
                 }
               >
                 {item.cta}
               </Link>
+            </li>
+          ))}
+        </ul>
+
+        <ul className="mt-6 grid gap-3 border-t border-mf-border-subtle pt-6 md:grid-cols-3">
+          {LAYERS.map((item) => (
+            <li key={item.title} className="min-w-0">
+              <p className="text-sm font-semibold text-mf-gph-ink">{item.title}</p>
+              <p className="mt-1 text-sm leading-6 text-mf-text-secondary">{item.detail}</p>
             </li>
           ))}
         </ul>

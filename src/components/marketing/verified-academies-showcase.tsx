@@ -150,7 +150,9 @@ export function VerifiedAcademiesShowcase({
                 Red certificada
               </p>
               <p className="mt-1 text-lg font-semibold text-white">
-                {stats.academyCount} academias en la red{" "}
+                {stats.academyCount === 1
+                  ? "1 academia en la red "
+                  : `${stats.academyCount} academias en la red `}
                 <BrandWordmark className="text-white" />
               </p>
             </div>

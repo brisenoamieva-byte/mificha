@@ -1,16 +1,23 @@
 import { supabase } from "@/lib/supabase";
 import type { UserRole } from "@/types/database";
 
+function appOrigin() {
+  if (typeof window !== "undefined") return window.location.origin;
+  return process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ?? "https://mificha.mx";
+}
+
 export async function signUp(
   email: string,
   password: string,
   role: UserRole,
   fullName: string,
+  opts?: { emailRedirectTo?: string },
 ) {
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
+      emailRedirectTo: opts?.emailRedirectTo ?? `${appOrigin()}/fut/login`,
       data: {
         role,
         full_name: fullName,
@@ -48,14 +55,19 @@ export async function signIn(email: string, password: string) {
   return data;
 }
 
-export async function requestPasswordReset(email: string) {
-  const origin =
-    typeof window !== "undefined"
-      ? window.location.origin
-      : process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ?? "https://mificha.mx";
+export async function requestPasswordReset(
+  email: string,
+  opts?: { nextPath?: string },
+) {
+  const origin = appOrigin();
+  const next =
+    opts?.nextPath && opts.nextPath.startsWith("/")
+      ? opts.nextPath
+      : "/fut/login";
+  const redirectTo = `${origin}/fut/recuperar/nueva?next=${encodeURIComponent(next)}`;
 
   const { error } = await supabase.auth.resetPasswordForEmail(email.trim().toLowerCase(), {
-    redirectTo: `${origin}/fut/recuperar/nueva`,
+    redirectTo,
   });
 
   if (error) throw error;

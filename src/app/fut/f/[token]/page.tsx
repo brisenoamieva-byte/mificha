@@ -85,7 +85,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       "Jugador";
     return {
       title: `${name} · ${resolved.code ?? "Código"} | MiFicha`,
-      description: `Código MiFicha${resolved.code ? ` ${resolved.code}` : ""} · conexiones de academia, visoría y ficha tutor.`,
+      description: `Código MiFicha${resolved.code ? ` ${resolved.code}` : ""} · conexiones de academia, visoría y ficha del jugador.`,
       robots: { index: false, follow: false },
     };
   } catch {

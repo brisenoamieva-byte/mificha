@@ -180,6 +180,33 @@ export function AcademyForm() {
 
         if (insertError) throw insertError;
         setSuccess("Academia registrada correctamente.");
+        void (async () => {
+          const {
+            data: { session },
+          } = await supabase.auth.getSession();
+          if (!session) return;
+          await fetch("/fut/api/ops/notify", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${session.access_token}`,
+            },
+            body: JSON.stringify({
+              kind: "academy_created",
+              subject: `Nueva academia · ${payload.name}`,
+              details: {
+                Nombre: payload.name,
+                Slug: payload.slug,
+                Ciudad: payload.city,
+                Estado: payload.state,
+                Teléfono: payload.phone,
+                Dueño: user.email,
+              },
+            }),
+          });
+        })().catch(() => {
+          /* aviso interno; no bloquea el alta */
+        });
       }
 
       await refresh();

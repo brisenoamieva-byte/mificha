@@ -37,10 +37,10 @@ export function buildOgTutorSharePayload(child: TutorChild): OgTutorSharePayload
     subtitle: bits.length > 0 ? bits.join(" · ") : "Ficha de presentación",
     publicCode: child.public_code || null,
     initials,
-    badge: child.linked_academy_name ? "Academia ligada" : "Ficha tutor",
+    badge: child.linked_academy_name ? "Academia ligada" : "Ficha del jugador",
   };
 }
 
 export function buildOgTutorImageAlt(payload: OgTutorSharePayload) {
-  return `${payload.title} · Ficha tutor · MiFicha`;
+  return `${payload.title} · Ficha del jugador · MiFicha`;
 }

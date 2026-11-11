@@ -1,10 +1,14 @@
 import Link from "next/link";
 import {
-  MIFICH_OPPORTUNITIES,
+  getOpenOpportunities,
+  OPPORTUNITY_ROADMAP_NOTE,
   OPPORTUNITY_STATUS_LABEL,
 } from "@/lib/opportunities";
 
 export function OpportunitiesSection() {
+  const items = getOpenOpportunities();
+  if (items.length === 0) return null;
+
   return (
     <section id="oportunidades" className="scroll-mt-24 border-b border-mf-border bg-mf-canvas">
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-14">
@@ -15,24 +19,17 @@ export function OpportunitiesSection() {
           Próximas oportunidades
         </h2>
         <p className="mt-3 max-w-2xl text-sm leading-7 text-mf-text-secondary">
-          Lo que ya está abierto y lo que viene con la membresía. Sin inventar fechas:
-          si aún no hay cupo, se marca como por publicar.
+          Solo lo que ya tiene fecha o convocatoria abierta.
         </p>
 
         <ul className="mt-8 grid gap-3 sm:grid-cols-2">
-          {MIFICH_OPPORTUNITIES.map((item) => (
+          {items.map((item) => (
             <li
               key={item.id}
               className="flex flex-col rounded-xl border border-mf-border bg-white px-5 py-5"
             >
               <div className="flex flex-wrap items-center gap-2">
-                <span
-                  className={
-                    item.status === "abierta"
-                      ? "rounded-full bg-mf-gph px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-white"
-                      : "rounded-full bg-mf-canvas px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-mf-text-muted"
-                  }
-                >
+                <span className="rounded-md bg-mf-gph px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-white">
                   {OPPORTUNITY_STATUS_LABEL[item.status]}
                 </span>
                 <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-mf-text-muted">
@@ -43,19 +40,14 @@ export function OpportunitiesSection() {
               <p className="mt-1 text-sm font-medium text-mf-text">{item.dateLabel}</p>
               <p className="mt-0.5 text-xs text-mf-text-muted">{item.place}</p>
               <p className="mt-3 flex-1 text-sm leading-6 text-mf-text-secondary">{item.detail}</p>
-              <Link
-                href={item.href}
-                className={
-                  item.status === "abierta"
-                    ? "mf-btn-gph mt-4 self-start"
-                    : "mf-btn-gph-ghost mt-4 self-start"
-                }
-              >
+              <Link href={item.href} className="mf-btn-gph mt-4 self-start">
                 {item.cta}
               </Link>
             </li>
           ))}
         </ul>
+
+        <p className="mt-5 text-sm leading-6 text-mf-text-muted">{OPPORTUNITY_ROADMAP_NOTE}</p>
       </div>
     </section>
   );

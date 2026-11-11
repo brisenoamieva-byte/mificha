@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AuthShell } from "@/components/auth/auth-shell";
 import { consumeAuthRedirect } from "@/lib/auth-recovery";
@@ -25,6 +25,9 @@ const inputClassName = "mf-input mt-1";
 
 export function ResetPasswordScreen() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const rawNext = searchParams.get("next") || "/fut/login";
+  const nextPath = rawNext.startsWith("/") ? rawNext : "/fut/login";
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -75,7 +78,7 @@ export function ResetPasswordScreen() {
     setLoading(true);
     try {
       await updatePassword(password);
-      router.push("/fut/dashboard");
+      router.push(nextPath);
       router.refresh();
     } catch (submitError) {
       setError(getErrorMessage(submitError));

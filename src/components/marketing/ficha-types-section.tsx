@@ -3,10 +3,10 @@ import Link from "next/link";
 const TYPES = [
   {
     id: "tutor",
-    title: "Ficha del tutor",
-    status: "Piloto gratis",
+    title: "Ficha del jugador",
+    status: "En la plataforma",
     detail:
-      "Fotos, videos e historia. Un solo link para compartir con visores, universidades y clubes.",
+      "Fotos, videos e historia; la controla el tutor. Un solo link para compartir con visores, universidades y clubes.",
     href: "/fut/tutor",
     cta: "Entrar como tutor",
     live: true,

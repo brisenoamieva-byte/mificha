@@ -21,15 +21,15 @@ export function PadresPageHero() {
             </h1>
             <p className="mt-5 text-base leading-8 text-mf-text-secondary sm:text-[1.0625rem]">
               <WithBrandName>
-                Hoy puedes armar la ficha del tutor (fotos, videos e historia) en piloto
-                gratis. Después del partido, cuando el torneo esté activo, también llegarán
-                las stats oficiales al mismo expediente.
+                Hoy puedes armar la ficha del jugador (fotos, videos e historia); la controla
+                el tutor en la plataforma. Después del partido, cuando el torneo esté activo,
+                también llegarán las stats oficiales al mismo expediente.
               </WithBrandName>
             </p>
 
             <ul className="mt-6 flex flex-wrap gap-2">
               {[
-                { icon: Printer, label: "Ficha del tutor (piloto)" },
+                { icon: Printer, label: "Ficha del jugador" },
                 { icon: ClipboardList, label: "Diagnóstico GPH" },
                 { icon: MessageCircle, label: "Aviso post-partido (próximo)" },
                 { icon: BarChart3, label: "Stats del torneo (próximo)" },

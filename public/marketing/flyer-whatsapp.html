@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=1080" />
+    <title>MiFicha flyer</title>
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        background: #000;
+        display: grid;
+        place-items: center;
+        min-height: 100vh;
+        font-family: "Segoe UI", Inter, Arial, sans-serif;
+      }
+      .flyer {
+        width: 1080px;
+        height: 1920px;
+        position: relative;
+        overflow: hidden;
+        color: #fff;
+        background: #000;
+        text-decoration: none;
+        display: block;
+      }
+      .bg {
+        position: absolute;
+        inset: 0;
+        background:
+          linear-gradient(
+            180deg,
+            #000 0%,
+            #000 12%,
+            rgba(0, 0, 0, 0.72) 26%,
+            rgba(0, 0, 0, 0.40) 48%,
+            rgba(0, 0, 0, 0.55) 70%,
+            rgba(0, 0, 0, 0.92) 100%
+          ),
+          url("/marketing/flyer-stadium-bg.jpg") center 28% / cover no-repeat;
+      }
+      .inner {
+        position: relative;
+        z-index: 2;
+        height: 100%;
+        padding: 64px 68px 72px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: 36px;
+      }
+      .main {
+        display: flex;
+        flex-direction: column;
+        gap: 32px;
+        flex: 1;
+        justify-content: center;
+      }
+      .brand-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 28px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+      }
+      .brand-icon {
+        width: 108px;
+        height: 108px;
+        border-radius: 24px;
+        background: #000;
+        border: 2px solid rgba(255, 255, 255, 0.28);
+        display: grid;
+        place-items: center;
+        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55);
+      }
+      .brand-icon img {
+        width: 78px;
+        height: 78px;
+        object-fit: contain;
+      }
+      .brand-name {
+        font-size: 78px;
+        font-weight: 800;
+        letter-spacing: -0.04em;
+        line-height: 1;
+        color: #fff;
+        text-shadow: 0 2px 18px rgba(0, 0, 0, 0.65);
+      }
+      .divider {
+        width: 2px;
+        height: 64px;
+        background: rgba(255, 255, 255, 0.35);
+        flex-shrink: 0;
+      }
+      .alliance {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 18px 22px;
+        border-radius: 18px;
+        background: #fff;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+      }
+      .alliance img {
+        height: 58px;
+        width: auto;
+        object-fit: contain;
+      }
+      .headline {
+        margin-top: 0;
+        max-width: 14ch;
+        font-size: 56px;
+        font-weight: 750;
+        letter-spacing: -0.035em;
+        line-height: 1.12;
+        text-wrap: balance;
+      }
+      .card {
+        margin-top: 0;
+        background: linear-gradient(160deg, #ff6a22 0%, #f54200 58%, #e03c00 100%);
+        border-radius: 28px;
+        padding: 32px 36px 30px;
+        box-shadow: 0 24px 48px rgba(245, 66, 0, 0.32);
+      }
+      .badge {
+        display: inline-flex;
+        background: #fff;
+        color: #f54200;
+        font-size: 24px;
+        font-weight: 800;
+        letter-spacing: 0.04em;
+        padding: 10px 16px;
+        border-radius: 999px;
+      }
+      .prices {
+        margin-top: 18px;
+        display: flex;
+        align-items: baseline;
+        gap: 18px;
+      }
+      .old {
+        position: relative;
+        font-size: 34px;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.82);
+      }
+      .old::after {
+        content: "";
+        position: absolute;
+        left: -4%;
+        right: -4%;
+        top: 52%;
+        height: 3px;
+        background: #fff;
+        transform: rotate(-8deg);
+      }
+      .now {
+        font-size: 108px;
+        font-weight: 800;
+        letter-spacing: -0.045em;
+        line-height: 0.9;
+        font-variant-numeric: tabular-nums;
+      }
+      .offer-title {
+        margin-top: 18px;
+        font-size: 32px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+      }
+      .offer-sub {
+        margin-top: 8px;
+        font-size: 24px;
+        color: rgba(255, 255, 255, 0.92);
+      }
+      .benefits {
+        margin-top: 0;
+        display: grid;
+        gap: 16px;
+      }
+      .benefit {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        font-size: 30px;
+        font-weight: 650;
+      }
+      .dot {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: #34d399;
+        box-shadow: 0 0 0 6px rgba(52, 211, 153, 0.16);
+        flex-shrink: 0;
+      }
+      .gph-blurb {
+        margin-top: 0;
+        font-size: 22px;
+        font-weight: 500;
+        line-height: 1.4;
+        color: rgba(255, 255, 255, 0.78);
+        text-wrap: pretty;
+      }
+      .footer {
+        text-align: center;
+        padding-top: 8px;
+      }
+      .cta {
+        font-size: 26px;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.8);
+      }
+      .url {
+        margin-top: 12px;
+        font-size: 56px;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        line-height: 1.05;
+      }
+      .wa {
+        margin-top: 12px;
+        font-size: 26px;
+        color: rgba(255, 255, 255, 0.72);
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .wa svg { width: 28px; height: 28px; fill: #25d366; }
+    </style>
+  </head>
+  <body>
+    <a class="flyer" href="https://www.mificha.mx/fut" aria-label="Abrir MiFicha">
+      <div class="bg" aria-hidden="true"></div>
+      <div class="inner">
+        <div class="brand-row">
+          <div class="brand">
+            <div class="brand-icon">
+              <img src="/brand/mificha-icon.png" alt="" />
+            </div>
+            <div class="brand-name">MiFicha</div>
+          </div>
+          <div class="divider" aria-hidden="true"></div>
+          <div class="alliance">
+            <img src="/partners/gph-logo.png" alt="GPH" />
+          </div>
+        </div>
+
+        <div class="main">
+          <h1 class="headline">La ficha de futbol de tu hijo, lista para visorias</h1>
+
+          <section class="card">
+            <span class="badge">-30%</span>
+            <div class="prices">
+              <span class="old">$2,900</span>
+              <span class="now">$2,030</span>
+            </div>
+            <p class="offer-title">Diagnostico GPH + 12 meses MiFicha</p>
+            <p class="offer-sub">Evaluacion presencial · informe en la ficha</p>
+          </section>
+
+          <ul class="benefits">
+            <li class="benefit"><span class="dot"></span>Ficha del jugador</li>
+            <li class="benefit"><span class="dot"></span>Lista para compartir en visorias</li>
+            <li class="benefit"><span class="dot"></span>Objetivos claros para entrenar</li>
+          </ul>
+
+          <p class="gph-blurb">
+            El diagnóstico GPH es una sesión presencial que mide al jugador en físico,
+            técnica, coordinación, cognición y reglamento, define su etapa de desarrollo
+            y deja en MiFicha un informe con fortalezas, objetivos claros y seguimiento.
+          </p>
+        </div>
+
+        <footer class="footer">
+          <p class="cta">Contrata el diagnostico · prueba la plataforma</p>
+          <p class="url">www.mificha.mx</p>
+          <p class="wa">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12.04 2c-5.5 0-9.96 4.45-9.96 9.93 0 1.75.46 3.45 1.34 4.95L2 22l5.27-1.38a9.93 9.93 0 0 0 4.77 1.21h.01c5.5 0 9.96-4.45 9.96-9.93S17.54 2 12.04 2zm5.78 14.13c-.24.68-1.4 1.24-1.93 1.32-.5.07-1.13.1-1.82-.11-.42-.13-.96-.31-1.66-.61-2.92-1.26-4.82-4.2-4.97-4.39-.14-.19-1.2-1.6-1.2-3.05 0-1.45.76-2.16 1.03-2.45.27-.29.59-.36.79-.36h.57c.18 0 .42-.07.66.5.24.59.82 2.01.89 2.16.07.14.12.32.02.51-.1.2-.15.32-.29.49-.14.17-.3.38-.43.51-.14.14-.29.29-.12.57.16.29.73 1.2 1.56 1.94 1.08.96 1.98 1.26 2.26 1.4.29.14.45.12.62-.07.17-.2.71-.83.9-1.11.19-.29.38-.24.64-.14.27.1 1.7.8 1.99.95.29.14.49.22.56.34.07.12.07.71-.17 1.39z"/></svg>
+            WhatsApp 442 612 1214
+          </p>
+        </footer>
+      </div>
+    </a>
+  </body>
+</html>

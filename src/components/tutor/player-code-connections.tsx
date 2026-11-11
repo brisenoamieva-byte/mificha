@@ -17,10 +17,10 @@ export function PlayerCodeConnections({
   const nodes = [
     {
       key: "ficha",
-      label: "Ficha tutor",
+      label: "Ficha jugador",
       detail: resolution.tutor
         ? "Material e historia"
-        : "Aún sin ficha del tutor",
+        : "Aún sin ficha del jugador",
       href: resolution.tutor ? null : "/fut/tutor",
       active: Boolean(resolution.tutor),
     },

@@ -111,14 +111,11 @@ export function FamilyCheckout({
                 {mercadoPagoReady ? "Pago con Mercado Pago" : "Diagnóstico GPH"}
               </p>
               <h2 className="mt-2 text-xl font-semibold tracking-tight text-mf-gph-ink">
-                {product.publicName} · {product.priceLabel}{" "}
-                <span className="text-sm font-bold text-[#e11d48]">
-                  (−{product.discountPercent}%)
-                </span>
+                Datos para el pago
               </h2>
               <p className="mt-1 text-sm text-mf-text-secondary">
                 {mercadoPagoReady
-                  ? "Tarjeta, transferencia o OXXO. El cargo aparece como MiFicha / GPH. Incluye 12 meses de plataforma."
+                  ? "Tarjeta, transferencia o OXXO. El cargo aparece como MiFicha / GPH."
                   : "Cuando Mercado Pago esté activo podrás pagar aquí. Mientras, coordina por WhatsApp."}
               </p>
             </div>
@@ -180,7 +177,7 @@ export function FamilyCheckout({
             ) : null}
             {mercadoPagoReady ? (
               <button type="submit" disabled={loading} className="mf-btn-gph w-full justify-center">
-                {loading ? "Abriendo Mercado Pago…" : `Pagar ${product.priceLabel}`}
+                {loading ? "Abriendo Mercado Pago…" : "Continuar al pago"}
               </button>
             ) : (
               <a

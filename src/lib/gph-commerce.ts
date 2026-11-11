@@ -29,14 +29,14 @@ export const DIAGNOSIS_PROMO_PRICE_MXN = DIAGNOSIS_PROMO.priceMxn;
  */
 export const FAMILY_PRICING_COPY = {
   eyebrow: MEMBERSHIP_CHECKOUT_DISABLED
-    ? "Familias · ficha sin costo hoy"
+    ? "Familias · ficha del jugador"
     : "Familias · membresía anual",
   /** Explicación completa (sección membresía, página). */
   today:
-    "Hoy puedes armar la ficha del tutor sin pagar. Lo único que se cobra ahora es el diagnóstico GPH: de $2,900 a $2,030 (−30%), evaluación presencial + 12 meses de MiFicha.",
+    "La plataforma está abierta para que el tutor arme la ficha del jugador. Lo único que se cobra ahora es el diagnóstico GPH: de $2,900 a $2,030 (−30%), evaluación presencial + 12 meses de MiFicha.",
   /** Una línea (nav, pies, cards). */
   todayShort:
-    "Ficha tutor sin costo. Diagnóstico GPH $2,030 (−30% sobre $2,900, incluye 12 meses).",
+    "Ficha del jugador. Diagnóstico GPH $2,030 (−30% sobre $2,900, incluye 12 meses).",
   diagnosis:
     "$2,030 (−30%) · diagnóstico GPH + 12 meses de MiFicha",
   /** Solo pie discreto; no va en el hero. */

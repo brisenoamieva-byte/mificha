@@ -129,9 +129,15 @@ export function FichaDocument({
           ) : null}
 
           <div className={cn(model.academyLogoUrl && "pr-12 sm:pr-0")}>
-            <h1 className="text-lg font-semibold leading-tight tracking-tight text-mf-text sm:text-[1.35rem]">
-              {model.fullName}
-            </h1>
+            {isHero ? (
+              <p className="text-lg font-semibold leading-tight tracking-tight text-mf-text sm:text-[1.35rem]">
+                {model.fullName}
+              </p>
+            ) : (
+              <h1 className="text-lg font-semibold leading-tight tracking-tight text-mf-text sm:text-[1.35rem]">
+                {model.fullName}
+              </h1>
+            )}
             <p className="mt-1 text-sm font-medium text-mf-text">
               {model.positionLabel}
               {model.secondaryPositionLabel

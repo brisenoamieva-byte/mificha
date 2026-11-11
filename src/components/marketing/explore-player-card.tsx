@@ -95,7 +95,7 @@ export function ExplorePlayerCard({ player, className }: ExplorePlayerCardProps)
           {isTutor ? (
             <span className="inline-flex items-center gap-1 font-medium text-mf-gph">
               <ShieldCheck className="h-3 w-3 shrink-0" aria-hidden />
-              Ficha tutor
+              Ficha jugador
             </span>
           ) : (
             <span className="inline-flex items-center gap-1 font-medium text-emerald-700">
@@ -111,7 +111,7 @@ export function ExplorePlayerCard({ player, className }: ExplorePlayerCardProps)
             </span>
           ) : null}
           <span className="truncate text-mf-text-muted">
-            {player.academies?.name ?? (isTutor ? "Ficha tutor" : "Academia")}
+            {player.academies?.name ?? (isTutor ? "Por el tutor" : "Academia")}
           </span>
           {location ? (
             <span className="inline-flex items-center gap-0.5 text-mf-text-muted">

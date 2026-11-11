@@ -419,7 +419,7 @@ export function PlantelContent() {
                             {playerCodes[player.id] ? (
                               <p
                                 className="mt-0.5 font-mono text-xs font-semibold tracking-wide text-mf-gph"
-                                title="Código de jugador: el mismo número en ficha tutor, visorías y academia"
+                                title="Código de jugador: el mismo número en ficha del jugador, visorías y academia"
                               >
                                 {playerCodes[player.id]}
                               </p>

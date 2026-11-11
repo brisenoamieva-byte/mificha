@@ -112,7 +112,7 @@ export function VisoriaRegisterForm() {
             <Link href="/fut/tutor" className="font-semibold text-mf-gph hover:underline">
               completar foto e historia
             </Link>{" "}
-            en la ficha del tutor.
+            en la ficha del jugador.
           </p>
         ) : null}
         <div className="mt-5 flex flex-wrap gap-3">
@@ -125,7 +125,7 @@ export function VisoriaRegisterForm() {
             Escribir a GPH
           </a>
           <Link href="/fut/tutor" className="mf-btn-gph-ghost">
-            Armar ficha del tutor
+            Armar ficha del jugador
           </Link>
         </div>
       </div>

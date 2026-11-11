@@ -1,8 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { TutorBuilderPanel } from "@/components/tutor/tutor-builder-panel";
-import { signIn, signUp } from "@/lib/auth";
+import { signIn, signUp, updatePassword } from "@/lib/auth";
+import { LEGAL_ROUTES, TERMS_ACCEPTANCE_LABEL } from "@/lib/legal";
 import { supabase } from "@/lib/supabase";
 import {
   TUTOR_CITY_OPTIONS,
@@ -117,6 +119,8 @@ async function authed(path: string, init?: RequestInit) {
 export function TutorWorkspace() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [passwordConfirm, setPasswordConfirm] = useState("");
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
   const [mode, setMode] = useState<"login" | "signup">("signup");
@@ -133,7 +137,16 @@ export function TutorWorkspace() {
   const [notice, setNotice] = useState<string | null>(null);
   const [linkSuggestions, setLinkSuggestions] = useState<LinkSuggestion[]>([]);
   const [linkBusy, setLinkBusy] = useState(false);
+  const [onboardNotice, setOnboardNotice] = useState<string | null>(null);
+  const [pendingConfirmEmail, setPendingConfirmEmail] = useState<string | null>(
+    null,
+  );
+  const [showPasswordPanel, setShowPasswordPanel] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [newPasswordConfirm, setNewPasswordConfirm] = useState("");
+  const [passwordBusy, setPasswordBusy] = useState(false);
   const childPanelRef = useRef<HTMLDivElement | null>(null);
+  const createFichaRef = useRef<HTMLFormElement | null>(null);
 
   const load = useCallback(async (whatsapp: string, preferId?: string | null) => {
     const query = whatsapp ? `?phone=${encodeURIComponent(whatsapp)}` : "";
@@ -169,15 +182,33 @@ export function TutorWorkspace() {
           typeof window !== "undefined"
             ? window.localStorage.getItem(PHONE_STORAGE_KEY) ?? ""
             : "";
-        void load(savedPhone || phone).catch((err: unknown) => {
-          setError(err instanceof Error ? err.message : "No se cargó la ficha.");
-        });
+        void load(savedPhone || phone)
+          .then((rows) => {
+            if (cancelled) return;
+            if (rows.length === 0) {
+              setOnboardNotice(
+                "Cuenta lista. Ahora crea la ficha de tu hijo para continuar.",
+              );
+            }
+          })
+          .catch((err: unknown) => {
+            if (cancelled) return;
+            setError(err instanceof Error ? err.message : "No se cargó la ficha.");
+          });
       }
     });
     return () => {
       cancelled = true;
     };
   }, [load]);
+
+  useEffect(() => {
+    if (loading || !sessionEmail || children.length > 0 || !onboardNotice) return;
+    const timer = window.setTimeout(() => {
+      createFichaRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 120);
+    return () => window.clearTimeout(timer);
+  }, [loading, sessionEmail, children.length, onboardNotice]);
 
   const child = children.find((item) => item.id === selectedId) ?? null;
 
@@ -253,33 +284,136 @@ export function TutorWorkspace() {
     }
   }
 
+  function scrollToCreateFicha() {
+    window.setTimeout(() => {
+      createFichaRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 80);
+  }
+
+  async function enterWorkspace(opts?: { welcome?: boolean }) {
+    const normalizedEmail = email.trim().toLowerCase();
+    if (phone) {
+      try {
+        window.localStorage.setItem(PHONE_STORAGE_KEY, phone);
+      } catch {
+        /* ignore */
+      }
+    }
+    setPendingConfirmEmail(null);
+    setSessionEmail(normalizedEmail);
+    const rows = await load(phone);
+    if (opts?.welcome || rows.length === 0) {
+      setOnboardNotice(
+        rows.length === 0
+          ? "Cuenta lista. Ahora crea la ficha de tu hijo para continuar."
+          : "Bienvenido. Elige un jugador o crea otra ficha.",
+      );
+      if (rows.length === 0) scrollToCreateFicha();
+    }
+  }
+
+  function authErrorMessage(err: unknown) {
+    if (!(err instanceof Error)) return "No se pudo entrar.";
+    if (err.message.includes("Invalid login credentials")) {
+      return "Correo o contraseña incorrectos.";
+    }
+    if (err.message.includes("Email not confirmed")) {
+      return "Confirma tu correo con el link que te enviamos y vuelve a entrar.";
+    }
+    if (err.message.includes("User already registered")) {
+      return "Este correo ya tiene cuenta. Entra con tu contraseña o recupérala.";
+    }
+    if (err.message.includes("Password should be at least")) {
+      return "La contraseña debe tener al menos 6 caracteres.";
+    }
+    if (
+      err.message.includes("rate limit") ||
+      err.message.includes("over_email_send_rate_limit")
+    ) {
+      return "Demasiados intentos de correo. Espera unos minutos e inténtalo de nuevo.";
+    }
+    return err.message;
+  }
+
   async function onAuth(event: React.FormEvent) {
     event.preventDefault();
     setError(null);
+    setOnboardNotice(null);
+    setPendingConfirmEmail(null);
+    const normalizedEmail = email.trim().toLowerCase();
+
+    if (mode === "signup") {
+      if (!acceptedTerms) {
+        setError("Debes aceptar los Términos y el Aviso de Privacidad.");
+        return;
+      }
+      if (password !== passwordConfirm) {
+        setError("Las contraseñas no coinciden.");
+        return;
+      }
+    }
+
     setBusy(true);
     try {
       if (mode === "signup") {
-        const created = await signUp(email, password, "academy_admin", fullName);
+        const created = await signUp(
+          normalizedEmail,
+          password,
+          "academy_admin",
+          fullName,
+          { emailRedirectTo: `${window.location.origin}/fut/tutor` },
+        );
         if (!created.session) {
-          setError("Cuenta creada. Confirma el correo si te llegó el aviso y luego entra.");
-          return;
+          // Algunos proyectos piden confirmar correo: intentamos entrar igual;
+          // si falla, guiamos al login sin dejar al tutor “colgado”.
+          try {
+            await signIn(normalizedEmail, password);
+            await enterWorkspace({ welcome: true });
+            return;
+          } catch {
+            setPendingConfirmEmail(normalizedEmail);
+            setMode("login");
+            setPassword("");
+            setPasswordConfirm("");
+            return;
+          }
         }
-      } else {
-        await signIn(email.trim().toLowerCase(), password);
+        await enterWorkspace({ welcome: true });
+        return;
       }
-      if (phone) {
-        try {
-          window.localStorage.setItem(PHONE_STORAGE_KEY, phone);
-        } catch {
-          /* ignore */
-        }
-      }
-      setSessionEmail(email.trim().toLowerCase());
-      await load(phone);
+
+      await signIn(normalizedEmail, password);
+      await enterWorkspace({ welcome: true });
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "No se pudo entrar.");
+      setError(authErrorMessage(err));
     } finally {
       setBusy(false);
+    }
+  }
+
+  async function onChangePassword(event: React.FormEvent) {
+    event.preventDefault();
+    setError(null);
+    setNotice(null);
+    if (newPassword.length < 6) {
+      setError("La contraseña nueva debe tener al menos 6 caracteres.");
+      return;
+    }
+    if (newPassword !== newPasswordConfirm) {
+      setError("Las contraseñas nuevas no coinciden.");
+      return;
+    }
+    setPasswordBusy(true);
+    try {
+      await updatePassword(newPassword);
+      setNewPassword("");
+      setNewPasswordConfirm("");
+      setShowPasswordPanel(false);
+      setNotice("Contraseña actualizada.");
+    } catch (err: unknown) {
+      setError(authErrorMessage(err));
+    } finally {
+      setPasswordBusy(false);
     }
   }
 
@@ -317,10 +451,11 @@ export function TutorWorkspace() {
       const createdId = payload.child?.id ?? null;
       await load(phone, createdId);
       if (createdId) setSelectedId(createdId);
+      setOnboardNotice(null);
       setNotice(
         updating
           ? "Ficha actualizada. La vista previa ya refleja los cambios."
-          : "Ficha creada. Sigue los pasos para completarla.",
+          : "Ficha creada. Completa foto, historia y datos en el constructor.",
       );
       window.setTimeout(() => {
         childPanelRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -535,12 +670,47 @@ export function TutorWorkspace() {
             {TUTOR_PILOT_FREE ? TUTOR_PILOT_LABEL : "Incluido con la membresía anual."}
           </p>
         </div>
+
+        {pendingConfirmEmail ? (
+          <div className="space-y-3 rounded-xl border border-mf-gph/30 bg-mf-gph-soft p-5">
+            <p className="text-sm font-semibold text-mf-gph-ink">Cuenta creada</p>
+            <p className="text-sm leading-6 text-mf-text-secondary">
+              Si tu proyecto pide confirmación, revisa el correo de{" "}
+              <span className="font-medium text-mf-gph-ink">{pendingConfirmEmail}</span>{" "}
+              (bandeja y spam). Después entra aquí para crear la ficha.
+            </p>
+            <button
+              type="button"
+              className="mf-btn-gph w-full justify-center"
+              onClick={() => {
+                setMode("login");
+                setEmail(pendingConfirmEmail);
+                setPendingConfirmEmail(null);
+              }}
+            >
+              Continuar a entrar
+            </button>
+            <p className="text-center text-xs text-mf-text-muted">
+              ¿No llegó el correo?{" "}
+              <Link
+                href={`/fut/recuperar?next=${encodeURIComponent("/fut/tutor")}`}
+                className="font-semibold text-mf-gph hover:underline"
+              >
+                Recuperar acceso
+              </Link>
+            </p>
+          </div>
+        ) : null}
+
         <form onSubmit={(event) => void onAuth(event)} className="space-y-4 rounded-xl border border-mf-border bg-white p-5">
           <div className="flex gap-2 text-sm font-semibold">
             <button
               type="button"
               className={mode === "signup" ? "text-mf-gph" : "text-mf-text-muted"}
-              onClick={() => setMode("signup")}
+              onClick={() => {
+                setMode("signup");
+                setPendingConfirmEmail(null);
+              }}
             >
               Crear cuenta
             </button>
@@ -588,15 +758,78 @@ export function TutorWorkspace() {
               required
               type="password"
               minLength={6}
+              autoComplete={mode === "login" ? "current-password" : "new-password"}
               value={password}
               onChange={(event) => setPassword(event.target.value)}
               className={inputClass}
+              placeholder="Mínimo 6 caracteres"
             />
           </label>
+          {mode === "signup" ? (
+            <label className="block text-sm font-medium text-mf-text">
+              Confirmar contraseña
+              <input
+                required
+                type="password"
+                minLength={6}
+                autoComplete="new-password"
+                value={passwordConfirm}
+                onChange={(event) => setPasswordConfirm(event.target.value)}
+                className={inputClass}
+                placeholder="Repite la contraseña"
+              />
+            </label>
+          ) : (
+            <p className="-mt-1 text-right text-sm">
+              <Link
+                href={`/fut/recuperar?next=${encodeURIComponent("/fut/tutor")}`}
+                className="font-semibold text-mf-gph hover:underline"
+              >
+                Olvidé mi contraseña
+              </Link>
+            </p>
+          )}
+          {mode === "signup" ? (
+            <label className="flex items-start gap-3">
+              <input
+                type="checkbox"
+                checked={acceptedTerms}
+                onChange={(event) => setAcceptedTerms(event.target.checked)}
+                required
+                className="mt-1 h-4 w-4 rounded border-mf-border text-mf-gph"
+              />
+              <span className="text-sm leading-6 text-mf-text-secondary">
+                {TERMS_ACCEPTANCE_LABEL}{" "}
+                <Link
+                  href={LEGAL_ROUTES.terms}
+                  className="font-semibold text-mf-gph hover:underline"
+                >
+                  Términos
+                </Link>{" "}
+                ·{" "}
+                <Link
+                  href={LEGAL_ROUTES.privacy}
+                  className="font-semibold text-mf-gph hover:underline"
+                >
+                  Privacidad
+                </Link>
+              </span>
+            </label>
+          ) : null}
           {error ? <p className="text-sm text-mf-danger">{error}</p> : null}
           <button type="submit" disabled={busy} className="mf-btn-gph w-full justify-center">
-            {busy ? "Entrando…" : mode === "login" ? "Entrar" : "Empezar piloto"}
+            {busy
+              ? mode === "login"
+                ? "Entrando…"
+                : "Creando cuenta…"
+              : mode === "login"
+                ? "Entrar y continuar"
+                : "Crear cuenta y continuar"}
           </button>
+          <p className="text-center text-xs leading-5 text-mf-text-muted">
+            Después de {mode === "login" ? "entrar" : "registrarte"} pasas directo a
+            crear la ficha del jugador.
+          </p>
         </form>
       </div>
     );
@@ -611,17 +844,100 @@ export function TutorWorkspace() {
             <p className="mt-0.5 text-xs text-mf-text-muted">{TUTOR_PILOT_LABEL}</p>
           ) : null}
         </div>
-        <button
-          type="button"
-          className="text-sm font-semibold text-mf-text-muted hover:text-mf-text"
-          onClick={() => void supabase.auth.signOut().then(() => setSessionEmail(null))}
-        >
-          Salir
-        </button>
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            type="button"
+            className="text-sm font-semibold text-mf-text-muted hover:text-mf-text"
+            onClick={() => {
+              setShowPasswordPanel((open) => !open);
+              setError(null);
+            }}
+          >
+            Cambiar contraseña
+          </button>
+          <button
+            type="button"
+            className="text-sm font-semibold text-mf-text-muted hover:text-mf-text"
+            onClick={() =>
+              void supabase.auth.signOut().then(() => {
+                setSessionEmail(null);
+                setShowPasswordPanel(false);
+                setNewPassword("");
+                setNewPasswordConfirm("");
+              })
+            }
+          >
+            Salir
+          </button>
+        </div>
       </div>
+
+      {showPasswordPanel ? (
+        <form
+          onSubmit={(event) => void onChangePassword(event)}
+          className="mx-auto max-w-md space-y-3 rounded-xl border border-mf-border bg-white p-4 sm:p-5"
+        >
+          <p className="text-sm font-semibold text-mf-gph-ink">Nueva contraseña</p>
+          <label className="block text-sm font-medium text-mf-text">
+            Contraseña
+            <input
+              required
+              type="password"
+              minLength={6}
+              autoComplete="new-password"
+              value={newPassword}
+              onChange={(event) => setNewPassword(event.target.value)}
+              className={inputClass}
+            />
+          </label>
+          <label className="block text-sm font-medium text-mf-text">
+            Confirmar
+            <input
+              required
+              type="password"
+              minLength={6}
+              autoComplete="new-password"
+              value={newPasswordConfirm}
+              onChange={(event) => setNewPasswordConfirm(event.target.value)}
+              className={inputClass}
+            />
+          </label>
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="submit"
+              disabled={passwordBusy}
+              className="mf-btn-gph justify-center"
+            >
+              {passwordBusy ? "Guardando…" : "Guardar"}
+            </button>
+            <button
+              type="button"
+              className="rounded-lg px-3 py-2 text-sm font-semibold text-mf-text-muted hover:text-mf-text"
+              onClick={() => {
+                setShowPasswordPanel(false);
+                setNewPassword("");
+                setNewPasswordConfirm("");
+              }}
+            >
+              Cancelar
+            </button>
+          </div>
+        </form>
+      ) : null}
 
       {error ? (
         <p className="rounded-lg bg-mf-danger-soft px-4 py-3 text-sm text-mf-danger">{error}</p>
+      ) : null}
+      {onboardNotice ? (
+        <div className="rounded-xl border border-mf-gph/25 bg-mf-gph-soft px-4 py-4 sm:px-5">
+          <p className="text-sm font-semibold text-mf-gph-ink">{onboardNotice}</p>
+          {children.length === 0 ? (
+            <p className="mt-1 text-sm leading-6 text-mf-text-secondary">
+              Paso 1 de 2: pon el nombre del jugador y pulsa{" "}
+              <strong>Crear ficha y continuar</strong>.
+            </p>
+          ) : null}
+        </div>
       ) : null}
       {notice ? (
         <p className="rounded-lg bg-mf-gph-soft px-4 py-3 text-sm font-medium text-mf-gph-ink">
@@ -642,6 +958,7 @@ export function TutorWorkspace() {
                 onClick={() => {
                   setSelectedId(item.id);
                   setNotice(null);
+                  setOnboardNotice(null);
                   setError(null);
                 }}
                 className={
@@ -659,7 +976,9 @@ export function TutorWorkspace() {
                 setSelectedId(null);
                 setForm(emptyForm);
                 setNotice(null);
+                setOnboardNotice("Crea otra ficha para un hijo adicional.");
                 setError(null);
+                scrollToCreateFicha();
               }}
               className="rounded-full border border-dashed border-mf-gph/40 px-4 py-2 text-sm font-semibold text-mf-gph"
             >
@@ -669,14 +988,16 @@ export function TutorWorkspace() {
         </div>
       ) : (
         <p className="rounded-lg border border-dashed border-mf-border bg-white px-4 py-3 text-sm text-mf-text-secondary">
-          Aún no hay jugadores. Completa el formulario y pulsa <strong>Crear ficha</strong>.
+          Aún no hay jugadores. Completa el formulario y pulsa <strong>Crear ficha y continuar</strong>.
         </p>
       )}
 
       {!child || children.length === 0 ? (
         <form
+          id="crear-ficha"
+          ref={createFichaRef}
           onSubmit={(event) => void saveChild(event)}
-          className="mx-auto max-w-lg space-y-4 rounded-2xl border border-mf-border bg-white p-5 sm:p-6"
+          className="mx-auto max-w-lg scroll-mt-24 space-y-4 rounded-2xl border border-mf-border bg-white p-5 sm:p-6"
         >
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">

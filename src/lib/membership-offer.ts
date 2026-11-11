@@ -15,15 +15,8 @@ export const MEMBERSHIP_OFFER = {
       id: "seguimiento",
       title: "Seguimiento digital del desarrollo",
       detail:
-        "Ficha del tutor con fotos, videos, historia y, después, el historial de torneo y la lectura GPH en el mismo lugar.",
+        "Ficha del jugador con fotos, videos e historia (la arma el tutor) y, después, el historial de torneo y la lectura GPH en el mismo lugar.",
       status: "piloto" as const,
-    },
-    {
-      id: "torneos",
-      title: "Convocatorias a torneos de alto nivel",
-      detail:
-        "Avisos curados de torneos recomendados por GPH/MiFicha cuando haya convocatoria.",
-      status: "membresia" as const,
     },
     {
       id: "visorias",
@@ -31,6 +24,13 @@ export const MEMBERSHIP_OFFER = {
       detail:
         "Fechas como la de Querétaro con Chivas y Santos. El miembro recibe aviso y puede presentar la ficha del jugador.",
       status: "vivo" as const,
+    },
+    {
+      id: "torneos",
+      title: "Convocatorias a torneos de alto nivel",
+      detail:
+        "Avisos curados de torneos recomendados por GPH/MiFicha cuando haya convocatoria.",
+      status: "membresia" as const,
     },
     {
       id: "eventos",
@@ -54,3 +54,11 @@ export const MEMBERSHIP_STATUS_LABEL = {
   vivo: "Disponible",
   membresia: "En desarrollo",
 } as const;
+
+export const MEMBERSHIP_ROADMAP_NOTE =
+  "Más adelante: convocatorias a torneos, clínicas con precio de miembro y especialización GPH.";
+
+/** Beneficios listos para la home (sin placeholders “en desarrollo”). */
+export function getLiveMembershipBenefits() {
+  return MEMBERSHIP_OFFER.benefits.filter((item) => item.status !== "membresia");
+}

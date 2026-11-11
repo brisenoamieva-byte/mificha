@@ -1,6 +1,8 @@
 import Link from "next/link";
 import {
+  getLiveMembershipBenefits,
   MEMBERSHIP_OFFER,
+  MEMBERSHIP_ROADMAP_NOTE,
   MEMBERSHIP_STATUS_LABEL,
 } from "@/lib/membership-offer";
 import {
@@ -15,6 +17,8 @@ export function MembershipOfferSection({
   id?: string;
   compact?: boolean;
 }) {
+  const benefits = getLiveMembershipBenefits();
+
   return (
     <section
       id={id}
@@ -36,11 +40,11 @@ export function MembershipOfferSection({
           {MEMBERSHIP_OFFER.summary}
         </p>
         <p className="mt-3 max-w-2xl text-sm font-medium leading-7 text-mf-gph-ink">
-          {FAMILY_PRICING_COPY.today}
+          {FAMILY_PRICING_COPY.todayShort}
         </p>
 
-        <ul className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {MEMBERSHIP_OFFER.benefits.map((item) => (
+        <ul className="mt-8 grid gap-3 sm:grid-cols-2">
+          {benefits.map((item) => (
             <li
               key={item.id}
               className="rounded-xl border border-mf-border bg-mf-canvas px-4 py-4"
@@ -54,17 +58,19 @@ export function MembershipOfferSection({
           ))}
         </ul>
 
-        <p className="mt-5 text-xs leading-6 text-mf-text-muted">
-          Especialización: {MEMBERSHIP_OFFER.specializationLimit}
-          {MEMBERSHIP_CHECKOUT_DISABLED ? ` ${FAMILY_PRICING_COPY.laterNote}` : null}
-        </p>
+        <p className="mt-5 text-sm leading-6 text-mf-text-muted">{MEMBERSHIP_ROADMAP_NOTE}</p>
+        {MEMBERSHIP_CHECKOUT_DISABLED ? (
+          <p className="mt-1 text-xs leading-6 text-mf-text-muted">
+            {FAMILY_PRICING_COPY.laterNote}
+          </p>
+        ) : null}
 
         <div className="mt-6 flex flex-wrap gap-3">
-          <Link href="/fut/tutor" className="mf-btn-gph">
-            Crear ficha de tutor
+          <Link href="/fut/pagar?sku=diagnosis" className="mf-btn-gph">
+            Contratar diagnóstico
           </Link>
-          <Link href="/fut/pagar?sku=diagnosis" className="mf-btn-gph-ghost">
-            Pagar diagnóstico
+          <Link href="/fut/tutor" className="mf-btn-gph-ghost">
+            Crear ficha del jugador
           </Link>
           <Link href="/fut/visorias" className="mf-btn-gph-ghost">
             Visorías

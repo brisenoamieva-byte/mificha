@@ -8,6 +8,7 @@ import {
 } from "@/lib/gph-commerce";
 import {
   MEMBERSHIP_OFFER,
+  MEMBERSHIP_ROADMAP_NOTE,
   MEMBERSHIP_STATUS_LABEL,
 } from "@/lib/membership-offer";
 
@@ -57,7 +58,8 @@ export default function MembresiaPage() {
             ))}
           </ol>
 
-          <p className="mt-6 text-sm leading-7 text-mf-text-secondary">
+          <p className="mt-6 text-sm leading-6 text-mf-text-muted">{MEMBERSHIP_ROADMAP_NOTE}</p>
+          <p className="mt-3 text-sm leading-7 text-mf-text-secondary">
             <span className="font-semibold text-mf-text">Especialización. </span>
             {MEMBERSHIP_OFFER.specializationLimit}
           </p>
@@ -69,10 +71,10 @@ export default function MembresiaPage() {
 
           <div className="mt-8 flex flex-wrap gap-3">
             <Link href="/fut/tutor" className="mf-btn-gph">
-              Crear ficha de tutor
+              Crear ficha del jugador
             </Link>
             <Link href="/fut/pagar?sku=diagnosis" className="mf-btn-gph-ghost">
-              Pagar diagnóstico $2,030 (−30%)
+              Contratar diagnóstico
             </Link>
             <Link href="/fut/visorias" className="mf-btn-gph-ghost">
               Visorías

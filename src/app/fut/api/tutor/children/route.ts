@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
+import { fireAndForgetOpsNotify } from "@/lib/email/ops-notify";
 import {
   createTutorChild,
+  syncTutorChildren,
   updateTutorChild,
   updateTutorExploreOptIn,
   type TutorChildInput,
@@ -57,9 +59,26 @@ export async function POST(request: Request) {
     }
 
     const input = parseInput(body);
-    const child = childId
-      ? await updateTutorChild(admin, user.id, childId, input)
-      : await createTutorChild(admin, user, input);
+    if (childId) {
+      const child = await updateTutorChild(admin, user.id, childId, input);
+      return NextResponse.json({ ok: true, child });
+    }
+
+    const existing = await syncTutorChildren(admin, user, null);
+    const child = await createTutorChild(admin, user, input);
+    if (existing.length === 0) {
+      fireAndForgetOpsNotify({
+        kind: "tutor_signup",
+        subject: `Nuevo tutor · ${user.email ?? "sin correo"}`,
+        lines: [
+          ["Tutor", user.email ?? user.id],
+          ["Jugador", child.player_name],
+          ["Teléfono", child.guardian_phone],
+          ["Código", child.public_code],
+          ["Ciudad", child.profile.city],
+        ],
+      });
+    }
     return NextResponse.json({ ok: true, child });
   } catch (error) {
     const message = error instanceof Error ? error.message : "No se pudo guardar.";

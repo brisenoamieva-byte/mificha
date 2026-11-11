@@ -26,8 +26,8 @@ export function PublicCodeStub({ resolution }: { resolution: PublicCodeResolutio
           </p>
         ) : null}
         <p className="mt-3 max-w-xl text-sm leading-7 text-white/75">
-          {PLAYER_CODE_HEADLINE} Completa la ficha del tutor para sumar foto, historia y
-          material presentable.
+          {PLAYER_CODE_HEADLINE} Completa la ficha del jugador (la controla el tutor) para
+          sumar foto, historia y material presentable.
         </p>
       </div>
       <div className="space-y-3 px-5 py-5 sm:px-7">
@@ -65,7 +65,7 @@ export function PublicCodeStub({ resolution }: { resolution: PublicCodeResolutio
         ) : null}
         <div className="flex flex-wrap gap-2 pt-1">
           <Link href="/fut/tutor" className="mf-btn-gph">
-            Completar ficha tutor
+            Completar ficha del jugador
           </Link>
           {resolution.visoria ? (
             <Link href={resolution.visoria.eventPath} className="mf-btn-gph-ghost">

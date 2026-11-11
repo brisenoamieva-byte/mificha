@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { requestPasswordReset } from "@/lib/auth";
 
@@ -20,6 +21,13 @@ function getErrorMessage(error: unknown) {
 const inputClassName = "mf-input mt-1";
 
 export function ForgotPasswordForm() {
+  const searchParams = useSearchParams();
+  const rawNext = searchParams.get("next") || "/fut/login";
+  const nextPath = rawNext.startsWith("/") ? rawNext : "/fut/login";
+  const loginHref =
+    nextPath !== "/fut/login"
+      ? `/fut/login?next=${encodeURIComponent(nextPath)}`
+      : "/fut/login";
   const [email, setEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [sent, setSent] = useState(false);
@@ -31,7 +39,7 @@ export function ForgotPasswordForm() {
     setLoading(true);
 
     try {
-      await requestPasswordReset(email);
+      await requestPasswordReset(email, { nextPath });
       setSent(true);
     } catch (submitError) {
       setError(getErrorMessage(submitError));
@@ -48,7 +56,7 @@ export function ForgotPasswordForm() {
           una contraseña nueva. Revisa bandeja y spam.
         </p>
         <p className="text-center text-sm text-gray-600">
-          <Link href="/fut/login" className="font-medium text-[#1B4F8C] hover:underline">
+          <Link href={loginHref} className="font-medium text-[#1B4F8C] hover:underline">
             Volver a iniciar sesión
           </Link>
         </p>
@@ -88,7 +96,7 @@ export function ForgotPasswordForm() {
       </button>
 
       <p className="text-center text-sm text-gray-600">
-        <Link href="/fut/login" className="font-medium text-[#1B4F8C] hover:underline">
+        <Link href={loginHref} className="font-medium text-[#1B4F8C] hover:underline">
           Volver a iniciar sesión
         </Link>
       </p>

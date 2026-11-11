@@ -34,7 +34,7 @@ export const MARKETING_NAV: NavSection[] = [
       {
         href: "/fut/tutor",
         label: "Soy tutor",
-        description: "Arma la ficha con fotos, videos e historia · sin costo hoy",
+        description: "Arma la ficha con fotos, videos e historia",
       },
       {
         href: "/fut/padres",
@@ -45,6 +45,11 @@ export const MARKETING_NAV: NavSection[] = [
         href: "/fut/evaluaciones",
         label: "Evaluaciones GPH",
         description: "$2,030 (−30%) · diagnóstico GPH + 12 meses de MiFicha",
+      },
+      {
+        href: "/fut/pachuca",
+        label: "Orgullo GPH · Pachuca",
+        description: "Cuatro jugadores a segunda fase con Club Pachuca",
       },
       {
         href: "/fut/cracks",
@@ -81,7 +86,7 @@ export const MARKETING_NAV: NavSection[] = [
       {
         href: "/fut/pagar?sku=diagnosis",
         label: "Pagar diagnóstico",
-        description: "Ficha tutor sin costo. Diagnóstico GPH $2,030 (−30%, incluye 12 meses).",
+        description: "Ficha del jugador. Diagnóstico GPH $2,030 (−30%, incluye 12 meses).",
       },
       {
         href: "/fut/membresia",

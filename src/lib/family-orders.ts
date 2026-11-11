@@ -1,7 +1,9 @@
 import { randomBytes, randomUUID } from "crypto";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { fireAndForgetOpsNotify } from "@/lib/email/ops-notify";
 import {
   familyProduct,
+  formatMxn,
   type FamilyOrderRow,
   type FamilySku,
 } from "@/lib/gph-commerce";
@@ -168,14 +170,35 @@ export async function markFamilyOrderPaid(
 ) {
   const current = await getFamilyOrderByFolio(admin, folio);
   if (!current) return null;
+  if (current.status === "paid") return current;
+
   const product = familyProduct(current.sku);
   const until = product ? addDaysIso(product.includesMembershipDays) : addDaysIso(365);
-  return patchFamilyOrder(admin, folio, {
+  const updated = await patchFamilyOrder(admin, folio, {
     status: "paid",
     mp_payment_id: paymentId,
     paid_at: new Date().toISOString(),
     membership_until: until,
   });
+
+  if (updated?.sku === "diagnosis") {
+    fireAndForgetOpsNotify({
+      kind: "diagnosis_paid",
+      subject: `Pago evaluación GPH · ${updated.folio}`,
+      lines: [
+        ["Folio", updated.folio],
+        ["Pagó", updated.payer_name],
+        ["Correo", updated.payer_email],
+        ["WhatsApp", updated.payer_phone],
+        ["Jugador", updated.player_name],
+        ["Monto", formatMxn(updated.amount_mxn)],
+        ["MP payment", updated.mp_payment_id],
+        ["Membresía hasta", updated.membership_until],
+      ],
+    });
+  }
+
+  return updated;
 }
 
 export async function listFamilyOrders(admin: SupabaseClient) {

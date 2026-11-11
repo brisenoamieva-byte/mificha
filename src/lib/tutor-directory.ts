@@ -134,7 +134,7 @@ export async function fetchTutorDirectoryPlayers(
 
     const { first_name, last_name } = splitPlayerName(child.player_name);
     const clubOrSchool =
-      child.profile.club || child.profile.school || "Ficha tutor";
+      child.profile.club || child.profile.school || "Ficha del jugador";
     const city = child.profile.city;
 
     out.push({
