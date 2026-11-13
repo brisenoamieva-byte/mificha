@@ -72,6 +72,11 @@ export function FamilyOrdersAdmin() {
           {FAMILY_PRODUCTS.membership.priceLabel}: {formatMxn(FAMILY_PRODUCTS.membership.mifichaShareMxn)}{" "}
           para cada uno. Solo suma lo cobrado.
         </p>
+        <p className="mt-3 text-sm">
+          <Link href="/fut/interno/socios" className="font-semibold text-mf-brand hover:underline">
+            Ver cuentas persona (socios)
+          </Link>
+        </p>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-3">

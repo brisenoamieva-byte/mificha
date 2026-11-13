@@ -33,6 +33,7 @@ const QUICK_LINKS: Array<{ href: string; label: string; primary?: boolean }> = [
   { href: "/fut/interno/demo-one-pager", label: "One-pager" },
   { href: "/fut/interno/fut/organizadores", label: "Organizador" },
   { href: "/fut/interno/gph", label: "Socio GPH" },
+  { href: "/fut/interno/socios", label: "Cuentas socios" },
   { href: "/fut/interno/gph-ola", label: "Ola GPH" },
   { href: "/fut/gph", label: "Landing GPH" },
   { href: "/fut/dashboard", label: "Dashboard" },

@@ -1,6 +1,6 @@
-/** Quién puede ver el reparto de ganancias. Nadie más. */
+/** Quién puede ver el panel de socios (cuentas + ganancias). Nadie más. */
 
-const PARTNERSHIP_STAFF = [
+export const PARTNERSHIP_STAFF = [
   {
     name: "José Ricardo Briseño Amieva",
     email: "brisenoamieva@gmail.com",
@@ -13,6 +13,8 @@ const PARTNERSHIP_STAFF = [
   },
 ] as const;
 
+export const PARTNERSHIP_HUB_PATH = "/fut/interno/socios";
+
 export function canViewPartnershipLedger(user: {
   id?: string | null;
   email?: string | null;
@@ -22,4 +24,12 @@ export function canViewPartnershipLedger(user: {
     if (person.userId && user.id && person.userId === user.id) return true;
     return Boolean(email) && person.email === email;
   });
+}
+
+/** Alias explícito: mismo allowlist (solo Ricardo y Gustavo). */
+export function canAccessPartnershipHub(user: {
+  id?: string | null;
+  email?: string | null;
+}) {
+  return canViewPartnershipLedger(user);
 }

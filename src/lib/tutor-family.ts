@@ -343,6 +343,13 @@ async function loadRoster(admin: SupabaseClient): Promise<{
   return assignMissingPublicCodes(admin, base);
 }
 
+/** Solo ops/socios: listado completo de fichas persona (sin filtrar por usuario). */
+export async function listAllTutorChildrenForOps(admin: SupabaseClient) {
+  const { roster, changed } = await loadRoster(admin);
+  if (changed) await writeJson(admin, ROSTER, roster);
+  return [...roster].sort((a, b) => a.player_name.localeCompare(b.player_name, "es"));
+}
+
 export function membershipIsActive(until: string | null | undefined) {
   if (TUTOR_PILOT_FREE) return true;
   if (!until) return false;

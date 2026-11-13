@@ -72,18 +72,32 @@ export function DashboardSidebar({ open, onClose }: DashboardSidebarProps) {
           </Link>
         ) : null}
         {canSeeLedger ? (
-          <Link
-            href="/fut/dashboard/cobros"
-            onClick={onClose}
-            className={
-              pathname.startsWith("/fut/dashboard/cobros")
-                ? "mf-nav-link-active"
-                : "mf-nav-link"
-            }
-          >
-            <Wallet className="h-[18px] w-[18px] shrink-0" />
-            Ganancias
-          </Link>
+          <>
+            <Link
+              href="/fut/interno/socios"
+              onClick={onClose}
+              className={
+                pathname.startsWith("/fut/interno/socios")
+                  ? "mf-nav-link-active"
+                  : "mf-nav-link"
+              }
+            >
+              <Users className="h-[18px] w-[18px] shrink-0" />
+              Socios · cuentas
+            </Link>
+            <Link
+              href="/fut/dashboard/cobros"
+              onClick={onClose}
+              className={
+                pathname.startsWith("/fut/dashboard/cobros")
+                  ? "mf-nav-link-active"
+                  : "mf-nav-link"
+              }
+            >
+              <Wallet className="h-[18px] w-[18px] shrink-0" />
+              Ganancias
+            </Link>
+          </>
         ) : null}
         {navItems.map(({ href, label, icon: Icon }) => {
           const itemLabel =
