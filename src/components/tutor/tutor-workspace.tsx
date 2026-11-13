@@ -152,7 +152,7 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
-  const [mode, setMode] = useState<"login" | "signup">("signup");
+  const [mode, setMode] = useState<"login" | "signup">("login");
   const [sessionEmail, setSessionEmail] = useState<string | null>(null);
   const [children, setChildren] = useState<TutorChildCard[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -792,6 +792,13 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
           <div className="flex gap-2 text-sm font-semibold">
             <button
               type="button"
+              className={mode === "login" ? "text-mf-gph" : "text-mf-text-muted"}
+              onClick={() => setMode("login")}
+            >
+              Entrar
+            </button>
+            <button
+              type="button"
               className={mode === "signup" ? "text-mf-gph" : "text-mf-text-muted"}
               onClick={() => {
                 setMode("signup");
@@ -800,14 +807,13 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
             >
               Crear cuenta
             </button>
-            <button
-              type="button"
-              className={mode === "login" ? "text-mf-gph" : "text-mf-text-muted"}
-              onClick={() => setMode("login")}
-            >
-              Entrar
-            </button>
           </div>
+          {mode === "login" ? (
+            <p className="text-sm leading-6 text-mf-text-secondary">
+              Si ya tienes cuenta, solo correo y contraseña. En el celular la sesión es de
+              este navegador (no se comparte con la computadora).
+            </p>
+          ) : null}
           {mode === "signup" ? (
             <label className="block text-sm font-medium text-mf-text">
               Tu nombre
@@ -824,20 +830,25 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
             <input
               required
               type="email"
+              autoComplete="email"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
               className={inputClass}
             />
           </label>
-          <label className="block text-sm font-medium text-mf-text">
-            WhatsApp
-            <input
-              value={phone}
-              onChange={(event) => setPhone(event.target.value)}
-              className={inputClass}
-              placeholder="10 dígitos"
-            />
-          </label>
+          {mode === "signup" ? (
+            <label className="block text-sm font-medium text-mf-text">
+              WhatsApp
+              <input
+                value={phone}
+                onChange={(event) => setPhone(event.target.value)}
+                className={inputClass}
+                placeholder="10 dígitos"
+                inputMode="tel"
+                autoComplete="tel"
+              />
+            </label>
+          ) : null}
           <label className="block text-sm font-medium text-mf-text">
             Contraseña
             <input
