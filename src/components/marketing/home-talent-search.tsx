@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useDeferredValue, useMemo, useState } from "react";
 import { ChevronDown, Search } from "lucide-react";
 import { ExplorePlayerCard } from "@/components/marketing/explore-player-card";
 import {
@@ -57,14 +57,7 @@ export function HomeTalentSearch({
     DEFAULT_PERFORMANCE_FILTER,
   );
   const [showPerformance, setShowPerformance] = useState(false);
-  const [applied, setApplied] = useState({
-    query: "",
-    position: "all" as PlayerPosition | "all",
-    state: "",
-    city: "",
-    categoryFilter: initialCategoryFilter,
-    performance: DEFAULT_PERFORMANCE_FILTER,
-  });
+  const deferredQuery = useDeferredValue(query.trim());
 
   const birthDates = useMemo(
     () => collectBirthDatesFromDirectory(data.players, []),
@@ -75,15 +68,15 @@ export function HomeTalentSearch({
     () =>
       filterDirectory(
         data,
-        applied.query,
-        applied.position,
+        deferredQuery,
+        position,
         0,
-        applied.state,
-        applied.city,
-        applied.categoryFilter,
-        applied.performance,
+        state,
+        city,
+        categoryFilter,
+        performance,
       ),
-    [data, applied],
+    [data, deferredQuery, position, state, city, categoryFilter, performance],
   );
 
   const players = useMemo(() => {
@@ -109,20 +102,15 @@ export function HomeTalentSearch({
 
   function onSearch(event: FormEvent) {
     event.preventDefault();
-    setApplied({
-      query: query.trim(),
-      position,
-      state,
-      city,
-      categoryFilter,
-      performance,
-    });
     document.getElementById("directorio")?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
-  const hasExtraFilters =
-    applied.categoryFilter !== "all" ||
-    hasActivePerformanceFilter(applied.performance);
+  const hasActiveFilters =
+    Boolean(deferredQuery) ||
+    position !== "all" ||
+    Boolean(state) ||
+    categoryFilter !== "all" ||
+    hasActivePerformanceFilter(performance);
 
   return (
     <>
@@ -233,7 +221,7 @@ export function HomeTalentSearch({
                 ) : null}
               </button>
               <button type="submit" className="mf-btn-gph h-[42px] justify-center px-6">
-                Buscar
+                Ver resultados · {players.length}
               </button>
             </div>
 
@@ -280,12 +268,7 @@ export function HomeTalentSearch({
               </h2>
               <p className="mt-1 text-sm text-mf-text-secondary">
                 {players.length} resultado{players.length === 1 ? "" : "s"}
-                {applied.query ||
-                applied.position !== "all" ||
-                applied.state ||
-                hasExtraFilters
-                  ? " con tu filtro"
-                  : ""}
+                {hasActiveFilters ? " con tu filtro" : ""}
               </p>
             </div>
           </div>
