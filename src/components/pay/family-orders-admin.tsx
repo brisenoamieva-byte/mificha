@@ -57,6 +57,8 @@ export function FamilyOrdersAdmin() {
   if (!ledger) return null;
 
   const { collected, pendingDiagnoses } = ledger;
+  const pendingOrders = ledger.orders.filter((row) => row.status === "pending").length;
+  const paidOrders = ledger.orders.filter((row) => row.status === "paid").length;
 
   return (
     <div className="space-y-8">
@@ -70,7 +72,7 @@ export function FamilyOrdersAdmin() {
           {formatMxn(FAMILY_PRODUCTS.diagnosis.mifichaShareMxn)} para Ricardo y{" "}
           {formatMxn(FAMILY_PRODUCTS.diagnosis.gphShareMxn)} para Gustavo. Membresía de{" "}
           {FAMILY_PRODUCTS.membership.priceLabel}: {formatMxn(FAMILY_PRODUCTS.membership.mifichaShareMxn)}{" "}
-          para cada uno. Solo suma lo cobrado.
+          para cada uno. Los totales de arriba solo suman lo cobrado.
         </p>
         <p className="mt-3 text-sm">
           <Link href="/fut/interno/socios" className="font-semibold text-mf-brand hover:underline">
@@ -114,8 +116,10 @@ export function FamilyOrdersAdmin() {
         <div>
           <h2 className="text-lg font-semibold text-mf-text">Cobros</h2>
           <p className="mt-1 text-sm text-mf-text-secondary">
-            {collected.diagnosisCount} diagnósticos y {collected.membershipCount} membresías pagadas
-            · {formatMxn(collected.total)}
+            {paidOrders} pagados · {pendingOrders} pendientes · cobrado {formatMxn(collected.total)}
+            {collected.diagnosisCount || collected.membershipCount
+              ? ` (${collected.diagnosisCount} diagnósticos y ${collected.membershipCount} membresías)`
+              : null}
           </p>
         </div>
         <OrderTable rows={ledger.orders} />
