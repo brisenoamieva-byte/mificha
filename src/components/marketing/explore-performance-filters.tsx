@@ -13,27 +13,6 @@ export const DEFAULT_PERFORMANCE_FILTER: DirectoryPerformanceFilter = {
   requireVideo: false,
 };
 
-const MINUTES_OPTIONS = [
-  { value: 0, label: "Cualquier minutos" },
-  { value: 90, label: "Mín. 90 min" },
-  { value: 300, label: "Mín. 300 min" },
-  { value: 500, label: "Mín. 500 min" },
-] as const;
-
-const GOALS_OPTIONS = [
-  { value: 0, label: "Cualquier goles" },
-  { value: 1, label: "Mín. 1 gol" },
-  { value: 3, label: "Mín. 3 goles" },
-  { value: 5, label: "Mín. 5 goles" },
-] as const;
-
-const MATCHES_OPTIONS = [
-  { value: 0, label: "Cualquier partidos" },
-  { value: 3, label: "Mín. 3 PJ" },
-  { value: 5, label: "Mín. 5 PJ" },
-  { value: 10, label: "Mín. 10 PJ" },
-] as const;
-
 type ExplorePerformanceFiltersProps = {
   value: DirectoryPerformanceFilter;
   onChange: (next: DirectoryPerformanceFilter) => void;
@@ -42,6 +21,45 @@ type ExplorePerformanceFiltersProps = {
   tone?: "light" | "dark";
 };
 
+function parseMin(raw: string) {
+  if (!raw.trim()) return 0;
+  const n = Number(raw);
+  if (!Number.isFinite(n) || n < 0) return 0;
+  return Math.min(Math.round(n), 99999);
+}
+
+function MinNumberField({
+  label,
+  value,
+  onChange,
+  inputClass,
+  placeholder,
+}: {
+  label: string;
+  value: number;
+  onChange: (next: number) => void;
+  inputClass: string;
+  placeholder: string;
+}) {
+  return (
+    <label className="block">
+      <span className="mb-1 block text-xs font-medium text-mf-text-secondary">
+        {label}
+      </span>
+      <input
+        type="number"
+        inputMode="numeric"
+        min={0}
+        step={1}
+        value={value > 0 ? value : ""}
+        placeholder={placeholder}
+        onChange={(event) => onChange(parseMin(event.target.value))}
+        className={inputClass}
+      />
+    </label>
+  );
+}
+
 export function ExplorePerformanceFilters({
   value,
   onChange,
@@ -49,7 +67,7 @@ export function ExplorePerformanceFilters({
   tone = "light",
 }: ExplorePerformanceFiltersProps) {
   const dark = tone === "dark";
-  const selectClass = dark
+  const inputClass = dark
     ? "mf-input border-white/20 bg-white/95 text-mf-text"
     : "mf-input";
 
@@ -65,51 +83,31 @@ export function ExplorePerformanceFilters({
           dark ? "text-white/65" : "text-mf-text-muted",
         )}
       >
-        Rendimiento · {CURRENT_SEASON_LABEL}. Sin stats cuenta como 0.
+        Rendimiento · {CURRENT_SEASON_LABEL}. Escribe el mínimo que quieras; vacío =
+        sin filtro. Sin stats cuenta como 0.
       </p>
       <div className="grid gap-2 sm:grid-cols-3">
-        <label className="block">
-          <span className="sr-only">Minutos jugados</span>
-          <select
-            value={value.minMinutes ?? 0}
-            onChange={(event) => patch({ minMinutes: Number(event.target.value) })}
-            className={selectClass}
-          >
-            {MINUTES_OPTIONS.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="block">
-          <span className="sr-only">Goles</span>
-          <select
-            value={value.minGoals ?? 0}
-            onChange={(event) => patch({ minGoals: Number(event.target.value) })}
-            className={selectClass}
-          >
-            {GOALS_OPTIONS.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="block">
-          <span className="sr-only">Partidos</span>
-          <select
-            value={value.minMatches ?? 0}
-            onChange={(event) => patch({ minMatches: Number(event.target.value) })}
-            className={selectClass}
-          >
-            {MATCHES_OPTIONS.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </label>
+        <MinNumberField
+          label="Mín. minutos"
+          value={value.minMinutes ?? 0}
+          onChange={(minMinutes) => patch({ minMinutes })}
+          inputClass={inputClass}
+          placeholder="Ej. 120"
+        />
+        <MinNumberField
+          label="Mín. goles"
+          value={value.minGoals ?? 0}
+          onChange={(minGoals) => patch({ minGoals })}
+          inputClass={inputClass}
+          placeholder="Ej. 2"
+        />
+        <MinNumberField
+          label="Mín. partidos"
+          value={value.minMatches ?? 0}
+          onChange={(minMatches) => patch({ minMatches })}
+          inputClass={inputClass}
+          placeholder="Ej. 5"
+        />
       </div>
       <div className="flex flex-wrap gap-x-4 gap-y-2">
         <label
