@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { getPlayerInitials } from "@/lib/player-utils";
+import { supabase } from "@/lib/supabase";
 
 interface PlayerAvatarProps {
   firstName: string;
@@ -18,20 +19,84 @@ const sizeClasses = {
   xl: "h-28 w-28 text-xl rounded-2xl sm:h-32 sm:w-32",
 };
 
+function needsPrivateBucketSign(url: string) {
+  return (
+    url.includes("/storage/v1/object/public/player-photos/") ||
+    url.includes("/storage/v1/object/public/player-videos/")
+  );
+}
+
+const signedCache = new Map<string, string>();
+
+async function resolveSignedPhotoUrl(photoUrl: string): Promise<string> {
+  if (!needsPrivateBucketSign(photoUrl)) return photoUrl;
+  const cached = signedCache.get(photoUrl);
+  if (cached) return cached;
+
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  if (!session?.access_token) return photoUrl;
+
+  const response = await fetch("/fut/api/media/sign", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${session.access_token}`,
+    },
+    body: JSON.stringify({ urls: [photoUrl] }),
+  });
+  if (!response.ok) return photoUrl;
+  const payload = (await response.json().catch(() => ({}))) as {
+    signed?: Record<string, string>;
+  };
+  const next = payload.signed?.[photoUrl] || photoUrl;
+  signedCache.set(photoUrl, next);
+  return next;
+}
+
 export function PlayerAvatar({
   firstName,
   lastName,
   photoUrl,
   size = "sm",
 }: PlayerAvatarProps) {
+  const [resolvedUrl, setResolvedUrl] = useState<string | null>(
+    photoUrl && !needsPrivateBucketSign(photoUrl) ? photoUrl : null,
+  );
   const [failed, setFailed] = useState(false);
-  const showPhoto = Boolean(photoUrl) && !failed;
+
+  useEffect(() => {
+    let cancelled = false;
+    setFailed(false);
+
+    if (!photoUrl) {
+      setResolvedUrl(null);
+      return;
+    }
+
+    if (!needsPrivateBucketSign(photoUrl)) {
+      setResolvedUrl(photoUrl);
+      return;
+    }
+
+    setResolvedUrl(signedCache.get(photoUrl) ?? null);
+    void resolveSignedPhotoUrl(photoUrl).then((url) => {
+      if (!cancelled) setResolvedUrl(url);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [photoUrl]);
+
+  const showPhoto = Boolean(resolvedUrl) && !failed;
 
   if (showPhoto) {
     return (
       // eslint-disable-next-line @next/next/no-img-element
       <img
-        src={photoUrl!}
+        src={resolvedUrl!}
         alt=""
         className={cn("object-cover", sizeClasses[size])}
         onError={() => setFailed(true)}

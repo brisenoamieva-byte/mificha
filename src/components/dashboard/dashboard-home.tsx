@@ -14,6 +14,7 @@ import {
 import { useDashboard } from "@/components/dashboard/dashboard-context";
 import { MetricCard } from "@/components/dashboard/metric-card";
 import { ProgressTierBadge } from "@/components/ui/passport-score-display";
+import { PlayerAvatar } from "@/components/ui/player-avatar";
 import { NoAcademyState } from "@/components/dashboard/no-academy-state";
 import { AcademyOnboardingPanel } from "@/components/dashboard/academy-onboarding-panel";
 import { SubscriptionPanel } from "@/components/dashboard/subscription-panel";
@@ -325,19 +326,12 @@ export function DashboardHome() {
                     <tr key={player.id} className="border-b border-slate-100 last:border-0">
                       <td className="py-4 pr-4">
                         <div className="flex items-center gap-3">
-                          {player.photo_url ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img
-                              src={player.photo_url}
-                              alt={`${player.first_name} ${player.last_name}`}
-                              className="h-10 w-10 rounded-full object-cover"
-                            />
-                          ) : (
-                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-xs font-semibold text-slate-500">
-                              {player.first_name[0]}
-                              {player.last_name[0]}
-                            </div>
-                          )}
+                          <PlayerAvatar
+                            firstName={player.first_name}
+                            lastName={player.last_name}
+                            photoUrl={player.photo_url}
+                            size="sm"
+                          />
                           <span className="font-medium text-slate-900">
                             {player.first_name} {player.last_name}
                           </span>
