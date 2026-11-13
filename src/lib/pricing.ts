@@ -73,7 +73,7 @@ export const DIAGNOSIS_PRODUCT = {
   title: "Evaluaciones",
   subtitle:
     "Sesión presencial con metodología GPH. El informe, la etapa y el plan quedan en mificha.mx para que la familia dé seguimiento.",
-  footnote: `${FAMILY_PRODUCTS.diagnosis.priceLabel} (−${DIAGNOSIS_PROMO.discountPercent}% sobre ${FAMILY_PRODUCTS.diagnosis.listPriceLabel}) · sesión GPH + 12 meses de MiFicha · Mercado Pago o WhatsApp.`,
+  footnote: "Sesión GPH + 12 meses de MiFicha · Mercado Pago o WhatsApp.",
   memberPriceLabel: "$1,200",
   listPriceLabel: FAMILY_PRODUCTS.diagnosis.listPriceLabel,
   publicPriceLabel: FAMILY_PRODUCTS.diagnosis.priceLabel,
@@ -103,7 +103,7 @@ export const DIAGNOSIS_PRODUCT = {
       promo: true,
       period: "MXN · evaluación + 12 meses MiFicha",
       description:
-        "Diagnóstico GPH completo: sesión, ficha, lectura de entrenador y un año de plataforma para dar seguimiento. Promoción −30% por tiempo limitado.",
+        "Diagnóstico GPH completo: sesión, ficha, lectura de entrenador y un año de plataforma para dar seguimiento.",
     },
     {
       id: "grupo",

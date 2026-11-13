@@ -114,6 +114,7 @@ export default async function PlayerPublicPage({ params }: PageProps) {
             place={place || null}
             loginHref={loginHref}
             returnPath={fichaPath}
+            loggedIn={Boolean(access.userId)}
           />
           <p className="mt-6 text-center text-xs leading-6 text-mf-text-muted">
             Busca más jugadores en{" "}

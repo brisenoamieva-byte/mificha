@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { signIn } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 
@@ -43,6 +43,26 @@ export function LoginForm() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [checkingSession, setCheckingSession] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (cancelled) return;
+      if (session) {
+        const destination = await resolveSmartNext(nextPath);
+        window.location.assign(destination);
+        return;
+      }
+      setCheckingSession(false);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [nextPath]);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -62,6 +82,10 @@ export function LoginForm() {
       setError(getErrorMessage(submitError));
       setLoading(false);
     }
+  }
+
+  if (checkingSession) {
+    return <p className="text-sm text-gray-500">Comprobando sesión…</p>;
   }
 
   return (

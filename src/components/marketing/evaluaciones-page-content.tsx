@@ -123,7 +123,7 @@ export function EvaluacionesPageContent() {
             <div>
               <p className="mf-marketing-eyebrow">Alcance</p>
               <h2 className="mt-3 text-2xl font-semibold tracking-[-0.02em] text-mf-text">
-                Para qué sirve (y qué no promete)
+                Para qué sirve
               </h2>
               <ul className="mt-6 space-y-3">
                 {DIAGNOSIS_PRODUCT.scope.map((item) => (
@@ -232,14 +232,7 @@ export function EvaluacionesPageContent() {
                     : "border-mf-border",
                 )}
               >
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <p className="text-sm font-semibold text-mf-text">{plan.label}</p>
-                  {"promo" in plan && plan.promo ? (
-                    <span className="rounded-md bg-[#e11d48] px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-white">
-                      −{DIAGNOSIS_PRODUCT.discountPercent}%
-                    </span>
-                  ) : null}
-                </div>
+                <p className="text-sm font-semibold text-mf-text">{plan.label}</p>
                 {"promo" in plan && plan.promo ? (
                   <DiagnosisPromoPrice className="mt-3" size="md" />
                 ) : (

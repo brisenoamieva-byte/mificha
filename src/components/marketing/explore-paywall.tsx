@@ -86,7 +86,11 @@ export function ExplorePaywallBanner({ access }: { access: ExploreAccess }) {
           <p className="mt-2 text-sm text-mf-text-secondary">
             Incluye publicar fichas y desbloquear detalle, fotos y contacto de terceros.
           </p>
-          <PersonaMembershipCta className="mt-5" nextPath="/fut/tutor" />
+          <PersonaMembershipCta
+            className="mt-5"
+            nextPath="/fut/tutor"
+            loggedIn={Boolean(access.userId)}
+          />
           <p className="mt-3 text-xs text-mf-text-muted">
             ¿Solo quieres ver tus jugadores?{" "}
             <Link href="/fut/tutor" className="font-semibold text-mf-gph hover:underline">
@@ -107,6 +111,7 @@ export function FichaLockedTeaser({
   code,
   loginHref,
   returnPath,
+  loggedIn = false,
 }: {
   name: string;
   position?: string | null;
@@ -117,6 +122,8 @@ export function FichaLockedTeaser({
   loginHref?: string | null;
   /** Tras activar membresía, volver aquí (no a Explorar). */
   returnPath?: string | null;
+  /** Sesión activa: no pedir Entrar ni «necesitas cuenta». */
+  loggedIn?: boolean;
 }) {
   const copy = personaMembershipPublicCopy();
   const afterActivate = returnPath || "/fut/tutor";
@@ -142,29 +149,49 @@ export function FichaLockedTeaser({
         <div className="rounded-xl border border-mf-border bg-mf-canvas px-4 py-3 text-sm leading-6 text-mf-text-secondary">
           <p className="font-semibold text-mf-gph-ink">¿Es tu jugador?</p>
           <p className="mt-1">
-            Entra a{" "}
+            En{" "}
             <Link href="/fut/tutor" className="font-semibold text-mf-gph hover:underline">
               Mis fichas
             </Link>{" "}
-            para verla, editarla y descargar el PDF. No necesitas pasar por Explorar.
+            la editas y descargas el PDF. El kit completo de <strong>tus</strong> jugadores
+            se abre con la misma cuenta (sin pagar Explorar).
           </p>
         </div>
         <p className="text-sm leading-7 text-mf-text-secondary">
-          Si quieres ver la ficha completa de <strong>otro</strong> jugador (fotos, contacto,
-          kit), activa la membresía persona
-          {PERSONA_MEMBERSHIP_FREE_PROMO
-            ? ` (${copy.short})`
-            : ` (${SCOUT_PRODUCT.priceLabel} ${SCOUT_PRODUCT.currency}/año)`}
-          .
+          {loggedIn ? (
+            <>
+              Para ver la ficha completa o el kit de <strong>otro</strong> jugador, activa la
+              membresía persona
+              {PERSONA_MEMBERSHIP_FREE_PROMO
+                ? ` (${copy.short})`
+                : ` (${SCOUT_PRODUCT.priceLabel} ${SCOUT_PRODUCT.currency}/año)`}
+              .
+            </>
+          ) : (
+            <>
+              Si quieres ver la ficha completa de <strong>otro</strong> jugador (fotos,
+              contacto, kit), entra con tu cuenta o activa la membresía persona
+              {PERSONA_MEMBERSHIP_FREE_PROMO
+                ? ` (${copy.short})`
+                : ` (${SCOUT_PRODUCT.priceLabel} ${SCOUT_PRODUCT.currency}/año)`}
+              .
+            </>
+          )}
         </p>
         <div className="flex flex-wrap items-start gap-2">
           <Link href="/fut/tutor" className="mf-btn-gph">
             Mis fichas
           </Link>
-          <Link href={enterHref} className="mf-btn-gph-ghost">
-            Entrar
-          </Link>
-          <PersonaMembershipCta variant="ghost" nextPath={afterActivate} />
+          {loggedIn ? null : (
+            <Link href={enterHref} className="mf-btn-gph-ghost">
+              Entrar
+            </Link>
+          )}
+          <PersonaMembershipCta
+            variant="ghost"
+            nextPath={afterActivate}
+            loggedIn={loggedIn}
+          />
         </div>
       </div>
     </div>

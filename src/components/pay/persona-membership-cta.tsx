@@ -13,11 +13,14 @@ export function PersonaMembershipCta({
   className,
   variant = "primary",
   nextPath = "/fut/tutor",
+  loggedIn = false,
 }: {
   className?: string;
   variant?: "primary" | "ghost";
   /** Tras activar: por defecto Mis fichas (lo principal de la cuenta). */
   nextPath?: string;
+  /** Si ya hay sesión, no mostrar «Necesitas cuenta». */
+  loggedIn?: boolean;
 }) {
   const router = useRouter();
   const copy = personaMembershipPublicCopy();
@@ -89,7 +92,7 @@ export function PersonaMembershipCta({
             WhatsApp
           </a>
         </p>
-      ) : (
+      ) : loggedIn ? null : (
         <p className="mt-2 text-xs text-mf-text-muted">
           Necesitas cuenta.{" "}
           <Link

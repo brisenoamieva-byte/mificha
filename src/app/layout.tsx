@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import { DevServiceWorkerCleanup } from "@/components/dev-service-worker-cleanup";
 import { AuthRecoveryRedirect } from "@/components/auth/auth-recovery-redirect";
+import { AuthSessionSync } from "@/components/auth/auth-session-sync";
 import { CookieNotice } from "@/components/marketing/cookie-notice";
 import { AppToaster } from "@/components/ui/toast";
 import { BRAND_OG_IMAGE } from "@/lib/brand";
@@ -72,6 +73,7 @@ export default function RootLayout({
       <body className="min-h-dvh bg-mf-canvas font-sans text-mf-text antialiased">
         <DevServiceWorkerCleanup />
         <AuthRecoveryRedirect />
+        <AuthSessionSync />
         {children}
         <CookieNotice />
         <AppToaster />

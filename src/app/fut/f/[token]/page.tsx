@@ -166,6 +166,7 @@ export default async function TutorShareFichaPage({ params }: PageProps) {
             code={child.public_code}
             loginHref={loginHref}
             returnPath={sharePath}
+            loggedIn={Boolean(accessGate.userId)}
           />
           <p className="mt-6 text-center text-xs leading-6 text-mf-text-muted">
             Busca más jugadores en{" "}

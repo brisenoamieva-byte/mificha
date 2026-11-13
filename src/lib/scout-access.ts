@@ -81,5 +81,6 @@ export async function resolveExploreAccess(options?: {
     /* storage/admin unavailable */
   }
 
+  // Sesión válida pero sin membresía / rol / ownership de esta ficha.
   return { unlocked: false, reason: "anonymous", userId: user.id, email };
 }

@@ -68,6 +68,7 @@ export default async function AgentMaterialsPage({ params }: PageProps) {
       .join(" · ");
     const kitPath = agentMaterialsPath(agentMaterialsAccess(child));
     const loginHref = `/fut/login?next=${encodeURIComponent(kitPath)}`;
+    const loggedIn = Boolean(gate.userId);
     return (
       <div className="flex min-h-dvh flex-col bg-mf-canvas">
         <SiteHeader actionHref="/fut/tutor" actionLabel="Mis fichas" />
@@ -80,6 +81,7 @@ export default async function AgentMaterialsPage({ params }: PageProps) {
             code={child.public_code}
             loginHref={loginHref}
             returnPath={kitPath}
+            loggedIn={loggedIn}
           />
         </main>
         <SiteFooter />
