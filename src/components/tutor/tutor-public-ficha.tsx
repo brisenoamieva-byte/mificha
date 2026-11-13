@@ -119,9 +119,11 @@ export function TutorPublicFicha({
               <p className="mt-2 text-sm font-medium text-white/75">{placeLine}</p>
             </div>
             <div className="flex shrink-0 flex-col items-end gap-3">
-              <div className="rounded-md bg-white px-2 py-1.5">
-                <GphLogo size="sm" />
-              </div>
+              {performance?.gph ? (
+                <div className="rounded-md bg-white px-2 py-1.5" title="Evaluación GPH">
+                  <GphLogo size="sm" />
+                </div>
+              ) : null}
               {cover ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
