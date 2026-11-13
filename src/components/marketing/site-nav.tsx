@@ -219,11 +219,11 @@ export function SiteNavMobile({
                   {actionLabel}
                 </Link>
                 <Link
-                  href="/fut/login"
+                  href="/fut/dashboard"
                   className="block rounded-lg px-2 py-2.5 text-center text-sm font-medium text-mf-text-secondary hover:bg-mf-brand-soft"
                   onClick={() => setMobileOpen(false)}
                 >
-                  Academia · iniciar sesión
+                  Academia
                 </Link>
               </div>
             </div>

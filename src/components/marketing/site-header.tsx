@@ -30,7 +30,7 @@ export function SiteHeader({
 
         <div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-2">
           <Link
-            href="/fut/login"
+            href="/fut/dashboard"
             className="hidden text-sm font-medium text-mf-text-secondary transition hover:text-mf-text lg:inline-flex"
           >
             Academia

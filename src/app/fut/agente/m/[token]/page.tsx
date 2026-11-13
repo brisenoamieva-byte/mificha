@@ -2,8 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AgentMaterialsToolbar } from "@/components/agente/agent-materials-toolbar";
-import { AgentOnePager } from "@/components/agente/agent-one-pager";
-import { AgentPresentationDeck } from "@/components/agente/agent-presentation-deck";
 import { FichaLockedTeaser } from "@/components/marketing/explore-paywall";
 import { SiteFooter, SiteHeader } from "@/components/marketing/site-header";
 import { TutorPublicFicha } from "@/components/tutor/tutor-public-ficha";
@@ -27,25 +25,19 @@ interface PageProps {
   params: Promise<{ token: string }>;
 }
 
-function appOrigin() {
-  return (
-    process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ?? "https://www.mificha.mx"
-  );
-}
-
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { token } = await params;
   try {
     const admin = createSupabaseAdminClient();
     const child = await peekTutorChildByShareToken(admin, token);
-    if (!child) return { title: "Kit agente | MiFicha", robots: { index: false } };
+    if (!child) return { title: "Ficha PDF | MiFicha", robots: { index: false } };
     return {
-      title: `${child.player_name} · Kit agente | MiFicha`,
-      description: `One-pager y ficha imprimible de ${child.player_name} para representación profesional.`,
+      title: `${child.player_name} · Ficha PDF | MiFicha`,
+      description: `Ficha imprimible de ${child.player_name}.`,
       robots: { index: false, follow: false },
     };
   } catch {
-    return { title: "Kit agente | MiFicha", robots: { index: false } };
+    return { title: "Ficha PDF | MiFicha", robots: { index: false } };
   }
 }
 
@@ -95,11 +87,7 @@ export default async function AgentMaterialsPage({ params }: PageProps) {
   ]);
 
   const access = agentMaterialsAccess(child);
-  const origin = appOrigin();
   const fichaPath = digitalFichaPath(child);
-  const kitPath = agentMaterialsPath(access);
-  const fichaUrl = `${origin}${fichaPath}`;
-  const kitUrl = `${origin}${kitPath}`;
 
   return (
     <div className="flex min-h-dvh flex-col bg-mf-canvas">
@@ -112,11 +100,10 @@ export default async function AgentMaterialsPage({ params }: PageProps) {
             Espacio agente
           </p>
           <h1 className="mt-2 text-2xl font-semibold tracking-tight text-mf-gph-ink">
-            Materiales de {child.player_name}
+            Ficha de {child.player_name}
           </h1>
           <p className="mt-2 max-w-2xl text-sm leading-7 text-mf-text-secondary">
-            Currículum profesional (foto, datos, trayectoria, contacto y enlaces) + ficha
-            imprimible. El link digital sigue en{" "}
+            Vista imprimible de la ficha. El link digital sigue en{" "}
             <Link href={tutorSharePath(access)} className="font-semibold text-mf-gph hover:underline">
               {fichaPath}
             </Link>
@@ -124,39 +111,12 @@ export default async function AgentMaterialsPage({ params }: PageProps) {
           </p>
           <p className="mt-2 text-sm text-mf-text-muted">
             <Link href="/fut/tutor" className="font-semibold text-mf-gph hover:underline">
-              ← Volver al espacio agente
+              ← Volver a Mis fichas
             </Link>
           </p>
         </div>
 
-        <AgentMaterialsToolbar
-          playerName={child.player_name}
-          fichaUrl={fichaUrl}
-          kitUrl={kitUrl}
-        />
-
-        <section className="agent-kit-onepager space-y-3">
-          <h2 className="print:hidden text-sm font-semibold uppercase tracking-[0.14em] text-mf-text-muted">
-            Hoja de vida
-          </h2>
-          <AgentOnePager
-            child={child}
-            materials={materials}
-            seasons={seasons}
-            absoluteFichaUrl={fichaUrl}
-          />
-        </section>
-
-        <section className="agent-kit-deck space-y-3">
-          <h2 className="print:hidden text-sm font-semibold uppercase tracking-[0.14em] text-mf-text-muted">
-            Presentación (diapositivas)
-          </h2>
-          <AgentPresentationDeck
-            child={child}
-            materials={materials}
-            seasons={seasons}
-          />
-        </section>
+        <AgentMaterialsToolbar playerName={child.player_name} />
 
         <section className="agent-kit-ficha space-y-3">
           <h2 className="print:hidden text-sm font-semibold uppercase tracking-[0.14em] text-mf-text-muted">
