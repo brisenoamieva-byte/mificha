@@ -1,25 +1,27 @@
 import Link from "next/link";
+import { SCOUT_PRODUCT } from "@/lib/scout-product";
 
 const ACCOUNTS = [
   {
-    id: "tutor",
-    title: "Cuenta de tutor (papá/mamá)",
-    forWho: "Familias",
-    status: "En la plataforma",
+    id: "persona",
+    title: "Familia o representante",
+    forWho: "Persona",
+    status: `${SCOUT_PRODUCT.priceLabel} ${SCOUT_PRODUCT.currency}/${SCOUT_PRODUCT.period.replace("al ", "")}`,
     canDo: [
-      "Dar de alta a tu hijo y armar su ficha (fotos, videos, historia)",
-      "Compartir un link presentable para visorías o universidades",
-      "Ligar al hijo con su academia y ver stats de torneo cuando existan",
+      "Llenar fichas de hijos o representados y llevar seguimiento",
+      "Con consentimiento, aparecer en el buscador",
+      "Desbloquear detalle de otros jugadores (Explorar Pro incluido)",
+      "En el espacio eliges si eres familia o representante",
     ],
-    href: "/fut/tutor",
-    cta: "Entrar como tutor",
+    href: "/fut/entrar",
+    cta: "Entrar / crear cuenta",
     primary: true,
   },
   {
     id: "academia",
-    title: "Cuenta de academia",
+    title: "Academia",
     forWho: "Colegios y clubes",
-    status: "Activa",
+    status: "Gratis",
     canDo: [
       "Registrar plantel, partidos y avisos a tutores",
       "Operar el día a día del torneo con staff",
@@ -33,15 +35,15 @@ const ACCOUNTS = [
 const LAYERS = [
   {
     title: "Ficha del jugador",
-    detail: "Fotos, videos e historia; la controla el tutor.",
+    detail: "Fotos, videos e historia; la arma la familia o el representante.",
   },
   {
-    title: "Stats de torneo",
-    detail: "Partidos y minutos cuando ligas la academia.",
+    title: "Directorio Explorar",
+    detail: "Con opt-in, la ficha aparece en el buscador para scouts y clubes.",
   },
   {
     title: "Informe GPH",
-    detail: "Diagnóstico del evaluador en el mismo expediente.",
+    detail: "Diagnóstico del evaluador en el mismo expediente (cuando lo contratan).",
   },
 ] as const;
 
@@ -53,14 +55,14 @@ export function AccountTypesSection() {
           Accesos
         </p>
         <h2 className="mt-2 max-w-2xl text-2xl font-semibold tracking-[-0.02em] text-mf-gph-ink sm:text-3xl">
-          Qué cuenta necesitas
+          Dos cuentas, claro
         </h2>
         <p className="mt-3 max-w-2xl text-sm leading-7 text-mf-text-secondary">
-          Elige tu entrada según tu rol. La ficha del jugador, los stats de torneo y el
-          informe GPH viven en el mismo expediente.
+          Persona ($50 USD/año) o academia (gratis). La ficha, los stats de torneo y el informe
+          GPH viven en el mismo expediente.
         </p>
 
-        <ul className="mt-8 grid gap-3 lg:grid-cols-2">
+        <ul className="mt-8 grid gap-3 md:grid-cols-2">
           {ACCOUNTS.map((item) => (
             <li
               key={item.id}

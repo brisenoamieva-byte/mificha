@@ -2,16 +2,18 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Check, Circle, Copy, ExternalLink, ImagePlus, Video } from "lucide-react";
+import { Check, Circle, Copy, ExternalLink, FileText, ImagePlus, Video } from "lucide-react";
 import { PlayerPublicCodeCard } from "@/components/public/player-public-code-card";
 import { TutorCareerSummaryCard } from "@/components/tutor/tutor-career-summary";
 import { TutorPublicFicha } from "@/components/tutor/tutor-public-ficha";
+import { agentMaterialsPath } from "@/lib/agent-materials";
 import {
   defaultTutorSeasonLabel,
   TUTOR_CITY_OPTIONS,
   TUTOR_POSITION_OPTIONS,
   TUTOR_TOURNAMENT_PRESETS,
   tutorSharePath,
+  type GuardianKind,
   type TutorChild,
   type TutorMaterialKind,
   type TutorSeasonInput,
@@ -23,6 +25,7 @@ import {
 } from "@/lib/tutor-ficha-progress";
 import { MEMBERSHIP_CHECKOUT_DISABLED } from "@/lib/gph-commerce";
 import type { TutorLinkedPerformance } from "@/lib/tutor-linked-performance";
+import { parseLinesToList, parseTitleDetailLines } from "@/lib/tutor-family";
 import { cn } from "@/lib/utils";
 
 function buildEmptySeasonForm(club?: string | null) {
@@ -97,9 +100,20 @@ interface TutorBuilderPanelProps {
     school: string;
     city: string;
     height_cm: string;
+    weight_kg: string;
+    nationality: string;
     dominant_foot: "" | "left" | "right" | "both";
     bio: string;
     goals: string;
+    youtube_url: string;
+    transfermarkt_url: string;
+    role_title: string;
+    tagline: string;
+    contact_email: string;
+    instagram: string;
+    highlight_chips_text: string;
+    achievements_text: string;
+    callups_text: string;
   };
   setForm: React.Dispatch<
     React.SetStateAction<TutorBuilderPanelProps["form"]>
@@ -125,6 +139,7 @@ interface TutorBuilderPanelProps {
   onLinkPlayer: (playerId: string) => void;
   onUnlinkPlayer: () => void;
   onToggleExploreOptIn: (enabled: boolean) => void;
+  workspace?: GuardianKind;
 }
 
 export function TutorBuilderPanel({
@@ -152,6 +167,7 @@ export function TutorBuilderPanel({
   onToggleExploreOptIn,
   onLinkPlayer,
   onUnlinkPlayer,
+  workspace = "tutor",
 }: TutorBuilderPanelProps) {
   const [seasonForm, setSeasonForm] = useState(() =>
     buildEmptySeasonForm(child.profile.club || form.club),
@@ -167,9 +183,23 @@ export function TutorBuilderPanel({
       school: form.school || null,
       city: form.city || null,
       height_cm: form.height_cm ? Number(form.height_cm) : null,
+      weight_kg: form.weight_kg ? Number(form.weight_kg) : null,
+      nationality: form.nationality || null,
       dominant_foot: form.dominant_foot || null,
       bio: form.bio || null,
       goals: form.goals || null,
+      youtube_url: form.youtube_url || null,
+      transfermarkt_url: form.transfermarkt_url || null,
+      role_title: form.role_title || null,
+      tagline: form.tagline || null,
+      contact_email: form.contact_email || null,
+      instagram: form.instagram || null,
+      highlight_chips: parseLinesToList(form.highlight_chips_text, 4),
+      achievements: parseTitleDetailLines(form.achievements_text, 12),
+      callups: parseTitleDetailLines(form.callups_text, 12).map((row) => ({
+        level: row.title,
+        detail: row.detail,
+      })),
     }),
     [form],
   );
@@ -196,10 +226,10 @@ export function TutorBuilderPanel({
   );
   const [step, setStep] = useState<TutorBuilderStepId>(progress.next.id);
   const lastSavedKey = useRef(`${child.id}:${child.materials.length}:${child.player_name}`);
-  const shareHref =
-    child.public_code || child.share_token
-      ? tutorSharePath(child.public_code || child.share_token)
-      : null;
+  const shareAccess = child.public_code || child.share_token;
+  const shareHref = shareAccess ? tutorSharePath(shareAccess) : null;
+  const materialsHref =
+    workspace === "agente" && shareAccess ? agentMaterialsPath(shareAccess) : null;
   const showAcademy = Boolean(child.linked_player_id) || linkSuggestions.length > 0;
 
   useEffect(() => {
@@ -268,6 +298,12 @@ export function TutorBuilderPanel({
                     {copied ? "Copiado" : "Copiar link"}
                   </button>
                 </>
+              ) : null}
+              {materialsHref ? (
+                <Link href={materialsHref} target="_blank" className="mf-btn-gph-ghost">
+                  <FileText className="h-4 w-4" />
+                  Kit PDF
+                </Link>
               ) : null}
             </div>
           </div>
@@ -524,6 +560,35 @@ export function TutorBuilderPanel({
                     />
                   </label>
                   <label className="block text-sm font-medium text-mf-text">
+                    Peso (kg)
+                    <input
+                      inputMode="numeric"
+                      value={form.weight_kg}
+                      onChange={(event) =>
+                        setForm((current) => ({
+                          ...current,
+                          weight_kg: event.target.value,
+                        }))
+                      }
+                      className={inputClass}
+                      placeholder="65"
+                    />
+                  </label>
+                  <label className="block text-sm font-medium text-mf-text">
+                    Nacionalidad
+                    <input
+                      value={form.nationality}
+                      onChange={(event) =>
+                        setForm((current) => ({
+                          ...current,
+                          nationality: event.target.value,
+                        }))
+                      }
+                      className={inputClass}
+                      placeholder="Mexicano · doble nacionalidad…"
+                    />
+                  </label>
+                  <label className="block text-sm font-medium text-mf-text">
                     Club o academia
                     <input
                       value={form.club}
@@ -551,7 +616,7 @@ export function TutorBuilderPanel({
               <>
                 <StepHeading
                   title="Historia y objetivo"
-                  detail="Texto corto para que la ficha se lea profesional."
+                  detail="Texto de currículum: estilo de juego, mentalidad y siguiente paso."
                 />
                 <label className="block text-sm font-medium text-mf-text">
                   Presentación
@@ -561,7 +626,7 @@ export function TutorBuilderPanel({
                       setForm((current) => ({ ...current, bio: event.target.value }))
                     }
                     className={`${inputClass} min-h-28`}
-                    placeholder="Quién es, cómo juega, trayectoria breve…"
+                    placeholder="Jugador encarador, de juego frontal y dinámico. Técnica, velocidad, intensidad…"
                   />
                 </label>
                 <label className="block text-sm font-medium text-mf-text">
@@ -573,6 +638,134 @@ export function TutorBuilderPanel({
                     }
                     className={`${inputClass} min-h-24`}
                     placeholder="Universidad, visoría, club, siguiente paso…"
+                  />
+                </label>
+                <label className="block text-sm font-medium text-mf-text">
+                  Título profesional
+                  <input
+                    value={form.role_title}
+                    onChange={(event) =>
+                      setForm((current) => ({
+                        ...current,
+                        role_title: event.target.value,
+                      }))
+                    }
+                    className={inputClass}
+                    placeholder="Jugadora de fútbol profesional"
+                  />
+                </label>
+                <label className="block text-sm font-medium text-mf-text">
+                  En una frase
+                  <input
+                    value={form.tagline}
+                    onChange={(event) =>
+                      setForm((current) => ({
+                        ...current,
+                        tagline: event.target.value,
+                      }))
+                    }
+                    className={inputClass}
+                    placeholder="Fe, disciplina y pasión por el fútbol"
+                  />
+                </label>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <label className="block text-sm font-medium text-mf-text">
+                    Correo de contacto
+                    <input
+                      type="email"
+                      value={form.contact_email}
+                      onChange={(event) =>
+                        setForm((current) => ({
+                          ...current,
+                          contact_email: event.target.value,
+                        }))
+                      }
+                      className={inputClass}
+                    />
+                  </label>
+                  <label className="block text-sm font-medium text-mf-text">
+                    Instagram
+                    <input
+                      value={form.instagram}
+                      onChange={(event) =>
+                        setForm((current) => ({
+                          ...current,
+                          instagram: event.target.value,
+                        }))
+                      }
+                      className={inputClass}
+                      placeholder="@jugador"
+                    />
+                  </label>
+                </div>
+                <label className="block text-sm font-medium text-mf-text">
+                  Hitos (uno por línea, máx. 4)
+                  <textarea
+                    value={form.highlight_chips_text}
+                    onChange={(event) =>
+                      setForm((current) => ({
+                        ...current,
+                        highlight_chips_text: event.target.value,
+                      }))
+                    }
+                    className={`${inputClass} min-h-24`}
+                    placeholder={"4 categorías de Selección\n2024 Campeona en Europa"}
+                  />
+                </label>
+                <label className="block text-sm font-medium text-mf-text">
+                  Logros (`Club | detalle`, uno por línea)
+                  <textarea
+                    value={form.achievements_text}
+                    onChange={(event) =>
+                      setForm((current) => ({
+                        ...current,
+                        achievements_text: event.target.value,
+                      }))
+                    }
+                    className={`${inputClass} min-h-24`}
+                    placeholder={"Chorrillo FC | Campeona LFF 2025-26"}
+                  />
+                </label>
+                <label className="block text-sm font-medium text-mf-text">
+                  Selección / convocatorias (`Nivel | detalle`)
+                  <textarea
+                    value={form.callups_text}
+                    onChange={(event) =>
+                      setForm((current) => ({
+                        ...current,
+                        callups_text: event.target.value,
+                      }))
+                    }
+                    className={`${inputClass} min-h-24`}
+                    placeholder={"MAYOR | Copa Oro: Colombia, Brasil…"}
+                  />
+                </label>
+                <label className="block text-sm font-medium text-mf-text">
+                  YouTube / highlights
+                  <input
+                    value={form.youtube_url}
+                    onChange={(event) =>
+                      setForm((current) => ({
+                        ...current,
+                        youtube_url: event.target.value,
+                      }))
+                    }
+                    className={inputClass}
+                    placeholder="https://youtu.be/…"
+                  />
+                </label>
+                <label className="block text-sm font-medium text-mf-text">
+                  Transfermarkt
+                  <input
+                    value={form.transfermarkt_url}
+                    onChange={(event) =>
+                      setForm((current) => ({
+                        ...current,
+                        transfermarkt_url: event.target.value,
+                      }))
+                    }
+                    className={inputClass}
+                    placeholder="https://www.transfermarkt.com/…"
                   />
                 </label>
               </>
@@ -1053,11 +1246,12 @@ export function TutorBuilderPanel({
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-semibold text-mf-gph-ink">
-                    Aparecer en Explorar
+                    Consentimiento · aparecer en el buscador
                   </p>
                   <p className="mt-1 text-sm leading-6 text-mf-text-secondary">
-                    Si lo activas, la ficha puede verse en el directorio público de
-                    MiFicha. El link directo sigue funcionando aunque esté apagado.
+                    Con tu permiso, la ficha entra al buscador general (categoría, posición,
+                    ciudad). El público ve datos básicos; el detalle completo solo lo abren
+                    quienes pagan Explorar Pro. El link directo sigue funcionando si lo apagas.
                   </p>
                 </div>
                 <button
@@ -1081,8 +1275,8 @@ export function TutorBuilderPanel({
               </div>
               <p className="mt-3 text-xs font-medium text-mf-text-muted">
                 {child.explore_opt_in
-                  ? "Visible en Explorar (si la ficha tiene contenido suficiente)."
-                  : "Solo visible con el link o el código MF-."}
+                  ? "Visible para agentes en Explorar (si la ficha tiene contenido suficiente)."
+                  : "Solo visible con el link o el código MF- · no aparece en búsquedas."}
               </p>
               {child.explore_opt_in ? (
                 <Link

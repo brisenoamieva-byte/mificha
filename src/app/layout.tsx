@@ -23,6 +23,12 @@ export const metadata: Metadata = {
   description:
     "Plataforma de futbol para familias: ficha del jugador, visorías, torneos y diagnóstico GPH.",
   metadataBase: new URL(appUrl),
+  applicationName: "MiFicha",
+  appleWebApp: {
+    capable: true,
+    title: "MiFicha",
+    statusBarStyle: "default",
+  },
   openGraph: {
     title: "MiFicha · Ficha de futbol",
     description:

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Film, MapPin, ShieldCheck } from "lucide-react";
+import { Film, Lock, MapPin, ShieldCheck } from "lucide-react";
 import { GphEvaluationBadge } from "@/components/ui/gph-evaluation-badge";
 import { PlayerPortraitImage } from "@/components/ui/player-portrait-image";
 import { PlayerCategoryBadge } from "@/components/ui/player-category-badge";
@@ -15,18 +15,27 @@ import { cn } from "@/lib/utils";
 type ExplorePlayerCardProps = {
   player: DirectoryPlayer | ExploreDemoPlayer;
   className?: string;
+  /** Si false, solo info básica (sin foto nítida / stats / video). */
+  unlocked?: boolean;
 };
 
-export function ExplorePlayerCard({ player, className }: ExplorePlayerCardProps) {
+export function ExplorePlayerCard({
+  player,
+  className,
+  unlocked = true,
+}: ExplorePlayerCardProps) {
   const demo = isExploreDemoPlayer(player);
   const isTutor = !demo && player.source === "tutor";
   const fullName = `${player.first_name} ${player.last_name}`.trim();
+  const basicName = unlocked
+    ? fullName
+    : `${player.first_name} ${(player.last_name?.[0] ?? "").toUpperCase()}.`.trim();
   const href = demo
     ? player.example_href
     : isTutor && player.public_code
       ? `/fut/f/${player.public_code}`
       : `/fut/j/${player.slug}`;
-  const stats = demo ? player.season_stats : null;
+  const stats = unlocked && demo ? player.season_stats : null;
   const location = [player.academies?.city, player.academies?.state]
     .filter(Boolean)
     .join(", ");
@@ -40,7 +49,7 @@ export function ExplorePlayerCard({ player, className }: ExplorePlayerCardProps)
       )}
     >
       <div className="relative h-[88px] w-[68px] shrink-0 overflow-hidden rounded-lg bg-mf-canvas sm:h-[96px] sm:w-[72px]">
-        {player.photo_url ? (
+        {unlocked && player.photo_url ? (
           <PlayerPortraitImage
             src={player.photo_url}
             alt={`Retrato de ${fullName}`}
@@ -48,9 +57,12 @@ export function ExplorePlayerCard({ player, className }: ExplorePlayerCardProps)
             sizes="72px"
           />
         ) : (
-          <div className="flex h-full items-center justify-center text-sm font-semibold text-mf-text-muted">
-            {player.first_name[0]}
-            {player.last_name[0]}
+          <div className="flex h-full flex-col items-center justify-center gap-1 text-sm font-semibold text-mf-text-muted">
+            <span>
+              {player.first_name[0]}
+              {player.last_name[0]}
+            </span>
+            {!unlocked ? <Lock className="h-3.5 w-3.5 text-mf-gph" aria-hidden /> : null}
           </div>
         )}
 
@@ -59,13 +71,18 @@ export function ExplorePlayerCard({ player, className }: ExplorePlayerCardProps)
             Ejemplo
           </span>
         ) : null}
+        {!unlocked ? (
+          <span className="absolute bottom-1 left-1 rounded bg-mf-gph px-1 py-px text-[8px] font-semibold uppercase tracking-wide text-white">
+            Básico
+          </span>
+        ) : null}
       </div>
 
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-start justify-between gap-2">
           <div className="min-w-0">
             <p className="truncate text-sm font-semibold text-mf-text sm:text-[15px]">
-              {fullName}
+              {basicName}
             </p>
             <p className="mt-0.5 text-xs text-mf-text-secondary">
               {getPositionLabel(player.position)}
@@ -88,7 +105,9 @@ export function ExplorePlayerCard({ player, className }: ExplorePlayerCardProps)
             <span className="font-semibold text-mf-text">{stats.minutes}</span> min
           </p>
         ) : (
-          <p className="mt-2 text-xs text-mf-text-muted">{CURRENT_SEASON_LABEL}</p>
+          <p className="mt-2 text-xs text-mf-text-muted">
+            {unlocked ? CURRENT_SEASON_LABEL : "Detalle con membresía persona"}
+          </p>
         )}
 
         <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px]">
@@ -103,15 +122,17 @@ export function ExplorePlayerCard({ player, className }: ExplorePlayerCardProps)
               Verificada
             </span>
           )}
-          {player.has_gph_evaluation ? <GphEvaluationBadge asSpan /> : null}
-          {player.video_url ? (
+          {unlocked && player.has_gph_evaluation ? <GphEvaluationBadge asSpan /> : null}
+          {unlocked && player.video_url ? (
             <span className="inline-flex items-center gap-1 font-medium text-violet-700">
               <Film className="h-3 w-3 shrink-0" aria-hidden />
               Video
             </span>
           ) : null}
           <span className="truncate text-mf-text-muted">
-            {player.academies?.name ?? (isTutor ? "Por el tutor" : "Academia")}
+            {unlocked
+              ? (player.academies?.name ?? (isTutor ? "Por el tutor" : "Academia"))
+              : (player.academies?.city || player.academies?.state || "México")}
           </span>
           {location ? (
             <span className="inline-flex items-center gap-0.5 text-mf-text-muted">

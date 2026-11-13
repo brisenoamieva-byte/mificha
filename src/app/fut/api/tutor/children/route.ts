@@ -2,7 +2,10 @@ import { NextResponse } from "next/server";
 import { fireAndForgetOpsNotify } from "@/lib/email/ops-notify";
 import {
   createTutorChild,
-  syncTutorChildren,
+  listGuardianChildren,
+  normalizeGuardianKind,
+  parseLinesToList,
+  parseTitleDetailLines,
   updateTutorChild,
   updateTutorExploreOptIn,
   type TutorChildInput,
@@ -21,18 +24,60 @@ function parseInput(body: Record<string, unknown>): TutorChildInput {
       : heightRaw
         ? Number(heightRaw)
         : null;
+  const weightRaw = body.weight_kg;
+  const weight =
+    typeof weightRaw === "number"
+      ? weightRaw
+      : weightRaw
+        ? Number(weightRaw)
+        : null;
   return {
     player_name: String(body.player_name ?? ""),
     guardian_phone: body.guardian_phone == null ? null : String(body.guardian_phone),
+    guardian_kind: normalizeGuardianKind(
+      body.guardian_kind == null ? undefined : String(body.guardian_kind),
+    ),
     birth_date: body.birth_date == null ? null : String(body.birth_date),
     position: body.position == null ? null : String(body.position),
     club: body.club == null ? null : String(body.club),
     school: body.school == null ? null : String(body.school),
     city: body.city == null ? null : String(body.city),
     height_cm: Number.isFinite(height) ? height : null,
+    weight_kg: Number.isFinite(weight) ? weight : null,
+    nationality: body.nationality == null ? null : String(body.nationality),
     dominant_foot: dominant,
     bio: body.bio == null ? null : String(body.bio),
     goals: body.goals == null ? null : String(body.goals),
+    youtube_url: body.youtube_url == null ? null : String(body.youtube_url),
+    transfermarkt_url:
+      body.transfermarkt_url == null ? null : String(body.transfermarkt_url),
+    role_title: body.role_title == null ? null : String(body.role_title),
+    tagline: body.tagline == null ? null : String(body.tagline),
+    contact_email: body.contact_email == null ? null : String(body.contact_email),
+    instagram: body.instagram == null ? null : String(body.instagram),
+    highlight_chips: Array.isArray(body.highlight_chips)
+      ? body.highlight_chips.map((item) => String(item))
+      : parseLinesToList(
+          body.highlight_chips_text == null
+            ? null
+            : String(body.highlight_chips_text),
+          4,
+        ),
+    achievements: Array.isArray(body.achievements)
+      ? (body.achievements as Array<{ title: string; detail: string }>)
+      : parseTitleDetailLines(
+          body.achievements_text == null ? null : String(body.achievements_text),
+          12,
+        ),
+    callups: Array.isArray(body.callups)
+      ? (body.callups as Array<{ level: string; detail: string }>).map((row) => ({
+          level: row.level,
+          detail: row.detail,
+        }))
+      : parseTitleDetailLines(
+          body.callups_text == null ? null : String(body.callups_text),
+          12,
+        ).map((row) => ({ level: row.title, detail: row.detail })),
   };
 }
 
@@ -64,14 +109,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: true, child });
     }
 
-    const existing = await syncTutorChildren(admin, user, null);
+    const existing = await listGuardianChildren(admin, user, null, "all");
     const child = await createTutorChild(admin, user, input);
     if (existing.length === 0) {
       fireAndForgetOpsNotify({
         kind: "tutor_signup",
-        subject: `Nuevo tutor · ${user.email ?? "sin correo"}`,
+        subject: `Nueva cuenta persona · ${user.email ?? "sin correo"}`,
         lines: [
-          ["Tutor", user.email ?? user.id],
+          ["Cuenta", user.email ?? user.id],
           ["Jugador", child.player_name],
           ["Teléfono", child.guardian_phone],
           ["Código", child.public_code],

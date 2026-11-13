@@ -173,7 +173,7 @@ export function FichaDocument({
           ) : null}
           {model.isDemo ? (
             <span className="rounded-md bg-mf-brand-soft px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-mf-brand">
-              Ejemplo
+              Formato
             </span>
           ) : null}
         </div>

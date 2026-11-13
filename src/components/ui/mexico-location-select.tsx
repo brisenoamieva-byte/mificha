@@ -25,6 +25,8 @@ interface MexicoLocationSelectProps {
   allStateLabel?: string;
   allCityLabel?: string;
   showCity?: boolean;
+  /** Oculta etiquetas visibles (p. ej. buscador compacto). */
+  hideLabels?: boolean;
 }
 
 export function MexicoLocationSelect({
@@ -43,6 +45,7 @@ export function MexicoLocationSelect({
   allStateLabel = "Todos los estados",
   allCityLabel = "Todos los municipios",
   showCity = true,
+  hideLabels = false,
 }: MexicoLocationSelectProps) {
   const municipalities = useMemo(
     () => (state ? getMunicipalitiesForState(state) : []),
@@ -76,12 +79,18 @@ export function MexicoLocationSelect({
   return (
     <div className={cn(showCity ? "grid gap-4 sm:grid-cols-2" : "", className)}>
       <label className="block">
-        <span className="text-sm font-medium text-mf-text">{stateLabel}</span>
+        <span
+          className={
+            hideLabels ? "sr-only" : "text-sm font-medium text-mf-text"
+          }
+        >
+          {stateLabel}
+        </span>
         <select
           value={state}
           required={required}
           onChange={(event) => handleStateChange(event.target.value)}
-          className={cn("mf-input mt-2", selectClassName)}
+          className={cn("mf-input", !hideLabels && "mt-2", selectClassName)}
         >
           {allowAll ? <option value="">{allStateLabel}</option> : null}
           {!allowAll ? (
@@ -99,14 +108,21 @@ export function MexicoLocationSelect({
 
       {showCity ? (
         <label className="block">
-        <span className="text-sm font-medium text-mf-text">{cityLabel}</span>
+        <span
+          className={
+            hideLabels ? "sr-only" : "text-sm font-medium text-mf-text"
+          }
+        >
+          {cityLabel}
+        </span>
         <select
           value={city}
           required={required && Boolean(state)}
           disabled={!state}
           onChange={(event) => onCityChange(event.target.value)}
           className={cn(
-            "mf-input mt-2 disabled:cursor-not-allowed disabled:bg-mf-canvas disabled:text-mf-text-muted",
+            "mf-input disabled:cursor-not-allowed disabled:bg-mf-canvas disabled:text-mf-text-muted",
+            !hideLabels && "mt-2",
             selectClassName,
           )}
         >

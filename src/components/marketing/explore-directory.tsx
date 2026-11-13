@@ -2,23 +2,14 @@
 
 import Link from "next/link";
 import { Award, MapPin, Search } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { CategoryFilterSelect } from "@/components/ui/category-filter-select";
 import { MexicoLocationSelect } from "@/components/ui/mexico-location-select";
-import { IdealXIPanel } from "@/components/marketing/ideal-xi-panel";
-import { WeeklyCompetitionPanels } from "@/components/marketing/weekly-competition-panels";
-import { PositionRankingsPanel } from "@/components/marketing/position-rankings-panel";
 import { ExplorePlayerCard } from "@/components/marketing/explore-player-card";
 import {
-  DEMO_EXPLORE_ACADEMY,
-  DEMO_EXPLORE_PLAYERS,
-  filterDemoExploreAcademy,
-  filterDemoExplorePlayers,
   isMarketingPlaceholderAcademy,
   normalizeExplorePlayerName,
-  type ExploreDemoPlayer,
 } from "@/lib/explore-demo-data";
-import type { RankedWeeklyPerformance, WeeklyPlayerPerformance } from "@/lib/ideal-xi";
 import { collectBirthDatesFromDirectory } from "@/lib/player-category";
 import {
   filterDirectory,
@@ -26,21 +17,31 @@ import {
   type DirectoryPlayer,
   type PublicDirectoryData,
 } from "@/lib/public-directory";
-import { cn } from "@/lib/utils";
 import { CURRENT_SEASON_LABEL } from "@/lib/marketing-season";
 import { PROGRESS_TIER_FILTER_OPTIONS } from "@/lib/passport-score";
 import type { PlayerPosition } from "@/types/database";
 
-type ExploreView = "directorio" | "semana";
-
 interface ExploreDirectoryProps {
   data: PublicDirectoryData;
-  weeklyPerformances: WeeklyPlayerPerformance[];
-  rankedPerformances: RankedWeeklyPerformance[];
-  risingPerformances: RankedWeeklyPerformance[];
-  leaderboard: RankedWeeklyPerformance[];
-  weekLabel: string;
   initialCategoryFilter?: string;
+  /** Ficha completa desbloqueada (membresía persona / staff / dueño). */
+  unlocked?: boolean;
+  initialQuery?: string;
+  initialPosition?: string;
+  initialState?: string;
+  initialCity?: string;
+}
+
+function parseInitialPosition(value?: string): PlayerPosition | "all" {
+  if (
+    value === "goalkeeper" ||
+    value === "defender" ||
+    value === "midfielder" ||
+    value === "forward"
+  ) {
+    return value;
+  }
+  return "all";
 }
 
 const positionOptions: { value: PlayerPosition | "all"; label: string }[] = [
@@ -53,27 +54,25 @@ const positionOptions: { value: PlayerPosition | "all"; label: string }[] = [
 
 export function ExploreDirectory({
   data,
-  weeklyPerformances,
-  rankedPerformances,
-  risingPerformances,
-  leaderboard,
-  weekLabel,
   initialCategoryFilter = "all",
+  unlocked = false,
+  initialQuery = "",
+  initialPosition,
+  initialState = "",
+  initialCity = "",
 }: ExploreDirectoryProps) {
-  const [view, setView] = useState<ExploreView>("directorio");
-  const [query, setQuery] = useState("");
-  const [position, setPosition] = useState<PlayerPosition | "all">("all");
+  const [query, setQuery] = useState(initialQuery);
+  const [position, setPosition] = useState<PlayerPosition | "all">(
+    parseInitialPosition(initialPosition),
+  );
   const [minPassport, setMinPassport] = useState(0);
-  const [state, setState] = useState("");
-  const [city, setCity] = useState("");
+  const [state, setState] = useState(initialState);
+  const [city, setCity] = useState(initialCity);
   const [categoryFilter, setCategoryFilter] = useState(initialCategoryFilter);
 
   const birthDates = useMemo(
-    () => [
-      ...collectBirthDatesFromDirectory(data.players, weeklyPerformances),
-      ...DEMO_EXPLORE_PLAYERS.map((player) => player.birth_date),
-    ],
-    [data.players, weeklyPerformances],
+    () => collectBirthDatesFromDirectory(data.players, []),
+    [data.players],
   );
 
   const filtered = useMemo(
@@ -82,93 +81,33 @@ export function ExploreDirectory({
     [data, query, position, minPassport, state, city, categoryFilter],
   );
 
-  const filteredDemos = useMemo(
-    () =>
-      filterDemoExplorePlayers(
-        DEMO_EXPLORE_PLAYERS,
-        query,
-        position,
-        minPassport,
-        state,
-        city,
-        categoryFilter,
-      ),
-    [query, position, minPassport, state, city, categoryFilter],
-  );
-
   const displayPlayers = useMemo(() => {
     const realPlayers = filtered.players.filter((player) => !isDevSeedPlayer(player));
-    const realSlugs = new Set(realPlayers.map((player) => player.slug));
-    const demos = filteredDemos.filter((player) => !realSlugs.has(player.slug));
-
     const seenNames = new Set<string>();
-    const merged: Array<DirectoryPlayer | ExploreDemoPlayer> = [];
+    const unique: DirectoryPlayer[] = [];
 
-    for (const player of [...demos, ...realPlayers]) {
+    for (const player of realPlayers) {
       const nameKey = normalizeExplorePlayerName(player.first_name, player.last_name);
       if (seenNames.has(nameKey)) continue;
       seenNames.add(nameKey);
-      merged.push(player);
+      unique.push(player);
     }
 
-    return merged;
-  }, [filtered.players, filteredDemos]);
+    return unique;
+  }, [filtered.players]);
 
-  const displayAcademies = useMemo(() => {
-    const realAcademies = filtered.academies.filter(
-      (academy) => !isMarketingPlaceholderAcademy(academy),
-    );
-    const includeDemo = filterDemoExploreAcademy(query, state, city);
-
-    return includeDemo ? [DEMO_EXPLORE_ACADEMY, ...realAcademies] : realAcademies;
-  }, [filtered.academies, query, state, city]);
-
-  useEffect(() => {
-    const syncViewFromHash = () => {
-      const hash = window.location.hash.replace("#", "");
-      if (["destacados", "ideal-11", "rankings", "semana"].includes(hash)) {
-        setView("semana");
-      }
-    };
-
-    syncViewFromHash();
-    window.addEventListener("hashchange", syncViewFromHash);
-    return () => window.removeEventListener("hashchange", syncViewFromHash);
-  }, []);
+  const displayAcademies = useMemo(
+    () =>
+      filtered.academies.filter((academy) => !isMarketingPlaceholderAcademy(academy)),
+    [filtered.academies],
+  );
 
   return (
     <div className="space-y-6">
       <div className="mf-card p-4 sm:p-5">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="text-sm text-mf-text-secondary">
-            Academia verificada y fichas tutor · {CURRENT_SEASON_LABEL}
-          </p>
-          <div className="flex gap-1 rounded-lg border border-mf-border bg-mf-canvas p-1">
-            {(
-              [
-                { id: "directorio" as const, label: "Directorio", count: displayPlayers.length },
-                { id: "semana" as const, label: "Esta semana", count: null },
-              ] as const
-            ).map((tab) => (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setView(tab.id)}
-                className={cn(
-                  "rounded-md px-3 py-1.5 text-sm font-semibold transition",
-                  view === tab.id
-                    ? "bg-white text-mf-brand shadow-sm"
-                    : "text-mf-text-secondary hover:text-mf-text",
-                )}
-              >
-                {tab.label}
-                {tab.count != null ? (
-                  <span className="ml-1.5 tabular-nums text-mf-text-muted">({tab.count})</span>
-                ) : null}
-              </button>
-            ))}
-          </div>
-        </div>
+        <p className="text-sm text-mf-text-secondary">
+          Fichas publicadas por familia o representante · {CURRENT_SEASON_LABEL}
+        </p>
 
         <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <label className="block sm:col-span-2 lg:col-span-2">
@@ -223,7 +162,7 @@ export function ExploreDirectory({
             value={categoryFilter}
             onChange={setCategoryFilter}
             birthDates={birthDates}
-            hint="Obligatorio para rankings semanales."
+            hint="Filtra por categoría de edad."
           />
           <MexicoLocationSelect
             allowAll
@@ -234,122 +173,95 @@ export function ExploreDirectory({
               if (!nextState) setCity("");
             }}
             onCityChange={setCity}
+            stateLabel="Estado"
+            cityLabel="Ciudad o municipio"
           />
         </div>
       </div>
 
-      {view === "directorio" ? (
-        <div className="space-y-8">
-          <section className="space-y-3">
-            <div className="flex items-baseline justify-between gap-3">
-              <h2 className="mf-section-title">Jugadores</h2>
-              <span className="text-sm text-mf-text-muted">
-                {displayPlayers.length} resultados
-              </span>
+      <div className="space-y-8">
+        <section className="space-y-3">
+          <div className="flex items-baseline justify-between gap-3">
+            <h2 className="text-base font-semibold text-mf-text">Jugadores</h2>
+            <span className="text-sm text-mf-text-muted">
+              {displayPlayers.length} resultado{displayPlayers.length === 1 ? "" : "s"}
+            </span>
+          </div>
+
+          {displayPlayers.length === 0 ? (
+            <div className="rounded-xl border border-dashed border-mf-border bg-white px-5 py-10 text-center text-sm text-mf-text-secondary">
+              No hay jugadores que coincidan. Las fichas las publican familias o
+              representantes con consentimiento.
             </div>
-
-            {displayPlayers.length === 0 ? (
-              <div className="mf-card border-dashed p-8 text-center text-sm text-mf-text-secondary">
-                No hay jugadores que coincidan con tu búsqueda.
-              </div>
-            ) : (
-              <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
-                {displayPlayers.map((player) => (
-                  <ExplorePlayerCard key={player.slug} player={player} />
-                ))}
-              </div>
-            )}
-          </section>
-
-          <section className="space-y-3 border-t border-mf-border-subtle pt-8">
-            <div className="flex items-baseline justify-between gap-3">
-              <h2 className="text-base font-semibold text-mf-text">Academias certificadas</h2>
-              <span className="text-sm text-mf-text-muted">
-                {displayAcademies.length} resultados
-              </span>
+          ) : (
+            <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+              {displayPlayers.map((player) => (
+                <ExplorePlayerCard
+                  key={player.slug}
+                  player={player}
+                  unlocked={unlocked}
+                />
+              ))}
             </div>
+          )}
+        </section>
 
-            {displayAcademies.length === 0 ? (
-              <p className="text-sm text-mf-text-secondary">
-                No hay academias que coincidan con tu búsqueda.
-              </p>
-            ) : (
-              <ul className="divide-y divide-mf-border-subtle rounded-xl border border-mf-border bg-white">
-                {displayAcademies.map((academy) => (
-                  <li key={academy.id}>
-                    <Link
-                      href={`/fut/a/${academy.slug}`}
-                      className="flex items-center gap-3 px-4 py-3 transition hover:bg-mf-canvas"
-                    >
-                      {academy.logo_url ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={academy.logo_url}
-                          alt=""
-                          className="h-9 w-9 rounded-md bg-white object-contain p-0.5 ring-1 ring-mf-border"
-                        />
-                      ) : (
-                        <div className="flex h-9 w-9 items-center justify-center rounded-md bg-mf-brand-soft text-xs font-semibold text-mf-brand">
-                          {academy.name.slice(0, 2).toUpperCase()}
-                        </div>
-                      )}
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-semibold text-mf-text">
-                          {academy.name}
-                        </p>
-                        {[academy.city, academy.state].filter(Boolean).length > 0 ? (
-                          <p className="mt-0.5 inline-flex items-center gap-1 text-xs text-mf-text-muted">
-                            <MapPin className="h-3 w-3" />
-                            {[academy.city, academy.state].filter(Boolean).join(", ")}
-                          </p>
-                        ) : null}
+        <section className="space-y-3 border-t border-mf-border-subtle pt-8">
+          <div className="flex items-baseline justify-between gap-3">
+            <h2 className="text-base font-semibold text-mf-text">Academias</h2>
+            <span className="text-sm text-mf-text-muted">
+              {displayAcademies.length} resultados
+            </span>
+          </div>
+
+          {displayAcademies.length === 0 ? (
+            <p className="text-sm text-mf-text-secondary">
+              No hay academias que coincidan con tu búsqueda.
+            </p>
+          ) : (
+            <ul className="divide-y divide-mf-border-subtle rounded-xl border border-mf-border bg-white">
+              {displayAcademies.map((academy) => (
+                <li key={academy.id}>
+                  <Link
+                    href={`/fut/a/${academy.slug}`}
+                    className="flex items-center gap-3 px-4 py-3 transition hover:bg-mf-canvas"
+                  >
+                    {academy.logo_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={academy.logo_url}
+                        alt=""
+                        className="h-9 w-9 rounded-md bg-white object-contain p-0.5 ring-1 ring-mf-border"
+                      />
+                    ) : (
+                      <div className="flex h-9 w-9 items-center justify-center rounded-md bg-mf-brand-soft text-xs font-semibold text-mf-brand">
+                        {academy.name.slice(0, 2).toUpperCase()}
                       </div>
-                      {academy.slug === DEMO_EXPLORE_ACADEMY.slug ? (
-                        <span className="hidden shrink-0 text-[11px] font-medium text-mf-text-muted sm:inline-flex">
-                          Ejemplo
-                        </span>
-                      ) : academy.is_certified ? (
-                        <span className="hidden shrink-0 items-center gap-1 text-[11px] font-medium text-mf-accent-dark sm:inline-flex">
-                          <Award className="h-3.5 w-3.5" />
-                          Certificada
-                        </span>
+                    )}
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-semibold text-mf-text">
+                        {academy.name}
+                      </p>
+                      {[academy.city, academy.state].filter(Boolean).length > 0 ? (
+                        <p className="mt-0.5 inline-flex items-center gap-1 text-xs text-mf-text-muted">
+                          <MapPin className="h-3 w-3" />
+                          {[academy.city, academy.state].filter(Boolean).join(", ")}
+                        </p>
                       ) : null}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </section>
-        </div>
-      ) : (
-        <div id="destacados" className="scroll-mt-24 space-y-10">
-          <WeeklyCompetitionPanels
-            ranked={rankedPerformances}
-            rising={risingPerformances}
-            leaderboard={leaderboard}
-            weekLabel={weekLabel}
-            state={state}
-            city={city}
-            categoryFilter={categoryFilter}
-          />
-
-          <IdealXIPanel
-            performances={weeklyPerformances}
-            weekLabel={weekLabel}
-            categoryFilter={categoryFilter}
-            filterState={state}
-            filterCity={city}
-          />
-
-          <PositionRankingsPanel
-            rankedPerformances={rankedPerformances}
-            weekLabel={weekLabel}
-            state={state}
-            city={city}
-            categoryFilter={categoryFilter}
-          />
-        </div>
-      )}
+                    </div>
+                    {academy.is_certified ? (
+                      <span className="hidden shrink-0 items-center gap-1 text-[11px] font-medium text-mf-accent-dark sm:inline-flex">
+                        <Award className="h-3.5 w-3.5" />
+                        Certificada
+                      </span>
+                    ) : null}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      </div>
     </div>
   );
 }

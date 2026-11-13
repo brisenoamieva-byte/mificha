@@ -204,11 +204,11 @@ export function IdealXIPanel({
         <div className="mf-card border-dashed p-8 text-center">
           <Trophy className="mx-auto h-8 w-8 text-mf-text-muted" />
           <p className="mt-3 text-sm font-medium text-mf-text">
-            Aún no hay partidos registrados esta semana
+            Rankings semanales en pausa
           </p>
           <p className="mt-2 text-sm text-mf-text-secondary">
-            Cuando las academias capturen resultados, aquí aparecerá el 11 ideal
-            automáticamente.
+            Por ahora MiFicha se basa en las fichas que publican familias o
+            representantes, no en resultados de torneo.
           </p>
         </div>
       ) : !hasEnoughPlayers ? (

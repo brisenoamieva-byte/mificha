@@ -1,11 +1,10 @@
 import Link from "next/link";
 import {
   ArrowDown,
-  BarChart3,
   Building2,
+  FileUser,
   MapPin,
   ShieldCheck,
-  Trophy,
   Users,
 } from "lucide-react";
 import { CURRENT_SEASON_LABEL } from "@/lib/marketing-season";
@@ -14,8 +13,6 @@ import { cn } from "@/lib/utils";
 interface ExplorePageHeroProps {
   playerCount: number;
   academyCount: number;
-  weeklyActiveCount: number;
-  weekLabel: string;
 }
 
 interface StatCardProps {
@@ -56,12 +53,7 @@ function StatCard({ icon: Icon, value, label, hint, accent = "brand" }: StatCard
   );
 }
 
-export function ExplorePageHero({
-  playerCount,
-  academyCount,
-  weeklyActiveCount,
-  weekLabel,
-}: ExplorePageHeroProps) {
+export function ExplorePageHero({ playerCount, academyCount }: ExplorePageHeroProps) {
   return (
     <section className="relative overflow-hidden border-b border-mf-border bg-mf-surface">
       <div
@@ -72,20 +64,20 @@ export function ExplorePageHero({
       <div className="relative mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:py-16">
         <div className="grid gap-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:items-start lg:gap-12">
           <div className="max-w-xl">
-            <p className="mf-marketing-eyebrow">Visorías · {CURRENT_SEASON_LABEL}</p>
+            <p className="mf-marketing-eyebrow">Buscador · {CURRENT_SEASON_LABEL}</p>
             <h1 className="mt-4 text-[2rem] font-semibold leading-[1.08] tracking-[-0.035em] text-mf-text sm:text-[2.5rem]">
-              Encuentra jugadores verificados
+              Busca jugadores de futbol
             </h1>
             <p className="mt-5 text-base leading-8 text-mf-text-secondary sm:text-[1.0625rem]">
-              Busca por categoría, posición y ciudad. Cada ficha incluye stats del torneo
-              y evaluación de la academia.
+              El directorio se nutre de fichas que suben familias o representantes. Vista
+              básica gratis; detalle completo con membresía persona ($50 USD/año).
             </p>
 
             <ul className="mt-6 flex flex-wrap gap-2">
               {[
-                { icon: ShieldCheck, label: "Consentimiento parental" },
-                { icon: BarChart3, label: "Stats del torneo" },
-                { icon: MapPin, label: "Querétaro y zona metropolitana" },
+                { icon: ShieldCheck, label: "Consentimiento (opt-in)" },
+                { icon: FileUser, label: "Ficha de familia o representante" },
+                { icon: MapPin, label: "Filtro por ciudad" },
               ].map(({ icon: Icon, label }) => (
                 <li
                   key={label}
@@ -111,26 +103,19 @@ export function ExplorePageHero({
               icon={Users}
               value={String(playerCount)}
               label="Jugadores en directorio"
-              hint="Perfiles públicos con ficha activa"
+              hint="Fichas publicadas con consentimiento"
               accent="brand"
             />
             <StatCard
               icon={Building2}
               value={String(academyCount)}
-              label="Academias certificadas"
+              label="Academias"
               hint={
                 academyCount === 0
-                  ? "Próximamente más sedes en el directorio"
-                  : "Sedes con plantel verificado"
+                  ? "Plantel y operación · aparte del buscador"
+                  : "Sedes en el directorio"
               }
               accent="neutral"
-            />
-            <StatCard
-              icon={Trophy}
-              value={String(weeklyActiveCount)}
-              label="Con actividad esta semana"
-              hint={weekLabel}
-              accent="accent"
             />
           </div>
         </div>

@@ -1,19 +1,23 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
-import { DemoPublicPlayerCard } from "@/components/public/demo-public-player-card";
+import { FichaLockedTeaser } from "@/components/marketing/explore-paywall";
+import { SiteFooter, SiteHeader } from "@/components/marketing/site-header";
 import { PublicPlayerCard } from "@/components/public/public-player-card";
 import { getPositionLabel } from "@/lib/dashboard-utils";
-import { DEMO_FICHA_PREVIEW, isDemoPlayerSlug } from "@/lib/demo-ficha-preview";
+import { isDemoPlayerSlug } from "@/lib/demo-ficha-preview";
 import {
   buildOgPlayerImageAlt,
   buildOgPlayerSharePayload,
 } from "@/lib/og-player-share";
+import { formatPlayerCategory } from "@/lib/player-category";
 import {
   fetchPublicPlayerBySlug,
   getProtectedProfileTitle,
   getPublicProfileDescription,
 } from "@/lib/public-player";
 import { buildPublicPlayerUrl } from "@/lib/player-utils";
+import { resolveExploreAccess } from "@/lib/scout-access";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -24,9 +28,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   if (isDemoPlayerSlug(slug)) {
     return {
-      title: `${DEMO_FICHA_PREVIEW.fullName} (ejemplo) | MiFicha`,
-      description:
-        "Ficha de ejemplo con stats del torneo, evaluación del entrenador e insignias MiFicha.",
+      title: "Ficha no disponible | MiFicha",
       robots: { index: false, follow: false },
     };
   }
@@ -84,13 +86,41 @@ export default async function PlayerPublicPage({ params }: PageProps) {
   const { slug } = await params;
 
   if (isDemoPlayerSlug(slug)) {
-    return <DemoPublicPlayerCard />;
+    notFound();
   }
 
   const data = await fetchPublicPlayerBySlug(slug);
 
   if (!data) {
     notFound();
+  }
+
+  const access = await resolveExploreAccess();
+  if (!access.unlocked) {
+    const fullName = `${data.player.first_name} ${data.player.last_name}`.trim();
+    const place = [data.player.academies?.city, data.player.academies?.name]
+      .filter(Boolean)
+      .join(" · ");
+    return (
+      <div className="flex min-h-dvh flex-col bg-mf-canvas">
+        <SiteHeader actionHref="/fut/explorar#pro" actionLabel="Explorar Pro" />
+        <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-8 sm:px-6 sm:py-12">
+          <FichaLockedTeaser
+            name={fullName}
+            position={getPositionLabel(data.player.position)}
+            category={formatPlayerCategory(data.player.birth_date)}
+            place={place || null}
+          />
+          <p className="mt-6 text-center text-xs leading-6 text-mf-text-muted">
+            Busca más jugadores en{" "}
+            <Link href="/fut/explorar" className="font-semibold text-mf-gph hover:underline">
+              Explorar
+            </Link>
+          </p>
+        </main>
+        <SiteFooter />
+      </div>
+    );
   }
 
   return <PublicPlayerCard data={data} />;

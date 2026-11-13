@@ -1,9 +1,9 @@
-import { CRACKS_TRYOUTS, CRACKS_TRYOUTS_PATH } from "@/lib/cracks-tryouts";
 import {
   GPH_PACHUCA_PATH,
   GPH_PACHUCA_SEGUNDA_FASE,
 } from "@/lib/gph-pachuca-segunda-fase";
 import { VISORIA_EVENT, VISORIA_PUBLIC_PATH } from "@/lib/visoria-event";
+import { CRACKS_TRYOUTS, CRACKS_TRYOUTS_PATH } from "@/lib/cracks-tryouts";
 
 export type HomeAnnouncementTone = "brand" | "gph" | "event" | "pilot";
 
@@ -19,14 +19,14 @@ export interface HomeAnnouncement {
 }
 
 /**
- * Carrusel de la home. Orden = prioridad visual.
- * Para apagar uno: quítalo o pon `until` en el pasado.
+ * Carrusel de home: solo noticias / oportunidades vivas.
+ * No duplica el buscador ni CTAs de cuenta.
  */
 export const HOME_ANNOUNCEMENTS: HomeAnnouncement[] = [
   {
     id: "gph-pachuca-segunda-fase-nov-2026",
     tone: "gph",
-    eyebrow: GPH_PACHUCA_SEGUNDA_FASE.eyebrow,
+    eyebrow: "Noticia",
     title: "Cuatro jugadores a segunda fase con Pachuca",
     detail: `${GPH_PACHUCA_SEGUNDA_FASE.alliance} · ${GPH_PACHUCA_SEGUNDA_FASE.place}`,
     href: GPH_PACHUCA_PATH,
@@ -37,34 +37,18 @@ export const HOME_ANNOUNCEMENTS: HomeAnnouncement[] = [
     tone: "event",
     eyebrow: "Visoría",
     title: VISORIA_EVENT.title,
-    detail: `26–27 nov · ${VISORIA_EVENT.organizers} · Chivas y Santos`,
+    detail: `26–27 nov · ${VISORIA_EVENT.organizers}`,
     href: VISORIA_PUBLIC_PATH,
     until: "2026-11-27",
   },
   {
     id: "cracks-tryouts-nov-2026",
     tone: "gph",
-    eyebrow: "Alianza",
+    eyebrow: "Convocatoria",
     title: CRACKS_TRYOUTS.title,
     detail: `${CRACKS_TRYOUTS.headline} · ${CRACKS_TRYOUTS.city}`,
     href: CRACKS_TRYOUTS_PATH,
     until: "2026-11-30",
-  },
-  {
-    id: "gph-diagnosis-promo",
-    tone: "gph",
-    eyebrow: "Diagnóstico GPH",
-    title: "Evaluación de futbol disponible",
-    detail: "Diagnóstico GPH + 12 meses de MiFicha",
-    href: "/fut/pagar?sku=diagnosis",
-  },
-  {
-    id: "tutor-pilot",
-    tone: "pilot",
-    eyebrow: "Piloto",
-    title: "Ficha del jugador",
-    detail: "El tutor arma fotos, videos e historia",
-    href: "/fut/tutor",
   },
 ];
 

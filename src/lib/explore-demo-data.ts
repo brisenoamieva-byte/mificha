@@ -185,16 +185,13 @@ export function normalizeExplorePlayerName(firstName: string, lastName: string) 
     .trim();
 }
 
-/** Total de perfiles únicos en el listado público (demos + reales, sin seed de dev). */
+/** Total de perfiles únicos reales en el listado público (sin demos ni seed). */
 export function countExploreDirectoryPlayers(data: PublicDirectoryData): number {
   const realPlayers = data.players.filter((player) => !isDevSeedPlayer(player));
-  const realSlugs = new Set(realPlayers.map((player) => player.slug));
-  const demos = DEMO_EXPLORE_PLAYERS.filter((player) => !realSlugs.has(player.slug));
-
   const seenNames = new Set<string>();
   let count = 0;
 
-  for (const player of [...demos, ...realPlayers]) {
+  for (const player of realPlayers) {
     const nameKey = normalizeExplorePlayerName(player.first_name, player.last_name);
     if (seenNames.has(nameKey)) continue;
     seenNames.add(nameKey);
@@ -255,11 +252,10 @@ export function buildHomeShowcaseAcademies(data: PublicDirectoryData): Directory
   return data.academies.filter((academy) => !isMarketingPlaceholderAcademy(academy));
 }
 
-/** Conteo del directorio Explorar: demo de marketing + reales (sin seed). */
+/** Conteo del directorio Explorar: solo academias reales (sin demo ni seed). */
 export function countExploreDirectoryAcademies(data: PublicDirectoryData): number {
-  const real = data.academies.filter((academy) => !isMarketingPlaceholderAcademy(academy));
-  const hasDemoSlug = real.some((academy) => academy.slug === DEMO_ACADEMY_SLUG);
-  return real.length + (hasDemoSlug ? 0 : 1);
+  return data.academies.filter((academy) => !isMarketingPlaceholderAcademy(academy))
+    .length;
 }
 
 const DEMO_ACADEMY_PROFILE: PublicAcademy = {

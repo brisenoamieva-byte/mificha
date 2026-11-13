@@ -17,22 +17,22 @@ export function PadresPageHero() {
           <div className="max-w-xl lg:pt-2">
             <p className="mf-marketing-eyebrow">Padres y jugadores · {CURRENT_SEASON_LABEL}</p>
             <h1 className="mt-4 text-[2rem] font-semibold leading-[1.08] tracking-[-0.035em] text-mf-text sm:text-[2.5rem]">
-              La ficha de tu hijo, en un solo lugar
+              Llena la ficha. Que te vean los agentes.
             </h1>
             <p className="mt-5 text-base leading-8 text-mf-text-secondary sm:text-[1.0625rem]">
               <WithBrandName>
-                Hoy puedes armar la ficha del jugador (fotos, videos e historia); la controla
-                el tutor en la plataforma. Después del partido, cuando el torneo esté activo,
-                también llegarán las stats oficiales al mismo expediente.
+                Arma la ficha de tu hijo (fotos, videos e historia), lleva el seguimiento y
+                publícalo en Explorar para que agentes y scouts de futbol lo encuentren. El
+                torneo, cuando esté activo, suma stats al mismo expediente.
               </WithBrandName>
             </p>
 
             <ul className="mt-6 flex flex-wrap gap-2">
               {[
                 { icon: Printer, label: "Ficha del jugador" },
+                { icon: MessageCircle, label: "Visible para agentes" },
                 { icon: ClipboardList, label: "Diagnóstico GPH" },
-                { icon: MessageCircle, label: "Aviso post-partido (próximo)" },
-                { icon: BarChart3, label: "Stats del torneo (próximo)" },
+                { icon: BarChart3, label: "Seguimiento / stats" },
               ].map(({ icon: Icon, label }) => (
                 <li
                   key={label}
@@ -46,7 +46,7 @@ export function PadresPageHero() {
 
             <div className="mt-8 flex flex-wrap gap-3">
               <Link href="/fut/tutor" className="mf-btn-gph">
-                Crear cuenta de tutor
+                Ir al espacio tutor
               </Link>
               <Link href="/fut/evaluaciones" className="mf-btn-gph-ghost">
                 Diagnóstico GPH

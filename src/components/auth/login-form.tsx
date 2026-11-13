@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { signIn } from "@/lib/auth";
+import { supabase } from "@/lib/supabase";
 
 function getErrorMessage(error: unknown) {
   if (error instanceof Error) {
@@ -20,9 +21,24 @@ function getErrorMessage(error: unknown) {
 
 const inputClassName = "mf-input mt-1";
 
+async function resolveSmartNext(explicitNext: string | null) {
+  if (explicitNext?.startsWith("/") && explicitNext !== "/fut/dashboard") {
+    return explicitNext;
+  }
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  if (!session) return "/fut/entrar";
+  const response = await fetch("/fut/api/me/home", {
+    headers: { Authorization: `Bearer ${session.access_token}` },
+  });
+  const payload = (await response.json().catch(() => ({}))) as { path?: string };
+  return payload.path?.startsWith("/") ? payload.path : "/fut/entrar";
+}
+
 export function LoginForm() {
   const searchParams = useSearchParams();
-  const nextPath = searchParams.get("next") || "/fut/dashboard";
+  const nextPath = searchParams.get("next");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -40,7 +56,8 @@ export function LoginForm() {
         setLoading(false);
         return;
       }
-      window.location.assign(nextPath.startsWith("/") ? nextPath : "/fut/dashboard");
+      const destination = await resolveSmartNext(nextPath);
+      window.location.assign(destination);
     } catch (submitError) {
       setError(getErrorMessage(submitError));
       setLoading(false);
@@ -102,16 +119,9 @@ export function LoginForm() {
       </button>
 
       <p className="text-center text-sm text-gray-600">
-        ¿No tienes cuenta?{" "}
-        <Link
-          href={
-            nextPath !== "/fut/dashboard"
-              ? `/fut/signup?next=${encodeURIComponent(nextPath)}`
-              : "/fut/signup"
-          }
-          className="font-medium text-[#1B4F8C] hover:underline"
-        >
-          Regístrate
+        ¿Familia, representante o academia?{" "}
+        <Link href="/fut/entrar" className="font-medium text-[#1B4F8C] hover:underline">
+          Usa el acceso unificado
         </Link>
       </p>
     </form>

@@ -299,8 +299,36 @@ body {
   .diagnosis-report,
   .diagnosis-report *,
   .tutor-ficha-print,
-  .tutor-ficha-print * {
+  .tutor-ficha-print *,
+  .agent-one-pager-print,
+  .agent-one-pager-print *,
+  .agent-deck-print,
+  .agent-deck-print * {
     visibility: visible;
+  }
+
+  html[data-agent-print="onepager"] .agent-kit-ficha,
+  html[data-agent-print="onepager"] .agent-kit-ficha *,
+  html[data-agent-print="onepager"] .agent-kit-deck,
+  html[data-agent-print="onepager"] .agent-kit-deck * {
+    visibility: hidden !important;
+    display: none !important;
+  }
+
+  html[data-agent-print="deck"] .agent-kit-ficha,
+  html[data-agent-print="deck"] .agent-kit-ficha *,
+  html[data-agent-print="deck"] .agent-kit-onepager,
+  html[data-agent-print="deck"] .agent-kit-onepager * {
+    visibility: hidden !important;
+    display: none !important;
+  }
+
+  html[data-agent-print="ficha"] .agent-kit-onepager,
+  html[data-agent-print="ficha"] .agent-kit-onepager *,
+  html[data-agent-print="ficha"] .agent-kit-deck,
+  html[data-agent-print="ficha"] .agent-kit-deck * {
+    visibility: hidden !important;
+    display: none !important;
   }
 
   .demo-ficha-shell {
@@ -336,7 +364,9 @@ body {
     -webkit-print-color-adjust: exact;
   }
 
-  .tutor-ficha-print {
+  .tutor-ficha-print,
+  .agent-one-pager-print,
+  .agent-deck-print {
     position: absolute;
     left: 0;
     top: 0;
@@ -347,6 +377,23 @@ body {
     box-shadow: none !important;
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
+  }
+
+  .agent-one-pager-print {
+    border-radius: 0 !important;
+    border: 1px solid #cbd5e1 !important;
+  }
+
+  .agent-deck-slide {
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    break-after: page;
+    page-break-after: always;
+  }
+
+  .agent-deck-slide:last-child {
+    break-after: auto;
+    page-break-after: auto;
   }
 
   .tutor-ficha-print article,

@@ -99,7 +99,8 @@ export function WeeklyCompetitionPanels({
   if (filteredRanked.length === 0) {
     return (
       <div className="mf-card border-dashed p-8 text-center text-sm text-mf-text-secondary">
-        Aún no hay partidos esta semana en esta categoría.
+        Destacados semanales en pausa. Usa el directorio: fichas de familia o
+        representante.
       </div>
     );
   }
@@ -114,7 +115,7 @@ export function WeeklyCompetitionPanels({
           </div>
           <h2 className="mt-3 mf-section-title">Top 10 · {weekLabel}</h2>
           <p className="mt-1 text-sm text-mf-text-secondary">
-            Actividad verificada en partidos — por categoría, estado y ciudad.
+            Cuando haya métricas de ficha, aparecerán aquí por categoría y zona.
           </p>
         </div>
 

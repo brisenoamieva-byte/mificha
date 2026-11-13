@@ -5,7 +5,7 @@ export const MEMBERSHIP_OFFER = {
   headlineLead: "Seguimiento del jugador +",
   headlineHook: "puertas a oportunidades reales",
   summary:
-    "Expediente del hijo y acceso a visorías, torneos, eventos y entrenamiento con GPH — en una sola cuenta.",
+    "Ficha del hijo, seguimiento y visibilidad ante agentes en Explorar — más visorías, torneos y GPH en una sola cuenta.",
   priceLabel: "$1,200",
   pricePeriod: "MXN al año",
   specializationLimit:
@@ -15,7 +15,7 @@ export const MEMBERSHIP_OFFER = {
       id: "seguimiento",
       title: "Seguimiento digital del desarrollo",
       detail:
-        "Ficha del jugador con fotos, videos e historia (la arma el tutor) y, después, el historial de torneo y la lectura GPH en el mismo lugar.",
+        "Ficha con fotos, videos e historia; opt-in a Explorar para que agentes te vean; después, historial de torneo y lectura GPH en el mismo lugar.",
       status: "piloto" as const,
     },
     {

@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 import {
+  listGuardianChildren,
   listTutorMaterials,
   listTutorSeasons,
   membershipIsActive,
-  syncTutorChildren,
+  normalizeGuardianKind,
 } from "@/lib/tutor-family";
 import { getTutorFichaViewStats } from "@/lib/tutor-ficha-views";
 import { fetchTutorLinkedPerformance } from "@/lib/tutor-linked-performance";
@@ -19,10 +20,14 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Inicia sesión." }, { status: 401 });
   }
 
-  const phone = new URL(request.url).searchParams.get("phone");
+  const url = new URL(request.url);
+  const phone = url.searchParams.get("phone");
+  const kindParam = url.searchParams.get("kind");
+  const kind =
+    !kindParam || kindParam === "all" ? ("all" as const) : normalizeGuardianKind(kindParam);
   try {
     const admin = createSupabaseAdminClient();
-    const children = await syncTutorChildren(admin, user, phone);
+    const children = await listGuardianChildren(admin, user, phone, kind);
     const detailed = await Promise.all(
       children.map(async (child) => ({
         ...child,

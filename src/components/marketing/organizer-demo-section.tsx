@@ -51,7 +51,7 @@ export function OrganizerDemoSection() {
             </ol>
             <div className="flex flex-wrap gap-3">
               <Link href={ORGANIZER_ONE_PAGER.demoFichaHref} className="mf-btn-primary">
-                Ver ficha de ejemplo
+                Ver Explorar
                 <ArrowRight className="h-4 w-4" />
               </Link>
               <Link href={ORGANIZER_ONE_PAGER.demoExploreHref} className="mf-btn-accent">

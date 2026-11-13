@@ -2,6 +2,7 @@ import Link from "next/link";
 import { BrandLogoLink } from "@/components/ui/brand-logo";
 import { BrandWordmark } from "@/components/ui/brand-wordmark";
 import { SiteNavDesktop, SiteNavMobile } from "@/components/marketing/site-nav";
+import { SponsorSlot } from "@/components/marketing/sponsor-slot";
 import { LEGAL_ROUTES } from "@/lib/legal";
 
 interface SiteHeaderProps {
@@ -10,8 +11,8 @@ interface SiteHeaderProps {
 }
 
 export function SiteHeader({
-  actionHref = "/fut/tutor",
-  actionLabel = "Soy tutor",
+  actionHref = "/fut/entrar",
+  actionLabel = "Entrar",
 }: SiteHeaderProps) {
   return (
     <header className="mf-safe-top relative sticky top-0 z-50">
@@ -28,14 +29,14 @@ export function SiteHeader({
         </div>
 
         <div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-2">
-          <Link href={actionHref} className="mf-btn-ghost hidden sm:inline-flex">
-            {actionLabel}
-          </Link>
-          <Link href="/fut/login" className="mf-btn-ghost hidden lg:inline-flex">
+          <Link
+            href="/fut/login"
+            className="hidden text-sm font-medium text-mf-text-secondary transition hover:text-mf-text lg:inline-flex"
+          >
             Academia
           </Link>
-          <Link href="/fut/signup" className="mf-btn-primary hidden sm:inline-flex">
-            Registrar academia
+          <Link href={actionHref} className="mf-btn-gph hidden sm:inline-flex">
+            {actionLabel}
           </Link>
           <SiteNavMobile actionHref={actionHref} actionLabel={actionLabel} />
         </div>
@@ -47,46 +48,35 @@ export function SiteHeader({
 export function SiteFooter() {
   return (
     <footer className="border-t border-mf-border bg-mf-surface">
+      <SponsorSlot placement="footer_rail" />
       <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
-        <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-mf-text-secondary">
-          <Link href="/fut#como-funciona" className="transition hover:text-mf-text">
-            Cómo funciona
+        <div className="flex flex-wrap gap-x-5 gap-y-2 text-sm text-mf-text-secondary">
+          <Link href="/fut/planes" className="transition hover:text-mf-text">
+            Planes
           </Link>
-          <Link href="/fut#tipos-de-cuenta" className="transition hover:text-mf-text">
-            Accesos
+          <Link href="/fut/productos" className="transition hover:text-mf-text">
+            Productos
           </Link>
-          <Link href="/fut/explorar" className="transition hover:text-mf-text">
-            Explorar
-          </Link>
-          <Link href="/fut/tutor" className="transition hover:text-mf-text">
-            Tutor
-          </Link>
-          <Link href="/fut/padres" className="transition hover:text-mf-text">
-            Info padres
-          </Link>
-          <Link href="/fut/evaluaciones" className="transition hover:text-mf-text">
-            Evaluaciones
+          <Link href="/fut/noticias" className="transition hover:text-mf-text">
+            Noticias
           </Link>
           <Link href="/fut/visorias" className="transition hover:text-mf-text">
             Visorías
           </Link>
-          <Link href="/fut/membresia" className="transition hover:text-mf-text">
-            Membresía
+          <Link href="/fut/eventos" className="transition hover:text-mf-text">
+            Eventos
           </Link>
-          <Link href="/fut/pagar?sku=diagnosis" className="transition hover:text-mf-text">
-            Pagar diagnóstico
+          <Link href="/fut/convocatorias" className="transition hover:text-mf-text">
+            Convocatorias
           </Link>
-          <Link href="/fut/organizadores" className="transition hover:text-mf-text">
-            Organizadores
+          <Link href="/fut#como-funciona" className="transition hover:text-mf-text">
+            Cómo funciona
+          </Link>
+          <Link href="/fut/entrar" className="transition hover:text-mf-text">
+            Entrar
           </Link>
           <Link href={LEGAL_ROUTES.privacy} className="transition hover:text-mf-text">
             Privacidad
-          </Link>
-          <Link href={LEGAL_ROUTES.terms} className="transition hover:text-mf-text">
-            Términos
-          </Link>
-          <Link href={LEGAL_ROUTES.cookies} className="transition hover:text-mf-text">
-            Cookies
           </Link>
         </div>
       </div>

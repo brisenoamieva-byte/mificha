@@ -15,9 +15,19 @@ const SEASONS = "families/tutor-seasons.json";
 
 /** Piloto gratuito: sin cobro de $1,200. Apagar cuando se active la membresía. */
 export const TUTOR_PILOT_FREE = true;
-export const TUTOR_PILOT_LABEL = "Ficha del jugador · lo único que se paga es el diagnóstico GPH";
+export const TUTOR_PILOT_LABEL =
+  "Ficha + seguimiento + visibilidad ante agentes · lo único que se paga ahora es el diagnóstico GPH";
 
 export type TutorMaterialKind = "photo" | "video" | "story";
+
+/** Quién arma la ficha: tutor (familia) o agente (representante). */
+export type GuardianKind = "tutor" | "agente";
+
+export function normalizeGuardianKind(
+  value: string | null | undefined,
+): GuardianKind {
+  return value === "agente" ? "agente" : "tutor";
+}
 
 export interface TutorChildProfile {
   birth_date: string | null;
@@ -26,9 +36,27 @@ export interface TutorChildProfile {
   school: string | null;
   city: string | null;
   height_cm: number | null;
+  weight_kg: number | null;
+  nationality: string | null;
   dominant_foot: "left" | "right" | "both" | null;
   bio: string | null;
   goals: string | null;
+  /** Highlights / reel (YouTube u otro). */
+  youtube_url: string | null;
+  /** Perfil Transfermarkt u otro marketplace. */
+  transfermarkt_url: string | null;
+  /** Ej. "Jugadora de fútbol profesional". */
+  role_title: string | null;
+  /** Frase corta bajo el nombre / “en una frase”. */
+  tagline: string | null;
+  contact_email: string | null;
+  instagram: string | null;
+  /** Chips de hitos (máx. 4), ej. "Campeona Europa 2024". */
+  highlight_chips: string[];
+  /** Logros: club/torneo + detalle. */
+  achievements: Array<{ title: string; detail: string }>;
+  /** Convocatorias / selección. */
+  callups: Array<{ level: string; detail: string }>;
 }
 
 export interface TutorChild {
@@ -36,6 +64,8 @@ export interface TutorChild {
   guardian_user_id: string;
   guardian_email: string;
   guardian_phone: string | null;
+  /** Default tutor si falta (fichas antiguas). */
+  guardian_kind?: GuardianKind;
   player_name: string;
   membership_until: string | null;
   source_folios: string[];
@@ -58,6 +88,25 @@ export interface TutorChild {
   explore_opt_in_at: string | null;
 }
 
+export function childGuardianKind(child: Pick<TutorChild, "guardian_kind">): GuardianKind {
+  return normalizeGuardianKind(child.guardian_kind);
+}
+
+/** Quiénes de guardian_kind tiene este usuario (roster). */
+export async function listGuardianKindsForUser(
+  admin: SupabaseClient,
+  userId: string,
+): Promise<GuardianKind[]> {
+  const { roster, changed } = await loadRoster(admin);
+  if (changed) await writeJson(admin, ROSTER, roster);
+  const kinds = new Set<GuardianKind>();
+  for (const child of roster) {
+    if (child.guardian_user_id !== userId) continue;
+    kinds.add(childGuardianKind(child));
+  }
+  return [...kinds];
+}
+
 export interface TutorMaterial {
   id: string;
   child_id: string;
@@ -76,15 +125,27 @@ export interface TutorMaterial {
 export type TutorChildInput = {
   player_name: string;
   guardian_phone?: string | null;
+  guardian_kind?: GuardianKind;
   birth_date?: string | null;
   position?: string | null;
   club?: string | null;
   school?: string | null;
   city?: string | null;
   height_cm?: number | null;
+  weight_kg?: number | null;
+  nationality?: string | null;
   dominant_foot?: "left" | "right" | "both" | null;
   bio?: string | null;
   goals?: string | null;
+  youtube_url?: string | null;
+  transfermarkt_url?: string | null;
+  role_title?: string | null;
+  tagline?: string | null;
+  contact_email?: string | null;
+  instagram?: string | null;
+  highlight_chips?: string[];
+  achievements?: Array<{ title: string; detail: string }>;
+  callups?: Array<{ level: string; detail: string }>;
 };
 
 function phoneKey(value: string | null | undefined) {
@@ -109,10 +170,74 @@ function emptyProfile(): TutorChildProfile {
     school: null,
     city: null,
     height_cm: null,
+    weight_kg: null,
+    nationality: null,
     dominant_foot: null,
     bio: null,
     goals: null,
+    youtube_url: null,
+    transfermarkt_url: null,
+    role_title: null,
+    tagline: null,
+    contact_email: null,
+    instagram: null,
+    highlight_chips: [],
+    achievements: [],
+    callups: [],
   };
+}
+
+function cleanUrl(value: string | null | undefined) {
+  const trimmed = value?.trim() || "";
+  if (!trimmed) return null;
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  return `https://${trimmed}`;
+}
+
+function normalizeStringList(value: unknown, limit = 8): string[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .map((item) => String(item ?? "").trim())
+    .filter(Boolean)
+    .slice(0, limit);
+}
+
+function normalizeNamedPairs(
+  value: unknown,
+  titleKey: "title" | "level",
+  limit = 12,
+): Array<{ title: string; detail: string } | { level: string; detail: string }> {
+  if (!Array.isArray(value)) return [];
+  const rows: Array<Record<string, string>> = [];
+  for (const raw of value) {
+    if (!raw || typeof raw !== "object") continue;
+    const row = raw as Record<string, unknown>;
+    const title = String(row[titleKey] ?? row.title ?? row.level ?? "").trim();
+    const detail = String(row.detail ?? "").trim();
+    if (!title && !detail) continue;
+    rows.push({ [titleKey]: title || "—", detail: detail || "—" });
+    if (rows.length >= limit) break;
+  }
+  return rows as Array<{ title: string; detail: string } | { level: string; detail: string }>;
+}
+
+export function parseLinesToList(text: string | null | undefined, limit = 8) {
+  return (text ?? "")
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .slice(0, limit);
+}
+
+/** "Club | detalle" por línea. */
+export function parseTitleDetailLines(text: string | null | undefined, limit = 12) {
+  return parseLinesToList(text, limit).map((line) => {
+    const parts = line.split("|").map((part) => part.trim());
+    if (parts.length >= 2) {
+      return { title: parts[0] || "—", detail: parts.slice(1).join(" | ") || "—" };
+    }
+    return { title: line, detail: "" };
+  });
 }
 
 function newShareToken() {
@@ -120,13 +245,25 @@ function newShareToken() {
 }
 
 function normalizeChild(raw: TutorChild): TutorChild {
+  const merged = {
+    ...emptyProfile(),
+    ...(raw.profile ?? {}),
+  };
   return {
     ...raw,
     share_token: raw.share_token || newShareToken(),
     public_code: normalizePublicCode(raw.public_code) ?? "",
     profile: {
-      ...emptyProfile(),
-      ...(raw.profile ?? {}),
+      ...merged,
+      highlight_chips: normalizeStringList(merged.highlight_chips, 4),
+      achievements: normalizeNamedPairs(merged.achievements, "title", 12) as Array<{
+        title: string;
+        detail: string;
+      }>,
+      callups: normalizeNamedPairs(merged.callups, "level", 12) as Array<{
+        level: string;
+        detail: string;
+      }>,
     },
     linked_player_id: raw.linked_player_id ?? null,
     linked_academy_id: raw.linked_academy_id ?? null,
@@ -135,6 +272,37 @@ function normalizeChild(raw: TutorChild): TutorChild {
     linked_at: raw.linked_at ?? null,
     explore_opt_in: Boolean(raw.explore_opt_in),
     explore_opt_in_at: raw.explore_opt_in_at ?? null,
+  };
+}
+
+function profileFromInput(input: TutorChildInput): TutorChildProfile {
+  return {
+    birth_date: input.birth_date?.trim() || null,
+    position: input.position?.trim() || null,
+    club: input.club?.trim() || null,
+    school: input.school?.trim() || null,
+    city: input.city?.trim() || null,
+    height_cm: input.height_cm ?? null,
+    weight_kg: input.weight_kg ?? null,
+    nationality: input.nationality?.trim() || null,
+    dominant_foot: input.dominant_foot ?? null,
+    bio: input.bio?.trim() || null,
+    goals: input.goals?.trim() || null,
+    youtube_url: cleanUrl(input.youtube_url),
+    transfermarkt_url: cleanUrl(input.transfermarkt_url),
+    role_title: input.role_title?.trim() || null,
+    tagline: input.tagline?.trim() || null,
+    contact_email: input.contact_email?.trim() || null,
+    instagram: input.instagram?.trim().replace(/^@/, "") || null,
+    highlight_chips: normalizeStringList(input.highlight_chips, 4),
+    achievements: normalizeNamedPairs(input.achievements, "title", 12) as Array<{
+      title: string;
+      detail: string;
+    }>,
+    callups: normalizeNamedPairs(input.callups, "level", 12) as Array<{
+      level: string;
+      detail: string;
+    }>,
   };
 }
 
@@ -489,6 +657,17 @@ export async function syncTutorChildren(
     .sort((a, b) => a.player_name.localeCompare(b.player_name, "es"));
 }
 
+export async function listGuardianChildren(
+  admin: SupabaseClient,
+  user: { id: string; email?: string | null },
+  phone: string | null | undefined,
+  kind: GuardianKind | "all" = "all",
+) {
+  const children = await syncTutorChildren(admin, user, phone ?? null);
+  if (kind === "all") return children;
+  return children.filter((child) => childGuardianKind(child) === kind);
+}
+
 export async function createTutorChild(
   admin: SupabaseClient,
   user: { id: string; email?: string | null },
@@ -497,13 +676,15 @@ export async function createTutorChild(
   const playerName = input.player_name.trim();
   if (playerName.length < 2) throw new Error("Escribe el nombre completo del jugador.");
 
+  const kind = normalizeGuardianKind(input.guardian_kind);
   const email = (user.email ?? "").trim().toLowerCase();
   const phone = phoneKey(input.guardian_phone);
   const loaded = await loadRoster(admin);
   const roster = loaded.roster;
   const duplicate = roster.find(
     (child) =>
-      child.guardian_user_id === user.id && nameKey(child.player_name) === nameKey(playerName),
+      child.guardian_user_id === user.id &&
+      nameKey(child.player_name) === nameKey(playerName),
   );
   if (duplicate) throw new Error("Ese jugador ya está en tu cuenta.");
 
@@ -517,22 +698,13 @@ export async function createTutorChild(
     guardian_user_id: user.id,
     guardian_email: email,
     guardian_phone: phone || null,
+    guardian_kind: kind,
     player_name: playerName,
     membership_until: TUTOR_PILOT_FREE ? "2099-12-31" : null,
     source_folios: [],
     share_token: newShareToken(),
     public_code: publicCode,
-    profile: {
-      birth_date: input.birth_date?.trim() || null,
-      position: input.position?.trim() || null,
-      club: input.club?.trim() || null,
-      school: input.school?.trim() || null,
-      city: input.city?.trim() || null,
-      height_cm: input.height_cm ?? null,
-      dominant_foot: input.dominant_foot ?? null,
-      bio: input.bio?.trim() || null,
-      goals: input.goals?.trim() || null,
-    },
+    profile: profileFromInput(input),
     created_at: new Date().toISOString(),
     linked_player_id: null,
     linked_academy_id: null,
@@ -566,17 +738,7 @@ export async function updateTutorChild(
     ...current,
     player_name: playerName,
     guardian_phone: phoneKey(input.guardian_phone) || current.guardian_phone,
-    profile: {
-      birth_date: input.birth_date?.trim() || null,
-      position: input.position?.trim() || null,
-      club: input.club?.trim() || null,
-      school: input.school?.trim() || null,
-      city: input.city?.trim() || null,
-      height_cm: input.height_cm ?? null,
-      dominant_foot: input.dominant_foot ?? null,
-      bio: input.bio?.trim() || null,
-      goals: input.goals?.trim() || null,
-    },
+    profile: profileFromInput(input),
   };
   await writeJson(admin, ROSTER, roster);
   return roster[index];

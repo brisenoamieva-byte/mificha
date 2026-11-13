@@ -29,7 +29,7 @@ export const ORGANIZER_ONE_PAGER = {
     "MiFicha sincroniza stats con cada plantel.",
     "El padre recibe link automático a la ficha.",
   ],
-  demoFichaHref: "/fut/j/santiago-hernandez-demo",
+  demoFichaHref: "/fut/explorar",
   demoExploreHref: "/fut/explorar",
   academyKitTitle: "Guión para academias",
   academyKitDescription: "Copia y pega en WhatsApp cuando abras inscripciones.",

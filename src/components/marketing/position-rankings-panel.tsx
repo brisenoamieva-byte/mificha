@@ -197,7 +197,8 @@ export function PositionRankingsPanel({
 
       {!hasAnyRankings ? (
         <div className="mf-card border-dashed p-8 text-center text-sm text-mf-text-secondary">
-          Aún no hay partidos registrados esta semana para armar rankings por posición.
+          Rankings por posición en pausa: hoy el directorio sale de fichas de familia o
+          representante, no de partidos de torneo.
         </div>
       ) : (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">

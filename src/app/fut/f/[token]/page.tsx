@@ -7,13 +7,16 @@ import { PlayerCodeConnections } from "@/components/tutor/player-code-connection
 import { PublicCodeStub } from "@/components/tutor/public-code-stub";
 import { TutorFichaViewTracker } from "@/components/tutor/tutor-ficha-view-tracker";
 import { TutorPublicFicha } from "@/components/tutor/tutor-public-ficha";
+import { FichaLockedTeaser } from "@/components/marketing/explore-paywall";
 import { TutorShareActions } from "@/components/tutor/tutor-share-actions";
 import {
   buildOgTutorImageAlt,
   buildOgTutorSharePayload,
   buildTutorShareAbsoluteUrl,
 } from "@/lib/og-tutor-share";
+import { formatPlayerCategory } from "@/lib/player-category";
 import { resolvePublicCode } from "@/lib/public-code-resolve";
+import { resolveExploreAccess } from "@/lib/scout-access";
 import { fetchTutorLinkedPerformance } from "@/lib/tutor-linked-performance";
 import {
   getTutorChildByShareToken,
@@ -129,6 +132,38 @@ export default async function TutorShareFichaPage({ params }: PageProps) {
             Un código abre ficha, academia y visorías cuando existen ·{" "}
             <Link href="/fut/tutor" className="font-semibold text-mf-gph hover:underline">
               Entrar como tutor
+            </Link>
+          </p>
+        </main>
+        <SiteFooter />
+      </div>
+    );
+  }
+
+  const accessGate = await resolveExploreAccess({
+    ownerUserId: child.guardian_user_id,
+  });
+
+  if (!accessGate.unlocked) {
+    const place = [child.profile.club || child.profile.school, child.profile.city]
+      .filter(Boolean)
+      .join(" · ");
+    return (
+      <div className="flex min-h-dvh flex-col bg-mf-canvas">
+        <TutorFichaViewTracker token={access || token} />
+        <SiteHeader actionHref="/fut/explorar#pro" actionLabel="Explorar Pro" />
+        <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-8 sm:px-6 sm:py-12">
+          <FichaLockedTeaser
+            name={playerName}
+            position={child.profile.position}
+            category={formatPlayerCategory(child.profile.birth_date)}
+            place={place || null}
+            code={child.public_code}
+          />
+          <p className="mt-6 text-center text-xs leading-6 text-mf-text-muted">
+            Busca más jugadores en{" "}
+            <Link href="/fut/explorar" className="font-semibold text-mf-gph hover:underline">
+              Explorar
             </Link>
           </p>
         </main>

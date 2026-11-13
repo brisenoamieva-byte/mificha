@@ -12,14 +12,14 @@ export default function LoginPage() {
   return (
     <AuthShell
       title="Inicia sesión"
-      subtitle="Panel de academia. Si eres papá o mamá, usa la cuenta de tutor."
+      subtitle="Mismo acceso para familia, representante o academia: te llevamos a tu espacio."
       footer={
         <>
-          <Link href="/fut/tutor" className="font-semibold text-mf-brand hover:underline">
-            ¿Eres padre? Entrar como tutor
+          <Link href="/fut/entrar" className="font-semibold text-mf-brand hover:underline">
+            Acceso unificado
           </Link>
           <span className="mx-2 text-mf-text-muted">·</span>
-          <Link href="/" className="text-mf-brand hover:underline">
+          <Link href="/fut" className="text-mf-brand hover:underline">
             Volver al inicio
           </Link>
         </>

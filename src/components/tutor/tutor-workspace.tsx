@@ -6,11 +6,13 @@ import { TutorBuilderPanel } from "@/components/tutor/tutor-builder-panel";
 import { signIn, signUp, updatePassword } from "@/lib/auth";
 import { LEGAL_ROUTES, TERMS_ACCEPTANCE_LABEL } from "@/lib/legal";
 import { supabase } from "@/lib/supabase";
+import { guardianWorkspaceCopy } from "@/lib/guardian-workspace-copy";
 import {
   TUTOR_CITY_OPTIONS,
   TUTOR_PILOT_FREE,
   TUTOR_PILOT_LABEL,
   tutorSharePath,
+  type GuardianKind,
   type TutorMaterialKind,
   type TutorSeasonInput,
   type TutorSeasonStat,
@@ -18,6 +20,10 @@ import {
 import type { TutorLinkedPerformance } from "@/lib/tutor-linked-performance";
 
 const PHONE_STORAGE_KEY = "mificha.tutor.phone";
+
+interface TutorWorkspaceProps {
+  workspace?: GuardianKind;
+}
 
 interface MaterialItem {
   id: string;
@@ -58,9 +64,20 @@ interface TutorChildCard {
     school: string | null;
     city: string | null;
     height_cm: number | null;
+    weight_kg: number | null;
+    nationality: string | null;
     dominant_foot: "left" | "right" | "both" | null;
     bio: string | null;
     goals: string | null;
+    youtube_url: string | null;
+    transfermarkt_url: string | null;
+    role_title: string | null;
+    tagline: string | null;
+    contact_email: string | null;
+    instagram: string | null;
+    highlight_chips: string[];
+    achievements: Array<{ title: string; detail: string }>;
+    callups: Array<{ level: string; detail: string }>;
   };
   materials: MaterialItem[];
 }
@@ -86,9 +103,20 @@ const emptyForm = {
   school: "",
   city: "",
   height_cm: "",
+  weight_kg: "",
+  nationality: "",
   dominant_foot: "" as "" | "left" | "right" | "both",
   bio: "",
   goals: "",
+  youtube_url: "",
+  transfermarkt_url: "",
+  role_title: "",
+  tagline: "",
+  contact_email: "",
+  instagram: "",
+  highlight_chips_text: "",
+  achievements_text: "",
+  callups_text: "",
 };
 
 async function authed(path: string, init?: RequestInit) {
@@ -116,7 +144,8 @@ async function authed(path: string, init?: RequestInit) {
   return payload;
 }
 
-export function TutorWorkspace() {
+export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
+  const copy = guardianWorkspaceCopy();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
@@ -149,8 +178,9 @@ export function TutorWorkspace() {
   const createFichaRef = useRef<HTMLFormElement | null>(null);
 
   const load = useCallback(async (whatsapp: string, preferId?: string | null) => {
-    const query = whatsapp ? `?phone=${encodeURIComponent(whatsapp)}` : "";
-    const payload = await authed(`/fut/api/tutor/home${query}`);
+    const params = new URLSearchParams({ kind: "all" });
+    if (whatsapp) params.set("phone", whatsapp);
+    const payload = await authed(`/fut/api/tutor/home?${params.toString()}`);
     const rows = payload.children ?? [];
     setChildren(rows);
     setSelectedId((current) => {
@@ -186,9 +216,7 @@ export function TutorWorkspace() {
           .then((rows) => {
             if (cancelled) return;
             if (rows.length === 0) {
-              setOnboardNotice(
-                "Cuenta lista. Ahora crea la ficha de tu hijo para continuar.",
-              );
+              setOnboardNotice(copy.onboardEmpty);
             }
           })
           .catch((err: unknown) => {
@@ -200,7 +228,7 @@ export function TutorWorkspace() {
     return () => {
       cancelled = true;
     };
-  }, [load]);
+  }, [load, phone, copy.onboardEmpty]);
 
   useEffect(() => {
     if (loading || !sessionEmail || children.length > 0 || !onboardNotice) return;
@@ -222,9 +250,28 @@ export function TutorWorkspace() {
       school: child.profile.school ?? "",
       city: child.profile.city ?? "",
       height_cm: child.profile.height_cm != null ? String(child.profile.height_cm) : "",
+      weight_kg: child.profile.weight_kg != null ? String(child.profile.weight_kg) : "",
+      nationality: child.profile.nationality ?? "",
       dominant_foot: child.profile.dominant_foot ?? "",
       bio: child.profile.bio ?? "",
       goals: child.profile.goals ?? "",
+      youtube_url: child.profile.youtube_url ?? "",
+      transfermarkt_url: child.profile.transfermarkt_url ?? "",
+      role_title: child.profile.role_title ?? "",
+      tagline: child.profile.tagline ?? "",
+      contact_email: child.profile.contact_email ?? "",
+      instagram: child.profile.instagram ?? "",
+      highlight_chips_text: (child.profile.highlight_chips ?? []).join("\n"),
+      achievements_text: (child.profile.achievements ?? [])
+        .map((row) =>
+          row.detail ? `${row.title} | ${row.detail}` : row.title,
+        )
+        .join("\n"),
+      callups_text: (child.profile.callups ?? [])
+        .map((row) =>
+          row.detail ? `${row.level} | ${row.detail}` : row.level,
+        )
+        .join("\n"),
     });
   }, [child]);
 
@@ -304,9 +351,7 @@ export function TutorWorkspace() {
     const rows = await load(phone);
     if (opts?.welcome || rows.length === 0) {
       setOnboardNotice(
-        rows.length === 0
-          ? "Cuenta lista. Ahora crea la ficha de tu hijo para continuar."
-          : "Bienvenido. Elige un jugador o crea otra ficha.",
+        rows.length === 0 ? copy.onboardEmpty : copy.onboardWelcome,
       );
       if (rows.length === 0) scrollToCreateFicha();
     }
@@ -361,7 +406,7 @@ export function TutorWorkspace() {
           password,
           "academy_admin",
           fullName,
-          { emailRedirectTo: `${window.location.origin}/fut/tutor` },
+          { emailRedirectTo: `${window.location.origin}${copy.path}` },
         );
         if (!created.session) {
           // Algunos proyectos piden confirmar correo: intentamos entrar igual;
@@ -435,6 +480,7 @@ export function TutorWorkspace() {
         method: "POST",
         body: JSON.stringify({
           child_id: child?.id,
+          guardian_kind: workspace,
           player_name: form.player_name,
           guardian_phone: phone || undefined,
           birth_date: form.birth_date || null,
@@ -443,9 +489,20 @@ export function TutorWorkspace() {
           school: form.school || null,
           city: form.city || null,
           height_cm: form.height_cm ? Number(form.height_cm) : null,
+          weight_kg: form.weight_kg ? Number(form.weight_kg) : null,
+          nationality: form.nationality || null,
           dominant_foot: form.dominant_foot || null,
           bio: form.bio || null,
           goals: form.goals || null,
+          youtube_url: form.youtube_url || null,
+          transfermarkt_url: form.transfermarkt_url || null,
+          role_title: form.role_title || null,
+          tagline: form.tagline || null,
+          contact_email: form.contact_email || null,
+          instagram: form.instagram || null,
+          highlight_chips_text: form.highlight_chips_text || null,
+          achievements_text: form.achievements_text || null,
+          callups_text: form.callups_text || null,
         }),
       });
       const createdId = payload.child?.id ?? null;
@@ -659,14 +716,13 @@ export function TutorWorkspace() {
       <div className="mx-auto max-w-md space-y-6">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
-            {TUTOR_PILOT_FREE ? "Piloto gratuito" : "Tutor"}
+            {TUTOR_PILOT_FREE ? "Piloto · cuenta persona" : copy.eyebrow}
           </p>
-          <h1 className="mt-2 text-2xl font-semibold tracking-tight text-mf-gph-ink">
-            Organiza la ficha de tu hijo
-          </h1>
+          <h2 className="mt-2 text-xl font-semibold tracking-tight text-mf-gph-ink">
+            {copy.authTitle}
+          </h2>
           <p className="mt-2 text-sm leading-7 text-mf-text-secondary">
-            Sube fotos, videos e historia. Arma una ficha para presentar en
-            universidades, visorías o clubes.{" "}
+            {copy.authDetail}{" "}
             {TUTOR_PILOT_FREE ? TUTOR_PILOT_LABEL : "Incluido con la membresía anual."}
           </p>
         </div>
@@ -693,7 +749,7 @@ export function TutorWorkspace() {
             <p className="text-center text-xs text-mf-text-muted">
               ¿No llegó el correo?{" "}
               <Link
-                href={`/fut/recuperar?next=${encodeURIComponent("/fut/tutor")}`}
+                href={`/fut/recuperar?next=${encodeURIComponent(copy.path)}`}
                 className="font-semibold text-mf-gph hover:underline"
               >
                 Recuperar acceso
@@ -782,7 +838,7 @@ export function TutorWorkspace() {
           ) : (
             <p className="-mt-1 text-right text-sm">
               <Link
-                href={`/fut/recuperar?next=${encodeURIComponent("/fut/tutor")}`}
+                href={`/fut/recuperar?next=${encodeURIComponent(copy.path)}`}
                 className="font-semibold text-mf-gph hover:underline"
               >
                 Olvidé mi contraseña
@@ -827,8 +883,10 @@ export function TutorWorkspace() {
                 : "Crear cuenta y continuar"}
           </button>
           <p className="text-center text-xs leading-5 text-mf-text-muted">
-            Después de {mode === "login" ? "entrar" : "registrarte"} pasas directo a
-            crear la ficha del jugador.
+            {copy.afterAuthHint.replace(
+              "{action}",
+              mode === "login" ? "entrar" : "registrarte",
+            )}
           </p>
         </form>
       </div>
@@ -948,7 +1006,7 @@ export function TutorWorkspace() {
       {children.length > 0 ? (
         <div className="space-y-2">
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-mf-text-muted">
-            Tus hijos · elige a quién armar
+            {copy.rosterLabel}
           </p>
           <div className="flex flex-wrap gap-2">
             {children.map((item) => (
@@ -976,19 +1034,19 @@ export function TutorWorkspace() {
                 setSelectedId(null);
                 setForm(emptyForm);
                 setNotice(null);
-                setOnboardNotice("Crea otra ficha para un hijo adicional.");
+                setOnboardNotice(copy.addAnotherNotice);
                 setError(null);
                 scrollToCreateFicha();
               }}
               className="rounded-full border border-dashed border-mf-gph/40 px-4 py-2 text-sm font-semibold text-mf-gph"
             >
-              + Otro hijo
+              {copy.addAnother}
             </button>
           </div>
         </div>
       ) : (
         <p className="rounded-lg border border-dashed border-mf-border bg-white px-4 py-3 text-sm text-mf-text-secondary">
-          Aún no hay jugadores. Completa el formulario y pulsa <strong>Crear ficha y continuar</strong>.
+          {copy.emptyRoster}
         </p>
       )}
 
@@ -1001,12 +1059,10 @@ export function TutorWorkspace() {
         >
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
-              Nuevo jugador
+              {copy.createEyebrow}
             </p>
-            <h2 className="mt-1 text-xl font-semibold text-mf-gph-ink">Empieza con el nombre</h2>
-            <p className="mt-1 text-sm text-mf-text-secondary">
-              Luego el constructor te pide el resto paso a paso.
-            </p>
+            <h2 className="mt-1 text-xl font-semibold text-mf-gph-ink">{copy.createTitle}</h2>
+            <p className="mt-1 text-sm text-mf-text-secondary">{copy.createDetail}</p>
           </div>
           <label className="block text-sm font-medium text-mf-text">
             Nombre completo
@@ -1062,6 +1118,7 @@ export function TutorWorkspace() {
       {child ? (
         <div ref={childPanelRef} className="scroll-mt-24">
           <TutorBuilderPanel
+            workspace={workspace}
             child={child}
             form={form}
             setForm={setForm}

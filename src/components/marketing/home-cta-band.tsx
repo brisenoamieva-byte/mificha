@@ -19,10 +19,10 @@ export function HomeCtaBand() {
             Piloto · familias
           </p>
           <h2 className="mt-2 text-xl font-semibold tracking-[-0.02em] text-white sm:text-2xl">
-            Arma la ficha o agenda el diagnóstico
+            Ficha, seguimiento y visibilidad ante agentes
           </h2>
           <p className="mt-2 text-sm leading-6 text-white/80">
-            El tutor arma la ficha en la plataforma. Diagnóstico GPH cuando lo necesites.
+            Llena la ficha de tu hijo en MiFicha. En Explorar te buscan agentes de futbol.
           </p>
         </div>
         <div className="flex flex-wrap gap-3">

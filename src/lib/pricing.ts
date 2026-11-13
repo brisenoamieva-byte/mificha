@@ -109,13 +109,15 @@ export const DIAGNOSIS_PRODUCT = {
 } as const;
 
 export const SCOUT_PRICING = {
-  headline: "Explorar para visorías",
-  basicLabel: "Directorio básico",
+  headline: "Explorar · membresía persona",
+  basicLabel: "Búsqueda básica",
   basicPrice: "Gratis",
-  proLabel: "Explorar Pro",
-  proStatus: "Próximamente",
+  proLabel: "Membresía persona · Explorar Pro",
+  proStatus: "$50 USD / año",
   description:
-    "Búsqueda avanzada, listas guardadas y alertas por categoría — cuando la red tenga masa crítica.",
+    "Filtra por categoría, posición y ciudad. Solo fichas con consentimiento. El detalle completo se desbloquea con la membresía persona ($50 USD/año).",
+  unlockNote:
+    "Incluye publicar fichas (familia o representante) y ver fotos, videos, bio, contacto y ficha completa de terceros con opt-in.",
 } as const;
 
 /** Suscripción legacy para academias — desactivada en producto; conservada para Stripe futuro. */

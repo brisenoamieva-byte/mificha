@@ -3,7 +3,6 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { DiagnosisReport } from "@/components/diagnosis/diagnosis-report";
-import { buildDemoDiagnosisReport } from "@/lib/demo-diagnosis";
 import { isDemoPlayerSlug } from "@/lib/demo-ficha-preview";
 import { diagnosisWhatsAppHref } from "@/lib/gph-alliance";
 import {
@@ -22,7 +21,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { slug } = await params;
   if (isDemoPlayerSlug(slug)) {
     return {
-      title: "Evaluación GPH · Santiago Hernández (ejemplo) | MiFicha",
+      title: "Evaluación no disponible | MiFicha",
       robots: { index: false, follow: false },
     };
   }
@@ -44,22 +43,7 @@ export default async function PublicPlayerEvaluationPage({ params }: PageProps) 
   const { slug } = await params;
 
   if (isDemoPlayerSlug(slug)) {
-    const demo = buildDemoDiagnosisReport();
-    return (
-      <DiagnosisPageShell
-        fichaHref={`/fut/j/${slug}`}
-        showExampleCta
-      >
-        <p className="mb-4 text-center text-[11px] font-semibold uppercase tracking-[0.18em] text-mf-gph print:hidden">
-          Ejemplo · GPH · MiFicha
-        </p>
-        <DiagnosisReport
-          diagnosis={demo.diagnosis}
-          player={demo.player}
-          academy={demo.academy}
-        />
-      </DiagnosisPageShell>
-    );
+    notFound();
   }
 
   const publicPlayer = await fetchPublicPlayerBySlug(slug);

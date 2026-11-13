@@ -1,10 +1,22 @@
 import type { LucideIcon } from "lucide-react";
-import { Trophy, Users } from "lucide-react";
+import {
+  CalendarDays,
+  ClipboardList,
+  Megaphone,
+  Newspaper,
+  Package,
+  Sparkles,
+} from "lucide-react";
+import { CRACKS_TRYOUTS_PATH } from "@/lib/cracks-tryouts";
+import { GPH_PACHUCA_PATH } from "@/lib/gph-pachuca-segunda-fase";
+import { VISORIA_PUBLIC_PATH } from "@/lib/visoria-event";
 
 export interface NavLink {
   href: string;
   label: string;
   description?: string;
+  /** Si true, se muestra como “próximamente” sin inventar oferta. */
+  soon?: boolean;
 }
 
 export interface NavSection {
@@ -14,86 +26,122 @@ export interface NavSection {
   links: NavLink[];
 }
 
-/** Navegación marketing — un enlace por destino, sin duplicados. */
+/**
+ * IA marketing limpia — sin duplicar el buscador de la home ni mezclar roles.
+ * Orden = prioridad en el menú.
+ */
 export const MARKETING_NAV: NavSection[] = [
   {
-    id: "producto",
-    label: "Producto",
-    icon: Trophy,
+    id: "planes",
+    label: "Planes",
+    icon: Package,
     links: [
       {
-        href: "/fut/#como-funciona",
-        label: "Cómo funciona",
-        description: "Tutor, academia y seguimiento en un lugar",
+        href: "/fut/planes#persona",
+        label: "Familia o representante",
+        description: "Fichas + Explorar Pro · $50 USD/año",
       },
       {
-        href: "/fut/j/santiago-hernandez-demo",
-        label: "Ficha de ejemplo",
-        description: "Stats del torneo en una ficha de muestra",
-      },
-      {
-        href: "/fut/tutor",
-        label: "Soy tutor",
-        description: "Arma la ficha con fotos, videos e historia",
-      },
-      {
-        href: "/fut/padres",
-        label: "Padres",
-        description: "Cómo funciona MiFicha para la familia",
-      },
-      {
-        href: "/fut/evaluaciones",
-        label: "Evaluaciones GPH",
-        description: "$2,030 (−30%) · diagnóstico GPH + 12 meses de MiFicha",
-      },
-      {
-        href: "/fut/pachuca",
-        label: "Orgullo GPH · Pachuca",
-        description: "Cuatro jugadores a segunda fase con Club Pachuca",
-      },
-      {
-        href: "/fut/cracks",
-        label: "CRACKS try outs",
-        description: "Noviembre · Colegio San Javier · solicita liga de registro",
-      },
-      {
-        href: "/fut/visorias",
-        label: "Visorías Querétaro",
-        description: "26 y 27 de noviembre 2026 · registro abierto",
+        href: "/fut/planes#academia",
+        label: "Academia",
+        description: "Plantel y torneo · gratis para la escuela",
       },
     ],
   },
   {
-    id: "acceso",
-    label: "Acceso",
-    icon: Users,
+    id: "productos",
+    label: "Productos",
+    icon: Sparkles,
     links: [
       {
-        href: "/fut/signup",
-        label: "Registrar academia",
-        description: "Plantel, partidos y reportes",
+        href: "/fut/evaluaciones",
+        label: "Evaluaciones GPH",
+        description: "Diagnóstico GPH + 12 meses de MiFicha",
       },
       {
-        href: "/fut/organizadores",
-        label: "Organizadores",
-        description: "Calendario y acta oficial",
-      },
-      {
-        href: "/fut/explorar",
-        label: "Explorar",
-        description: "Directorio, rankings e 11 ideal semanal",
-      },
-      {
-        href: "/fut/pagar?sku=diagnosis",
-        label: "Pagar diagnóstico",
-        description: "Ficha del jugador. Diagnóstico GPH $2,030 (−30%, incluye 12 meses).",
-      },
-      {
-        href: "/fut/membresia",
-        label: "Membresía anual",
-        description: "Qué incluye el seguimiento y las oportunidades",
+        href: "/fut/productos#entrenamientos",
+        label: "Entrenamientos",
+        description: "Especialización y sesiones GPH",
       },
     ],
+  },
+  {
+    id: "noticias",
+    label: "Noticias",
+    icon: Newspaper,
+    links: [
+      {
+        href: GPH_PACHUCA_PATH,
+        label: "Orgullo GPH · Pachuca",
+        description: "Cuatro jugadores a segunda fase con Club Pachuca",
+      },
+      {
+        href: "/fut/noticias",
+        label: "Todas las noticias",
+        description: "Anuncios y logros de la red",
+      },
+    ],
+  },
+  {
+    id: "visorias",
+    label: "Visorías",
+    icon: ClipboardList,
+    links: [
+      {
+        href: VISORIA_PUBLIC_PATH,
+        label: "Visorías Querétaro",
+        description: "26–27 nov · Chivas y Santos · registro abierto",
+      },
+      {
+        href: "/fut/visorias",
+        label: "Ver visorías",
+        description: "Calendario y registro",
+      },
+    ],
+  },
+  {
+    id: "eventos",
+    label: "Eventos",
+    icon: CalendarDays,
+    links: [
+      {
+        href: "/fut/eventos",
+        label: "Próximos eventos",
+        description: "Aún no hay eventos publicados",
+        soon: true,
+      },
+    ],
+  },
+  {
+    id: "convocatorias",
+    label: "Convocatorias",
+    icon: Megaphone,
+    links: [
+      {
+        href: CRACKS_TRYOUTS_PATH,
+        label: "CRACKS · Querétaro",
+        description: "Try outs noviembre · solicita liga de registro",
+      },
+      {
+        href: "/fut/convocatorias",
+        label: "Todas las convocatorias",
+        description: "Oportunidades abiertas para jugadores",
+      },
+    ],
+  },
+];
+
+/** Enlaces secundarios (menú “Más”). Sin “Entrar”: ya está el botón del header. */
+export const MARKETING_SECONDARY_LINKS: NavLink[] = [
+  {
+    href: "/fut/#como-funciona",
+    label: "Cómo funciona",
+    description: "Buscar gratis, publicar ficha, membresía",
+  },
+  {
+    href: "https://wa.me/524421556155?text=Hola%20Ricardo%2C%20quiero%20informaci%C3%B3n%20sobre%20patrocinio%20en%20MiFicha.",
+    label: "Patrocinio",
+    description: "WhatsApp · solicitar información",
   },
 ];
 
