@@ -33,11 +33,17 @@ export function TutorShareActions({
   }, [absoluteUrl, sharePath]);
 
   const whatsappHref = useMemo(() => {
-    const text = publicCode
-      ? `Mira la ficha de ${playerName} en MiFicha (${publicCode}): ${resolvedUrl}`
-      : `Mira la ficha de ${playerName} en MiFicha: ${resolvedUrl}`;
+    const isPlayerMode =
+      resolvedUrl.includes("vista=jugador") || sharePath.includes("vista=jugador");
+    const text = isPlayerMode
+      ? publicCode
+        ? `Esta es mi carta en MiFicha (${publicCode}): ${resolvedUrl}`
+        : `Esta es mi carta en MiFicha: ${resolvedUrl}`
+      : publicCode
+        ? `Mira la ficha de ${playerName} en MiFicha (${publicCode}): ${resolvedUrl}`
+        : `Mira la ficha de ${playerName} en MiFicha: ${resolvedUrl}`;
     return `https://wa.me/?text=${encodeURIComponent(text)}`;
-  }, [resolvedUrl, playerName, publicCode]);
+  }, [resolvedUrl, sharePath, playerName, publicCode]);
 
   useEffect(() => {
     setCanNativeShare(typeof navigator !== "undefined" && typeof navigator.share === "function");
