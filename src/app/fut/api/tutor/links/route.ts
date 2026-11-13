@@ -55,6 +55,7 @@ export async function POST(request: Request) {
     action?: string;
     child_id?: string;
     player_id?: string;
+    confirm?: boolean;
   };
 
   const childId = String(body.child_id ?? "").trim();
@@ -67,6 +68,13 @@ export async function POST(request: Request) {
     if (body.action === "unlink") {
       const child = await unlinkTutorChild(admin, user.id, childId);
       return NextResponse.json({ ok: true, child });
+    }
+
+    if (body.confirm !== true) {
+      return NextResponse.json(
+        { error: "Confirma el vínculo antes de conectar (confirm: true)." },
+        { status: 400 },
+      );
     }
 
     const playerId = String(body.player_id ?? "").trim();

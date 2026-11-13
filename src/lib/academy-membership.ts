@@ -4,17 +4,19 @@ import { createMercadoPagoPreference, isMercadoPagoConfigured } from "@/lib/merc
 
 export { ACADEMY_MEMBERSHIP_FREE_PROMO } from "@/lib/membership-promo";
 import { ACADEMY_MEMBERSHIP_FREE_PROMO } from "@/lib/membership-promo";
+import { isAcademyBillingEnabled } from "@/lib/pricing";
 
 export const ACADEMY_PRODUCT = {
   id: "academia",
-  title: "Membresía academia",
+  /** Checkout / legado; en promo el pitch es “canal gratuito” (`ACADEMY_COMMERCIAL`). */
+  title: "Acceso academia",
   priceUsd: 150,
   priceLabel: "$150",
   currency: "USD",
   period: "al año",
   days: 365,
   summary:
-    "Plantel, partidos y avisos a tutores. El organizador activa la temporada.",
+    "Plantel, partidos, código MF y avisos a tutores. El cobro a academias está apagado mientras el piloto necesite densidad de alumnos.",
 } as const;
 
 /** ~$150 USD en MXN. Ajustable con ACADEMY_MEMBERSHIP_PRICE_MXN. */
@@ -178,9 +180,9 @@ export function academyMembershipPublicCopy() {
     meta: listPrice,
     cta: `Contratar · ${ACADEMY_PRODUCT.priceLabel} USD/año`,
     short: listPrice,
-    headline: "Membresía academia",
+    headline: "Acceso academia",
     summary:
-      "Plantel, partidos y avisos a tutores · $150 USD/año. El organizador activa la temporada.",
+      "Plantel, partidos, código MF y avisos · $150 USD/año. El organizador del torneo se cotiza aparte.",
   };
 }
 
@@ -286,7 +288,10 @@ export async function markAcademyOrderPaid(
   return updated;
 }
 
-/** Cobro activo (promo apagada). */
+/**
+ * Cobro anual a academias activo.
+ * Delega en `isAcademyBillingEnabled` (promo + env NEXT_PUBLIC_ACADEMY_BILLING).
+ */
 export function isAcademyAnnualBillingEnabled() {
-  return !ACADEMY_MEMBERSHIP_FREE_PROMO;
+  return isAcademyBillingEnabled();
 }

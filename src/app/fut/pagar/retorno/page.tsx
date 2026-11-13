@@ -82,7 +82,7 @@ export default async function PagoRetornoPage({
   const paidTitle = isPersona
     ? "Listo. Membresía persona activa."
     : isAcademy
-      ? "Listo. Membresía academia activa."
+      ? "Listo. Acceso academia activo."
       : "Listo. Ya quedó tu año en MiFicha.";
 
   return (

@@ -15,9 +15,9 @@ const STEPS = [
   },
   {
     n: "3",
-    title: "Detalle con membresía",
+    title: "Detalle y academia",
     detail:
-      "Fotos, contacto y ficha completa con membresía persona (gratis por tiempo limitado; después $50 USD/año). Academia gratis por tiempo limitado (después $150 USD/año).",
+      "Fotos, contacto y ficha completa con membresía persona (gratis por tiempo limitado; después $50 USD/año). La academia opera plantel, partidos y código MF sin cuota; el ingreso es el diagnóstico GPH a familias.",
   },
 ] as const;
 

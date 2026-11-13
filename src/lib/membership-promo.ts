@@ -1,6 +1,8 @@
 /**
- * Interruptores de promo de membresía (persona + academia).
- * Un solo lugar para apagar el “gratis por tiempo limitado” cuando cobremos.
+ * Interruptores de promo de membresía.
+ * Persona: “gratis por tiempo limitado” → Explorar Pro.
+ * Academia: canal gratuito (plantel/partidos/MF); no es pitch de cuota.
+ * Apagar ACADEMY_MEMBERSHIP_FREE_PROMO solo cuando cobremos acceso academia.
  */
 
 export const PERSONA_MEMBERSHIP_FREE_PROMO = true;

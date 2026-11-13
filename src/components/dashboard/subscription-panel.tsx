@@ -104,7 +104,7 @@ export function SubscriptionPanel() {
       }
 
       if (result.alreadyActive || result.ok) {
-        toast.success("Membresía academia activa.");
+        toast.success("Acceso academia activo.");
         globalThis.location.reload();
         return;
       }

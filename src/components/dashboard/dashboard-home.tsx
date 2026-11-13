@@ -35,6 +35,7 @@ import {
   formatMatchDate,
   getMatchResultLabel,
 } from "@/lib/match-utils";
+import { ACADEMY_MEMBERSHIP_FREE_PROMO } from "@/lib/membership-promo";
 import { isLaunchFreeMode } from "@/lib/launch-mode";
 import { supabase } from "@/lib/supabase";
 import type { MatchResult, MatchStatus, Player, PlayerPosition, PlayerSeasonStat } from "@/types/database";
@@ -262,12 +263,23 @@ export function DashboardHome() {
               icon={AlertCircle}
             />
             <MetricCard
-              title={complimentary ? "Acceso" : isLaunchFreeMode() ? "Acceso" : "Suscripción"}
+              title={
+                complimentary || ACADEMY_MEMBERSHIP_FREE_PROMO || isLaunchFreeMode()
+                  ? "Acceso"
+                  : "Suscripción"
+              }
               value=""
               icon={Sparkles}
               badge={{
-                label: complimentary ? "Socio GPH" : isLaunchFreeMode() ? "Lanzamiento" : "Suscripción",
-                active: complimentary || isLaunchFreeMode(),
+                label: complimentary
+                  ? "Socio GPH"
+                  : ACADEMY_MEMBERSHIP_FREE_PROMO || isLaunchFreeMode()
+                    ? "Canal gratis"
+                    : "Suscripción",
+                active:
+                  complimentary ||
+                  ACADEMY_MEMBERSHIP_FREE_PROMO ||
+                  isLaunchFreeMode(),
               }}
             />
           </>

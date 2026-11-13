@@ -10,8 +10,8 @@ import { createSupabaseAdminClient } from "@/lib/supabase-admin";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 
 /**
- * Membresía academia anual ($150 USD).
- * - Promo gratis: registra 12 meses sin cobro.
+ * Acceso academia (referencia futura $150 USD/año).
+ * - Promo / canal gratuito: registra 12 meses sin cobro.
  * - Cobro activo: Mercado Pago.
  */
 export async function POST(request: Request) {

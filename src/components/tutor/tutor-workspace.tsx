@@ -305,7 +305,11 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
     try {
       await authed("/fut/api/tutor/links", {
         method: "POST",
-        body: JSON.stringify({ child_id: child.id, player_id: playerId }),
+        body: JSON.stringify({
+          child_id: child.id,
+          player_id: playerId,
+          confirm: true,
+        }),
       });
       await load(phone, child.id);
       setNotice("Jugador ligado con su academia. Es la misma persona en ambos lados.");

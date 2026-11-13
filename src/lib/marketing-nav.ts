@@ -50,7 +50,7 @@ export const MARKETING_NAV: NavSection[] = [
       {
         href: "/fut/planes",
         label: "Academia",
-        description: `Plantel y torneo · ${academyCopy.short}`,
+        description: `Canal academia · plantel, partidos y MF · ${academyCopy.short}`,
       },
     ],
   },
