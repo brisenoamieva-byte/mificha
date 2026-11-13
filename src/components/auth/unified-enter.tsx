@@ -18,7 +18,7 @@ const CHOICES = [
   {
     id: "academia",
     title: "Academia",
-    detail: "Plantel, partidos y panel · gratis por tiempo limitado.",
+    detail: "Plantel, partidos y código MF · canal sin cuota.",
     href: "/fut/signup",
   },
   {

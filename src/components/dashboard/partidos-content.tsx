@@ -94,7 +94,8 @@ export function PartidosContent() {
         <div>
           <h1 className="text-2xl font-bold text-slate-900 sm:text-3xl">Partidos</h1>
           <p className="mt-1 text-slate-600">
-            Jornadas oficiales: MiFicha sincroniza el acta del torneo y avisa al tutor
+            Aquí queda el rendimiento oficial (minutos, goles, asistencias). El acta
+            alimenta la ficha y puede avisar al tutor
             {season ? ` · ${season.name}` : ""}
           </p>
         </div>

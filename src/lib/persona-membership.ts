@@ -134,7 +134,7 @@ export function personaMembershipPublicCopy() {
       cta: "Activar gratis",
       short: "Gratis por tiempo limitado",
       planesSummary:
-        "Dos cuentas: persona (gratis por tiempo limitado; después $50 USD/año) o academia (gratis por tiempo limitado; después $150 USD/año).",
+        "Dos cuentas: persona (gratis por tiempo limitado; después $50 USD/año) o academia (canal gratuito: plantel, partidos y MF).",
     };
   }
   return {

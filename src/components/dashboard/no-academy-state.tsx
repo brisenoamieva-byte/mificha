@@ -10,8 +10,8 @@ export function NoAcademyState() {
         ¿Academia o cuenta de tutor?
       </h1>
       <p className="mt-3 text-sm leading-7 text-mf-text-secondary">
-        Esta área es para colegios y clubes. Si eres papá o mamá, entra al espacio de
-        tutor para armar la ficha de tu hijo.
+        Academia: plantel, partidos y avisos (rendimiento oficial). Tutor: carta y
+        proyección del jugador. Si eres papá o mamá, entra al espacio de tutor.
       </p>
       <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
         <Link href="/fut/tutor" className="mf-btn-gph">

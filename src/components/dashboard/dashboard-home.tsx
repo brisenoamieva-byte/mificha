@@ -17,6 +17,7 @@ import { ProgressTierBadge } from "@/components/ui/passport-score-display";
 import { PlayerAvatar } from "@/components/ui/player-avatar";
 import { NoAcademyState } from "@/components/dashboard/no-academy-state";
 import { AcademyOnboardingPanel } from "@/components/dashboard/academy-onboarding-panel";
+import { AcademyRolePanel } from "@/components/dashboard/academy-role-panel";
 import { SubscriptionPanel } from "@/components/dashboard/subscription-panel";
 import { AcademyWeeklyCompetition } from "@/components/dashboard/academy-weekly-competition";
 import { TeamInsightsPanel } from "@/components/dashboard/team-insights-panel";
@@ -221,23 +222,26 @@ export function DashboardHome() {
         </p>
       </div>
 
+      <AcademyRolePanel />
+
+      <AcademyOnboardingPanel />
+
       <Link
         href="/fut/dashboard/diagnostico"
-        className="flex flex-col gap-2 rounded-2xl border border-mf-brand/20 bg-mf-brand-soft px-5 py-4 transition hover:border-mf-brand sm:flex-row sm:items-center sm:justify-between"
+        className="flex flex-col gap-2 rounded-2xl border border-mf-border bg-white px-5 py-4 transition hover:border-mf-brand/40 sm:flex-row sm:items-center sm:justify-between"
       >
         <div>
-          <p className="inline-flex items-center gap-2 text-sm font-semibold text-mf-brand">
-            <ClipboardList className="h-4 w-4" />
-            Diagnóstico de jugadores
+          <p className="inline-flex items-center gap-2 text-sm font-semibold text-mf-text">
+            <ClipboardList className="h-4 w-4 text-mf-brand" />
+            Diagnóstico GPH · para familias
           </p>
           <p className="mt-1 text-sm text-mf-text-secondary">
-            Metodología GPH · ficha visual y seguimiento en MiFicha.
+            Opcional en el flujo del plantel. Si una familia lo contrata, la evaluación queda
+            ligada al jugador.
           </p>
         </div>
         <span className="text-sm font-semibold text-mf-brand">Abrir →</span>
       </Link>
-
-      <AcademyOnboardingPanel />
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         {stats ? (

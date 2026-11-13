@@ -1,7 +1,7 @@
-/** Modelo comercial MiFicha — academias (promo gratis / $150 USD año); organizador paga temporada. */
+/** Modelo comercial MiFicha — academia = canal; organizador paga temporada; familias pagan GPH. */
 
 import { DIAGNOSIS_PROMO, FAMILY_PRODUCTS } from "@/lib/gph-commerce";
-
+import { ACADEMY_COMMERCIAL } from "@/lib/academy-role";
 import { ACADEMY_BILLING_PROMO_FREE } from "@/lib/membership-promo";
 
 /**
@@ -9,16 +9,11 @@ import { ACADEMY_BILLING_PROMO_FREE } from "@/lib/membership-promo";
  * pricing ↔ mercadopago ↔ academy-membership en el build).
  */
 export const ACADEMY_ACCESS = {
-  headline: "Gratis para academias · tiempo limitado",
-  summary:
-    "Plantel, fichas y avisos a tutores — gratis por tiempo limitado. Después $150 USD/año.",
-  features: [
-    "Plantel y consentimiento parental",
-    "Ficha sincronizada con el acta del torneo",
-    "Avisos automáticos al tutor",
-  ],
-  priceUsd: 150,
-  priceLabel: "$150",
+  headline: ACADEMY_COMMERCIAL.headline,
+  summary: ACADEMY_COMMERCIAL.summary,
+  features: [...ACADEMY_COMMERCIAL.features],
+  priceUsd: ACADEMY_COMMERCIAL.futurePriceUsd,
+  priceLabel: `$${ACADEMY_COMMERCIAL.futurePriceUsd}`,
   promoFree: ACADEMY_BILLING_PROMO_FREE,
 } as const;
 
@@ -35,7 +30,7 @@ export interface OrganizerPricingPlan {
 export const ORGANIZER_PRICING = {
   title: "Precios",
   subtitle:
-    "Las academias no pagan. Elige tarifa por categoría o por jugador — puedes incluirla en la inscripción del torneo.",
+    "Las academias operan plantel y partidos sin cuota. El organizador elige tarifa por categoría o por jugador — puedes incluirla en la inscripción del torneo.",
   footnote: "Temporada 2026 · Querétaro · Cupos limitados para torneos fundadores.",
   costExample: {
     label: "Ejemplo por jugador",

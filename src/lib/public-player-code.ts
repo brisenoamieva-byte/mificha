@@ -394,22 +394,27 @@ export async function ensureTutorPublicCodes(
     const preferred = normalizePublicCode(preferredByChild[childId] ?? null);
     if (preferred) {
       const owner = registry[preferred];
-      // Libre, ya de este tutor, o código de visoría del mismo jugador → unificar.
+      // Libre, ya de este tutor, visoría, o plantel (mismo MF) → unificar.
       const canAdopt =
         !owner ||
         (owner.kind === "tutor" && owner.id === childId) ||
-        owner.kind === "visoria";
+        owner.kind === "visoria" ||
+        owner.kind === "player";
       if (canAdopt) {
         result[childId] = preferred;
         used.add(preferred);
-        if (!owner || owner.kind === "visoria" || owner.id !== childId) {
+        if (!owner || owner.kind === "visoria") {
           registry[preferred] = {
             kind: "tutor",
             id: childId,
             updated_at: new Date().toISOString(),
           };
           registryChanged = true;
+        } else if (owner.kind === "tutor" && owner.id !== childId) {
+          // no-op; canAdopt already excludes other tutors
         }
+        // Si el dueño es plantel, dejamos el registro como player: la ficha tutor
+        // guarda el mismo MF y el vínculo lo confirma la UI.
         continue;
       }
     }

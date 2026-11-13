@@ -89,7 +89,7 @@ interface LinkSuggestion {
   player_name: string;
   slug: string;
   reason: string;
-  match?: "code" | "contact";
+  match?: "code" | "birth" | "contact";
 }
 
 const inputClass =
@@ -97,6 +97,7 @@ const inputClass =
 
 const emptyForm = {
   player_name: "",
+  public_code: "",
   birth_date: "",
   position: "",
   club: "",
@@ -246,6 +247,7 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
     if (!child) return;
     setForm({
       player_name: child.player_name,
+      public_code: "",
       birth_date: child.profile.birth_date ?? "",
       position: child.profile.position ?? "",
       club: child.profile.club ?? "",
@@ -489,6 +491,7 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
           child_id: child?.id,
           guardian_kind: workspace,
           player_name: form.player_name,
+          public_code: child ? undefined : form.public_code || undefined,
           guardian_phone: phone || undefined,
           birth_date: form.birth_date || null,
           position: form.position || null,
@@ -519,7 +522,9 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
       setNotice(
         updating
           ? "Ficha actualizada. La vista previa ya refleja los cambios."
-          : "Ficha creada. Completa foto, historia y datos en el constructor.",
+          : form.public_code.trim()
+            ? "Ficha creada con tu código MF. Si hay plantel con el mismo código, confirma el vínculo en Academia."
+            : "Ficha creada. Completa foto, historia y datos en el constructor.",
       );
       window.setTimeout(() => {
         childPanelRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -1154,6 +1159,26 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
               </select>
             </label>
           </div>
+          <label className="block text-sm font-medium text-mf-text">
+            Código MF- de academia (opcional)
+            <input
+              value={form.public_code}
+              onChange={(event) =>
+                setForm((current) => ({
+                  ...current,
+                  public_code: event.target.value.toUpperCase(),
+                }))
+              }
+              className={`${inputClass} font-mono uppercase`}
+              placeholder="MF-A3K9"
+              autoComplete="off"
+              spellCheck={false}
+            />
+            <span className="mt-1 block text-xs font-normal text-mf-text-muted">
+              Si la academia ya te dio un código, pégalo aquí para usar el mismo y no
+              duplicar fichas. El vínculo con plantel se confirma después.
+            </span>
+          </label>
           {error ? (
             <p className="rounded-lg bg-mf-danger-soft px-3 py-2 text-sm text-mf-danger">{error}</p>
           ) : null}

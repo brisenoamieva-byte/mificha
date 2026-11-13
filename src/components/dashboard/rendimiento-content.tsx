@@ -105,14 +105,14 @@ export function RendimientoContent() {
         <div className="relative flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-mf-accent-bright">
-              Rendimiento · engagement
+              Rendimiento oficial
             </p>
             <h1 className="mt-2 text-3xl font-semibold tracking-[-0.03em]">
-              Progreso que emociona
+              Lo que sale de tus partidos
             </h1>
             <p className="mt-3 max-w-2xl text-sm leading-7 text-white/80">
-              Gráficas vivas, comparativas por categoría y evolución partido a
-              partido. Lo que padres y jugadores quieren revisar una y otra vez.
+              Comparativas del plantel y evolución partido a partido. Es el dato
+              oficial de la academia; la carta la completa el tutor con el mismo MF.
             </p>
           </div>
           <Link

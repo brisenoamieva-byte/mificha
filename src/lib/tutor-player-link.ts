@@ -39,6 +39,8 @@ function namesLikelySame(a: string, b: string) {
   return shared.length >= 2;
 }
 
+export type TutorLinkMatchKind = "code" | "birth" | "contact";
+
 export interface TutorLinkSuggestion {
   player_id: string;
   academy_id: string;
@@ -46,15 +48,37 @@ export interface TutorLinkSuggestion {
   player_name: string;
   slug: string;
   reason: string;
-  /** Match por código MF tiene prioridad para el CTA. */
-  match: "code" | "contact";
+  /** Prioridad: code → birth → contact. */
+  match: TutorLinkMatchKind;
+}
+
+export interface AcademyTutorMatch {
+  child_id: string;
+  guardian_user_id: string;
+  player_name: string;
+  public_code: string;
+  birth_date: string | null;
+  reason: string;
+  match: TutorLinkMatchKind;
+}
+
+function matchRank(kind: TutorLinkMatchKind) {
+  if (kind === "code") return 0;
+  if (kind === "birth") return 1;
+  return 2;
+}
+
+function birthKey(value: string | null | undefined) {
+  const raw = String(value ?? "").trim().slice(0, 10);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(raw) || raw === "1900-01-01") return "";
+  return raw;
 }
 
 async function hydratePlayerSuggestion(
   admin: SupabaseClient,
   playerId: string,
   reason: string,
-  match: "code" | "contact",
+  match: TutorLinkMatchKind,
 ): Promise<TutorLinkSuggestion | null> {
   const { data: player, error } = await admin
     .from("players")
@@ -126,6 +150,37 @@ export async function suggestAcademyPlayersForChild(
     }
   }
 
+  const birth = birthKey(child.profile.birth_date);
+  if (birth) {
+    const { data: byBirth } = await admin
+      .from("players")
+      .select(
+        "id, first_name, last_name, slug, academy_id, birth_date, academies(name)",
+      )
+      .eq("birth_date", birth)
+      .limit(60);
+    for (const row of byBirth ?? []) {
+      const playerName = `${row.first_name ?? ""} ${row.last_name ?? ""}`.trim();
+      if (!namesLikelySame(child.player_name, playerName)) continue;
+      const id = String(row.id);
+      if (byId.has(id)) continue;
+      const academyRel = (row as { academies?: { name?: string } | { name?: string }[] | null })
+        .academies;
+      const academyName = Array.isArray(academyRel)
+        ? academyRel[0]?.name
+        : academyRel?.name;
+      byId.set(id, {
+        player_id: id,
+        academy_id: String(row.academy_id),
+        academy_name: academyName || "Academia",
+        player_name: playerName,
+        slug: String(row.slug ?? ""),
+        reason: `Mismo nombre y fecha de nacimiento (${birth})`,
+        match: "birth",
+      });
+    }
+  }
+
   const email = child.guardian_email.trim().toLowerCase();
   const phone = phoneKey(child.guardian_phone);
   if (email || phone) {
@@ -183,8 +238,9 @@ export async function suggestAcademyPlayersForChild(
   }
 
   return [...byId.values()].sort((a, b) => {
-    if (a.match === b.match) return a.player_name.localeCompare(b.player_name);
-    return a.match === "code" ? -1 : 1;
+    const rank = matchRank(a.match) - matchRank(b.match);
+    if (rank !== 0) return rank;
+    return a.player_name.localeCompare(b.player_name, "es");
   });
 }
 
@@ -275,4 +331,115 @@ export async function unlinkTutorChild(
     linked_player_slug: null,
     linked_at: null,
   });
+}
+
+/** Candidatos tutor al dar de alta / editar en plantel de academia. */
+export async function findTutorMatchesForAcademyPlayer(
+  admin: SupabaseClient,
+  input: {
+    name: string;
+    birthDate?: string | null;
+    guardianPhone?: string | null;
+    guardianEmail?: string | null;
+    publicCode?: string | null;
+  },
+): Promise<AcademyTutorMatch[]> {
+  const { listAllTutorChildrenForOps } = await import("@/lib/tutor-family");
+  const roster = await listAllTutorChildrenForOps(admin);
+  const byId = new Map<string, AcademyTutorMatch>();
+  const code = normalizePublicCode(input.publicCode);
+  const birth = birthKey(input.birthDate);
+  const email = String(input.guardianEmail ?? "")
+    .trim()
+    .toLowerCase();
+  const phone = phoneKey(input.guardianPhone);
+  const name = String(input.name ?? "").trim();
+
+  for (const child of roster) {
+    if (child.linked_player_id) continue;
+
+    if (code && normalizePublicCode(child.public_code) === code) {
+      byId.set(child.id, {
+        child_id: child.id,
+        guardian_user_id: child.guardian_user_id,
+        player_name: child.player_name,
+        public_code: child.public_code,
+        birth_date: child.profile.birth_date,
+        reason: `Mismo código ${code}`,
+        match: "code",
+      });
+      continue;
+    }
+
+    if (
+      birth &&
+      birthKey(child.profile.birth_date) === birth &&
+      namesLikelySame(name, child.player_name)
+    ) {
+      byId.set(child.id, {
+        child_id: child.id,
+        guardian_user_id: child.guardian_user_id,
+        player_name: child.player_name,
+        public_code: child.public_code,
+        birth_date: child.profile.birth_date,
+        reason: `Mismo nombre y fecha de nacimiento (${birth})`,
+        match: "birth",
+      });
+      continue;
+    }
+
+    const contactOk =
+      (email && child.guardian_email.trim().toLowerCase() === email) ||
+      (phone && phoneKey(child.guardian_phone) === phone);
+    if (contactOk && namesLikelySame(name, child.player_name)) {
+      byId.set(child.id, {
+        child_id: child.id,
+        guardian_user_id: child.guardian_user_id,
+        player_name: child.player_name,
+        public_code: child.public_code,
+        birth_date: child.profile.birth_date,
+        reason: "Mismo contacto de tutor y nombre parecido",
+        match: "contact",
+      });
+    }
+  }
+
+  return [...byId.values()].sort((a, b) => {
+    const rank = matchRank(a.match) - matchRank(b.match);
+    if (rank !== 0) return rank;
+    return a.player_name.localeCompare(b.player_name, "es");
+  });
+}
+
+/**
+ * Academia conecta un player de plantel con una ficha tutor.
+ * La autorización (owner/staff/GPH) la hace el caller; aquí solo valida pertenencia.
+ */
+export async function linkAcademyPlayerToTutorChild(
+  admin: SupabaseClient,
+  _userId: string,
+  academyId: string,
+  playerId: string,
+  childId: string,
+) {
+  const { data: player, error } = await admin
+    .from("players")
+    .select("id, academy_id, first_name, last_name, slug, academies(name)")
+    .eq("id", playerId)
+    .maybeSingle();
+  if (error) throw new Error(error.message);
+  if (!player) throw new Error("Jugador de academia no encontrado.");
+  if (String(player.academy_id) !== academyId) {
+    throw new Error("Ese jugador no pertenece a tu academia.");
+  }
+
+  const { listAllTutorChildrenForOps } = await import("@/lib/tutor-family");
+  const roster = await listAllTutorChildrenForOps(admin);
+  const target = roster.find((row) => row.id === childId);
+  if (!target) throw new Error("No encontramos la ficha tutor.");
+  if (target.linked_player_id && target.linked_player_id !== playerId) {
+    throw new Error("Esa ficha tutor ya está vinculada a otro jugador.");
+  }
+
+  return linkTutorChildToPlayer(admin, target.guardian_user_id, childId, playerId);
 }

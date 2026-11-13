@@ -14,8 +14,10 @@ import { PlayerPrivacyControls } from "@/components/ui/player-privacy-controls";
 import { PlayerVideosPanel } from "@/components/dashboard/player-videos-panel";
 import { PlayerVisualProfileFields } from "@/components/dashboard/player-visual-profile-fields";
 import { COACH_NOTES_MAX_LENGTH, clampTrait } from "@/lib/player-visual-profile";
+import { PLAYER_CODE_LABEL, PLAYER_CODE_SHORT } from "@/lib/player-public-code-copy";
 import { buildPrivacyPayload } from "@/lib/privacy";
 import { supabase } from "@/lib/supabase";
+import type { TutorLinkMatchKind } from "@/lib/tutor-player-link";
 import { cn } from "@/lib/utils";
 import type { DominantFoot, Player, PlayerPosition } from "@/types/database";
 
@@ -25,6 +27,15 @@ const inputClassName = cn(
 );
 
 const selectClassName = cn(inputClassName, "bg-white");
+
+type TutorMatchRow = {
+  child_id: string;
+  player_name: string;
+  public_code: string;
+  birth_date: string | null;
+  reason: string;
+  match: TutorLinkMatchKind;
+};
 
 export interface PlayerModalProps {
   open: boolean;
@@ -37,6 +48,27 @@ export interface PlayerModalProps {
 function getErrorMessage(error: unknown) {
   if (error instanceof Error) return error.message;
   return "No se pudo guardar el jugador.";
+}
+
+async function authedFetch(path: string, init?: RequestInit) {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  if (!session) throw new Error("Sesión expirada. Vuelve a iniciar sesión.");
+  const response = await fetch(path, {
+    ...init,
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${session.access_token}`,
+      ...(init?.headers ?? {}),
+    },
+  });
+  const payload = (await response.json().catch(() => ({}))) as {
+    error?: string;
+    matches?: TutorMatchRow[];
+  };
+  if (!response.ok) throw new Error(payload.error || "No se pudo completar.");
+  return payload;
 }
 
 export function PlayerModal({
@@ -53,6 +85,7 @@ export function PlayerModal({
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [birthDate, setBirthDate] = useState("");
+  const [publicCode, setPublicCode] = useState("");
   const [position, setPosition] = useState<PlayerPosition>("midfielder");
   const [dominantFoot, setDominantFoot] = useState<DominantFoot>("right");
   const [jerseyNumber, setJerseyNumber] = useState("");
@@ -75,6 +108,9 @@ export function PlayerModal({
   const [traitPhysical, setTraitPhysical] = useState<number | null>(null);
   const [traitAttitude, setTraitAttitude] = useState<number | null>(null);
   const [coachNotes, setCoachNotes] = useState("");
+  const [tutorMatches, setTutorMatches] = useState<TutorMatchRow[]>([]);
+  const [selectedChildId, setSelectedChildId] = useState<string | null>(null);
+  const [matchBusy, setMatchBusy] = useState(false);
 
   useEffect(() => {
     if (!open) return;
@@ -82,6 +118,9 @@ export function PlayerModal({
     setError(null);
     setPhotoFile(null);
     setVideoFile(null);
+    setTutorMatches([]);
+    setSelectedChildId(null);
+    setPublicCode("");
 
     if (player) {
       setFirstName(player.first_name);
@@ -123,6 +162,7 @@ export function PlayerModal({
     setHasConsent(false);
     setGuardianName("");
     setGuardianEmail("");
+    setGuardianPhone("");
     setPhotoPreview(null);
     setVideoPreview(null);
     setSecondaryPosition("");
@@ -132,6 +172,53 @@ export function PlayerModal({
     setTraitAttitude(null);
     setCoachNotes("");
   }, [open, player]);
+
+  useEffect(() => {
+    if (!open) return;
+    const name = `${firstName} ${lastName}`.trim();
+    const code = publicCode.trim();
+    const birth = birthDate.trim();
+    const phone = guardianPhone.trim();
+    const email = guardianEmail.trim();
+    if (!code && !(name.length >= 3 && birth) && !(name.length >= 3 && (phone || email))) {
+      setTutorMatches([]);
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      void (async () => {
+        setMatchBusy(true);
+        try {
+          const params = new URLSearchParams({ academy_id: academyId, name });
+          if (birth) params.set("birth_date", birth);
+          if (phone) params.set("guardian_phone", phone);
+          if (email) params.set("guardian_email", email);
+          if (code) params.set("public_code", code);
+          const payload = await authedFetch(`/fut/api/players/match?${params}`);
+          const rows = payload.matches ?? [];
+          setTutorMatches(rows);
+          setSelectedChildId((current) =>
+            current && rows.some((row) => row.child_id === current) ? current : null,
+          );
+        } catch {
+          setTutorMatches([]);
+        } finally {
+          setMatchBusy(false);
+        }
+      })();
+    }, 420);
+
+    return () => window.clearTimeout(timer);
+  }, [
+    open,
+    academyId,
+    firstName,
+    lastName,
+    birthDate,
+    publicCode,
+    guardianPhone,
+    guardianEmail,
+  ]);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -181,6 +268,8 @@ export function PlayerModal({
         ...privacy,
       };
 
+      let playerId = player?.id ?? "";
+
       if (isEditing && player) {
         const { error: updateError } = await supabase
           .from("players")
@@ -188,20 +277,47 @@ export function PlayerModal({
           .eq("id", player.id);
 
         if (updateError) throw updateError;
-        onSaved("Jugador actualizado.");
       } else {
         const slug = buildPlayerSlug(firstName, lastName);
         const qrCode = buildPublicPlayerUrl(slug);
 
-        const { error: insertError } = await supabase.from("players").insert({
-          ...payload,
-          slug,
-          qr_code: qrCode,
-          academy_id: academyId,
-        });
+        const { data: inserted, error: insertError } = await supabase
+          .from("players")
+          .insert({
+            ...payload,
+            slug,
+            qr_code: qrCode,
+            academy_id: academyId,
+          })
+          .select("id")
+          .single();
 
         if (insertError) throw insertError;
-        onSaved("Ficha creada. Envía el link al tutor desde Avisos a tutores.");
+        playerId = String(inserted.id);
+      }
+
+      if (selectedChildId) {
+        await authedFetch("/fut/api/players/link-tutor", {
+          method: "POST",
+          body: JSON.stringify({
+            academy_id: academyId,
+            player_id: playerId,
+            child_id: selectedChildId,
+            public_code: publicCode.trim() || undefined,
+            confirm: true,
+          }),
+        });
+        onSaved(
+          isEditing
+            ? "Jugador actualizado y vinculado a la ficha tutor."
+            : "Ficha creada y vinculada a la ficha tutor (mismo código MF).",
+        );
+      } else {
+        onSaved(
+          isEditing
+            ? "Jugador actualizado."
+            : "Ficha creada. Envía el link al tutor desde Avisos a tutores.",
+        );
       }
 
       onOpenChange(false);
@@ -284,6 +400,83 @@ export function PlayerModal({
                   className={inputClassName}
                 />
               </div>
+            </div>
+
+            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+              <p className="text-sm font-semibold text-slate-900">{PLAYER_CODE_LABEL}</p>
+              <p className="mt-1 text-xs leading-relaxed text-slate-500">
+                {PLAYER_CODE_SHORT} Si el tutor ya tiene ficha, pega su{" "}
+                <span className="font-mono font-semibold">MF-</span> o completa
+                nombre + nacimiento para evitar duplicados. El vínculo solo se
+                crea si confirmas abajo.
+              </p>
+              <label className="mt-3 block text-sm font-medium text-slate-700">
+                Código MF- del tutor (opcional)
+                <input
+                  value={publicCode}
+                  onChange={(event) => setPublicCode(event.target.value.toUpperCase())}
+                  className={cn(inputClassName, "font-mono uppercase")}
+                  placeholder="MF-A3K9"
+                  autoComplete="off"
+                  spellCheck={false}
+                />
+              </label>
+              {matchBusy ? (
+                <p className="mt-3 text-xs text-slate-500">Buscando fichas tutor…</p>
+              ) : null}
+              {tutorMatches.length > 0 ? (
+                <ul className="mt-3 space-y-2">
+                  {tutorMatches.map((item) => {
+                    const selected = selectedChildId === item.child_id;
+                    return (
+                      <li key={item.child_id}>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setSelectedChildId(selected ? null : item.child_id)
+                          }
+                          className={cn(
+                            "flex w-full items-start justify-between gap-3 rounded-lg border px-3 py-3 text-left",
+                            selected
+                              ? "border-[#1B4F8C] bg-white ring-2 ring-[#1B4F8C]/20"
+                              : item.match === "code"
+                                ? "border-[#1B4F8C]/30 bg-white"
+                                : "border-slate-200 bg-white hover:border-slate-300",
+                          )}
+                        >
+                          <div>
+                            <p className="text-sm font-semibold text-slate-900">
+                              {item.player_name}
+                              {item.public_code ? (
+                                <span className="ml-2 font-mono text-xs font-semibold text-[#1B4F8C]">
+                                  {item.public_code}
+                                </span>
+                              ) : null}
+                            </p>
+                            <p className="mt-0.5 text-xs text-slate-500">{item.reason}</p>
+                          </div>
+                          <span
+                            className={cn(
+                              "shrink-0 rounded-md px-2 py-1 text-[11px] font-semibold",
+                              selected
+                                ? "bg-[#1B4F8C] text-white"
+                                : "bg-slate-100 text-slate-600",
+                            )}
+                          >
+                            {selected ? "Conectar al guardar" : "Seleccionar"}
+                          </span>
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              ) : null}
+              {selectedChildId ? (
+                <p className="mt-3 text-xs font-medium text-[#1B4F8C]">
+                  Al guardar se vinculará con esa ficha tutor (mismo MF). No se
+                  crea una segunda ficha suelta.
+                </p>
+              ) : null}
             </div>
 
             <div className="grid gap-5 sm:grid-cols-2">

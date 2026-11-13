@@ -11,6 +11,7 @@ import {
   ACADEMY_PRODUCT,
   academyMembershipPublicCopy,
 } from "@/lib/academy-membership";
+import { ACADEMY_COMMERCIAL } from "@/lib/academy-role";
 import { ACADEMY_ACCESS, isAcademyBillingEnabled } from "@/lib/pricing";
 import { cn } from "@/lib/utils";
 
@@ -35,6 +36,9 @@ function AcademyFreePanel() {
           {ACADEMY_MEMBERSHIP_FREE_PROMO ? (
             <p className="mt-3 text-xs font-medium text-emerald-800">{copy.priceLine}</p>
           ) : null}
+          <p className="mt-2 text-xs leading-5 text-emerald-900/80">
+            {ACADEMY_COMMERCIAL.futurePriceHint}
+          </p>
           <Link
             href="/fut/organizadores"
             className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-[#1B4F8C] hover:underline"
@@ -62,8 +66,8 @@ export function SubscriptionPanel() {
           <div>
             <h2 className="text-lg font-semibold text-slate-900">Socio GPH · sin costo</h2>
             <p className="mt-2 text-sm leading-7 text-slate-700">
-              Esta academia no paga suscripción. Plantel, fichas y diagnósticos GPH
-              quedan abiertos. Las evaluaciones a familias se cotizan aparte.
+              Plantel, partidos, MF y avisos sin cuota. Las evaluaciones GPH a familias
+              se cotizan aparte; no son requisito del plantel.
             </p>
           </div>
         </div>

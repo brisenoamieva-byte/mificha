@@ -211,8 +211,9 @@ export function PlantelContent() {
               Mi Plantel
             </h1>
             <p className="mt-1 text-slate-600">
-              {players.length} jugador{players.length === 1 ? "" : "es"} · la
-              academia registra el plantel; los padres solo ven la ficha por link
+              {players.length} jugador{players.length === 1 ? "" : "es"} · aquí
+              operas el roster oficial; el tutor completa la carta con el mismo
+              código MF
             </p>
           </div>
 
@@ -268,9 +269,9 @@ export function PlantelContent() {
             </p>
             <ol className="mt-3 list-decimal space-y-2 pl-5 text-sm text-slate-600">
               <li>Descarga la plantilla Excel (incluye columnas opcionales de tutor).</li>
-              <li>Importa todo el roster (ideal al inicio de temporada). La fecha de nacimiento puede ir después.</li>
-              <li>Filtra por generación o Sub-X y completa foto, perfil visual y consentimiento.</li>
-              <li>Registra contacto del tutor y sube video highlight desde el jugador.</li>
+              <li>Importa el roster. Si el tutor ya tiene MF-, pégalo al crear para no duplicar fichas.</li>
+              <li>Registra contacto del tutor (WhatsApp/email) para avisos post-partido.</li>
+              <li>Luego captura partidos: eso es el rendimiento oficial que ve la familia.</li>
             </ol>
           </div>
         ) : null}
@@ -346,7 +347,8 @@ export function PlantelContent() {
         {Object.keys(playerCodes).length > 0 ? (
           <p className="text-xs leading-5 text-slate-500">
             El código <span className="font-mono font-semibold text-mf-gph">MF-…</span> bajo
-            cada nombre: {PLAYER_CODE_SHORT}
+            cada nombre une plantel y ficha tutor ({PLAYER_CODE_SHORT}). Si el padre ya
+            tiene uno, conéctalo al editar o crear jugador.
           </p>
         ) : null}
 

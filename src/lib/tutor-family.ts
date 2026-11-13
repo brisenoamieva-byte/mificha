@@ -124,6 +124,8 @@ export interface TutorMaterial {
 
 export type TutorChildInput = {
   player_name: string;
+  /** Si el tutor ya tiene MF- de academia/visoría, se intenta adoptar. */
+  public_code?: string | null;
   guardian_phone?: string | null;
   guardian_kind?: GuardianKind;
   birth_date?: string | null;
@@ -696,9 +698,19 @@ export async function createTutorChild(
   if (duplicate) throw new Error("Ese jugador ya está en tu cuenta.");
 
   const childId = randomUUID();
-  const codes = await ensureTutorPublicCodes(admin, [childId]);
+  const preferredCode = normalizePublicCode(input.public_code);
+  const codes = await ensureTutorPublicCodes(
+    admin,
+    [childId],
+    preferredCode ? { [childId]: preferredCode } : {},
+  );
   const publicCode = codes[childId];
   if (!publicCode) throw new Error("No se pudo asignar un código único.");
+  if (preferredCode && publicCode !== preferredCode) {
+    throw new Error(
+      `El código ${preferredCode} ya está en uso. Déjalo vacío para generar uno nuevo o verifica el MF- con la academia.`,
+    );
+  }
 
   const child: TutorChild = {
     id: childId,

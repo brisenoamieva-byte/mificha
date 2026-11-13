@@ -89,13 +89,14 @@ export interface TutorLinkSuggestion {
   player_name: string;
   slug: string;
   reason: string;
-  match?: "code" | "contact";
+  match?: "code" | "birth" | "contact";
 }
 
 interface TutorBuilderPanelProps {
   child: TutorBuilderChild;
   form: {
     player_name: string;
+    public_code: string;
     birth_date: string;
     position: string;
     club: string;
@@ -1373,7 +1374,7 @@ export function TutorBuilderPanel({
                     key={item.player_id}
                     className={cn(
                       "flex flex-wrap items-center justify-between gap-2 rounded-lg px-3 py-3",
-                      item.match === "code"
+                      item.match === "code" || item.match === "birth"
                         ? "border border-mf-gph/30 bg-mf-gph-soft"
                         : "bg-mf-canvas",
                     )}
@@ -1394,7 +1395,9 @@ export function TutorBuilderPanel({
                         ? "Ligando…"
                         : item.match === "code"
                           ? "Usar mismo código"
-                          : "Es el mismo"}
+                          : item.match === "birth"
+                            ? "Confirmar (mismo nombre y nacimiento)"
+                            : "Es el mismo"}
                     </button>
                   </li>
                 ))}

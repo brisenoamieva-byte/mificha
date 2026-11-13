@@ -34,6 +34,7 @@ function parseInput(body: Record<string, unknown>): TutorChildInput {
         : null;
   return {
     player_name: String(body.player_name ?? ""),
+    public_code: body.public_code == null ? null : String(body.public_code),
     guardian_phone: body.guardian_phone == null ? null : String(body.guardian_phone),
     guardian_kind: normalizeGuardianKind(
       body.guardian_kind == null ? undefined : String(body.guardian_kind),

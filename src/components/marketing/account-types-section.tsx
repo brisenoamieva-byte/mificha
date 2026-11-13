@@ -28,8 +28,9 @@ const ACCOUNTS = [
     forWho: "Colegios y clubes",
     status: academyCopy.meta,
     canDo: [
-      "Registrar plantel, partidos y avisos a tutores",
-      "Operar el día a día del torneo con staff",
+      "Operar plantel y rendimiento oficial (partidos / stats)",
+      "Vincular código MF con la ficha del tutor (sin duplicar)",
+      "Avisar a padres tras el partido · sin cuota de academia",
     ],
     href: "/fut/signup",
     cta: "Registrar academia",
@@ -43,12 +44,12 @@ const LAYERS = [
     detail: "Fotos, videos e historia; la arma el tutor o el representante.",
   },
   {
-    title: "Directorio Explorar",
-    detail: "Con opt-in, la ficha aparece en el buscador para scouts y clubes.",
+    title: "Rendimiento de academia",
+    detail: "Plantel y partidos oficiales; el club aporta el dato que el tutor no inventa.",
   },
   {
     title: "Informe GPH",
-    detail: "Diagnóstico del evaluador (cuando lo contratan).",
+    detail: "Diagnóstico a familias (cuando lo contratan); no es requisito del plantel.",
   },
 ] as const;
 

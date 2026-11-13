@@ -162,14 +162,14 @@ export function academyMembershipPublicCopy() {
   const listPrice = `${ACADEMY_PRODUCT.priceLabel} ${ACADEMY_PRODUCT.currency}/${ACADEMY_PRODUCT.period.replace("al ", "")}`;
   if (ACADEMY_MEMBERSHIP_FREE_PROMO) {
     return {
-      badge: "Gratis por tiempo limitado",
-      priceLine: `Gratis ahora · después ${listPrice}`,
-      meta: "Gratis · tiempo limitado",
+      badge: "Canal gratuito",
+      priceLine: "Sin cuota de academia · ingreso en diagnóstico a familias",
+      meta: "Gratis · canal",
       cta: "Registrar academia",
-      short: "Gratis por tiempo limitado",
-      headline: "Gratis para academias · tiempo limitado",
+      short: "Gratis (canal)",
+      headline: "Academia · canal gratuito",
       summary:
-        "Plantel, fichas y avisos a tutores — gratis por tiempo limitado. Después $150 USD/año.",
+        "Plantel, partidos, código MF y avisos sin cuota. El valor de pago está en el diagnóstico GPH para familias.",
     };
   }
   return {
@@ -180,7 +180,7 @@ export function academyMembershipPublicCopy() {
     short: listPrice,
     headline: "Membresía academia",
     summary:
-      "Plantel, fichas y avisos a tutores · $150 USD/año. El organizador activa la temporada.",
+      "Plantel, partidos y avisos a tutores · $150 USD/año. El organizador activa la temporada.",
   };
 }
 
@@ -194,7 +194,7 @@ export function planesHubSummary(
     return personaPlanesSummary.replace(
       /academia \([^)]+\)/,
       ACADEMY_MEMBERSHIP_FREE_PROMO
-        ? "academia (gratis por tiempo limitado; después $150 USD/año)"
+        ? "academia (canal gratuito: plantel, partidos y MF)"
         : "academia ($150 USD/año)",
     );
   }
