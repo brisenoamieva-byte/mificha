@@ -4,11 +4,16 @@ import {
   GPH_PACHUCA_PATH,
   GPH_PACHUCA_SEGUNDA_FASE,
 } from "@/lib/gph-pachuca-segunda-fase";
+import {
+  academyMembershipPublicCopy,
+  planesHubSummary,
+} from "@/lib/academy-membership";
 import { personaMembershipPublicCopy } from "@/lib/persona-membership";
 import { SCOUT_PRODUCT } from "@/lib/scout-product";
 import { VISORIA_EVENT, VISORIA_PUBLIC_PATH } from "@/lib/visoria-event";
 
 const personaCopy = personaMembershipPublicCopy();
+const academyCopy = academyMembershipPublicCopy();
 
 export type HubItem = {
   id: string;
@@ -22,7 +27,7 @@ export type HubItem = {
 
 export const PLANES_HUB = {
   title: "Planes",
-  summary: personaCopy.planesSummary,
+  summary: planesHubSummary(personaCopy.planesSummary, academyCopy),
   items: [
     {
       id: "persona",
@@ -35,11 +40,10 @@ export const PLANES_HUB = {
     {
       id: "academia",
       title: "Academia",
-      detail:
-        "Plantel, partidos y avisos a tutores sin costo para la escuela. El organizador activa la temporada.",
-      meta: "Gratis para la academia",
+      detail: academyCopy.summary,
+      meta: academyCopy.meta,
       href: "/fut/signup",
-      cta: "Registrar academia",
+      cta: academyCopy.cta,
     },
   ] satisfies HubItem[],
 } as const;

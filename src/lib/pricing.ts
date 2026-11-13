@@ -1,16 +1,25 @@
-/** Modelo comercial MiFicha — academias gratis; organizador paga la temporada. */
+/** Modelo comercial MiFicha — academias (promo gratis / $150 USD año); organizador paga temporada. */
 
+import {
+  ACADEMY_MEMBERSHIP_FREE_PROMO,
+  academyMembershipPublicCopy,
+  isAcademyAnnualBillingEnabled,
+} from "@/lib/academy-membership";
 import { DIAGNOSIS_PROMO, FAMILY_PRODUCTS } from "@/lib/gph-commerce";
 
+const academyCopy = academyMembershipPublicCopy();
+
 export const ACADEMY_ACCESS = {
-  headline: "Gratis para academias",
-  summary:
-    "Plantel, fichas y avisos al tutor — sin costo para la escuela. El torneo activa la temporada.",
+  headline: academyCopy.headline,
+  summary: academyCopy.summary,
   features: [
     "Plantel y consentimiento parental",
     "Ficha sincronizada con el acta del torneo",
     "Avisos automáticos al tutor",
   ],
+  priceUsd: 150,
+  priceLabel: "$150",
+  promoFree: ACADEMY_MEMBERSHIP_FREE_PROMO,
 } as const;
 
 export interface OrganizerPricingPlan {
@@ -127,8 +136,11 @@ export const LEGACY_ACADEMY_PLANS = {
   elite: { label: "Elite", priceLabel: "$1,999/mes", amount: 199_900 },
 } as const;
 
+/** Cobro anual academia ($150). Env fuerza on/off; si no, sigue el flag de promo. */
 export function isAcademyBillingEnabled() {
-  return process.env.NEXT_PUBLIC_ACADEMY_BILLING === "true";
+  if (process.env.NEXT_PUBLIC_ACADEMY_BILLING === "true") return true;
+  if (process.env.NEXT_PUBLIC_ACADEMY_BILLING === "false") return false;
+  return isAcademyAnnualBillingEnabled();
 }
 
 export function formatOrganizerPriceMailtoSubject(tournamentName?: string) {

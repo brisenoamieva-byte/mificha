@@ -17,7 +17,7 @@ const STEPS = [
     n: "3",
     title: "Detalle con membresía",
     detail:
-      "Fotos, contacto y ficha completa con membresía persona (gratis por tiempo limitado; después $50 USD/año). Academia opera plantel gratis.",
+      "Fotos, contacto y ficha completa con membresía persona (gratis por tiempo limitado; después $50 USD/año). Academia gratis por tiempo limitado (después $150 USD/año).",
   },
 ] as const;
 

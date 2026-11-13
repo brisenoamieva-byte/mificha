@@ -1,8 +1,10 @@
 import Link from "next/link";
+import { academyMembershipPublicCopy } from "@/lib/academy-membership";
 import { personaMembershipPublicCopy } from "@/lib/persona-membership";
 import { SCOUT_PRODUCT } from "@/lib/scout-product";
 
 const personaCopy = personaMembershipPublicCopy();
+const academyCopy = academyMembershipPublicCopy();
 
 const ACCOUNTS = [
   {
@@ -24,7 +26,7 @@ const ACCOUNTS = [
     id: "academia",
     title: "Academia",
     forWho: "Colegios y clubes",
-    status: "Gratis",
+    status: academyCopy.meta,
     canDo: [
       "Registrar plantel, partidos y avisos a tutores",
       "Operar el día a día del torneo con staff",
@@ -61,7 +63,7 @@ export function AccountTypesSection() {
           Dos cuentas
         </h2>
         <p className="mt-3 max-w-2xl text-sm leading-7 text-mf-text-secondary">
-          {personaCopy.planesSummary.replace("Dos cuentas: ", "").replace(/\.$/, "")}.
+          Persona ({personaCopy.short}) o academia ({academyCopy.short}).
         </p>
 
         <ul className="mt-8 grid gap-3 md:grid-cols-2">

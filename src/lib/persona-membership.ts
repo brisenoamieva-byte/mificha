@@ -136,7 +136,8 @@ export function personaMembershipPublicCopy() {
       meta: "Gratis · tiempo limitado",
       cta: "Activar gratis",
       short: "Gratis por tiempo limitado",
-      planesSummary: "Dos cuentas: persona (gratis por tiempo limitado; después $50 USD/año) o academia (gratis).",
+      planesSummary:
+        "Dos cuentas: persona (gratis por tiempo limitado; después $50 USD/año) o academia (gratis por tiempo limitado; después $150 USD/año).",
     };
   }
   return {
@@ -145,7 +146,8 @@ export function personaMembershipPublicCopy() {
     meta: listPrice,
     cta: `Contratar · ${SCOUT_PRODUCT.priceLabel} USD/año`,
     short: listPrice,
-    planesSummary: "Dos cuentas: persona ($50 USD/año) o academia (gratis).",
+    planesSummary:
+      "Dos cuentas: persona ($50 USD/año) o academia ($150 USD/año).",
   };
 }
 

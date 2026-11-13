@@ -3,6 +3,10 @@ import Link from "next/link";
 import { SiteFooter, SiteHeader } from "@/components/marketing/site-header";
 import { diagnosisWhatsAppHref } from "@/lib/gph-alliance";
 import { createSupabaseAdminClient } from "@/lib/supabase-admin";
+import {
+  getAcademyOrderByFolio,
+  markAcademyOrderPaid,
+} from "@/lib/academy-membership";
 import { getFamilyOrderByFolio, markFamilyOrderPaid } from "@/lib/family-orders";
 import {
   getPersonaOrderByFolio,
@@ -29,6 +33,7 @@ export default async function PagoRetornoPage({
   let status = collection === "approved" || collection === "success" ? "paid" : collection;
   let membershipUntil: string | null = null;
   const isPersona = folio.startsWith("PE-");
+  const isAcademy = folio.startsWith("AC-");
 
   if (folio) {
     try {
@@ -36,12 +41,20 @@ export default async function PagoRetornoPage({
       if ((collection === "approved" || collection === "success") && params.payment_id) {
         if (isPersona) {
           await markPersonaOrderPaid(admin, folio, params.payment_id);
+        } else if (isAcademy) {
+          await markAcademyOrderPaid(admin, folio, params.payment_id);
         } else {
           await markFamilyOrderPaid(admin, folio, params.payment_id);
         }
       }
       if (isPersona) {
         const order = await getPersonaOrderByFolio(admin, folio);
+        if (order) {
+          status = order.status;
+          membershipUntil = order.membership_until;
+        }
+      } else if (isAcademy) {
+        const order = await getAcademyOrderByFolio(admin, folio);
         if (order) {
           status = order.status;
           membershipUntil = order.membership_until;
@@ -61,6 +74,12 @@ export default async function PagoRetornoPage({
   const paid = status === "paid" || status === "approved" || status === "success";
   const pending = status === "pending" || status === "in_process";
 
+  const paidTitle = isPersona
+    ? "Listo. Membresía persona activa."
+    : isAcademy
+      ? "Listo. Membresía academia activa."
+      : "Listo. Ya quedó tu año en MiFicha.";
+
   return (
     <div className="flex min-h-dvh flex-col bg-mf-canvas">
       <SiteHeader />
@@ -74,9 +93,7 @@ export default async function PagoRetornoPage({
               </p>
               <h1 className="mt-2 text-2xl font-semibold tracking-tight text-mf-gph-ink">
                 {paid
-                  ? isPersona
-                    ? "Listo. Membresía persona activa."
-                    : "Listo. Ya quedó tu año en MiFicha."
+                  ? paidTitle
                   : pending
                     ? "Mercado Pago sigue confirmando."
                     : "No se cerró el cobro."}
@@ -89,7 +106,9 @@ export default async function PagoRetornoPage({
                   Acceso hasta {membershipUntil}
                   {isPersona
                     ? ". Ya puedes ver fichas completas en Explorar."
-                    : ". Si contrataste evaluación, el equipo GPH coordina la sesión por WhatsApp."}
+                    : isAcademy
+                      ? ". Ya puedes operar plantel y partidos en el panel."
+                      : ". Si contrataste evaluación, el equipo GPH coordina la sesión por WhatsApp."}
                 </p>
               ) : null}
               {!paid && !pending ? (
@@ -108,6 +127,10 @@ export default async function PagoRetornoPage({
                         Mis fichas
                       </Link>
                     </>
+                  ) : isAcademy ? (
+                    <Link href="/fut/dashboard" className="mf-btn-gph">
+                      Ir al panel academia
+                    </Link>
                   ) : (
                     <>
                       <a
@@ -124,13 +147,30 @@ export default async function PagoRetornoPage({
                     </>
                   )
                 ) : pending ? (
-                  <Link href={isPersona ? "/fut/explorar" : "/fut/tutor"} className="mf-btn-gph-ghost">
-                    {isPersona ? "Ir a Explorar" : "Ir a tutor"}
+                  <Link
+                    href={
+                      isPersona
+                        ? "/fut/explorar"
+                        : isAcademy
+                          ? "/fut/dashboard"
+                          : "/fut/tutor"
+                    }
+                    className="mf-btn-gph-ghost"
+                  >
+                    {isPersona
+                      ? "Ir a Explorar"
+                      : isAcademy
+                        ? "Ir al panel"
+                        : "Ir a tutor"}
                   </Link>
                 ) : (
                   <>
                     {isPersona ? (
                       <Link href="/fut/explorar#pro" className="mf-btn-gph">
+                        Reintentar membresía
+                      </Link>
+                    ) : isAcademy ? (
+                      <Link href="/fut/dashboard" className="mf-btn-gph">
                         Reintentar membresía
                       </Link>
                     ) : (

@@ -18,7 +18,7 @@ const CHOICES = [
   {
     id: "academia",
     title: "Academia",
-    detail: "Plantel, partidos y panel de torneo · gratis.",
+    detail: "Plantel, partidos y panel · gratis por tiempo limitado.",
     href: "/fut/signup",
   },
   {

@@ -6,17 +6,16 @@ import { useState } from "react";
 import { useDashboard } from "@/components/dashboard/dashboard-context";
 import { toast } from "@/components/ui/toast";
 import { isSubscriptionActive } from "@/lib/dashboard-utils";
-import { isLaunchFreeMode } from "@/lib/launch-mode";
-import { ACADEMY_ACCESS, isAcademyBillingEnabled } from "@/lib/pricing";
-import { supabase } from "@/lib/supabase";
 import {
-  getPlanStatusLabel,
-  PLAN_CONFIG,
-  type SubscriptionPlan,
-} from "@/lib/stripe";
+  ACADEMY_MEMBERSHIP_FREE_PROMO,
+  ACADEMY_PRODUCT,
+  academyMembershipPublicCopy,
+} from "@/lib/academy-membership";
+import { ACADEMY_ACCESS, isAcademyBillingEnabled } from "@/lib/pricing";
 import { cn } from "@/lib/utils";
 
 function AcademyFreePanel() {
+  const copy = academyMembershipPublicCopy();
   return (
     <section className="rounded-xl border border-emerald-200 bg-emerald-50/60 p-6 shadow-sm">
       <div className="flex items-start gap-3">
@@ -33,6 +32,9 @@ function AcademyFreePanel() {
               <li key={item}>· {item}</li>
             ))}
           </ul>
+          {ACADEMY_MEMBERSHIP_FREE_PROMO ? (
+            <p className="mt-3 text-xs font-medium text-emerald-800">{copy.priceLine}</p>
+          ) : null}
           <Link
             href="/fut/organizadores"
             className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-[#1B4F8C] hover:underline"
@@ -48,8 +50,7 @@ function AcademyFreePanel() {
 
 export function SubscriptionPanel() {
   const { academy } = useDashboard();
-  const [loadingPlan, setLoadingPlan] = useState<SubscriptionPlan | null>(null);
-  const [loadingPortal, setLoadingPortal] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   if (!academy) return null;
 
@@ -70,88 +71,45 @@ export function SubscriptionPanel() {
     );
   }
 
-  if (isLaunchFreeMode() || !isAcademyBillingEnabled()) {
+  if (ACADEMY_MEMBERSHIP_FREE_PROMO || !isAcademyBillingEnabled()) {
     return <AcademyFreePanel />;
   }
 
   const academyId = academy.id;
   const active = isSubscriptionActive(academy.plan_status);
 
-  async function getAccessToken() {
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-    return session?.access_token ?? null;
-  }
-
-  async function handleCheckout(plan: SubscriptionPlan) {
-    setLoadingPlan(plan);
-
+  async function handleCheckout() {
+    setLoading(true);
     try {
-      const accessToken = await getAccessToken();
-      if (!accessToken) {
-        toast.error("Tu sesión expiró. Vuelve a iniciar sesión.");
-        return;
-      }
-
-      const response = await fetch("/fut/api/stripe/create-checkout", {
+      const response = await fetch("/fut/api/pay/academy", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify({
-          plan,
-          academy_id: academyId,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ academy_id: academyId }),
       });
+      const result = (await response.json()) as {
+        url?: string;
+        checkoutUrl?: string;
+        error?: string;
+        ok?: boolean;
+        alreadyActive?: boolean;
+      };
 
-      const result = (await response.json()) as { url?: string; error?: string };
-
-      if (!response.ok || !result.url) {
-        toast.error(result.error ?? "No se pudo iniciar el pago.");
+      if (result.checkoutUrl) {
+        globalThis.location.assign(result.checkoutUrl);
         return;
       }
 
-      globalThis.location.assign(result.url);
+      if (result.alreadyActive || result.ok) {
+        toast.success("Membresía academia activa.");
+        globalThis.location.reload();
+        return;
+      }
+
+      toast.error(result.error ?? "No se pudo iniciar el pago.");
     } catch {
       toast.error("Error de red al iniciar el pago.");
     } finally {
-      setLoadingPlan(null);
-    }
-  }
-
-  async function handleManagePayment() {
-    setLoadingPortal(true);
-
-    try {
-      const accessToken = await getAccessToken();
-      if (!accessToken) {
-        toast.error("Tu sesión expiró. Vuelve a iniciar sesión.");
-        return;
-      }
-
-      const response = await fetch("/fut/api/stripe/create-portal", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify({ academy_id: academyId }),
-      });
-
-      const result = (await response.json()) as { url?: string; error?: string };
-
-      if (!response.ok || !result.url) {
-        toast.error(result.error ?? "No se pudo abrir el portal de pagos.");
-        return;
-      }
-
-      globalThis.location.assign(result.url);
-    } catch {
-      toast.error("Error de red al abrir el portal de pagos.");
-    } finally {
-      setLoadingPortal(false);
+      setLoading(false);
     }
   }
 
@@ -161,75 +119,36 @@ export function SubscriptionPanel() {
         <div>
           <div className="flex items-center gap-2">
             <CreditCard className="h-5 w-5 text-[#1B4F8C]" />
-            <h2 className="text-lg font-semibold text-slate-900">Suscripción</h2>
+            <h2 className="text-lg font-semibold text-slate-900">
+              {ACADEMY_PRODUCT.title}
+            </h2>
           </div>
           <p className="mt-2 text-sm text-slate-600">
-            Plan actual:{" "}
-            <span className="font-semibold text-slate-900">
-              {getPlanStatusLabel(academy.plan_status)}
-            </span>
+            {ACADEMY_PRODUCT.priceLabel} {ACADEMY_PRODUCT.currency}{" "}
+            {ACADEMY_PRODUCT.period}. Plantel, partidos y avisos a tutores.
           </p>
           <span
             className={cn(
               "mt-3 inline-flex rounded-full px-3 py-1 text-xs font-semibold",
-              active
-                ? "bg-green-100 text-green-700"
-                : "bg-slate-100 text-slate-600",
+              active ? "bg-green-100 text-green-700" : "bg-slate-100 text-slate-600",
             )}
           >
-            {active ? "Activa" : "Inactiva"}
+            {active ? "Activa" : "Pendiente de pago"}
           </span>
         </div>
 
-        {academy.stripe_customer_id ? (
+        {!active ? (
           <button
             type="button"
-            onClick={handleManagePayment}
-            disabled={loadingPortal}
-            className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60"
+            onClick={() => void handleCheckout()}
+            disabled={loading}
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#1B4F8C] px-4 py-3 text-sm font-semibold text-white hover:bg-[#164278] disabled:opacity-60"
           >
-            <ExternalLink className="h-4 w-4" />
-            {loadingPortal ? "Abriendo..." : "Gestionar pago"}
+            {loading
+              ? "Redirigiendo…"
+              : `Contratar · ${ACADEMY_PRODUCT.priceLabel} USD/año`}
           </button>
         ) : null}
-      </div>
-
-      <div className="mt-6 grid gap-4 md:grid-cols-3">
-        {(Object.keys(PLAN_CONFIG) as SubscriptionPlan[]).map((plan) => {
-          const config = PLAN_CONFIG[plan];
-          const isCurrent = academy.plan_status === plan;
-
-          return (
-            <div
-              key={plan}
-              className={cn(
-                "rounded-2xl border p-5",
-                isCurrent
-                  ? "border-[#1B4F8C] bg-[#1B4F8C]/5"
-                  : "border-slate-200 bg-slate-50",
-              )}
-            >
-              <p className="text-sm font-bold uppercase tracking-wide text-[#1B4F8C]">
-                {config.label}
-              </p>
-              <p className="mt-2 text-2xl font-black text-slate-900">
-                {config.priceLabel}
-              </p>
-              <button
-                type="button"
-                disabled={loadingPlan !== null || isCurrent}
-                onClick={() => handleCheckout(plan)}
-                className="mt-4 w-full rounded-xl bg-[#1B4F8C] px-4 py-3 text-sm font-semibold text-white hover:bg-[#164278] disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {loadingPlan === plan
-                  ? "Redirigiendo..."
-                  : isCurrent
-                    ? "Plan actual"
-                    : `Elegir ${config.label}`}
-              </button>
-            </div>
-          );
-        })}
       </div>
     </section>
   );

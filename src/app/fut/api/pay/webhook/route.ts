@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { markAcademyOrderPaid } from "@/lib/academy-membership";
 import { markFamilyOrderPaid } from "@/lib/family-orders";
 import { fetchMercadoPagoPayment, isMercadoPagoConfigured } from "@/lib/mercadopago";
 import { markPersonaOrderPaid } from "@/lib/persona-membership";
@@ -14,6 +15,10 @@ async function handlePaymentNotification(paymentId: string) {
     const paymentKey = String(payment.id ?? paymentId);
     if (folio.startsWith("PE-")) {
       await markPersonaOrderPaid(admin, folio, paymentKey);
+      return;
+    }
+    if (folio.startsWith("AC-")) {
+      await markAcademyOrderPaid(admin, folio, paymentKey);
       return;
     }
     await markFamilyOrderPaid(admin, folio, paymentKey);
