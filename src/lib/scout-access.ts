@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { canAccessPartnershipHub } from "@/lib/partnership-access";
 import { createSupabaseAdminClient } from "@/lib/supabase-admin";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import type { ExploreAccess } from "@/lib/scout-product";
@@ -45,8 +46,8 @@ async function readScoutSubs(admin: SupabaseClient): Promise<ScoutSubRow[]> {
 
 /**
  * Buscador: público con datos básicos.
- * Ficha completa: membresía persona (Explorar Pro), staff, o dueño de esa ficha.
- * Sin membresía, familia/representante solo publican con opt-in; no desbloquean el detalle de terceros.
+ * Ficha completa: socios MiFicha/GPH (superadmin), role admin/scout, membresía persona,
+ * o dueño de esa ficha.
  */
 export async function resolveExploreAccess(options?: {
   ownerUserId?: string | null;
@@ -63,6 +64,11 @@ export async function resolveExploreAccess(options?: {
   const email = (user.email ?? "").trim().toLowerCase();
   if (options?.ownerUserId && options.ownerUserId === user.id) {
     return { unlocked: true, reason: "owner", userId: user.id, email };
+  }
+
+  // Ricardo + Gustavo: acceso total a fichas sin membresía.
+  if (canAccessPartnershipHub({ id: user.id, email })) {
+    return { unlocked: true, reason: "admin", userId: user.id, email };
   }
 
   if (email && unlockedEmailsFromEnv().includes(email)) {

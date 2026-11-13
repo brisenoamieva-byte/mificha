@@ -12,7 +12,7 @@ export function ExplorePaywallBanner({ access }: { access: ExploreAccess }) {
       access.reason === "scout_sub"
         ? "Acceso completo · membresía persona"
         : access.reason === "admin"
-          ? "Acceso completo · staff"
+          ? "Acceso completo · superadmin / staff"
           : access.reason === "owner"
             ? "Acceso completo · tu ficha"
             : "Acceso completo";

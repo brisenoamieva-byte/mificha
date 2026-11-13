@@ -228,8 +228,7 @@ export function TutorBuilderPanel({
   const lastSavedKey = useRef(`${child.id}:${child.materials.length}:${child.player_name}`);
   const shareAccess = child.public_code || child.share_token;
   const shareHref = shareAccess ? tutorSharePath(shareAccess) : null;
-  const materialsHref =
-    workspace === "agente" && shareAccess ? agentMaterialsPath(shareAccess) : null;
+  const materialsHref = shareAccess ? agentMaterialsPath(shareAccess) : null;
   const showAcademy = Boolean(child.linked_player_id) || linkSuggestions.length > 0;
 
   useEffect(() => {
