@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { fireAndForgetOpsNotify } from "@/lib/email/ops-notify";
 import {
   createTutorChild,
+  grantTutorLinkedAcademyConsent,
   listGuardianChildren,
   normalizeGuardianKind,
   parseLinesToList,
@@ -99,7 +100,15 @@ export async function POST(request: Request) {
         user.id,
         childId,
         body.explore_opt_in,
+        { consentAck: body.consent_ack === true || body.explore_opt_in === false },
       );
+      return NextResponse.json({ ok: true, child });
+    }
+
+    if (childId && body.action === "linked_academy_consent") {
+      const child = await grantTutorLinkedAcademyConsent(admin, user.id, childId, {
+        consentAck: body.consent_ack === true,
+      });
       return NextResponse.json({ ok: true, child });
     }
 

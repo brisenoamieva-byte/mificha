@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Check, Circle, Copy, ExternalLink, FileText, ImagePlus, Video } from "lucide-react";
 import { PlayerPublicCodeCard } from "@/components/public/player-public-code-card";
 import { TutorCareerSummaryCard } from "@/components/tutor/tutor-career-summary";
+import { TutorConsentPanel } from "@/components/tutor/tutor-consent-panel";
 import { TutorPublicFicha } from "@/components/tutor/tutor-public-ficha";
 import { agentMaterialsPath } from "@/lib/agent-materials";
 import {
@@ -139,6 +140,7 @@ interface TutorBuilderPanelProps {
   onLinkPlayer: (playerId: string) => void;
   onUnlinkPlayer: () => void;
   onToggleExploreOptIn: (enabled: boolean) => void;
+  onSignLinkedAcademyConsent?: () => void;
   workspace?: GuardianKind;
 }
 
@@ -165,6 +167,7 @@ export function TutorBuilderPanel({
   onCopyShare,
   onCopyPublicCode,
   onToggleExploreOptIn,
+  onSignLinkedAcademyConsent,
   onLinkPlayer,
   onUnlinkPlayer,
   workspace = "tutor",
@@ -321,6 +324,19 @@ export function TutorBuilderPanel({
               <ImagePlus className="h-4 w-4" />
               Subir foto de portada
             </button>
+          ) : null}
+          {!child.explore_opt_in ? (
+            <p className="mt-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs leading-5 text-amber-950">
+              Sin consentimiento: no aparece en Explorar. Firma abajo en{" "}
+              <button
+                type="button"
+                className="font-semibold underline"
+                onClick={() => setStep("compartir")}
+              >
+                Compartir
+              </button>
+              .
+            </p>
           ) : null}
         </div>
 
@@ -1241,52 +1257,20 @@ export function TutorBuilderPanel({
               </div>
             ) : null}
 
-            <div className="rounded-xl border border-mf-border bg-mf-canvas px-4 py-4">
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-semibold text-mf-gph-ink">
-                    Consentimiento · aparecer en el buscador
-                  </p>
-                  <p className="mt-1 text-sm leading-6 text-mf-text-secondary">
-                    Con tu permiso, la ficha entra al buscador general (categoría, posición,
-                    ciudad). El público ve datos básicos; el detalle completo solo lo abren
-                    quienes pagan Explorar Pro. El link directo sigue funcionando si lo apagas.
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  role="switch"
-                  aria-checked={Boolean(child.explore_opt_in)}
-                  disabled={busy}
-                  onClick={() => onToggleExploreOptIn(!child.explore_opt_in)}
-                  className={cn(
-                    "relative h-8 w-14 shrink-0 rounded-full transition",
-                    child.explore_opt_in ? "bg-mf-gph" : "bg-mf-border",
-                  )}
-                >
-                  <span
-                    className={cn(
-                      "absolute top-1 h-6 w-6 rounded-full bg-white shadow transition",
-                      child.explore_opt_in ? "left-7" : "left-1",
-                    )}
-                  />
-                </button>
-              </div>
-              <p className="mt-3 text-xs font-medium text-mf-text-muted">
-                {child.explore_opt_in
-                  ? "Visible para agentes en Explorar (si la ficha tiene contenido suficiente)."
-                  : "Solo visible con el link o el código MF- · no aparece en búsquedas."}
-              </p>
-              {child.explore_opt_in ? (
-                <Link
-                  href="/fut/explorar"
-                  target="_blank"
-                  className="mt-3 inline-flex text-sm font-semibold text-mf-gph hover:underline"
-                >
-                  Ver Explorar
-                </Link>
-              ) : null}
-            </div>
+            <TutorConsentPanel
+              exploreOptIn={Boolean(child.explore_opt_in)}
+              exploreOptInAt={child.explore_opt_in_at}
+              linkedAcademyName={child.linked_academy_name}
+              linkedNeedsAcademyConsent={Boolean(
+                child.linked_player_id &&
+                  child.linked_performance &&
+                  !child.linked_performance.isPublicFicha,
+              )}
+              busy={busy}
+              onSignExplore={() => onToggleExploreOptIn(true)}
+              onRevokeExplore={() => onToggleExploreOptIn(false)}
+              onSignAcademy={onSignLinkedAcademyConsent}
+            />
 
             {child.view_stats && child.view_stats.total_views > 0 ? (
               <p className="text-sm leading-6 text-mf-text-secondary">

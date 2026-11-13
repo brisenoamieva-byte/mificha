@@ -85,8 +85,8 @@ export function TutorPerformanceBridge({
             </Link>
           ) : (
             <p className="text-xs leading-6 text-mf-text-muted">
-              Hay vínculo con academia. Cuando activen consentimiento y ficha pública,
-              aquí aparecerá el enlace completo de torneo.
+              Hay vínculo con academia, pero falta tu consentimiento para publicar la
+              ficha de torneo. En Compartir puedes firmarlo y aprobarla.
             </p>
           )}
         </div>

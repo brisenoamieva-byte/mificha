@@ -117,17 +117,18 @@ export async function fetchPublicDirectory(): Promise<PublicDirectoryData> {
       if (retry.ok) playersJson = await retry.json();
     }
 
-    const certified = Array.isArray(playersJson)
-      ? (playersJson as DirectoryPlayer[]).filter((player) =>
-          asAcademyEmbed(player.academies)?.is_certified,
-        )
+    // Consentimiento + ficha pública/discoverable es el candado; la certificación
+    // de academia es un sello, no un requisito para aparecer en el buscador.
+    const consented = Array.isArray(playersJson)
+      ? (playersJson as DirectoryPlayer[])
       : [];
     const gphIds = await fetchGphPlayerIdSet(
-      certified.map((player) => player.id).filter((id): id is string => Boolean(id)),
+      consented.map((player) => player.id).filter((id): id is string => Boolean(id)),
     );
     const players = await Promise.all(
-      certified.map(async (player) => ({
+      consented.map(async (player) => ({
         ...player,
+        source: "academy" as const,
         academies: asAcademyEmbed(player.academies),
         photo_url: await signPlayerPhotoUrl(player.photo_url),
         has_gph_evaluation: Boolean(player.id && gphIds.has(player.id)),

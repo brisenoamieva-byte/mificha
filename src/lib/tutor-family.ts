@@ -826,23 +826,74 @@ export async function updateTutorChildLink(
   return roster[index];
 }
 
-/** Activa o apaga el listado de la ficha en Explorar (opt-in). */
+/** Activa o apaga el listado de la ficha en Explorar (opt-in firmado por el tutor). */
 export async function updateTutorExploreOptIn(
   admin: SupabaseClient,
   userId: string,
   childId: string,
   exploreOptIn: boolean,
+  options?: { consentAck?: boolean },
 ) {
   const { roster } = await loadRoster(admin);
   const index = roster.findIndex(
     (child) => child.id === childId && child.guardian_user_id === userId,
   );
   if (index < 0) throw new Error("No encontramos a ese jugador.");
+  if (exploreOptIn && !options?.consentAck) {
+    throw new Error(
+      "Para publicar en Explorar debes confirmar el consentimiento parental.",
+    );
+  }
   const now = new Date().toISOString();
   roster[index] = {
     ...roster[index],
     explore_opt_in: Boolean(exploreOptIn),
     explore_opt_in_at: exploreOptIn ? now : null,
+  };
+  await writeJson(admin, ROSTER, roster);
+  return roster[index];
+}
+
+/**
+ * El tutor aprueba la ficha pública del jugador de academia vinculado
+ * (public_consent_at + link + directorio).
+ */
+export async function grantTutorLinkedAcademyConsent(
+  admin: SupabaseClient,
+  userId: string,
+  childId: string,
+  options?: { consentAck?: boolean },
+) {
+  if (!options?.consentAck) {
+    throw new Error(
+      "Para aprobar la ficha de academia debes confirmar el consentimiento parental.",
+    );
+  }
+  const { roster } = await loadRoster(admin);
+  const index = roster.findIndex(
+    (child) => child.id === childId && child.guardian_user_id === userId,
+  );
+  if (index < 0) throw new Error("No encontramos a ese jugador.");
+  const child = roster[index];
+  if (!child.linked_player_id) {
+    throw new Error("Este jugador aún no está vinculado a un plantel de academia.");
+  }
+
+  const now = new Date().toISOString();
+  const { error } = await admin
+    .from("players")
+    .update({
+      public_consent_at: now,
+      is_public: true,
+      is_discoverable: true,
+    })
+    .eq("id", child.linked_player_id);
+  if (error) throw new Error(error.message || "No se pudo guardar el consentimiento.");
+
+  roster[index] = {
+    ...child,
+    explore_opt_in: true,
+    explore_opt_in_at: child.explore_opt_in_at ?? now,
   };
   await writeJson(admin, ROSTER, roster);
   return roster[index];

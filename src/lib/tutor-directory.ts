@@ -46,27 +46,9 @@ async function readOpsJson<T>(admin: SupabaseClient, path: string): Promise<T[]>
   }
 }
 
-function isPresentableTutor(
-  child: TutorChild,
-  materialCount: { photos: number; stories: number; videos: number },
-  hasSeasonStats: boolean,
-) {
-  if (!normalizePublicCode(child.public_code)) return false;
-  if (!child.player_name.trim()) return false;
-  if (!child.profile?.birth_date || !child.profile?.position) return false;
-  const hasBio = Boolean(child.profile.bio?.trim());
-  return (
-    materialCount.photos > 0 ||
-    materialCount.stories > 0 ||
-    materialCount.videos > 0 ||
-    hasBio ||
-    hasSeasonStats
-  );
-}
-
 /**
- * Fichas tutor listas para descubrir en Explorar.
- * Criterio: código MF + identidad básica + algo de contenido (foto, historia o stats).
+ * Fichas tutor con consentimiento (explore_opt_in) para Explorar.
+ * Criterio: opt-in firmado + código MF + identidad básica.
  */
 export async function fetchTutorDirectoryPlayers(
   admin: SupabaseClient,
@@ -110,7 +92,6 @@ export async function fetchTutorDirectoryPlayers(
     const hasSeasonStats = mySeasons.some(
       (row) => Number(row.matches) > 0 || Number(row.minutes) > 0,
     );
-    if (!isPresentableTutor(child, materialCount, hasSeasonStats)) continue;
 
     const coverRow =
       photoRows.find((item) => item.is_cover) ?? photoRows[0] ?? null;

@@ -106,7 +106,14 @@ export function ExploreDirectory({
     <div className="space-y-6">
       <div className="mf-card p-4 sm:p-5">
         <p className="text-sm text-mf-text-secondary">
-          Fichas publicadas por tutor o representante · {CURRENT_SEASON_LABEL}
+          Solo fichas con consentimiento · {CURRENT_SEASON_LABEL} ·{" "}
+          <span className="tabular-nums font-medium text-mf-text">
+            {displayPlayers.length}
+          </span>{" "}
+          {displayPlayers.length === 1 ? "jugador" : "jugadores"}
+          {query || position !== "all" || state || city || categoryFilter !== "all"
+            ? " con este filtro"
+            : " en el buscador"}
         </p>
 
         <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">

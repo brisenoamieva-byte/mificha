@@ -6,10 +6,6 @@ import { HomeHowItWorks } from "@/components/marketing/home-how-it-works";
 import { HomeGphAllianceBand } from "@/components/marketing/evaluaciones-page-content";
 import { SponsorSlot } from "@/components/marketing/sponsor-slot";
 import { countExploreDirectoryPlayers } from "@/lib/explore-demo-data";
-import {
-  collectBirthDatesFromDirectory,
-  getDefaultCategoryFilter,
-} from "@/lib/player-category";
 import { fetchPublicDirectory } from "@/lib/public-directory";
 import { resolveExploreAccess } from "@/lib/scout-access";
 import { createSupabaseAdminClient } from "@/lib/supabase-admin";
@@ -41,9 +37,7 @@ export default async function Home() {
   };
 
   const playerCount = countExploreDirectoryPlayers(directory);
-  const initialCategoryFilter = getDefaultCategoryFilter(
-    collectBirthDatesFromDirectory(directory.players, []),
-  );
+  const initialCategoryFilter = "all";
 
   return (
     <div className="flex min-h-dvh flex-col bg-mf-canvas">

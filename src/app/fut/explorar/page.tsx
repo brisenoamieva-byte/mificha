@@ -4,10 +4,6 @@ import { ExploreDirectory } from "@/components/marketing/explore-directory";
 import { ExplorePaywallBanner } from "@/components/marketing/explore-paywall";
 import { SiteFooter, SiteHeader } from "@/components/marketing/site-header";
 import { countExploreDirectoryAcademies, countExploreDirectoryPlayers } from "@/lib/explore-demo-data";
-import {
-  collectBirthDatesFromDirectory,
-  getDefaultCategoryFilter,
-} from "@/lib/player-category";
 import { fetchPublicDirectory } from "@/lib/public-directory";
 import { resolveExploreAccess } from "@/lib/scout-access";
 import { createSupabaseAdminClient } from "@/lib/supabase-admin";
@@ -60,9 +56,8 @@ export default async function ExplorarPage({
 
   const playerCount = countExploreDirectoryPlayers(directory);
   const academyCount = countExploreDirectoryAcademies(directory);
-  const initialCategoryFilter =
-    initialCategory ||
-    getDefaultCategoryFilter(collectBirthDatesFromDirectory(directory.players, []));
+  // Por defecto: todos con consentimiento. El filtro Sub-X es opcional.
+  const initialCategoryFilter = initialCategory || "all";
 
   return (
     <div className="flex min-h-dvh flex-col bg-mf-canvas">

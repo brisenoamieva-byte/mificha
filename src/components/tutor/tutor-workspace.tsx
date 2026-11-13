@@ -562,17 +562,47 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
           action: "explore_opt_in",
           child_id: child.id,
           explore_opt_in: enabled,
+          consent_ack: enabled,
         }),
       });
       await load(phone);
       setNotice(
         enabled
-          ? "Listo: la ficha puede aparecer en Explorar."
-          : "Listo: la ficha ya no aparece en Explorar. El link directo sigue activo.",
+          ? "Consentimiento firmado: la ficha puede aparecer en Explorar."
+          : "Consentimiento retirado: ya no aparece en Explorar. El link directo sigue activo.",
       );
     } catch (err: unknown) {
       setError(
-        err instanceof Error ? err.message : "No se pudo actualizar Explorar.",
+        err instanceof Error ? err.message : "No se pudo actualizar el consentimiento.",
+      );
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function signLinkedAcademyConsent() {
+    if (!child) return;
+    setBusy(true);
+    setError(null);
+    setNotice(null);
+    try {
+      await authed("/fut/api/tutor/children", {
+        method: "POST",
+        body: JSON.stringify({
+          action: "linked_academy_consent",
+          child_id: child.id,
+          consent_ack: true,
+        }),
+      });
+      await load(phone);
+      setNotice(
+        "Listo: aprobaste la ficha de academia y el consentimiento para Explorar.",
+      );
+    } catch (err: unknown) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "No se pudo aprobar la ficha de academia.",
       );
     } finally {
       setBusy(false);
@@ -1141,6 +1171,7 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
             onCopyShare={() => void copyShare()}
             onCopyPublicCode={() => void copyPublicCode()}
             onToggleExploreOptIn={(enabled) => void toggleExploreOptIn(enabled)}
+            onSignLinkedAcademyConsent={() => void signLinkedAcademyConsent()}
             onLinkPlayer={(playerId) => void linkPlayer(playerId)}
             onUnlinkPlayer={() => void unlinkPlayer()}
           />
