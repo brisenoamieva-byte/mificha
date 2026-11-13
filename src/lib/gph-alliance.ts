@@ -30,25 +30,26 @@ export function diagnosisWhatsAppHref(playerName?: string) {
   return `https://wa.me/${GPH_WHATSAPP_E164}?text=${encodeURIComponent(text)}`;
 }
 
+/** Calendly GPH · diagnóstico (override con NEXT_PUBLIC_GPH_DIAGNOSIS_CALENDLY_URL). */
+export const GPH_DIAGNOSIS_CALENDLY_DEFAULT =
+  "https://calendly.com/gkperformancehub/diagnostico-gph";
+
+/** Calendly GPH · clase muestra / entrenamiento (override con NEXT_PUBLIC_GPH_CALENDLY_URL). */
+export const GPH_TRAINING_CALENDLY_DEFAULT =
+  "https://calendly.com/gkperformancehub/clase-muestra-gratuita";
+
 /**
- * Calendly / Google Appointment Schedule del coordinador GPH.
- * Prioridad: URL de diagnóstico → URL general GPH → WhatsApp.
- *
- * Ops (coordinador con Google Calendar):
- * 1. Calendly → conectar Google Calendar, event type “Diagnóstico GPH · Querétaro”
- *    (duración, buffers, preguntas: jugador, WhatsApp, folio MP), o
- *    Google Calendar → Appointment schedules → compartir link.
- * 2. Pegar el link público en Vercel / .env.local como
- *    NEXT_PUBLIC_GPH_DIAGNOSIS_CALENDLY_URL (o NEXT_PUBLIC_GPH_CALENDLY_URL).
+ * Calendly del coordinador GPH.
+ * Prioridad: env diagnóstico → default diagnóstico → env entrenamiento → WhatsApp.
  */
 export function getDiagnosisBookingConfig() {
   const dedicated = process.env.NEXT_PUBLIC_GPH_DIAGNOSIS_CALENDLY_URL?.trim() || "";
   const shared = process.env.NEXT_PUBLIC_GPH_CALENDLY_URL?.trim() || "";
-  const url = dedicated || shared;
+  const url = dedicated || GPH_DIAGNOSIS_CALENDLY_DEFAULT || shared;
   return {
     ready: Boolean(url),
     url: url || null,
-    source: dedicated
+    source: dedicated || GPH_DIAGNOSIS_CALENDLY_DEFAULT
       ? ("diagnosis" as const)
       : shared
         ? ("shared" as const)
@@ -71,11 +72,11 @@ export function diagnosisBookingCtaLabel(fallback = "Coordinar por WhatsApp") {
 
 /** Checklist ops para el coordinador (panel interno). */
 export const GPH_DIAGNOSIS_BOOKING_OPS_STEPS = [
-  "Crear event type “Diagnóstico GPH · Querétaro” en Calendly (o Appointment schedule en Google Calendar).",
-  "Conectar el Google Calendar de quien agenda diagnósticos.",
-  "Definir duración (60–90 min), buffers y horarios; sede Querétaro.",
-  "Preguntas al reservar: nombre del jugador, WhatsApp, folio de pago (opcional).",
-  "Publicar el link y configurarlo en Vercel: NEXT_PUBLIC_GPH_DIAGNOSIS_CALENDLY_URL.",
+  "Diagnóstico: https://calendly.com/gkperformancehub/diagnostico-gph (ya cableado).",
+  "Clase muestra: https://calendly.com/gkperformancehub/clase-muestra-gratuita (ya cableado).",
+  "Confirmar que el Google Calendar de Gustavo esté ligado a ambos event types.",
+  "Revisar duración, buffers, sede Querétaro y preguntas (jugador, WhatsApp, folio MP).",
+  "Opcional en Vercel: NEXT_PUBLIC_GPH_DIAGNOSIS_CALENDLY_URL / NEXT_PUBLIC_GPH_CALENDLY_URL para override.",
 ] as const;
 
 export function trainingWhatsAppHref() {
