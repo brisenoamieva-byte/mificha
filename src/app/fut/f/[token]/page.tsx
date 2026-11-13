@@ -152,10 +152,11 @@ export default async function TutorShareFichaPage({ params }: PageProps) {
     const place = [child.profile.club || child.profile.school, child.profile.city]
       .filter(Boolean)
       .join(" · ");
+    const loginHref = `/fut/login?next=${encodeURIComponent(sharePath)}`;
     return (
       <div className="flex min-h-dvh flex-col bg-mf-canvas">
         <TutorFichaViewTracker token={access || token} />
-        <SiteHeader actionHref="/fut/explorar#pro" actionLabel="Explorar Pro" />
+        <SiteHeader actionHref={loginHref} actionLabel="Entrar" />
         <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-8 sm:px-6 sm:py-12">
           <FichaLockedTeaser
             name={playerName}
@@ -163,6 +164,7 @@ export default async function TutorShareFichaPage({ params }: PageProps) {
             category={formatPlayerCategory(child.profile.birth_date)}
             place={place || null}
             code={child.public_code}
+            loginHref={loginHref}
           />
           <p className="mt-6 text-center text-xs leading-6 text-mf-text-muted">
             Busca más jugadores en{" "}
