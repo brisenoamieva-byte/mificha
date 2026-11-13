@@ -1,7 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { Copy, MessageCircle, Printer, Share2 } from "lucide-react";
+import { Copy, FileText, MessageCircle, Printer, Share2 } from "lucide-react";
 import { PLAYER_CODE_SHORT } from "@/lib/player-public-code-copy";
 
 export function TutorShareActions({
@@ -9,11 +10,14 @@ export function TutorShareActions({
   sharePath,
   absoluteUrl,
   publicCode,
+  materialsKitHref,
 }: {
   playerName: string;
   sharePath: string;
   absoluteUrl?: string;
   publicCode?: string | null;
+  /** Kit con PDF hoja de vida / presentación / ficha. */
+  materialsKitHref?: string | null;
 }) {
   const [copied, setCopied] = useState<"link" | "code" | null>(null);
   const [canNativeShare, setCanNativeShare] = useState(false);
@@ -124,8 +128,17 @@ export function TutorShareActions({
           className="inline-flex items-center justify-center gap-2 rounded-lg border border-mf-border bg-white px-3.5 py-2 text-sm font-semibold text-mf-gph hover:bg-mf-gph-soft"
         >
           <Printer className="h-4 w-4" />
-          PDF
+          Descargar PDF
         </button>
+        {materialsKitHref ? (
+          <Link
+            href={materialsKitHref}
+            className="inline-flex items-center justify-center gap-2 rounded-lg bg-mf-gph px-3.5 py-2 text-sm font-semibold text-white hover:bg-[#163f70]"
+          >
+            <FileText className="h-4 w-4" />
+            Kit PDF
+          </Link>
+        ) : null}
       </div>
     </div>
   );

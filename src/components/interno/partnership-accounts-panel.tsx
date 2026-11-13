@@ -150,32 +150,55 @@ export function PartnershipAccountsPanel() {
                     </p>
                   </div>
                 </div>
-                <ul className="mt-3 space-y-1.5">
-                  {account.players.map((player) => (
-                    <li
-                      key={player.id}
-                      className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-mf-text-secondary"
-                    >
-                      <span className="font-medium text-mf-gph-ink">
-                        {player.player_name}
-                      </span>
-                      <span className="font-mono text-xs text-mf-text-muted">
-                        {player.public_code}
-                      </span>
-                      {player.city ? (
-                        <span className="text-xs text-mf-text-muted">{player.city}</span>
-                      ) : null}
-                      {player.explore_opt_in ? (
-                        <span className="rounded bg-emerald-50 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-emerald-800">
-                          Explorar
+                <ul className="mt-3 space-y-2">
+                  {account.players.map((player) => {
+                    const access = player.public_code;
+                    const fichaHref = access ? `/fut/f/${encodeURIComponent(access)}` : null;
+                    const kitHref = access
+                      ? `/fut/agente/m/${encodeURIComponent(access)}`
+                      : null;
+                    return (
+                      <li
+                        key={player.id}
+                        className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-mf-text-secondary"
+                      >
+                        <span className="font-medium text-mf-gph-ink">
+                          {player.player_name}
                         </span>
-                      ) : (
-                        <span className="rounded bg-mf-canvas px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-mf-text-muted">
-                          Privada
+                        <span className="font-mono text-xs text-mf-text-muted">
+                          {player.public_code}
                         </span>
-                      )}
-                    </li>
-                  ))}
+                        {player.city ? (
+                          <span className="text-xs text-mf-text-muted">{player.city}</span>
+                        ) : null}
+                        {player.explore_opt_in ? (
+                          <span className="rounded bg-emerald-50 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-emerald-800">
+                            Explorar
+                          </span>
+                        ) : (
+                          <span className="rounded bg-mf-canvas px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-mf-text-muted">
+                            Privada
+                          </span>
+                        )}
+                        {fichaHref ? (
+                          <Link
+                            href={fichaHref}
+                            className="text-xs font-semibold text-mf-brand hover:underline"
+                          >
+                            Ver ficha
+                          </Link>
+                        ) : null}
+                        {kitHref ? (
+                          <Link
+                            href={kitHref}
+                            className="text-xs font-semibold text-mf-gph hover:underline"
+                          >
+                            Descargar PDF
+                          </Link>
+                        ) : null}
+                      </li>
+                    );
+                  })}
                 </ul>
               </li>
             ))}

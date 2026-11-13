@@ -82,7 +82,7 @@ export function PublicPlayerCard({ data }: PublicPlayerCardProps) {
             className="demo-ficha-print-btn inline-flex flex-1 items-center justify-center gap-2 rounded-lg border border-mf-border bg-white px-4 py-2.5 text-sm font-semibold text-mf-brand hover:bg-mf-canvas sm:flex-none sm:px-5"
           >
             <Printer className="h-4 w-4" />
-            Imprimir ficha
+            Descargar PDF
           </button>
         </div>
 

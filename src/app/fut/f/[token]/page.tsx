@@ -19,6 +19,10 @@ import { resolvePublicCode } from "@/lib/public-code-resolve";
 import { resolveExploreAccess } from "@/lib/scout-access";
 import { fetchTutorLinkedPerformance } from "@/lib/tutor-linked-performance";
 import {
+  agentMaterialsAccess,
+  agentMaterialsPath,
+} from "@/lib/agent-materials";
+import {
   getTutorChildByShareToken,
   listTutorMaterials,
   listTutorSeasons,
@@ -194,6 +198,7 @@ export default async function TutorShareFichaPage({ params }: PageProps) {
             sharePath={sharePath}
             absoluteUrl={absoluteUrl}
             publicCode={child.public_code}
+            materialsKitHref={agentMaterialsPath(agentMaterialsAccess(child))}
           />
         </div>
         {!performance?.gph ? (
