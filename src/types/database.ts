@@ -45,6 +45,7 @@ export type Database = {
           name: string;
           slug: string;
           logo_url: string | null;
+          cover_url?: string | null;
           description: string | null;
           city: string | null;
           state: string | null;
@@ -70,6 +71,7 @@ export type Database = {
           name: string;
           slug: string;
           logo_url?: string | null;
+          cover_url?: string | null;
           description?: string | null;
           city?: string | null;
           state?: string | null;
@@ -95,6 +97,7 @@ export type Database = {
           name?: string;
           slug?: string;
           logo_url?: string | null;
+          cover_url?: string | null;
           description?: string | null;
           city?: string | null;
           state?: string | null;

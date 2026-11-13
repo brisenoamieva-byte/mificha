@@ -1,4 +1,6 @@
 import { fetchGphPlayerIdSet } from "@/lib/gph-player-link";
+import { GPH_LOGO } from "@/lib/gph-alliance";
+import { signPlayerPhotoUrl } from "@/lib/supabase-admin";
 import type { PlayerPosition } from "@/types/database";
 
 export interface PublicAcademy {
@@ -6,9 +8,11 @@ export interface PublicAcademy {
   name: string;
   slug: string;
   logo_url: string | null;
+  cover_url?: string | null;
   description: string | null;
   city: string | null;
   state: string | null;
+  address?: string | null;
   phone: string | null;
   website: string | null;
   league_name: string | null;
@@ -52,7 +56,10 @@ export interface PublicScheduledMatch {
 }
 
 const PUBLIC_ACADEMY_SELECT =
-  "id,name,slug,logo_url,description,city,state,phone,website,league_name,league_calendar_url,primary_color,is_certified";
+  "id,name,slug,logo_url,cover_url,description,city,state,address,phone,website,league_name,league_calendar_url,primary_color,is_certified";
+
+const PUBLIC_ACADEMY_SELECT_FALLBACK =
+  "id,name,slug,logo_url,description,city,state,address,phone,website,league_name,league_calendar_url,primary_color,is_certified";
 
 function getSupabaseHeaders() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -95,22 +102,39 @@ export async function fetchPublicAcademyBySlug(
 ): Promise<PublicAcademyData | null> {
   const { url, key } = getSupabaseHeaders();
 
-  const academyResponse = await fetch(
-    `${url}/rest/v1/academies?slug=eq.${encodeURIComponent(slug)}&is_public=eq.true&select=${PUBLIC_ACADEMY_SELECT}&limit=1`,
-    {
-      headers: {
-        apikey: key,
-        Authorization: `Bearer ${key}`,
+  async function fetchAcademy(select: string) {
+    return fetch(
+      `${url}/rest/v1/academies?slug=eq.${encodeURIComponent(slug)}&is_public=eq.true&select=${select}&limit=1`,
+      {
+        headers: {
+          apikey: key,
+          Authorization: `Bearer ${key}`,
+        },
+        next: { revalidate: 60 },
       },
-      next: { revalidate: 60 },
-    },
-  );
+    );
+  }
 
+  let academyResponse = await fetchAcademy(PUBLIC_ACADEMY_SELECT);
+  if (!academyResponse.ok) {
+    academyResponse = await fetchAcademy(PUBLIC_ACADEMY_SELECT_FALLBACK);
+  }
   if (!academyResponse.ok) return null;
 
   const academies = (await academyResponse.json()) as PublicAcademy[];
-  const academy = academies[0];
-  if (!academy) return null;
+  const academyRow = academies[0];
+  if (!academyRow) return null;
+
+  const academy: PublicAcademy = {
+    ...academyRow,
+    cover_url: academyRow.cover_url ?? null,
+    address: academyRow.address ?? null,
+    logo_url:
+      academyRow.logo_url ||
+      (academyRow.slug === "academia-gph" || academyRow.name.toLowerCase().includes("gph")
+        ? GPH_LOGO
+        : null),
+  };
 
   const publicPlayerFilter = `academy_id=eq.${academy.id}&is_public=eq.true&public_consent_at=not.is.null`;
 
@@ -159,10 +183,13 @@ export async function fetchPublicAcademyBySlug(
     const gphIds = await fetchGphPlayerIdSet(
       rows.map((player) => player.id).filter((id): id is string => Boolean(id)),
     );
-    featuredPlayers = rows.map((player) => ({
-      ...player,
-      has_gph_evaluation: Boolean(player.id && gphIds.has(player.id)),
-    }));
+    featuredPlayers = await Promise.all(
+      rows.map(async (player) => ({
+        ...player,
+        photo_url: await signPlayerPhotoUrl(player.photo_url),
+        has_gph_evaluation: Boolean(player.id && gphIds.has(player.id)),
+      })),
+    );
   }
 
   if (scheduleResponse.ok) {

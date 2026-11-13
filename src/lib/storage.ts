@@ -3,7 +3,7 @@ import { supabase } from "@/lib/supabase";
 async function uploadViaApi(
   academyId: string,
   file: File,
-  kind: "photo" | "video" | "logo" | "diagnosis-photo" | "diagnosis-video",
+  kind: "photo" | "video" | "logo" | "cover" | "diagnosis-photo" | "diagnosis-video",
 ) {
   const {
     data: { session },
@@ -54,6 +54,11 @@ export async function uploadPlayerVideo(academyId: string, file: File) {
 
 export async function uploadAcademyLogo(academyId: string, file: File) {
   const payload = await uploadViaApi(academyId, file, "logo");
+  return payload.url!;
+}
+
+export async function uploadAcademyCover(academyId: string, file: File) {
+  const payload = await uploadViaApi(academyId, file, "cover");
   return payload.url!;
 }
 

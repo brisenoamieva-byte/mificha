@@ -10,7 +10,7 @@ import { requestAcademyCertificationSync } from "@/lib/academy-certification-cli
 import { countAcademiesForOwner } from "@/lib/academy-owner";
 import { buildPublicAcademyUrl } from "@/lib/public-academy";
 import { slugify } from "@/lib/slugify";
-import { uploadAcademyLogo } from "@/lib/storage";
+import { uploadAcademyCover, uploadAcademyLogo } from "@/lib/storage";
 import { supabase } from "@/lib/supabase";
 import { MexicoLocationSelect } from "@/components/ui/mexico-location-select";
 import { resolveMunicipalityName, resolveStateName } from "@/lib/mexico-locations";
@@ -50,6 +50,7 @@ export function AcademyForm() {
   const router = useRouter();
   const { academy, refresh, accessRole } = useDashboard();
   const logoInputRef = useRef<HTMLInputElement>(null);
+  const coverInputRef = useRef<HTMLInputElement>(null);
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
   const [slugEdited, setSlugEdited] = useState(false);
@@ -62,10 +63,12 @@ export function AcademyForm() {
   const [leagueName, setLeagueName] = useState("");
   const [leagueCalendarUrl, setLeagueCalendarUrl] = useState("");
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [coverUrl, setCoverUrl] = useState<string | null>(null);
   const [primaryColor, setPrimaryColor] = useState("#1B4F8C");
   const [isPublic, setIsPublic] = useState(false);
   const [loading, setLoading] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [uploadingCover, setUploadingCover] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
@@ -89,6 +92,7 @@ export function AcademyForm() {
     setLeagueName(academy.league_name ?? "");
     setLeagueCalendarUrl(academy.league_calendar_url ?? "");
     setLogoUrl(academy.logo_url);
+    setCoverUrl(academy.cover_url ?? null);
     setPrimaryColor(academy.primary_color || "#1B4F8C");
     setIsPublic(academy.is_public);
   }, [academy]);
@@ -127,6 +131,28 @@ export function AcademyForm() {
     }
   }
 
+  async function handleCoverUpload(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file || !academy) return;
+
+    setUploadingCover(true);
+    setError(null);
+
+    try {
+      const url = await uploadAcademyCover(academy.id, file);
+      setCoverUrl(url);
+    } catch (uploadError) {
+      setError(
+        uploadError instanceof Error
+          ? uploadError.message
+          : "No se pudo subir la portada.",
+      );
+    } finally {
+      setUploadingCover(false);
+      event.target.value = "";
+    }
+  }
+
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError(null);
@@ -153,15 +179,24 @@ export function AcademyForm() {
         league_name: leagueName.trim() || null,
         league_calendar_url: leagueCalendarUrl.trim() || null,
         logo_url: logoUrl,
+        cover_url: coverUrl,
         primary_color: primaryColor,
         is_public: isPublic,
       };
 
       if (academy) {
-        const { error: updateError } = await supabase
+        let { error: updateError } = await supabase
           .from("academies")
           .update(payload)
           .eq("id", academy.id);
+
+        if (updateError?.message?.includes("cover_url")) {
+          const { cover_url: _cover, ...withoutCover } = payload;
+          ({ error: updateError } = await supabase
+            .from("academies")
+            .update(withoutCover)
+            .eq("id", academy.id));
+        }
 
         if (updateError) throw updateError;
         setSuccess("Academia actualizada correctamente.");
@@ -173,10 +208,18 @@ export function AcademyForm() {
           );
         }
 
-        const { error: insertError } = await supabase.from("academies").insert({
+        let { error: insertError } = await supabase.from("academies").insert({
           ...payload,
           owner_id: user.id,
         });
+
+        if (insertError?.message?.includes("cover_url")) {
+          const { cover_url: _cover, ...withoutCover } = payload;
+          ({ error: insertError } = await supabase.from("academies").insert({
+            ...withoutCover,
+            owner_id: user.id,
+          }));
+        }
 
         if (insertError) throw insertError;
         setSuccess("Academia registrada correctamente.");
@@ -451,6 +494,45 @@ export function AcademyForm() {
               Guarda la academia primero para subir el logo.
             </p>
           ) : null}
+        </div>
+      </div>
+
+      <div>
+        <span className="block text-sm font-medium text-slate-700">
+          Foto de portada (landing pública)
+        </span>
+        <p className="mt-1 text-xs text-slate-500">
+          Imagen horizontal que promueve la academia en /fut/a/{slug || "tu-academia"}.
+        </p>
+        <div className="mt-2 flex flex-wrap items-center gap-4">
+          {coverUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={coverUrl}
+              alt="Portada de la academia"
+              className="h-20 w-36 rounded-xl border border-slate-200 object-cover"
+            />
+          ) : (
+            <div className="flex h-20 w-36 items-center justify-center rounded-xl bg-slate-100 text-xs font-semibold text-slate-500">
+              Sin portada
+            </div>
+          )}
+          <button
+            type="button"
+            disabled={!academy || uploadingCover}
+            onClick={() => coverInputRef.current?.click()}
+            className="inline-flex items-center gap-2 rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            <Upload className="h-4 w-4" />
+            {uploadingCover ? "Subiendo..." : "Subir portada"}
+          </button>
+          <input
+            ref={coverInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleCoverUpload}
+          />
         </div>
       </div>
 

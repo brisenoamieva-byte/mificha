@@ -8,10 +8,16 @@ export const runtime = "nodejs";
 const PHOTO_MAX = 12 * 1024 * 1024;
 const VIDEO_MAX = 50 * 1024 * 1024;
 
-type MediaKind = "photo" | "video" | "logo" | "diagnosis-photo" | "diagnosis-video";
+type MediaKind =
+  | "photo"
+  | "video"
+  | "logo"
+  | "cover"
+  | "diagnosis-photo"
+  | "diagnosis-video";
 
 function bucketFor(kind: MediaKind) {
-  if (kind === "logo") return "academy-logos" as const;
+  if (kind === "logo" || kind === "cover") return "academy-logos" as const;
   if (kind === "video" || kind === "diagnosis-video") return "player-videos" as const;
   return "player-photos" as const;
 }
@@ -47,7 +53,14 @@ export async function POST(request: Request) {
     }
 
     if (
-      !["photo", "video", "logo", "diagnosis-photo", "diagnosis-video"].includes(kind)
+      ![
+        "photo",
+        "video",
+        "logo",
+        "cover",
+        "diagnosis-photo",
+        "diagnosis-video",
+      ].includes(kind)
     ) {
       return NextResponse.json({ error: "kind inválido." }, { status: 400 });
     }

@@ -4,6 +4,12 @@
 alter table public.academies
 add column if not exists description text;
 
+alter table public.academies
+add column if not exists cover_url text;
+
+comment on column public.academies.cover_url is
+  'Foto de portada / promoción para la landing pública /fut/a/[slug].';
+
 insert into storage.buckets (id, name, public)
 values ('academy-logos', 'academy-logos', true)
 on conflict (id) do update set public = excluded.public;
