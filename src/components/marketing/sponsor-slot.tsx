@@ -27,7 +27,13 @@ function SlotLink({
 }) {
   if (isExternal(href)) {
     return (
-      <a href={href} className={className} rel="noopener noreferrer" title={title}>
+      <a
+        href={href}
+        className={className}
+        rel="noopener noreferrer"
+        target="_blank"
+        title={title}
+      >
         {children}
       </a>
     );

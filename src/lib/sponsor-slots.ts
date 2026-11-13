@@ -40,6 +40,13 @@ export const SPONSOR_BRANDS: Record<string, SponsorBrand> = {
     href: "/fut/evaluaciones",
     logoPath: GPH_LOGO,
   },
+  gabi: {
+    id: "gabi",
+    name: "gabi",
+    tagline: "Patrocinador MiFicha",
+    href: "https://gabi.mx",
+    logoPath: "/sponsors/gabi.png",
+  },
 };
 
 export interface SponsorSlotDefinition {
@@ -60,19 +67,19 @@ export const SPONSOR_SLOTS: Record<SponsorPlacement, SponsorSlotDefinition> = {
     placement: "home_strip",
     eyebrow: "Patrocinadores",
     availableLabel: "Tu marca en la home de MiFicha",
-    brandIds: ["ctm", "cracks"],
+    brandIds: ["gabi", "ctm", "cracks"],
   },
   tutor_card: {
     placement: "tutor_card",
     eyebrow: "Patrocinado",
     availableLabel: "Espacio para marca aliada en el hub de tutores",
-    brandIds: ["cracks"],
+    brandIds: ["gabi"],
   },
   footer_rail: {
     placement: "footer_rail",
     eyebrow: "Aliados",
     availableLabel: "Suma tu marca",
-    brandIds: ["gph", "ctm", "cracks"],
+    brandIds: ["gabi", "gph", "ctm", "cracks"],
   },
 };
 
