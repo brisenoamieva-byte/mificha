@@ -131,16 +131,41 @@ export function AcademyForm() {
     }
   }
 
+  async function persistCoverUrl(academyId: string, url: string | null) {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    if (!session) return;
+    const response = await fetch("/fut/api/academy/cover", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${session.access_token}`,
+      },
+      body: JSON.stringify({ academy_id: academyId, cover_url: url }),
+    });
+    if (!response.ok) {
+      const payload = (await response.json().catch(() => ({}))) as {
+        error?: string;
+      };
+      throw new Error(payload.error || "No se pudo guardar la portada.");
+    }
+  }
+
   async function handleCoverUpload(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     if (!file || !academy) return;
 
     setUploadingCover(true);
     setError(null);
+    setSuccess(null);
 
     try {
       const url = await uploadAcademyCover(academy.id, file);
+      await persistCoverUrl(academy.id, url);
       setCoverUrl(url);
+      setSuccess("Portada actualizada.");
+      await refresh();
     } catch (uploadError) {
       setError(
         uploadError instanceof Error
@@ -196,9 +221,15 @@ export function AcademyForm() {
             .from("academies")
             .update(withoutCover)
             .eq("id", academy.id));
+          if (!updateError && coverUrl) {
+            await persistCoverUrl(academy.id, coverUrl);
+          }
         }
 
         if (updateError) throw updateError;
+        if (coverUrl) {
+          await persistCoverUrl(academy.id, coverUrl).catch(() => undefined);
+        }
         setSuccess("Academia actualizada correctamente.");
       } else {
         const existingCount = await countAcademiesForOwner(user.id);

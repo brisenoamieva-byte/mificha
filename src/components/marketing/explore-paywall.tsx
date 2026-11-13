@@ -88,7 +88,7 @@ export function ExplorePaywallBanner({ access }: { access: ExploreAccess }) {
           </p>
           <PersonaMembershipCta
             className="mt-5"
-            nextPath="/fut/tutor"
+            nextPath="/fut/explorar"
             loggedIn={Boolean(access.userId)}
           />
           <p className="mt-3 text-xs text-mf-text-muted">

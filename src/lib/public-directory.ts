@@ -51,6 +51,18 @@ export function isDevSeedPlayer(player: Pick<DirectoryPlayer, "slug">) {
   return player.slug.endsWith("-seed");
 }
 
+/** Placeholders / stubs que no deben aparecer en el buscador público. */
+export function isPlaceholderExplorePlayer(
+  player: Pick<DirectoryPlayer, "slug" | "first_name" | "last_name">,
+) {
+  if (isDevSeedPlayer(player)) return true;
+  const slug = player.slug.toLowerCase();
+  const full = `${player.first_name} ${player.last_name}`.toLowerCase();
+  if (slug.includes("pendiente") || full.includes("(pendiente)")) return true;
+  if (slug.startsWith("juan-perez") || full === "juan perez") return true;
+  return false;
+}
+
 function asAcademyEmbed(
   value: DirectoryPlayer["academies"] | DirectoryPlayer["academies"][] | null | undefined,
 ): DirectoryPlayer["academies"] {

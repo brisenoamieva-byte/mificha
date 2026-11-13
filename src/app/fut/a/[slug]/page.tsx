@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { AcademyLanding } from "@/components/public/academy-landing";
-import { isDemoAcademySlug } from "@/lib/explore-demo-data";
+import {
+  getDemoAcademyPublicData,
+  isDemoAcademySlug,
+} from "@/lib/explore-demo-data";
 import {
   fetchPublicAcademyBySlug,
   getPublicAcademyDescription,
@@ -11,14 +14,21 @@ interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
+function academyShareImages(data: {
+  academy: { cover_url?: string | null; logo_url?: string | null };
+}) {
+  const images = [data.academy.cover_url, data.academy.logo_url].filter(
+    (value): value is string => Boolean(value?.trim()),
+  );
+  return images.length > 0 ? images : undefined;
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
 
-  if (isDemoAcademySlug(slug)) {
-    return { title: "Academia no disponible | MiFicha" };
-  }
-
-  const data = await fetchPublicAcademyBySlug(slug);
+  const data = isDemoAcademySlug(slug)
+    ? getDemoAcademyPublicData()
+    : await fetchPublicAcademyBySlug(slug);
 
   if (!data) {
     return {
@@ -27,6 +37,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 
   const description = getPublicAcademyDescription(data.academy);
+  const images = academyShareImages(data);
 
   return {
     title: `${data.academy.name} | Academia de Fútbol | MiFicha`,
@@ -34,14 +45,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     openGraph: {
       title: `${data.academy.name} | Academia de Fútbol | MiFicha`,
       description,
-      images: data.academy.logo_url ? [data.academy.logo_url] : undefined,
+      images,
       type: "website",
     },
     twitter: {
       card: "summary_large_image",
       title: `${data.academy.name} | Academia de Fútbol | MiFicha`,
       description,
-      images: data.academy.logo_url ? [data.academy.logo_url] : undefined,
+      images,
     },
   };
 }
@@ -49,11 +60,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function AcademyPublicPage({ params }: PageProps) {
   const { slug } = await params;
 
-  if (isDemoAcademySlug(slug)) {
-    notFound();
-  }
-
-  const data = await fetchPublicAcademyBySlug(slug);
+  const data = isDemoAcademySlug(slug)
+    ? getDemoAcademyPublicData()
+    : await fetchPublicAcademyBySlug(slug);
 
   if (!data) {
     notFound();

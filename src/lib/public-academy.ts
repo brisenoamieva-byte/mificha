@@ -1,5 +1,10 @@
+import {
+  defaultAcademyCoverFallback,
+  getAcademyCoverUrl,
+} from "@/lib/academy-cover-store";
 import { fetchGphPlayerIdSet } from "@/lib/gph-player-link";
 import { GPH_LOGO } from "@/lib/gph-alliance";
+import { createSupabaseAdminClient } from "@/lib/supabase-admin";
 import { signPlayerPhotoUrl } from "@/lib/supabase-admin";
 import type { PlayerPosition } from "@/types/database";
 
@@ -125,9 +130,20 @@ export async function fetchPublicAcademyBySlug(
   const academyRow = academies[0];
   if (!academyRow) return null;
 
+  let coverUrl = academyRow.cover_url ?? null;
+  try {
+    const admin = createSupabaseAdminClient();
+    coverUrl = await getAcademyCoverUrl(admin, academyRow.id, coverUrl);
+  } catch {
+    /* ops store unavailable */
+  }
+  if (!coverUrl) {
+    coverUrl = defaultAcademyCoverFallback(academyRow.slug);
+  }
+
   const academy: PublicAcademy = {
     ...academyRow,
-    cover_url: academyRow.cover_url ?? null,
+    cover_url: coverUrl,
     address: academyRow.address ?? null,
     logo_url:
       academyRow.logo_url ||
@@ -154,7 +170,7 @@ export async function fetchPublicAcademyBySlug(
         `academy_id=eq.${academy.id}&select=id`,
       ),
       fetch(
-        `${url}/rest/v1/players?${publicPlayerFilter}&select=id,slug,first_name,last_name,position,passport_score,photo_url&order=passport_score.desc&limit=12`,
+        `${url}/rest/v1/players?${publicPlayerFilter}&select=id,slug,first_name,last_name,position,passport_score,photo_url&order=passport_score.desc&limit=24`,
         {
           headers: {
             apikey: key,
@@ -180,11 +196,19 @@ export async function fetchPublicAcademyBySlug(
 
   if (playersResponse.ok) {
     const rows = (await playersResponse.json()) as FeaturedPlayer[];
+    // Prioriza quienes ya tienen foto en el plantel destacado.
+    const sorted = [...rows].sort((left, right) => {
+      const leftPhoto = left.photo_url ? 1 : 0;
+      const rightPhoto = right.photo_url ? 1 : 0;
+      if (leftPhoto !== rightPhoto) return rightPhoto - leftPhoto;
+      return (right.passport_score ?? 0) - (left.passport_score ?? 0);
+    });
+    const top = sorted.slice(0, 12);
     const gphIds = await fetchGphPlayerIdSet(
-      rows.map((player) => player.id).filter((id): id is string => Boolean(id)),
+      top.map((player) => player.id).filter((id): id is string => Boolean(id)),
     );
     featuredPlayers = await Promise.all(
-      rows.map(async (player) => ({
+      top.map(async (player) => ({
         ...player,
         photo_url: await signPlayerPhotoUrl(player.photo_url),
         has_gph_evaluation: Boolean(player.id && gphIds.has(player.id)),

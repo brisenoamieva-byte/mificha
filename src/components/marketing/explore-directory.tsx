@@ -13,7 +13,7 @@ import {
 import { collectBirthDatesFromDirectory } from "@/lib/player-category";
 import {
   filterDirectory,
-  isDevSeedPlayer,
+  isPlaceholderExplorePlayer,
   type DirectoryPlayer,
   type PublicDirectoryData,
 } from "@/lib/public-directory";
@@ -82,7 +82,9 @@ export function ExploreDirectory({
   );
 
   const displayPlayers = useMemo(() => {
-    const realPlayers = filtered.players.filter((player) => !isDevSeedPlayer(player));
+    const realPlayers = filtered.players.filter(
+      (player) => !isPlaceholderExplorePlayer(player),
+    );
     const seenNames = new Set<string>();
     const unique: DirectoryPlayer[] = [];
 

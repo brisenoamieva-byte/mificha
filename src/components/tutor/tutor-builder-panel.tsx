@@ -874,8 +874,8 @@ export function TutorBuilderPanel({
                 si lo necesitas.
               </p>
             ) : (
-              <Link href="/fut/pagar?sku=membership" className="mf-btn-gph">
-                Renovar año
+              <Link href="/fut/explorar#pro" className="mf-btn-gph">
+                Membresía persona
               </Link>
             )}
 

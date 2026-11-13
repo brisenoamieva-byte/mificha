@@ -2,10 +2,11 @@
 
 import { DIAGNOSIS_PROMO, FAMILY_PRODUCTS } from "@/lib/gph-commerce";
 
+import { ACADEMY_BILLING_PROMO_FREE } from "@/lib/membership-promo";
+
 /**
- * Copy academia (sin importar academy-membership aquí: evita ciclo
+ * Copy academia (sin importar academy-membership: evita ciclo
  * pricing ↔ mercadopago ↔ academy-membership en el build).
- * Mantener alineado con ACADEMY_MEMBERSHIP_FREE_PROMO.
  */
 export const ACADEMY_ACCESS = {
   headline: "Gratis para academias · tiempo limitado",
@@ -18,7 +19,7 @@ export const ACADEMY_ACCESS = {
   ],
   priceUsd: 150,
   priceLabel: "$150",
-  promoFree: true,
+  promoFree: ACADEMY_BILLING_PROMO_FREE,
 } as const;
 
 export interface OrganizerPricingPlan {

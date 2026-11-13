@@ -865,3 +865,23 @@ where id in ('player-photos', 'player-videos');
 -- Rompe 42P17 academies ↔ players (explorar + historial de ficha).
 
 
+
+-- ===== academy-landing.sql + academy-league-fields.sql =====
+alter table public.academies
+add column if not exists description text;
+
+alter table public.academies
+add column if not exists cover_url text;
+
+alter table public.academies
+add column if not exists league_name text;
+
+alter table public.academies
+add column if not exists league_calendar_url text;
+
+comment on column public.academies.cover_url is
+  'Foto de portada / promocion para la landing publica /fut/a/[slug].';
+
+insert into storage.buckets (id, name, public)
+values ('academy-logos', 'academy-logos', true)
+on conflict (id) do update set public = excluded.public;

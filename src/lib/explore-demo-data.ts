@@ -5,7 +5,10 @@ import {
   parseCategoryFilter,
 } from "@/lib/player-category";
 import type { DirectoryPlayer, DirectoryAcademy } from "@/lib/public-directory";
-import { isDevSeedPlayer, type PublicDirectoryData } from "@/lib/public-directory";
+import {
+  isPlaceholderExplorePlayer,
+  type PublicDirectoryData,
+} from "@/lib/public-directory";
 import type {
   FeaturedPlayer,
   PublicAcademy,
@@ -187,7 +190,9 @@ export function normalizeExplorePlayerName(firstName: string, lastName: string) 
 
 /** Total de perfiles únicos reales en el listado público (sin demos ni seed). */
 export function countExploreDirectoryPlayers(data: PublicDirectoryData): number {
-  const realPlayers = data.players.filter((player) => !isDevSeedPlayer(player));
+  const realPlayers = data.players.filter(
+    (player) => !isPlaceholderExplorePlayer(player),
+  );
   const seenNames = new Set<string>();
   let count = 0;
 
@@ -263,6 +268,7 @@ const DEMO_ACADEMY_PROFILE: PublicAcademy = {
   name: DEMO_EXPLORE_ACADEMY.name,
   slug: DEMO_EXPLORE_ACADEMY.slug,
   logo_url: MARKETING_IMAGES.demoAcademiaGallosLogo,
+  cover_url: MARKETING_IMAGES.audienceAcademias,
   description:
     "Academia formativa en Querétaro con categorías Sub-13 a Sub-17. Plantel verificado en MiFicha, stats sincronizadas con la liga interescolar y comunicación directa con tutores después de cada jornada.",
   city: "Querétaro",

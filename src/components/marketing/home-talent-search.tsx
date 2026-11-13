@@ -14,7 +14,7 @@ import {
 import { CURRENT_SEASON_LABEL } from "@/lib/marketing-season";
 import {
   filterDirectory,
-  isDevSeedPlayer,
+  isPlaceholderExplorePlayer,
   type DirectoryPlayer,
   type PublicDirectoryData,
 } from "@/lib/public-directory";
@@ -66,7 +66,9 @@ export function HomeTalentSearch({
   );
 
   const players = useMemo(() => {
-    const real = filtered.players.filter((player) => !isDevSeedPlayer(player));
+    const real = filtered.players.filter(
+      (player) => !isPlaceholderExplorePlayer(player),
+    );
     const seen = new Set<string>();
     const unique: DirectoryPlayer[] = [];
     for (const player of real) {

@@ -3,11 +3,8 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { createMercadoPagoPreference, isMercadoPagoConfigured } from "@/lib/mercadopago";
 import { SCOUT_PRODUCT } from "@/lib/scout-product";
 
-/**
- * Mientras sea true: se anuncia gratis por tiempo limitado y la activación
- * no cobra. El checkout Mercado Pago queda cableado para cuando pases a false.
- */
-export const PERSONA_MEMBERSHIP_FREE_PROMO = true;
+export { PERSONA_MEMBERSHIP_FREE_PROMO } from "@/lib/membership-promo";
+import { PERSONA_MEMBERSHIP_FREE_PROMO } from "@/lib/membership-promo";
 
 /** ~$50 USD en MXN (Mercado Pago cobra en MXN). Ajustable por env. */
 export function personaMembershipPriceMxn() {

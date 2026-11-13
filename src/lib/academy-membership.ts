@@ -2,11 +2,8 @@ import { randomBytes, randomUUID } from "crypto";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { createMercadoPagoPreference, isMercadoPagoConfigured } from "@/lib/mercadopago";
 
-/**
- * Mientras sea true: academia gratis por tiempo limitado.
- * Al pasar a false, el checkout Mercado Pago ($150 USD/año) queda activo.
- */
-export const ACADEMY_MEMBERSHIP_FREE_PROMO = true;
+export { ACADEMY_MEMBERSHIP_FREE_PROMO } from "@/lib/membership-promo";
+import { ACADEMY_MEMBERSHIP_FREE_PROMO } from "@/lib/membership-promo";
 
 export const ACADEMY_PRODUCT = {
   id: "academia",
