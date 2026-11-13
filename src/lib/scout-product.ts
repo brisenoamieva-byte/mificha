@@ -1,21 +1,21 @@
 import { GPH_WHATSAPP_E164 } from "@/lib/gph-alliance";
 
-/** Membresía persona (familia o representante): publica fichas + Explorar Pro. */
+/** Membresía persona (tutor o representante): publica fichas + Explorar Pro. */
 export const SCOUT_PRODUCT = {
   id: "persona",
   title: "Membresía persona",
-  headline: "Familia o representante · ficha completa",
+  headline: "Tutor o representante · ficha completa",
   priceUsd: 50,
   priceLabel: "$50",
   currency: "USD",
   period: "al año",
   summary:
-    "Una sola cuenta para familia o representante: publica fichas con consentimiento y desbloquea fotos, contacto, videos y detalle de terceros (Explorar Pro).",
+    "Una sola cuenta para tutor o representante: publica fichas con consentimiento y desbloquea fotos, contacto, videos y detalle de terceros (Explorar Pro).",
   includes: [
     "Publicar fichas de hijos o representados (con opt-in a Explorar)",
     "Ficha completa de terceros: fotos, videos, bio y stats",
-    "Datos de contacto cuando la familia o representante los publique",
-    "Búsqueda sin límite de detalle por categoría, posición y ciudad",
+    "Datos de contacto cuando el tutor o representante los publique",
+    "Búsqueda por categoría, posición y ciudad con detalle completo",
   ],
   checkoutPath: "/fut/explorar#pro",
   /** Alias comercial del beneficio de detalle. */

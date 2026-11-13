@@ -75,7 +75,7 @@ export const DIAGNOSIS_PRODUCT = {
   checkoutHref: "/fut/pagar?sku=diagnosis",
   whatYouGet: [
     "Sesión presencial con pruebas de técnica, táctica, físico, mental y hábitos",
-    "Calificación 1–5 y etapa de desarrollo (punto de partida claro, sin etiquetas)",
+    "Calificación 1–5 y etapa de desarrollo",
     "Ficha visual + lectura de entrenador con 3 a 5 objetivos concretos",
     "Informe digital ligado a la ficha del jugador en mificha.mx",
     "12 meses de acceso a MiFicha para seguimiento y material del tutor",
@@ -117,7 +117,7 @@ export const SCOUT_PRICING = {
   description:
     "Filtra por categoría, posición y ciudad. Solo fichas con consentimiento. El detalle completo se desbloquea con la membresía persona ($50 USD/año).",
   unlockNote:
-    "Incluye publicar fichas (familia o representante) y ver fotos, videos, bio, contacto y ficha completa de terceros con opt-in.",
+    "Incluye publicar fichas (tutor o representante) y ver fotos, videos, bio, contacto y ficha completa de terceros con opt-in.",
 } as const;
 
 /** Suscripción legacy para academias — desactivada en producto; conservada para Stripe futuro. */

@@ -85,12 +85,15 @@ export function FichaLockedTeaser({
   category,
   place,
   code,
+  loginHref,
 }: {
   name: string;
   position?: string | null;
   category?: string | null;
   place?: string | null;
   code?: string | null;
+  /** Si hay sesión de socio/dueño, volver aquí tras entrar. */
+  loginHref?: string | null;
 }) {
   return (
     <div className="overflow-hidden rounded-2xl border border-mf-border bg-white">
@@ -111,20 +114,37 @@ export function FichaLockedTeaser({
         <p className="text-sm leading-7 text-mf-text-secondary">
           Fotos, videos, historia, contacto y ficha completa se desbloquean con la{" "}
           <strong>membresía persona</strong> ({SCOUT_PRODUCT.exploreProLabel},{" "}
-          {SCOUT_PRODUCT.priceLabel} {SCOUT_PRODUCT.currency}/año).
+          {SCOUT_PRODUCT.priceLabel} {SCOUT_PRODUCT.currency}/año)
+          {loginHref ? " o iniciando sesión si ya tienes acceso." : "."}
         </p>
         <div className="flex flex-wrap gap-2">
-          <a
-            href={scoutWhatsAppCheckoutHref()}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mf-btn-gph"
-          >
-            Contratar · {SCOUT_PRODUCT.priceLabel} USD/año
-          </a>
+          {loginHref ? (
+            <Link href={loginHref} className="mf-btn-gph">
+              Entrar
+            </Link>
+          ) : (
+            <a
+              href={scoutWhatsAppCheckoutHref()}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mf-btn-gph"
+            >
+              Contratar · {SCOUT_PRODUCT.priceLabel} USD/año
+            </a>
+          )}
           <Link href="/fut/explorar#pro" className="mf-btn-gph-ghost">
             Ver membresía
           </Link>
+          {loginHref ? (
+            <a
+              href={scoutWhatsAppCheckoutHref()}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mf-btn-gph-ghost"
+            >
+              Contratar · {SCOUT_PRODUCT.priceLabel} USD/año
+            </a>
+          ) : null}
         </div>
       </div>
     </div>

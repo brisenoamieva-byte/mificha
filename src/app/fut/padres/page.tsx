@@ -48,10 +48,10 @@ export default function PadresPage() {
               <div className="max-w-xl">
                 <p className="mf-marketing-eyebrow">Buscador</p>
                 <h2 className="mt-2 text-xl font-semibold text-mf-text">
-                  Explora jugadores reales
+                  Explorar jugadores
                 </h2>
                 <p className="mt-2 text-sm leading-7 text-mf-text-secondary">
-                  Solo fichas con consentimiento de la familia o representante. Datos básicos
+                  Solo fichas con consentimiento del tutor o representante. Datos básicos
                   gratis; detalle completo con membresía persona ($50 USD/año).
                 </p>
               </div>

@@ -12,7 +12,7 @@ const CHOICES = [
   {
     id: "persona",
     title: "Cuenta persona",
-    detail: "Publica fichas de jugadores (familia o representante). Un solo espacio.",
+    detail: "Publica fichas de jugadores (tutor o representante).",
     href: "/fut/tutor",
   },
   {
@@ -24,7 +24,7 @@ const CHOICES = [
   {
     id: "patrocinio",
     title: "Patrocinio / marca",
-    detail: "Pide información por WhatsApp. Sin ficha de jugador.",
+    detail: "Pide información por WhatsApp.",
     href: "https://wa.me/524421556155?text=Hola%20Ricardo%2C%20quiero%20informaci%C3%B3n%20sobre%20patrocinio%20en%20MiFicha.",
   },
 ] as const;
@@ -178,7 +178,7 @@ export function UnifiedEnter() {
     return (
       <div className="space-y-4">
         <p className="text-sm leading-6 text-mf-text-secondary">
-          Dos cuentas principales: persona (familia o representante) o academia. Patrocinio es
+          Dos cuentas principales: persona (tutor o representante) o academia. Patrocinio es
           solo contacto comercial.
         </p>
         <ul className="space-y-2">
@@ -305,7 +305,7 @@ export function UnifiedEnter() {
       </button>
 
       <p className="text-center text-xs leading-5 text-mf-text-muted">
-        Familia, representante y academia usan el mismo correo. La membresía persona ($50
+        Tutor, representante y academia usan el mismo correo. La membresía persona ($50
         USD/año) publica fichas y desbloquea detalle en Explorar.
       </p>
     </form>

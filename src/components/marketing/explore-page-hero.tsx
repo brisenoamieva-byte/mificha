@@ -69,14 +69,14 @@ export function ExplorePageHero({ playerCount, academyCount }: ExplorePageHeroPr
               Busca jugadores de futbol
             </h1>
             <p className="mt-5 text-base leading-8 text-mf-text-secondary sm:text-[1.0625rem]">
-              El directorio se nutre de fichas que suben familias o representantes. Vista
-              básica gratis; detalle completo con membresía persona ($50 USD/año).
+              Fichas de tutores o representantes. Vista básica gratis; detalle completo con
+              membresía persona ($50 USD/año).
             </p>
 
             <ul className="mt-6 flex flex-wrap gap-2">
               {[
                 { icon: ShieldCheck, label: "Consentimiento (opt-in)" },
-                { icon: FileUser, label: "Ficha de familia o representante" },
+                { icon: FileUser, label: "Ficha de tutor o representante" },
                 { icon: MapPin, label: "Filtro por ciudad" },
               ].map(({ icon: Icon, label }) => (
                 <li

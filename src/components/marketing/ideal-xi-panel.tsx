@@ -207,7 +207,7 @@ export function IdealXIPanel({
             Rankings semanales en pausa
           </p>
           <p className="mt-2 text-sm text-mf-text-secondary">
-            Por ahora MiFicha se basa en las fichas que publican familias o
+            Por ahora MiFicha se basa en las fichas que publican tutores o
             representantes, no en resultados de torneo.
           </p>
         </div>

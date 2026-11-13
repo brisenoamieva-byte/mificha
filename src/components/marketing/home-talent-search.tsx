@@ -113,8 +113,8 @@ export function HomeTalentSearch({
             Encuentra jugadores de futbol
           </p>
           <p className="mt-2 max-w-xl text-sm leading-7 text-white/70 sm:text-base">
-            Un solo buscador: nombre, posición y lugar. Vista básica gratis; ficha completa con
-            membresía persona ($50 USD/año).
+            Nombre, posición y lugar. Vista básica gratis; ficha completa con membresía persona
+            ($50 USD/año).
             {playerCount > 0 ? (
               <>
                 {" "}

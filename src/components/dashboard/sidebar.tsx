@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
+  FileUser,
   LayoutDashboard,
   LineChart,
   Mail,
@@ -124,6 +125,12 @@ export function DashboardSidebar({ open, onClose }: DashboardSidebarProps) {
           );
         })}
         <PitchDeckNavLink onClose={onClose} />
+        <div className="mt-3 border-t border-mf-border pt-3">
+          <Link href="/fut/tutor" onClick={onClose} className="mf-nav-link">
+            <FileUser className="h-[18px] w-[18px] shrink-0" />
+            Mis fichas (tutor)
+          </Link>
+        </div>
       </nav>
     </div>
   );

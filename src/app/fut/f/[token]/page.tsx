@@ -209,7 +209,7 @@ export default async function TutorShareFichaPage({ params }: PageProps) {
           {performance
             ? " · incluye rendimiento de academia ligada"
             : seasons.length
-              ? " · con rendimiento capturado por la familia"
+              ? " · con rendimiento capturado por el tutor"
               : ""}
           {" · "}
           <Link href="/fut/tutor" className="font-semibold text-mf-gph hover:underline">

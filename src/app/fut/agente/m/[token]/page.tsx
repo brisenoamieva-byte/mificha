@@ -66,9 +66,11 @@ export default async function AgentMaterialsPage({ params }: PageProps) {
     const place = [child.profile.club || child.profile.school, child.profile.city]
       .filter(Boolean)
       .join(" · ");
+    const kitPath = agentMaterialsPath(agentMaterialsAccess(child));
+    const loginHref = `/fut/login?next=${encodeURIComponent(kitPath)}`;
     return (
       <div className="flex min-h-dvh flex-col bg-mf-canvas">
-        <SiteHeader actionHref="/fut/explorar#pro" actionLabel="Explorar Pro" />
+        <SiteHeader actionHref={loginHref} actionLabel="Entrar" />
         <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-8 sm:px-6 sm:py-12">
           <FichaLockedTeaser
             name={child.player_name}
@@ -76,6 +78,7 @@ export default async function AgentMaterialsPage({ params }: PageProps) {
             category={formatPlayerCategory(child.profile.birth_date)}
             place={place || null}
             code={child.public_code}
+            loginHref={loginHref}
           />
         </main>
         <SiteFooter />

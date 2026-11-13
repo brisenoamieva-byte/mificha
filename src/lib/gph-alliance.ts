@@ -29,3 +29,9 @@ export function diagnosisWhatsAppHref(playerName?: string) {
     : "Hola, quiero contratar una evaluación GPH en MiFicha.";
   return `https://wa.me/${GPH_WHATSAPP_E164}?text=${encodeURIComponent(text)}`;
 }
+
+export function trainingWhatsAppHref() {
+  const text =
+    "Hola, quiero información sobre entrenamientos y especialización GPH en MiFicha.";
+  return `https://wa.me/${GPH_WHATSAPP_E164}?text=${encodeURIComponent(text)}`;
+}

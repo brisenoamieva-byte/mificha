@@ -197,7 +197,7 @@ export function PositionRankingsPanel({
 
       {!hasAnyRankings ? (
         <div className="mf-card border-dashed p-8 text-center text-sm text-mf-text-secondary">
-          Rankings por posición en pausa: hoy el directorio sale de fichas de familia o
+          Rankings por posición en pausa: hoy el directorio sale de fichas de tutor o
           representante, no de partidos de torneo.
         </div>
       ) : (

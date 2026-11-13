@@ -69,7 +69,7 @@ export default async function Home() {
                 Membresías, evaluaciones y entrenamientos
               </h2>
               <p className="mt-1 max-w-xl text-sm leading-6 text-mf-text-secondary">
-                Todo lo contratable, en un solo lugar — sin mezclarlo con el buscador.
+                Cuentas de plataforma y servicios GPH.
               </p>
             </div>
             <div className="flex flex-wrap gap-2">

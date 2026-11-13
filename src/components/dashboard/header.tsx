@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { LogOut, Menu } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useDashboard } from "@/components/dashboard/dashboard-context";
@@ -57,6 +58,12 @@ export function DashboardHeader({ onMenuClick }: DashboardHeaderProps) {
         </div>
 
         <div className="flex items-center gap-2">
+          <Link
+            href="/fut/tutor"
+            className="hidden text-sm font-medium text-mf-text-secondary transition hover:text-mf-text sm:inline-flex"
+          >
+            Mis fichas
+          </Link>
           {profile?.avatar_url ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img

@@ -6,7 +6,7 @@ const TYPES = [
     title: "Ficha del jugador",
     status: "En la plataforma",
     detail:
-      "Fotos, videos e historia; la controla el tutor. Un solo link para compartir con visores, universidades y clubes.",
+      "Fotos, videos e historia; la controla el tutor. Link para compartir con visores, universidades y clubes.",
     href: "/fut/tutor",
     cta: "Entrar como tutor",
     live: true,
@@ -41,11 +41,10 @@ export function FichaTypesSection() {
           Cómo leer MiFicha
         </p>
         <h2 className="mt-2 max-w-2xl text-2xl font-semibold tracking-[-0.02em] text-mf-gph-ink sm:text-3xl">
-          Tres cosas distintas, un mismo expediente
+          Material del tutor, stats de torneo e informe GPH
         </h2>
         <p className="mt-3 max-w-2xl text-sm leading-7 text-mf-text-secondary">
-          Material del tutor, stats de torneo e informe GPH en un expediente. Si ligas la
-          academia, el mismo link que compartes resume lo oficial.
+          Si ligas la academia, el link del jugador resume lo oficial.
         </p>
 
         <ul className="mt-8 grid gap-3 md:grid-cols-3">

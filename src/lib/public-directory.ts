@@ -29,7 +29,7 @@ export interface DirectoryPlayer {
   photo_url: string | null;
   video_url?: string | null;
   has_gph_evaluation?: boolean;
-  /** academy = plantel certificado; tutor = ficha armada por la familia */
+  /** academy = plantel certificado; tutor = ficha armada por el tutor */
   source?: "academy" | "tutor";
   public_code?: string | null;
   academies: {

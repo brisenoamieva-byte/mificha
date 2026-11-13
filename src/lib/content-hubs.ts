@@ -1,4 +1,5 @@
 import { CRACKS_TRYOUTS, CRACKS_TRYOUTS_PATH } from "@/lib/cracks-tryouts";
+import { trainingWhatsAppHref } from "@/lib/gph-alliance";
 import {
   GPH_PACHUCA_PATH,
   GPH_PACHUCA_SEGUNDA_FASE,
@@ -19,11 +20,11 @@ export type HubItem = {
 export const PLANES_HUB = {
   title: "Planes",
   summary:
-    "Dos cuentas: persona ($50 USD/año) o academia (gratis). El buscador básico es gratis para todos.",
+    "Dos cuentas: persona ($50 USD/año) o academia (gratis).",
   items: [
     {
       id: "persona",
-      title: "Familia o representante",
+      title: "Tutor o representante",
       detail: SCOUT_PRODUCT.summary,
       meta: `${SCOUT_PRODUCT.priceLabel} ${SCOUT_PRODUCT.currency} ${SCOUT_PRODUCT.period}`,
       href: "/fut/explorar#pro",
@@ -56,11 +57,10 @@ export const PRODUCTOS_HUB = {
     {
       id: "entrenamientos",
       title: "Entrenamientos",
-      detail:
-        "Especialización y sesiones GPH. Cupos y fechas se publican en Productos.",
+      detail: "Especialización y sesiones GPH. Cupos y fechas por WhatsApp.",
       meta: "Con membresía o cotización",
-      href: "/fut/productos#entrenamientos",
-      cta: "Ver entrenamientos",
+      href: trainingWhatsAppHref(),
+      cta: "Pedir información",
     },
   ] satisfies HubItem[],
 } as const;

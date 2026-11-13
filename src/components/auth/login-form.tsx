@@ -119,7 +119,7 @@ export function LoginForm() {
       </button>
 
       <p className="text-center text-sm text-gray-600">
-        ¿Familia, representante o academia?{" "}
+        ¿Tutor, representante o academia?{" "}
         <Link href="/fut/entrar" className="font-medium text-[#1B4F8C] hover:underline">
           Usa el acceso unificado
         </Link>

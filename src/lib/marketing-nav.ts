@@ -8,6 +8,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { CRACKS_TRYOUTS_PATH } from "@/lib/cracks-tryouts";
+import { trainingWhatsAppHref } from "@/lib/gph-alliance";
 import { GPH_PACHUCA_PATH } from "@/lib/gph-pachuca-segunda-fase";
 import { VISORIA_PUBLIC_PATH } from "@/lib/visoria-event";
 
@@ -37,12 +38,12 @@ export const MARKETING_NAV: NavSection[] = [
     icon: Package,
     links: [
       {
-        href: "/fut/planes#persona",
-        label: "Familia o representante",
+        href: "/fut/planes",
+        label: "Tutor o representante",
         description: "Fichas + Explorar Pro · $50 USD/año",
       },
       {
-        href: "/fut/planes#academia",
+        href: "/fut/planes",
         label: "Academia",
         description: "Plantel y torneo · gratis para la escuela",
       },
@@ -59,9 +60,9 @@ export const MARKETING_NAV: NavSection[] = [
         description: "Diagnóstico GPH + 12 meses de MiFicha",
       },
       {
-        href: "/fut/productos#entrenamientos",
+        href: trainingWhatsAppHref(),
         label: "Entrenamientos",
-        description: "Especialización y sesiones GPH",
+        description: "Especialización GPH · WhatsApp",
       },
     ],
   },

@@ -1,6 +1,6 @@
 import type { GuardianKind } from "@/lib/tutor-family";
 
-/** Copy unificado cuenta persona (familia o representante). */
+/** Copy unificado cuenta persona (tutor o representante). */
 export const PERSONA_WORKSPACE_COPY = {
   kind: "tutor" as const,
   path: "/fut/tutor",

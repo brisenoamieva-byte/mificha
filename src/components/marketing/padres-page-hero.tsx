@@ -22,8 +22,7 @@ export function PadresPageHero() {
             <p className="mt-5 text-base leading-8 text-mf-text-secondary sm:text-[1.0625rem]">
               <WithBrandName>
                 Arma la ficha de tu hijo (fotos, videos e historia), lleva el seguimiento y
-                publícalo en Explorar para que agentes y scouts de futbol lo encuentren. El
-                torneo, cuando esté activo, suma stats al mismo expediente.
+                publícalo en Explorar para agentes y scouts. Si hay torneo ligado, suma stats.
               </WithBrandName>
             </p>
 

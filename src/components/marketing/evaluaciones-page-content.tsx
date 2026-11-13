@@ -138,8 +138,7 @@ export function EvaluacionesPageContent() {
                 <Link href="/fut/tutor" className="font-semibold text-mf-gph hover:underline">
                   ficha del jugador
                 </Link>{" "}
-                lista (la arma el tutor): el informe y el material del hijo viven en el
-                mismo expediente.
+                lista (la arma el tutor): el informe queda ligado a esa ficha.
               </p>
             </div>
           </div>

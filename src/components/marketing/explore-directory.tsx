@@ -106,7 +106,7 @@ export function ExploreDirectory({
     <div className="space-y-6">
       <div className="mf-card p-4 sm:p-5">
         <p className="text-sm text-mf-text-secondary">
-          Fichas publicadas por familia o representante · {CURRENT_SEASON_LABEL}
+          Fichas publicadas por tutor o representante · {CURRENT_SEASON_LABEL}
         </p>
 
         <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -190,7 +190,7 @@ export function ExploreDirectory({
 
           {displayPlayers.length === 0 ? (
             <div className="rounded-xl border border-dashed border-mf-border bg-white px-5 py-10 text-center text-sm text-mf-text-secondary">
-              No hay jugadores que coincidan. Las fichas las publican familias o
+              No hay jugadores que coincidan. Las fichas las publican tutores o
               representantes con consentimiento.
             </div>
           ) : (

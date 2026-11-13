@@ -20,7 +20,7 @@ export const TUTOR_PILOT_LABEL =
 
 export type TutorMaterialKind = "photo" | "video" | "story";
 
-/** Quién arma la ficha: tutor (familia) o agente (representante). */
+/** Quién arma la ficha: tutor o agente (representante). */
 export type GuardianKind = "tutor" | "agente";
 
 export function normalizeGuardianKind(

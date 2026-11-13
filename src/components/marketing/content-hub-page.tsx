@@ -65,10 +65,22 @@ export function ContentHubPage({
                       ) : null}
                     </div>
                     {!item.soon ? (
-                      <Link href={item.href} className="mf-btn-gph shrink-0 self-start">
-                        {item.cta || "Ver"}
-                        <ArrowRight className="h-4 w-4" />
-                      </Link>
+                      item.href.startsWith("http") ? (
+                        <a
+                          href={item.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="mf-btn-gph shrink-0 self-start"
+                        >
+                          {item.cta || "Ver"}
+                          <ArrowRight className="h-4 w-4" />
+                        </a>
+                      ) : (
+                        <Link href={item.href} className="mf-btn-gph shrink-0 self-start">
+                          {item.cta || "Ver"}
+                          <ArrowRight className="h-4 w-4" />
+                        </Link>
+                      )
                     ) : null}
                   </div>
                 </li>

@@ -12,7 +12,7 @@ export default function LoginPage() {
   return (
     <AuthShell
       title="Inicia sesión"
-      subtitle="Mismo acceso para familia, representante o academia: te llevamos a tu espacio."
+      subtitle="Mismo acceso para tutor, representante o academia: te llevamos a tu espacio."
       footer={
         <>
           <Link href="/fut/entrar" className="font-semibold text-mf-brand hover:underline">

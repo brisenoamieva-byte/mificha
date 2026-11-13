@@ -36,7 +36,7 @@ export function HomeExploreSection({
               Jugadores en MiFicha
             </h2>
             <p className="mt-1 max-w-xl text-sm leading-6 text-mf-text-secondary">
-              Fichas que publican familias o representantes. Datos básicos visibles; el
+              Fichas que publican tutores o representantes. Datos básicos visibles; el
               detalle se abre con la membresía persona.
             </p>
           </div>

@@ -99,7 +99,7 @@ export function WeeklyCompetitionPanels({
   if (filteredRanked.length === 0) {
     return (
       <div className="mf-card border-dashed p-8 text-center text-sm text-mf-text-secondary">
-        Destacados semanales en pausa. Usa el directorio: fichas de familia o
+        Destacados semanales en pausa. Usa el directorio: fichas de tutor o
         representante.
       </div>
     );

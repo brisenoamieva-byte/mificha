@@ -4,14 +4,14 @@ import { SCOUT_PRODUCT } from "@/lib/scout-product";
 const ACCOUNTS = [
   {
     id: "persona",
-    title: "Familia o representante",
+    title: "Tutor o representante",
     forWho: "Persona",
     status: `${SCOUT_PRODUCT.priceLabel} ${SCOUT_PRODUCT.currency}/${SCOUT_PRODUCT.period.replace("al ", "")}`,
     canDo: [
       "Llenar fichas de hijos o representados y llevar seguimiento",
       "Con consentimiento, aparecer en el buscador",
       "Desbloquear detalle de otros jugadores (Explorar Pro incluido)",
-      "En el espacio eliges si eres familia o representante",
+      "Mismo espacio para tutor o representante",
     ],
     href: "/fut/entrar",
     cta: "Entrar / crear cuenta",
@@ -35,7 +35,7 @@ const ACCOUNTS = [
 const LAYERS = [
   {
     title: "Ficha del jugador",
-    detail: "Fotos, videos e historia; la arma la familia o el representante.",
+    detail: "Fotos, videos e historia; la arma el tutor o el representante.",
   },
   {
     title: "Directorio Explorar",
@@ -43,7 +43,7 @@ const LAYERS = [
   },
   {
     title: "Informe GPH",
-    detail: "Diagnóstico del evaluador en el mismo expediente (cuando lo contratan).",
+    detail: "Diagnóstico del evaluador (cuando lo contratan).",
   },
 ] as const;
 
@@ -55,11 +55,10 @@ export function AccountTypesSection() {
           Accesos
         </p>
         <h2 className="mt-2 max-w-2xl text-2xl font-semibold tracking-[-0.02em] text-mf-gph-ink sm:text-3xl">
-          Dos cuentas, claro
+          Dos cuentas
         </h2>
         <p className="mt-3 max-w-2xl text-sm leading-7 text-mf-text-secondary">
-          Persona ($50 USD/año) o academia (gratis). La ficha, los stats de torneo y el informe
-          GPH viven en el mismo expediente.
+          Persona ($50 USD/año) o academia (gratis).
         </p>
 
         <ul className="mt-8 grid gap-3 md:grid-cols-2">

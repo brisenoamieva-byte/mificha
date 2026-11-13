@@ -39,7 +39,7 @@ export function TutorManualStats({
           {eyebrow}
         </p>
         <p className="mt-1 text-sm text-mf-text-secondary">
-          Torneos y números capturados por la familia
+          Torneos y números capturados por el tutor
           {totals.matches > 0 || totals.minutes > 0
             ? ` · ${totals.matches} partidos · ${totals.goals} goles · ${totals.assists} asist. · ${totals.minutes} min`
             : ""}

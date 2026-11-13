@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { SiteFooter, SiteHeader } from "@/components/marketing/site-header";
 import { TutorWorkspace } from "@/components/tutor/tutor-workspace";
 
@@ -13,17 +14,22 @@ export default function TutorPage() {
     <div className="flex min-h-dvh flex-col bg-mf-canvas">
       <SiteHeader actionHref="/fut/tutor" actionLabel="Mis fichas" />
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-6 sm:py-10">
-        <div className="mb-6 max-w-2xl">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
-            Cuenta persona
-          </p>
-          <h1 className="mt-2 text-2xl font-semibold tracking-tight text-mf-gph-ink sm:text-3xl">
-            Tus fichas
-          </h1>
-          <p className="mt-2 text-sm leading-7 text-mf-text-secondary">
-            Familia o representante: misma cuenta. Publica fichas con consentimiento; la
-            membresía ($50 USD/año) desbloquea detalle en Explorar.
-          </p>
+        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div className="max-w-2xl">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
+              Cuenta persona
+            </p>
+            <h1 className="mt-2 text-2xl font-semibold tracking-tight text-mf-gph-ink sm:text-3xl">
+              Tus fichas
+            </h1>
+            <p className="mt-2 text-sm leading-7 text-mf-text-secondary">
+              Tutor o representante: misma cuenta. Publica fichas con consentimiento; la
+              membresía ($50 USD/año) desbloquea detalle en Explorar.
+            </p>
+          </div>
+          <Link href="/fut/dashboard" className="mf-btn-gph-ghost shrink-0 self-start sm:self-auto">
+            Panel academia
+          </Link>
         </div>
 
         <section id="ficha" className="scroll-mt-24">

@@ -11,7 +11,7 @@ const STEPS = [
     n: "2",
     title: "Publica tu ficha",
     detail:
-      "Familia o representante arma la ficha del jugador y decide si aparece en Explorar (opt-in).",
+      "Tutor o representante arma la ficha del jugador y decide si aparece en Explorar (opt-in).",
   },
   {
     n: "3",
@@ -28,11 +28,8 @@ export function HomeHowItWorks() {
         <div className="max-w-2xl">
           <p className="mf-marketing-eyebrow">Cómo funciona</p>
           <h2 className="mt-2 text-xl font-semibold tracking-tight text-mf-gph-ink sm:text-2xl">
-            Tres pasos. Sin laberinto.
+            Tres pasos
           </h2>
-          <p className="mt-2 text-sm leading-7 text-mf-text-secondary">
-            MiFicha es ficha digital + buscador. No sustituye traspasos ni licencia FIFA.
-          </p>
         </div>
 
         <ol className="mt-8 grid gap-6 sm:grid-cols-3">

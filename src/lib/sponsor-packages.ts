@@ -110,7 +110,7 @@ export const SPONSOR_SALES = {
   eyebrow: "Patrocinio MiFicha",
   title: "Espacios de marca ante familias de futbol",
   summary:
-    "Si tu marca quiere aparecer en MiFicha (home, tutores, footer u eventos), pide información por WhatsApp. Sin catálogo público por ahora: armamos la propuesta según tu objetivo.",
+    "Si tu marca quiere aparecer en MiFicha (home, tutores, footer u eventos), pide información por WhatsApp.",
   audiencePoints: [
     "Padres y tutores que arman fichas y siguen oportunidades",
     "Familias, representantes y academias que operan en MiFicha",
