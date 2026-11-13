@@ -35,7 +35,16 @@ export function ExplorePlayerCard({
     : isTutor && player.public_code
       ? `/fut/f/${player.public_code}`
       : `/fut/j/${player.slug}`;
-  const stats = unlocked && demo ? player.season_stats : null;
+  const stats =
+    unlocked && player.season_stats
+      ? player.season_stats
+      : null;
+  const showStats =
+    stats &&
+    (stats.matches > 0 ||
+      stats.goals > 0 ||
+      stats.assists > 0 ||
+      stats.minutes > 0);
   const location = [player.academies?.city, player.academies?.state]
     .filter(Boolean)
     .join(", ");
@@ -79,8 +88,8 @@ export function ExplorePlayerCard({
       </div>
 
       <div className="min-w-0 flex-1">
-        <div className="flex flex-wrap items-start justify-between gap-2">
-          <div className="min-w-0">
+        <div className="flex items-start justify-between gap-2">
+          <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-semibold text-mf-text sm:text-[15px]">
               {basicName}
             </p>
@@ -91,10 +100,14 @@ export function ExplorePlayerCard({
               ) : null}
             </p>
           </div>
-          <PlayerCategoryBadge birthDate={player.birth_date} compact />
+          <PlayerCategoryBadge
+            birthDate={player.birth_date}
+            compact
+            className="shrink-0"
+          />
         </div>
 
-        {stats ? (
+        {showStats && stats ? (
           <p className="mt-2 text-xs tabular-nums text-mf-text-secondary">
             <span className="font-semibold text-mf-text">{stats.matches}</span> PJ
             {" · "}

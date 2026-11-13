@@ -1,7 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { diagnosisWhatsAppHref } from "@/lib/gph-alliance";
+import {
+  diagnosisBookingCtaLabel,
+  diagnosisBookingHref,
+  diagnosisBookingIsCalendar,
+  diagnosisWhatsAppHref,
+} from "@/lib/gph-alliance";
 import { DiagnosisPromoPrice } from "@/components/marketing/diagnosis-promo-price";
 import {
   FAMILY_PRODUCTS,
@@ -32,6 +37,8 @@ export function FamilyCheckout({
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const product = FAMILY_PRODUCTS.diagnosis;
+  const bookingHref = diagnosisBookingHref(playerName);
+  const bookingIsCalendar = diagnosisBookingIsCalendar();
 
   useEffect(() => {
     if (initialPlayerName?.trim()) {
@@ -91,12 +98,41 @@ export function FamilyCheckout({
             </p>
           </div>
           <div className="bg-mf-gph-soft/40 px-5 py-5">
-            <p className="text-lg font-semibold tracking-tight text-mf-gph-ink">
-              {product.publicName}
-            </p>
+            <div className="flex flex-wrap items-center gap-2">
+              <p className="text-lg font-semibold tracking-tight text-mf-gph-ink">
+                {product.publicName}
+              </p>
+              <span className="rounded-full bg-white px-2.5 py-0.5 text-[11px] font-semibold text-mf-gph ring-1 ring-mf-gph/25">
+                {product.locationLabel}
+              </span>
+            </div>
             <DiagnosisPromoPrice className="mt-3" size="lg" tone="gph" />
             <p className="mt-2 text-xs text-mf-text-muted">{product.period}</p>
-            <p className="mt-3 text-sm leading-6 text-mf-text-secondary">{product.description}</p>
+            <p className="mt-3 text-sm leading-6 text-mf-text-secondary">
+              {product.description}
+            </p>
+            <p className="mt-3 text-sm font-medium leading-6 text-mf-gph-ink">
+              {product.locationDetail}
+            </p>
+            <ul className="mt-4 space-y-2">
+              {product.highlights.map((item) => (
+                <li
+                  key={item}
+                  className="flex gap-2 text-sm leading-6 text-mf-text-secondary"
+                >
+                  <span
+                    className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-mf-gph"
+                    aria-hidden
+                  />
+                  {item}
+                </li>
+              ))}
+            </ul>
+            <p className="mt-4 text-xs leading-5 text-mf-text-muted">
+              {bookingIsCalendar
+                ? "Después del pago (o por WhatsApp) eliges fecha en el calendario del equipo GPH."
+                : "La fecha y sede se coordinan con GPH por WhatsApp tras el pago."}
+            </p>
           </div>
         </div>
 
@@ -181,21 +217,31 @@ export function FamilyCheckout({
               </button>
             ) : (
               <a
-                href={diagnosisWhatsAppHref(playerName)}
+                href={bookingHref}
                 className="mf-btn-gph w-full justify-center"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                Agendar por WhatsApp
+                {diagnosisBookingCtaLabel("Agendar por WhatsApp")}
               </a>
             )}
             <a
-              href={diagnosisWhatsAppHref(playerName)}
+              href={
+                mercadoPagoReady && bookingIsCalendar
+                  ? bookingHref
+                  : diagnosisWhatsAppHref(playerName)
+              }
               className="block text-center text-xs font-semibold text-mf-gph hover:underline"
               target="_blank"
               rel="noopener noreferrer"
             >
-              {mercadoPagoReady ? "Prefiero coordinar por WhatsApp" : "Abrir WhatsApp GPH"}
+              {mercadoPagoReady
+                ? bookingIsCalendar
+                  ? "Ver horarios disponibles"
+                  : "Prefiero coordinar por WhatsApp"
+                : bookingIsCalendar
+                  ? "Abrir calendario GPH"
+                  : "Abrir WhatsApp GPH"}
             </a>
           </div>
         </form>

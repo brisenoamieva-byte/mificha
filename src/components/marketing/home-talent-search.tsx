@@ -2,19 +2,27 @@
 
 import Link from "next/link";
 import { FormEvent, useMemo, useState } from "react";
-import { Search } from "lucide-react";
+import { ChevronDown, Search } from "lucide-react";
 import { ExplorePlayerCard } from "@/components/marketing/explore-player-card";
+import {
+  DEFAULT_PERFORMANCE_FILTER,
+  ExplorePerformanceFilters,
+} from "@/components/marketing/explore-performance-filters";
 import { ExplorePaywallBanner } from "@/components/marketing/explore-paywall";
 import { BrandWordmark } from "@/components/ui/brand-wordmark";
+import { CategoryFilterSelect } from "@/components/ui/category-filter-select";
 import { MexicoLocationSelect } from "@/components/ui/mexico-location-select";
 import {
   isMarketingPlaceholderAcademy,
   normalizeExplorePlayerName,
 } from "@/lib/explore-demo-data";
 import { CURRENT_SEASON_LABEL } from "@/lib/marketing-season";
+import { collectBirthDatesFromDirectory } from "@/lib/player-category";
 import {
   filterDirectory,
+  hasActivePerformanceFilter,
   isPlaceholderExplorePlayer,
+  type DirectoryPerformanceFilter,
   type DirectoryPlayer,
   type PublicDirectoryData,
 } from "@/lib/public-directory";
@@ -44,12 +52,24 @@ export function HomeTalentSearch({
   const [position, setPosition] = useState<PlayerPosition | "all">("all");
   const [state, setState] = useState("");
   const [city, setCity] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState(initialCategoryFilter);
+  const [performance, setPerformance] = useState<DirectoryPerformanceFilter>(
+    DEFAULT_PERFORMANCE_FILTER,
+  );
+  const [showPerformance, setShowPerformance] = useState(false);
   const [applied, setApplied] = useState({
     query: "",
     position: "all" as PlayerPosition | "all",
     state: "",
     city: "",
+    categoryFilter: initialCategoryFilter,
+    performance: DEFAULT_PERFORMANCE_FILTER,
   });
+
+  const birthDates = useMemo(
+    () => collectBirthDatesFromDirectory(data.players, []),
+    [data.players],
+  );
 
   const filtered = useMemo(
     () =>
@@ -60,9 +80,10 @@ export function HomeTalentSearch({
         0,
         applied.state,
         applied.city,
-        initialCategoryFilter,
+        applied.categoryFilter,
+        applied.performance,
       ),
-    [data, applied, initialCategoryFilter],
+    [data, applied],
   );
 
   const players = useMemo(() => {
@@ -93,9 +114,15 @@ export function HomeTalentSearch({
       position,
       state,
       city,
+      categoryFilter,
+      performance,
     });
     document.getElementById("directorio")?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
+
+  const hasExtraFilters =
+    applied.categoryFilter !== "all" ||
+    hasActivePerformanceFilter(applied.performance);
 
   return (
     <>
@@ -115,8 +142,8 @@ export function HomeTalentSearch({
             Encuentra jugadores de futbol
           </p>
           <p className="mt-2 max-w-xl text-sm leading-7 text-white/70 sm:text-base">
-            Nombre, posición y lugar. Vista básica gratis; ficha completa con membresía persona
-            (gratis por tiempo limitado).
+            Nombre, posición, categoría y rendimiento. Vista básica gratis; ficha completa con
+            membresía persona (gratis por tiempo limitado).
             {playerCount > 0 ? (
               <>
                 {" "}
@@ -147,7 +174,7 @@ export function HomeTalentSearch({
               </div>
             </label>
 
-            <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-[1fr_1.2fr_auto]">
+            <div className="mt-3 grid gap-2 sm:grid-cols-2">
               <label className="block">
                 <span className="sr-only">Posición</span>
                 <select
@@ -165,6 +192,14 @@ export function HomeTalentSearch({
                 </select>
               </label>
 
+              <CategoryFilterSelect
+                value={categoryFilter}
+                onChange={setCategoryFilter}
+                birthDates={birthDates}
+                hideLabel
+                className="block"
+              />
+
               <MexicoLocationSelect
                 allowAll
                 hideLabels
@@ -175,16 +210,42 @@ export function HomeTalentSearch({
                   if (!next) setCity("");
                 }}
                 onCityChange={setCity}
-                className="gap-2"
+                className="gap-2 sm:col-span-2"
               />
+            </div>
 
+            <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
               <button
-                type="submit"
-                className="mf-btn-gph h-[42px] justify-center sm:col-span-2 lg:col-span-1"
+                type="button"
+                onClick={() => setShowPerformance((open) => !open)}
+                className="inline-flex items-center gap-1.5 text-sm font-semibold text-mf-gph-ink hover:text-mf-gph"
+                aria-expanded={showPerformance}
               >
+                Filtros de rendimiento
+                <ChevronDown
+                  className={`h-4 w-4 transition ${showPerformance ? "rotate-180" : ""}`}
+                  aria-hidden
+                />
+                {hasActivePerformanceFilter(performance) ? (
+                  <span className="rounded-full bg-mf-gph-soft px-2 py-0.5 text-[11px] font-semibold text-mf-gph">
+                    activos
+                  </span>
+                ) : null}
+              </button>
+              <button type="submit" className="mf-btn-gph h-[42px] justify-center px-6">
                 Buscar
               </button>
             </div>
+
+            {showPerformance ? (
+              <div className="mt-3 rounded-xl border border-mf-border bg-mf-canvas/80 p-3 sm:p-4">
+                <ExplorePerformanceFilters
+                  value={performance}
+                  onChange={setPerformance}
+                  tone="light"
+                />
+              </div>
+            ) : null}
           </form>
 
           <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-white/70">
@@ -219,7 +280,10 @@ export function HomeTalentSearch({
               </h2>
               <p className="mt-1 text-sm text-mf-text-secondary">
                 {players.length} resultado{players.length === 1 ? "" : "s"}
-                {applied.query || applied.position !== "all" || applied.state
+                {applied.query ||
+                applied.position !== "all" ||
+                applied.state ||
+                hasExtraFilters
                   ? " con tu filtro"
                   : ""}
               </p>

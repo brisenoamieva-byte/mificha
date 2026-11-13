@@ -18,6 +18,29 @@ export interface DirectoryAcademy {
   is_certified: boolean;
 }
 
+export type DirectorySeasonStats = {
+  matches: number;
+  goals: number;
+  assists: number;
+  minutes: number;
+};
+
+export type DirectoryPerformanceFilter = {
+  minMinutes?: number;
+  minGoals?: number;
+  minAssists?: number;
+  minMatches?: number;
+  requireGph?: boolean;
+  requireVideo?: boolean;
+};
+
+export const EMPTY_SEASON_STATS: DirectorySeasonStats = {
+  matches: 0,
+  goals: 0,
+  assists: 0,
+  minutes: 0,
+};
+
 export interface DirectoryPlayer {
   id?: string;
   slug: string;
@@ -32,6 +55,8 @@ export interface DirectoryPlayer {
   /** academy = plantel certificado; tutor = ficha armada por el tutor */
   source?: "academy" | "tutor";
   public_code?: string | null;
+  /** Totales temporada activa (academia) o capturados por el tutor. */
+  season_stats?: DirectorySeasonStats;
   academies: {
     name: string;
     city: string | null;
@@ -80,6 +105,83 @@ function getSupabaseHeaders() {
   }
 
   return { url, key };
+}
+
+function asNonNeg(value: unknown) {
+  const n = Number(value);
+  if (!Number.isFinite(n) || n < 0) return 0;
+  return Math.round(n);
+}
+
+async function fetchActiveSeasonStatsByPlayerId(
+  playerIds: string[],
+  url: string,
+  key: string,
+): Promise<Map<string, DirectorySeasonStats>> {
+  const map = new Map<string, DirectorySeasonStats>();
+  if (playerIds.length === 0) return map;
+
+  const headers = {
+    apikey: key,
+    Authorization: `Bearer ${key}`,
+  };
+
+  const seasonsResponse = await fetch(
+    `${url}/rest/v1/seasons?is_active=eq.true&select=id`,
+    { headers, next: { revalidate: 60 } },
+  );
+  if (!seasonsResponse.ok) return map;
+  const seasonsJson = (await seasonsResponse.json()) as Array<{ id: string }>;
+  const seasonIds = seasonsJson.map((row) => row.id).filter(Boolean);
+  if (seasonIds.length === 0) return map;
+
+  const chunkSize = 80;
+  for (let i = 0; i < playerIds.length; i += chunkSize) {
+    const chunk = playerIds.slice(i, i + chunkSize);
+    const statsResponse = await fetch(
+      `${url}/rest/v1/player_season_stats?season_id=in.(${seasonIds.join(",")})&player_id=in.(${chunk.join(",")})&select=player_id,total_matches,total_goals,total_assists,total_minutes`,
+      { headers, next: { revalidate: 60 } },
+    );
+    if (!statsResponse.ok) continue;
+    const rows = (await statsResponse.json()) as Array<{
+      player_id: string;
+      total_matches: number | null;
+      total_goals: number | null;
+      total_assists: number | null;
+      total_minutes: number | null;
+    }>;
+    for (const row of rows) {
+      const prev = map.get(row.player_id) ?? { ...EMPTY_SEASON_STATS };
+      map.set(row.player_id, {
+        matches: prev.matches + asNonNeg(row.total_matches),
+        goals: prev.goals + asNonNeg(row.total_goals),
+        assists: prev.assists + asNonNeg(row.total_assists),
+        minutes: prev.minutes + asNonNeg(row.total_minutes),
+      });
+    }
+  }
+
+  return map;
+}
+
+export function playerSeasonStats(
+  player: Pick<DirectoryPlayer, "season_stats">,
+): DirectorySeasonStats {
+  return player.season_stats ?? EMPTY_SEASON_STATS;
+}
+
+export function hasActivePerformanceFilter(
+  performance?: DirectoryPerformanceFilter | null,
+) {
+  if (!performance) return false;
+  return Boolean(
+    (performance.minMinutes && performance.minMinutes > 0) ||
+      (performance.minGoals && performance.minGoals > 0) ||
+      (performance.minAssists && performance.minAssists > 0) ||
+      (performance.minMatches && performance.minMatches > 0) ||
+      performance.requireGph ||
+      performance.requireVideo,
+  );
 }
 
 export async function fetchPublicDirectory(): Promise<PublicDirectoryData> {
@@ -134,9 +236,13 @@ export async function fetchPublicDirectory(): Promise<PublicDirectoryData> {
     const consented = Array.isArray(playersJson)
       ? (playersJson as DirectoryPlayer[])
       : [];
-    const gphIds = await fetchGphPlayerIdSet(
-      consented.map((player) => player.id).filter((id): id is string => Boolean(id)),
-    );
+    const playerIds = consented
+      .map((player) => player.id)
+      .filter((id): id is string => Boolean(id));
+    const [gphIds, seasonStatsById] = await Promise.all([
+      fetchGphPlayerIdSet(playerIds),
+      fetchActiveSeasonStatsByPlayerId(playerIds, url, key),
+    ]);
     const players = await Promise.all(
       consented.map(async (player) => ({
         ...player,
@@ -144,6 +250,9 @@ export async function fetchPublicDirectory(): Promise<PublicDirectoryData> {
         academies: asAcademyEmbed(player.academies),
         photo_url: await signPlayerPhotoUrl(player.photo_url),
         has_gph_evaluation: Boolean(player.id && gphIds.has(player.id)),
+        season_stats: player.id
+          ? (seasonStatsById.get(player.id) ?? { ...EMPTY_SEASON_STATS })
+          : { ...EMPTY_SEASON_STATS },
       })),
     );
 
@@ -186,12 +295,19 @@ export function filterDirectory(
   state = "",
   city = "",
   categoryFilter: PlayerCategoryFilter | string = "all",
+  performance?: DirectoryPerformanceFilter,
 ) {
   const normalizedQuery = query.trim().toLowerCase();
   const category =
     typeof categoryFilter === "string"
       ? parseCategoryFilter(categoryFilter)
       : categoryFilter;
+  const minMinutes = performance?.minMinutes ?? 0;
+  const minGoals = performance?.minGoals ?? 0;
+  const minAssists = performance?.minAssists ?? 0;
+  const minMatches = performance?.minMatches ?? 0;
+  const requireGph = Boolean(performance?.requireGph);
+  const requireVideo = Boolean(performance?.requireVideo);
 
   const academies = (Array.isArray(data.academies) ? data.academies : []).filter((academy) => {
     if (state && !locationMatches(academy.state, state)) return false;
@@ -217,6 +333,14 @@ export function filterDirectory(
     if (!matchesCategoryFilter(player.birth_date, category)) return false;
     if (position !== "all" && player.position !== position) return false;
     if (player.passport_score < minPassport) return false;
+
+    const stats = playerSeasonStats(player);
+    if (stats.minutes < minMinutes) return false;
+    if (stats.goals < minGoals) return false;
+    if (stats.assists < minAssists) return false;
+    if (stats.matches < minMatches) return false;
+    if (requireGph && !player.has_gph_evaluation) return false;
+    if (requireVideo && !player.video_url) return false;
 
     if (!normalizedQuery) return true;
 

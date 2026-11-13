@@ -1,6 +1,10 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { normalizePublicCode } from "@/lib/public-player-code";
-import type { DirectoryPlayer } from "@/lib/public-directory";
+import {
+  EMPTY_SEASON_STATS,
+  type DirectoryPlayer,
+  type DirectorySeasonStats,
+} from "@/lib/public-directory";
 import type { TutorChild, TutorMaterial } from "@/lib/tutor-family";
 import type { PlayerPosition } from "@/types/database";
 
@@ -13,8 +17,22 @@ type TutorSeasonLite = {
   child_id: string;
   guardian_user_id: string;
   matches?: number;
+  goals?: number;
+  assists?: number;
   minutes?: number;
 };
+
+function aggregateTutorSeasonStats(rows: TutorSeasonLite[]): DirectorySeasonStats {
+  return rows.reduce<DirectorySeasonStats>(
+    (acc, row) => ({
+      matches: acc.matches + (Number(row.matches) || 0),
+      goals: acc.goals + (Number(row.goals) || 0),
+      assists: acc.assists + (Number(row.assists) || 0),
+      minutes: acc.minutes + (Number(row.minutes) || 0),
+    }),
+    { ...EMPTY_SEASON_STATS },
+  );
+}
 
 function mapTutorPosition(raw: string | null | undefined): PlayerPosition {
   const value = String(raw ?? "").toLowerCase();
@@ -89,9 +107,12 @@ export async function fetchTutorDirectoryPlayers(
       stories: storyRows.length,
       videos: videoRows.length,
     };
-    const hasSeasonStats = mySeasons.some(
-      (row) => Number(row.matches) > 0 || Number(row.minutes) > 0,
-    );
+    const season_stats = aggregateTutorSeasonStats(mySeasons);
+    const hasSeasonStats =
+      season_stats.matches > 0 ||
+      season_stats.minutes > 0 ||
+      season_stats.goals > 0 ||
+      season_stats.assists > 0;
 
     const coverRow =
       photoRows.find((item) => item.is_cover) ?? photoRows[0] ?? null;
@@ -131,6 +152,7 @@ export async function fetchTutorDirectoryPlayers(
       has_gph_evaluation: false,
       source: "tutor",
       public_code: code,
+      season_stats,
       academies: {
         name: clubOrSchool,
         city,

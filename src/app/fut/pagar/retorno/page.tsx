@@ -1,7 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SiteFooter, SiteHeader } from "@/components/marketing/site-header";
-import { diagnosisWhatsAppHref } from "@/lib/gph-alliance";
+import {
+  diagnosisBookingCtaLabel,
+  diagnosisBookingHref,
+  diagnosisBookingIsCalendar,
+  diagnosisWhatsAppHref,
+} from "@/lib/gph-alliance";
 import { createSupabaseAdminClient } from "@/lib/supabase-admin";
 import {
   getAcademyOrderByFolio,
@@ -108,6 +113,8 @@ export default async function PagoRetornoPage({
                     ? ". Ya puedes ver fichas completas en Explorar."
                     : isAcademy
                       ? ". Ya puedes operar plantel y partidos en el panel."
+                      : diagnosisBookingIsCalendar()
+                      ? ". Si contrataste evaluación, elige horario en el calendario GPH (Querétaro)."
                       : ". Si contrataste evaluación, el equipo GPH coordina la sesión por WhatsApp."}
                 </p>
               ) : null}
@@ -134,13 +141,23 @@ export default async function PagoRetornoPage({
                   ) : (
                     <>
                       <a
-                        href={diagnosisWhatsAppHref()}
+                        href={diagnosisBookingHref()}
                         className="mf-btn-gph"
                         target="_blank"
                         rel="noopener noreferrer"
                       >
-                        Avisar a GPH
+                        {diagnosisBookingCtaLabel("Avisar a GPH")}
                       </a>
+                      {diagnosisBookingIsCalendar() ? (
+                        <a
+                          href={diagnosisWhatsAppHref()}
+                          className="mf-btn-gph-ghost"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          WhatsApp GPH
+                        </a>
+                      ) : null}
                       <Link href="/fut/tutor" className="mf-btn-gph-ghost">
                         Ir a mi cuenta de tutor
                       </Link>

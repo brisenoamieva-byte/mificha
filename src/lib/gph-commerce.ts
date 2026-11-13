@@ -94,9 +94,17 @@ export const FAMILY_PRODUCTS = {
     priceLabel: "$2,030",
     discountPercent: DIAGNOSIS_PROMO.discountPercent,
     promoBadge: DIAGNOSIS_PROMO.badge,
-    period: "MXN · sesión + 12 meses de plataforma",
+    period: "MXN · sesión presencial en Querétaro + 12 meses de plataforma",
+    locationLabel: "Querétaro",
+    locationDetail: "Sesión presencial en Querétaro (fecha y sede se coordinan al pagar o por WhatsApp).",
     description:
-      "Diagnóstico GPH de tu hijo (sesión, ficha y lectura de entrenador) e incluye 12 meses de acceso a MiFicha. Promoción −30% por tiempo limitado.",
+      "Es una evaluación presencial con metodología GPH: medimos técnica, táctica, físico, mental y hábitos. Sales con etapa de desarrollo, fortalezas, 3–5 objetivos claros y el informe en MiFicha — más 12 meses de acceso para seguimiento. Promoción −30% por tiempo limitado.",
+    highlights: [
+      "Presencial en Querétaro",
+      "Pruebas 1–5 + etapa de desarrollo",
+      "Ficha visual y lectura de entrenador",
+      "12 meses de MiFicha incluidos",
+    ],
     includesMembershipDays: 365,
     mifichaShareMxn: GPH_PARTNERSHIP.mifichaShareMxn,
     /** Resto del cobro promocional para GPH (2030 − 600). */

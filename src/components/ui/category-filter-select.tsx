@@ -15,6 +15,8 @@ interface CategoryFilterSelectProps {
   label?: string;
   hint?: string;
   includeAll?: boolean;
+  /** Compacto en buscadores: sin etiqueta visible. */
+  hideLabel?: boolean;
 }
 
 function renderOptions(options: CategoryFilterOption[]) {
@@ -60,19 +62,22 @@ export function CategoryFilterSelect({
   label = "Categoría / generación",
   hint,
   includeAll = true,
+  hideLabel = false,
 }: CategoryFilterSelectProps) {
   const options = buildCategoryFilterOptions(birthDates, { includeAll });
 
   return (
     <label className={cn("block", className)}>
-      <span className="text-sm font-medium text-mf-text">{label}</span>
-      {hint ? (
+      <span className={hideLabel ? "sr-only" : "text-sm font-medium text-mf-text"}>
+        {label || "Categoría / generación"}
+      </span>
+      {!hideLabel && hint ? (
         <span className="mt-1 block text-xs leading-5 text-mf-text-muted">{hint}</span>
       ) : null}
       <select
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className={cn("mf-input mt-2", selectClassName)}
+        className={cn("mf-input", !hideLabel && "mt-2", selectClassName)}
       >
         {renderOptions(options)}
       </select>

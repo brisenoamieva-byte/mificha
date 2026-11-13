@@ -30,6 +30,27 @@ export function diagnosisWhatsAppHref(playerName?: string) {
   return `https://wa.me/${GPH_WHATSAPP_E164}?text=${encodeURIComponent(text)}`;
 }
 
+/**
+ * Calendly / Google Appointment Schedule del coordinador GPH.
+ * Prioridad: URL de diagnóstico → URL general GPH → WhatsApp.
+ */
+export function diagnosisBookingHref(playerName?: string) {
+  const dedicated = process.env.NEXT_PUBLIC_GPH_DIAGNOSIS_CALENDLY_URL?.trim();
+  const shared = process.env.NEXT_PUBLIC_GPH_CALENDLY_URL?.trim();
+  return dedicated || shared || diagnosisWhatsAppHref(playerName);
+}
+
+export function diagnosisBookingIsCalendar() {
+  return Boolean(
+    process.env.NEXT_PUBLIC_GPH_DIAGNOSIS_CALENDLY_URL?.trim() ||
+      process.env.NEXT_PUBLIC_GPH_CALENDLY_URL?.trim(),
+  );
+}
+
+export function diagnosisBookingCtaLabel(fallback = "Coordinar por WhatsApp") {
+  return diagnosisBookingIsCalendar() ? "Elegir horario" : fallback;
+}
+
 export function trainingWhatsAppHref() {
   const text =
     "Hola, quiero información sobre entrenamientos y especialización GPH en MiFicha.";

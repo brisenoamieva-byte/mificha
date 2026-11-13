@@ -7,7 +7,7 @@ import { isMercadoPagoConfigured } from "@/lib/mercadopago";
 export const metadata: Metadata = {
   title: "Pagar diagnóstico GPH | MiFicha",
   description:
-    "Paga la evaluación GPH con 30% de descuento ($2,030, antes $2,900; incluye 1 año de MiFicha) con Mercado Pago o WhatsApp.",
+    "Evaluación presencial GPH en Querétaro: técnica, táctica, físico, mental y hábitos. $2,030 (−30%; incluye 1 año de MiFicha). Mercado Pago o WhatsApp.",
 };
 
 function parseSku(value: string | string[] | undefined): FamilySku | undefined {
@@ -45,6 +45,11 @@ export default async function PagarPage({
               ? `Diagnóstico GPH para ${playerName}`
               : "Pagar diagnóstico GPH"}
           </h1>
+          <p className="mt-3 max-w-2xl text-sm leading-7 text-mf-text-secondary sm:text-base">
+            Sesión presencial en Querétaro con metodología GPH. Sirve para saber en qué
+            etapa está el jugador, qué priorizar en el entrenamiento y llevar el seguimiento
+            en MiFicha.
+          </p>
           <div className="mt-10">
             <FamilyCheckout
               initialSku={sku}

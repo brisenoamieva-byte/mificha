@@ -1,11 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { Award, MapPin, Search } from "lucide-react";
+import { Award, ChevronDown, MapPin, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 import { CategoryFilterSelect } from "@/components/ui/category-filter-select";
 import { MexicoLocationSelect } from "@/components/ui/mexico-location-select";
 import { ExplorePlayerCard } from "@/components/marketing/explore-player-card";
+import {
+  DEFAULT_PERFORMANCE_FILTER,
+  ExplorePerformanceFilters,
+} from "@/components/marketing/explore-performance-filters";
 import {
   isMarketingPlaceholderAcademy,
   normalizeExplorePlayerName,
@@ -13,7 +17,9 @@ import {
 import { collectBirthDatesFromDirectory } from "@/lib/player-category";
 import {
   filterDirectory,
+  hasActivePerformanceFilter,
   isPlaceholderExplorePlayer,
+  type DirectoryPerformanceFilter,
   type DirectoryPlayer,
   type PublicDirectoryData,
 } from "@/lib/public-directory";
@@ -69,6 +75,10 @@ export function ExploreDirectory({
   const [state, setState] = useState(initialState);
   const [city, setCity] = useState(initialCity);
   const [categoryFilter, setCategoryFilter] = useState(initialCategoryFilter);
+  const [performance, setPerformance] = useState<DirectoryPerformanceFilter>(
+    DEFAULT_PERFORMANCE_FILTER,
+  );
+  const [showPerformance, setShowPerformance] = useState(false);
 
   const birthDates = useMemo(
     () => collectBirthDatesFromDirectory(data.players, []),
@@ -77,8 +87,17 @@ export function ExploreDirectory({
 
   const filtered = useMemo(
     () =>
-      filterDirectory(data, query, position, minPassport, state, city, categoryFilter),
-    [data, query, position, minPassport, state, city, categoryFilter],
+      filterDirectory(
+        data,
+        query,
+        position,
+        minPassport,
+        state,
+        city,
+        categoryFilter,
+        performance,
+      ),
+    [data, query, position, minPassport, state, city, categoryFilter, performance],
   );
 
   const displayPlayers = useMemo(() => {
@@ -113,7 +132,12 @@ export function ExploreDirectory({
             {displayPlayers.length}
           </span>{" "}
           {displayPlayers.length === 1 ? "jugador" : "jugadores"}
-          {query || position !== "all" || state || city || categoryFilter !== "all"
+          {query ||
+          position !== "all" ||
+          state ||
+          city ||
+          categoryFilter !== "all" ||
+          hasActivePerformanceFilter(performance)
             ? " con este filtro"
             : " en el buscador"}
         </p>
@@ -185,6 +209,31 @@ export function ExploreDirectory({
             stateLabel="Estado"
             cityLabel="Ciudad o municipio"
           />
+        </div>
+
+        <div className="mt-3">
+          <button
+            type="button"
+            onClick={() => setShowPerformance((open) => !open)}
+            className="inline-flex items-center gap-1.5 text-sm font-semibold text-mf-gph-ink hover:text-mf-gph"
+            aria-expanded={showPerformance}
+          >
+            Filtros de rendimiento
+            <ChevronDown
+              className={`h-4 w-4 transition ${showPerformance ? "rotate-180" : ""}`}
+              aria-hidden
+            />
+            {hasActivePerformanceFilter(performance) ? (
+              <span className="rounded-full bg-mf-gph-soft px-2 py-0.5 text-[11px] font-semibold text-mf-gph">
+                activos
+              </span>
+            ) : null}
+          </button>
+          {showPerformance ? (
+            <div className="mt-3 rounded-xl border border-mf-border bg-mf-canvas px-3 py-3 sm:px-4">
+              <ExplorePerformanceFilters value={performance} onChange={setPerformance} />
+            </div>
+          ) : null}
         </div>
       </div>
 

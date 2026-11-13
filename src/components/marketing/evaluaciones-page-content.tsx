@@ -14,6 +14,8 @@ import { CURRENT_SEASON_LABEL } from "@/lib/marketing-season";
 import {
   GPH_ALLIANCE,
   GPH_WHATSAPP_DISPLAY,
+  diagnosisBookingCtaLabel,
+  diagnosisBookingHref,
   diagnosisWhatsAppHref,
 } from "@/lib/gph-alliance";
 import { DiagnosisPromoPrice } from "@/components/marketing/diagnosis-promo-price";
@@ -42,7 +44,7 @@ const STEPS = [
 ] as const;
 
 export function EvaluacionesPageContent() {
-  const whatsapp = diagnosisWhatsAppHref();
+  const bookingHref = diagnosisBookingHref();
 
   return (
     <>
@@ -51,20 +53,20 @@ export function EvaluacionesPageContent() {
         title="Diagnóstico GPH: mide, orienta y da seguimiento."
         description={
           <WithBrandName>
-            Una sesión presencial con metodología GPH. Sales con etapa de desarrollo,
-            fortalezas, objetivos claros y el informe en MiFicha — para entrenar con
-            rumbo, no a ciegas.
+            Sesión presencial en Querétaro con metodología GPH. Sales con etapa de
+            desarrollo, fortalezas, objetivos claros y el informe en MiFicha — para
+            entrenar con rumbo, no a ciegas.
           </WithBrandName>
         }
         actions={
           <>
             <a
-              href={whatsapp}
+              href={bookingHref}
               className="mf-btn-gph"
               target="_blank"
               rel="noopener noreferrer"
             >
-              Agendar por WhatsApp
+              {diagnosisBookingCtaLabel("Agendar por WhatsApp")}
               <ArrowRight className="h-4 w-4" />
             </a>
             <Link href="/fut/pagar?sku=diagnosis" className="mf-btn-gph-ghost">
@@ -87,7 +89,7 @@ export function EvaluacionesPageContent() {
               <DiagnosisPromoPrice className="mt-5" size="lg" />
               <ul className="mt-5 space-y-2 text-sm text-mf-text-secondary">
                 {[
-                  "Sesión presencial",
+                  "Sesión presencial en Querétaro",
                   "Ficha visual + lectura de entrenador",
                   "3 a 5 objetivos de desarrollo",
                   "Informe en mificha.mx",
@@ -303,8 +305,8 @@ export function HomeGphAllianceBand() {
             ¿Listo para el diagnóstico GPH?
           </h2>
           <p className="mt-2 text-sm leading-7 text-white/75">
-            Sesión presencial, informe en la ficha y 12 meses de plataforma. El detalle de
-            precio está arriba en el hero.
+            Sesión presencial en Querétaro, informe en la ficha y 12 meses de plataforma. El
+            detalle de precio está arriba en el hero.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
