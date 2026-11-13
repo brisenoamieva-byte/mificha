@@ -1,5 +1,6 @@
 import Stripe from "stripe";
 import type { PlanStatus } from "@/types/database";
+import { getAppBaseUrl as resolveAppBaseUrl } from "@/lib/app-url";
 import { LEGACY_ACADEMY_PLANS } from "@/lib/pricing";
 
 export type SubscriptionPlan = "starter" | "pro" | "elite";
@@ -25,10 +26,7 @@ export function getStripeClient() {
 }
 
 export function getAppBaseUrl() {
-  return (
-    process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ??
-    "https://mificha.mx"
-  );
+  return resolveAppBaseUrl();
 }
 
 export function getPlanStatusLabel(planStatus: PlanStatus) {

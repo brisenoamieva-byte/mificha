@@ -1,4 +1,4 @@
-import { getAppBaseUrl } from "@/lib/stripe";
+import { getAppBaseUrl } from "@/lib/app-url";
 
 export function isMercadoPagoConfigured() {
   const token = process.env.MERCADOPAGO_ACCESS_TOKEN?.trim() ?? "";
