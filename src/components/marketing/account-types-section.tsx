@@ -1,12 +1,15 @@
 import Link from "next/link";
+import { personaMembershipPublicCopy } from "@/lib/persona-membership";
 import { SCOUT_PRODUCT } from "@/lib/scout-product";
+
+const personaCopy = personaMembershipPublicCopy();
 
 const ACCOUNTS = [
   {
     id: "persona",
     title: "Tutor o representante",
     forWho: "Persona",
-    status: `${SCOUT_PRODUCT.priceLabel} ${SCOUT_PRODUCT.currency}/${SCOUT_PRODUCT.period.replace("al ", "")}`,
+    status: personaCopy.meta,
     canDo: [
       "Llenar fichas de hijos o representados y llevar seguimiento",
       "Con consentimiento, aparecer en el buscador",
@@ -58,7 +61,7 @@ export function AccountTypesSection() {
           Dos cuentas
         </h2>
         <p className="mt-3 max-w-2xl text-sm leading-7 text-mf-text-secondary">
-          Persona ($50 USD/año) o academia (gratis).
+          {personaCopy.planesSummary.replace("Dos cuentas: ", "").replace(/\.$/, "")}.
         </p>
 
         <ul className="mt-8 grid gap-3 md:grid-cols-2">

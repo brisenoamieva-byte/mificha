@@ -113,9 +113,9 @@ export const SCOUT_PRICING = {
   basicLabel: "Búsqueda básica",
   basicPrice: "Gratis",
   proLabel: "Membresía persona · Explorar Pro",
-  proStatus: "$50 USD / año",
+  proStatus: "Gratis por tiempo limitado · después $50 USD/año",
   description:
-    "Filtra por categoría, posición y ciudad. Solo fichas con consentimiento. El detalle completo se desbloquea con la membresía persona ($50 USD/año).",
+    "Filtra por categoría, posición y ciudad. Solo fichas con consentimiento. El detalle completo se desbloquea con la membresía persona (gratis por tiempo limitado; después $50 USD/año).",
   unlockNote:
     "Incluye publicar fichas (tutor o representante) y ver fotos, videos, bio, contacto y ficha completa de terceros con opt-in.",
 } as const;

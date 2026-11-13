@@ -1,12 +1,18 @@
 import Link from "next/link";
 import { Lock, Search } from "lucide-react";
+import { PersonaMembershipCta } from "@/components/pay/persona-membership-cta";
+import {
+  PERSONA_MEMBERSHIP_FREE_PROMO,
+  personaMembershipPublicCopy,
+} from "@/lib/persona-membership";
 import {
   SCOUT_PRODUCT,
-  scoutWhatsAppCheckoutHref,
   type ExploreAccess,
 } from "@/lib/scout-product";
 
 export function ExplorePaywallBanner({ access }: { access: ExploreAccess }) {
+  const copy = personaMembershipPublicCopy();
+
   if (access.unlocked) {
     const label =
       access.reason === "scout_sub"
@@ -51,28 +57,29 @@ export function ExplorePaywallBanner({ access }: { access: ExploreAccess }) {
           </p>
         </div>
         <div className="border-t border-mf-border bg-mf-canvas px-5 py-6 sm:px-6 lg:border-l lg:border-t-0">
-          <p className="text-3xl font-semibold text-mf-gph-ink">
-            {SCOUT_PRODUCT.priceLabel}
-            <span className="ml-1 text-base font-medium text-mf-text-muted">
-              {SCOUT_PRODUCT.currency} {SCOUT_PRODUCT.period}
-            </span>
-          </p>
+          {PERSONA_MEMBERSHIP_FREE_PROMO ? (
+            <>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-mf-gph">
+                {copy.badge}
+              </p>
+              <p className="mt-2 text-3xl font-semibold text-mf-gph-ink">Gratis</p>
+              <p className="mt-1 text-sm text-mf-text-secondary">
+                Después {SCOUT_PRODUCT.priceLabel} {SCOUT_PRODUCT.currency}{" "}
+                {SCOUT_PRODUCT.period}.
+              </p>
+            </>
+          ) : (
+            <p className="text-3xl font-semibold text-mf-gph-ink">
+              {SCOUT_PRODUCT.priceLabel}
+              <span className="ml-1 text-base font-medium text-mf-text-muted">
+                {SCOUT_PRODUCT.currency} {SCOUT_PRODUCT.period}
+              </span>
+            </p>
+          )}
           <p className="mt-2 text-sm text-mf-text-secondary">
             Incluye publicar fichas y desbloquear detalle, fotos y contacto de terceros.
           </p>
-          <div className="mt-5 flex flex-col gap-2">
-            <a
-              href={scoutWhatsAppCheckoutHref()}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mf-btn-gph justify-center"
-            >
-              Contratar membresía
-            </a>
-            <Link href="/fut/entrar" className="mf-btn-gph-ghost justify-center">
-              Entrar y publicar ficha
-            </Link>
-          </div>
+          <PersonaMembershipCta className="mt-5" nextPath="/fut/explorar" />
         </div>
       </div>
     </aside>
@@ -95,6 +102,8 @@ export function FichaLockedTeaser({
   /** Si hay sesión de socio/dueño, volver aquí tras entrar. */
   loginHref?: string | null;
 }) {
+  const copy = personaMembershipPublicCopy();
+
   return (
     <div className="overflow-hidden rounded-2xl border border-mf-border bg-white">
       <div className="bg-gradient-to-br from-[#0a1f3d] via-[#123d68] to-[#0f2d52] px-5 py-8 text-white sm:px-7">
@@ -112,39 +121,27 @@ export function FichaLockedTeaser({
       </div>
       <div className="space-y-4 px-5 py-6 sm:px-7">
         <p className="text-sm leading-7 text-mf-text-secondary">
-          Fotos, videos, historia, contacto y ficha completa se desbloquean con la{" "}
-          <strong>membresía persona</strong> ({SCOUT_PRODUCT.exploreProLabel},{" "}
-          {SCOUT_PRODUCT.priceLabel} {SCOUT_PRODUCT.currency}/año)
+          Fotos, videos, historia, contacto y ficha completa con la{" "}
+          <strong>membresía persona</strong> ({SCOUT_PRODUCT.exploreProLabel}
+          {PERSONA_MEMBERSHIP_FREE_PROMO
+            ? `: ${copy.short}`
+            : `, ${SCOUT_PRODUCT.priceLabel} ${SCOUT_PRODUCT.currency}/año`}
+          )
           {loginHref ? " o iniciando sesión si ya tienes acceso." : "."}
         </p>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap items-start gap-2">
           {loginHref ? (
             <Link href={loginHref} className="mf-btn-gph">
               Entrar
             </Link>
-          ) : (
-            <a
-              href={scoutWhatsAppCheckoutHref()}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mf-btn-gph"
-            >
-              Contratar · {SCOUT_PRODUCT.priceLabel} USD/año
-            </a>
-          )}
+          ) : null}
+          <PersonaMembershipCta
+            variant={loginHref ? "ghost" : "primary"}
+            nextPath="/fut/explorar"
+          />
           <Link href="/fut/explorar#pro" className="mf-btn-gph-ghost">
             Ver membresía
           </Link>
-          {loginHref ? (
-            <a
-              href={scoutWhatsAppCheckoutHref()}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mf-btn-gph-ghost"
-            >
-              Contratar · {SCOUT_PRODUCT.priceLabel} USD/año
-            </a>
-          ) : null}
         </div>
       </div>
     </div>

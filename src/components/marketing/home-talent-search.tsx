@@ -114,7 +114,7 @@ export function HomeTalentSearch({
           </p>
           <p className="mt-2 max-w-xl text-sm leading-7 text-white/70 sm:text-base">
             Nombre, posición y lugar. Vista básica gratis; ficha completa con membresía persona
-            ($50 USD/año).
+            (gratis por tiempo limitado).
             {playerCount > 0 ? (
               <>
                 {" "}
@@ -193,7 +193,7 @@ export function HomeTalentSearch({
               ·
             </span>
             <Link href="/fut/explorar#pro" className="hover:text-white">
-              Membresía · $50 USD/año
+              Membresía · gratis ahora
             </Link>
             <span className="hidden text-white/30 sm:inline" aria-hidden>
               ·

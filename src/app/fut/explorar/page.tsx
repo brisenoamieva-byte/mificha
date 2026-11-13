@@ -16,7 +16,7 @@ import { fetchTutorDirectoryPlayers } from "@/lib/tutor-directory";
 export const metadata: Metadata = {
   title: "Explorar talento | MiFicha",
   description:
-    "Buscador de jugadores con consentimiento. Filtra gratis; ficha completa con membresía persona ($50 USD/año).",
+    "Buscador de jugadores con consentimiento. Filtra gratis; ficha completa con membresía persona (gratis por tiempo limitado).",
 };
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;

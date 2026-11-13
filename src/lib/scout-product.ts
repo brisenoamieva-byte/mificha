@@ -18,6 +18,8 @@ export const SCOUT_PRODUCT = {
     "Búsqueda por categoría, posición y ciudad con detalle completo",
   ],
   checkoutPath: "/fut/explorar#pro",
+  /** Endpoint de activación / cobro (promo gratis o Mercado Pago). */
+  activateApiPath: "/fut/api/pay/persona",
   /** Alias comercial del beneficio de detalle. */
   exploreProLabel: "Explorar Pro",
 } as const;

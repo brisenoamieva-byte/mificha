@@ -10,7 +10,10 @@ import {
 import { CRACKS_TRYOUTS_PATH } from "@/lib/cracks-tryouts";
 import { trainingWhatsAppHref } from "@/lib/gph-alliance";
 import { GPH_PACHUCA_PATH } from "@/lib/gph-pachuca-segunda-fase";
+import { personaMembershipPublicCopy } from "@/lib/persona-membership";
 import { VISORIA_PUBLIC_PATH } from "@/lib/visoria-event";
+
+const personaCopy = personaMembershipPublicCopy();
 
 export interface NavLink {
   href: string;
@@ -40,7 +43,7 @@ export const MARKETING_NAV: NavSection[] = [
       {
         href: "/fut/planes",
         label: "Tutor o representante",
-        description: "Fichas + Explorar Pro · $50 USD/año",
+        description: `Fichas + Explorar Pro · ${personaCopy.short}`,
       },
       {
         href: "/fut/planes",

@@ -52,7 +52,7 @@ export default function PadresPage() {
                 </h2>
                 <p className="mt-2 text-sm leading-7 text-mf-text-secondary">
                   Solo fichas con consentimiento del tutor o representante. Datos básicos
-                  gratis; detalle completo con membresía persona ($50 USD/año).
+                  gratis; detalle completo con membresía persona (gratis por tiempo limitado).
                 </p>
               </div>
               <Link href="/fut/explorar" className="mf-btn-primary shrink-0 self-start sm:self-center">

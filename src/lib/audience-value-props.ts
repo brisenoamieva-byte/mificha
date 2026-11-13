@@ -100,7 +100,7 @@ export const AUDIENCE_VALUE_PROPS: AudienceValueProp[] = [
     reasons: [
       "Filtros por categoría, posición y ciudad — gratis.",
       "Solo jugadores con consentimiento del tutor o representante.",
-      "Vista básica para todos; ficha completa con membresía ($50 USD/año).",
+      "Vista básica para todos; ficha completa con membresía (gratis por tiempo limitado).",
       "Esa membresía publica fichas y desbloquea fotos, contacto y detalle.",
     ],
     href: "/fut/explorar",

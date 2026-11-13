@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { markFamilyOrderPaid } from "@/lib/family-orders";
 import { fetchMercadoPagoPayment, isMercadoPagoConfigured } from "@/lib/mercadopago";
+import { markPersonaOrderPaid } from "@/lib/persona-membership";
 import { createSupabaseAdminClient } from "@/lib/supabase-admin";
 
 async function handlePaymentNotification(paymentId: string) {
@@ -10,7 +11,12 @@ async function handlePaymentNotification(paymentId: string) {
   if (!folio) return;
   if (payment.status === "approved") {
     const admin = createSupabaseAdminClient();
-    await markFamilyOrderPaid(admin, folio, String(payment.id ?? paymentId));
+    const paymentKey = String(payment.id ?? paymentId);
+    if (folio.startsWith("PE-")) {
+      await markPersonaOrderPaid(admin, folio, paymentKey);
+      return;
+    }
+    await markFamilyOrderPaid(admin, folio, paymentKey);
   }
 }
 

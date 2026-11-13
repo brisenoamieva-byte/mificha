@@ -24,7 +24,8 @@ export default function TutorPage() {
             </h1>
             <p className="mt-2 text-sm leading-7 text-mf-text-secondary">
               Tutor o representante: misma cuenta. Publica fichas con consentimiento; la
-              membresía ($50 USD/año) desbloquea detalle en Explorar.
+              membresía (gratis por tiempo limitado; después $50 USD/año) desbloquea detalle en
+              Explorar.
             </p>
           </div>
           <Link href="/fut/dashboard" className="mf-btn-gph-ghost shrink-0 self-start sm:self-auto">

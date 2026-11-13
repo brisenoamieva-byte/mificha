@@ -70,7 +70,7 @@ export function ExplorePageHero({ playerCount, academyCount }: ExplorePageHeroPr
             </h1>
             <p className="mt-5 text-base leading-8 text-mf-text-secondary sm:text-[1.0625rem]">
               Fichas de tutores o representantes. Vista básica gratis; detalle completo con
-              membresía persona ($50 USD/año).
+              membresía persona (gratis por tiempo limitado; después $50 USD/año).
             </p>
 
             <ul className="mt-6 flex flex-wrap gap-2">

@@ -4,8 +4,11 @@ import {
   GPH_PACHUCA_PATH,
   GPH_PACHUCA_SEGUNDA_FASE,
 } from "@/lib/gph-pachuca-segunda-fase";
+import { personaMembershipPublicCopy } from "@/lib/persona-membership";
 import { SCOUT_PRODUCT } from "@/lib/scout-product";
 import { VISORIA_EVENT, VISORIA_PUBLIC_PATH } from "@/lib/visoria-event";
+
+const personaCopy = personaMembershipPublicCopy();
 
 export type HubItem = {
   id: string;
@@ -19,16 +22,15 @@ export type HubItem = {
 
 export const PLANES_HUB = {
   title: "Planes",
-  summary:
-    "Dos cuentas: persona ($50 USD/año) o academia (gratis).",
+  summary: personaCopy.planesSummary,
   items: [
     {
       id: "persona",
       title: "Tutor o representante",
       detail: SCOUT_PRODUCT.summary,
-      meta: `${SCOUT_PRODUCT.priceLabel} ${SCOUT_PRODUCT.currency} ${SCOUT_PRODUCT.period}`,
+      meta: personaCopy.meta,
       href: "/fut/explorar#pro",
-      cta: "Ver membresía",
+      cta: personaCopy.cta,
     },
     {
       id: "academia",

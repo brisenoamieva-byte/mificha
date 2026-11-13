@@ -31,7 +31,7 @@ export function HomeSearchHero({ playerCount }: HomeSearchHeroProps) {
         </p>
         <p className="mt-2 max-w-xl text-sm leading-7 text-white/70 sm:text-base">
           Filtra por posición y ciudad. Vista básica gratis; ficha completa con membresía
-          persona ($50 USD/año).
+          persona (gratis por tiempo limitado).
           {playerCount > 0 ? (
             <>
               {" "}
@@ -59,7 +59,7 @@ export function HomeSearchHero({ playerCount }: HomeSearchHeroProps) {
             ·
           </span>
           <Link href="/fut/explorar#pro" className="hover:text-white">
-            Membresía · $50 USD/año
+            Membresía · gratis ahora
           </Link>
         </div>
       </div>

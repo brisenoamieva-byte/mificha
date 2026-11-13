@@ -4,6 +4,10 @@ import { SiteFooter, SiteHeader } from "@/components/marketing/site-header";
 import { diagnosisWhatsAppHref } from "@/lib/gph-alliance";
 import { createSupabaseAdminClient } from "@/lib/supabase-admin";
 import { getFamilyOrderByFolio, markFamilyOrderPaid } from "@/lib/family-orders";
+import {
+  getPersonaOrderByFolio,
+  markPersonaOrderPaid,
+} from "@/lib/persona-membership";
 
 export const metadata: Metadata = {
   title: "Resultado del pago | MiFicha",
@@ -24,17 +28,30 @@ export default async function PagoRetornoPage({
   const collection = params.collection_status || params.status || "";
   let status = collection === "approved" || collection === "success" ? "paid" : collection;
   let membershipUntil: string | null = null;
+  const isPersona = folio.startsWith("PE-");
 
   if (folio) {
     try {
       const admin = createSupabaseAdminClient();
       if ((collection === "approved" || collection === "success") && params.payment_id) {
-        await markFamilyOrderPaid(admin, folio, params.payment_id);
+        if (isPersona) {
+          await markPersonaOrderPaid(admin, folio, params.payment_id);
+        } else {
+          await markFamilyOrderPaid(admin, folio, params.payment_id);
+        }
       }
-      const order = await getFamilyOrderByFolio(admin, folio);
-      if (order) {
-        status = order.status;
-        membershipUntil = order.membership_until;
+      if (isPersona) {
+        const order = await getPersonaOrderByFolio(admin, folio);
+        if (order) {
+          status = order.status;
+          membershipUntil = order.membership_until;
+        }
+      } else {
+        const order = await getFamilyOrderByFolio(admin, folio);
+        if (order) {
+          status = order.status;
+          membershipUntil = order.membership_until;
+        }
       }
     } catch {
       /* show URL status */
@@ -57,7 +74,9 @@ export default async function PagoRetornoPage({
               </p>
               <h1 className="mt-2 text-2xl font-semibold tracking-tight text-mf-gph-ink">
                 {paid
-                  ? "Listo. Ya quedó tu año en MiFicha."
+                  ? isPersona
+                    ? "Listo. Membresía persona activa."
+                    : "Listo. Ya quedó tu año en MiFicha."
                   : pending
                     ? "Mercado Pago sigue confirmando."
                     : "No se cerró el cobro."}
@@ -67,8 +86,10 @@ export default async function PagoRetornoPage({
               ) : null}
               {paid && membershipUntil ? (
                 <p className="mt-3 text-sm leading-6 text-mf-text-secondary">
-                  Acceso hasta {membershipUntil}. Si contrataste evaluación, el equipo GPH
-                  coordina la sesión por WhatsApp.
+                  Acceso hasta {membershipUntil}
+                  {isPersona
+                    ? ". Ya puedes ver fichas completas en Explorar."
+                    : ". Si contrataste evaluación, el equipo GPH coordina la sesión por WhatsApp."}
                 </p>
               ) : null}
               {!paid && !pending ? (
@@ -78,36 +99,55 @@ export default async function PagoRetornoPage({
               ) : null}
               <div className="mt-6 flex flex-wrap gap-3">
                 {paid ? (
-                  <>
-                    <a
-                      href={diagnosisWhatsAppHref()}
-                      className="mf-btn-gph"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Avisar a GPH
-                    </a>
-                    <Link href="/fut/tutor" className="mf-btn-gph-ghost">
-                      Ir a mi cuenta de tutor
-                    </Link>
-                  </>
+                  isPersona ? (
+                    <>
+                      <Link href="/fut/explorar" className="mf-btn-gph">
+                        Ir a Explorar
+                      </Link>
+                      <Link href="/fut/tutor" className="mf-btn-gph-ghost">
+                        Mis fichas
+                      </Link>
+                    </>
+                  ) : (
+                    <>
+                      <a
+                        href={diagnosisWhatsAppHref()}
+                        className="mf-btn-gph"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Avisar a GPH
+                      </a>
+                      <Link href="/fut/tutor" className="mf-btn-gph-ghost">
+                        Ir a mi cuenta de tutor
+                      </Link>
+                    </>
+                  )
                 ) : pending ? (
-                  <Link href="/fut/tutor" className="mf-btn-gph-ghost">
-                    Ir a tutor
+                  <Link href={isPersona ? "/fut/explorar" : "/fut/tutor"} className="mf-btn-gph-ghost">
+                    {isPersona ? "Ir a Explorar" : "Ir a tutor"}
                   </Link>
                 ) : (
                   <>
-                    <a
-                      href={diagnosisWhatsAppHref()}
-                      className="mf-btn-gph"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Coordinar por WhatsApp
-                    </a>
-                    <Link href="/fut/pagar?sku=diagnosis" className="mf-btn-gph-ghost">
-                      Reintentar pago
-                    </Link>
+                    {isPersona ? (
+                      <Link href="/fut/explorar#pro" className="mf-btn-gph">
+                        Reintentar membresía
+                      </Link>
+                    ) : (
+                      <>
+                        <a
+                          href={diagnosisWhatsAppHref()}
+                          className="mf-btn-gph"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          Coordinar por WhatsApp
+                        </a>
+                        <Link href="/fut/pagar?sku=diagnosis" className="mf-btn-gph-ghost">
+                          Reintentar pago
+                        </Link>
+                      </>
+                    )}
                   </>
                 )}
               </div>

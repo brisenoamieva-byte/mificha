@@ -1,5 +1,8 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
 import { canAccessPartnershipHub } from "@/lib/partnership-access";
+import {
+  findActivePersonaSub,
+  readPersonaSubs,
+} from "@/lib/persona-membership";
 import { createSupabaseAdminClient } from "@/lib/supabase-admin";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import type { ExploreAccess } from "@/lib/scout-product";
@@ -11,37 +14,11 @@ export {
   type ExploreUnlockReason,
 } from "@/lib/scout-product";
 
-type ScoutSubRow = {
-  user_id: string;
-  email: string | null;
-  until: string;
-  created_at: string;
-};
-
-const SCOUT_STORE = "payments/scout-subscriptions.json";
-
 function unlockedEmailsFromEnv() {
   return (process.env.SCOUT_UNLOCKED_EMAILS ?? "")
     .split(",")
     .map((value) => value.trim().toLowerCase())
     .filter(Boolean);
-}
-
-function isFutureIso(iso: string) {
-  const t = Date.parse(iso);
-  return Number.isFinite(t) && t > Date.now();
-}
-
-async function readScoutSubs(admin: SupabaseClient): Promise<ScoutSubRow[]> {
-  const { data, error } = await admin.storage.from("mificha-ops").download(SCOUT_STORE);
-  if (error || !data) return [];
-  try {
-    const text = await data.text();
-    const parsed = JSON.parse(text) as ScoutSubRow[];
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
 }
 
 /**
@@ -87,11 +64,17 @@ export async function resolveExploreAccess(options?: {
       return { unlocked: true, reason: "admin", userId: user.id, email };
     }
 
-    const subs = await readScoutSubs(admin);
-    const active = subs.find(
-      (row) => row.user_id === user.id && isFutureIso(row.until),
-    );
+    const active = await findActivePersonaSub(admin, user.id);
     if (active) {
+      return { unlocked: true, reason: "scout_sub", userId: user.id, email };
+    }
+
+    // Compat: emails listados en el store aunque el user_id haya cambiado.
+    const subs = await readPersonaSubs(admin);
+    const byEmail = email
+      ? subs.find((row) => row.email === email && Date.parse(row.until) > Date.now())
+      : null;
+    if (byEmail) {
       return { unlocked: true, reason: "scout_sub", userId: user.id, email };
     }
   } catch {
