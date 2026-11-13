@@ -67,13 +67,13 @@ export const SPONSOR_SLOTS: Record<SponsorPlacement, SponsorSlotDefinition> = {
     placement: "home_strip",
     eyebrow: "Patrocinadores",
     availableLabel: "Tu marca en la home de MiFicha",
-    brandIds: ["gabi", "ctm", "cracks"],
+    brandIds: ["gabi", "gph", "ctm", "cracks"],
   },
   tutor_card: {
     placement: "tutor_card",
     eyebrow: "Patrocinado",
     availableLabel: "Espacio para marca aliada en el hub de tutores",
-    brandIds: ["gabi"],
+    brandIds: ["gabi", "gph"],
   },
   footer_rail: {
     placement: "footer_rail",
