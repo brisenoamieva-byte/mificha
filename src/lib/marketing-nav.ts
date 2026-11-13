@@ -145,7 +145,7 @@ export const MARKETING_SECONDARY_LINKS: NavLink[] = [
     description: "Buscar gratis, publicar ficha, membresía",
   },
   {
-    href: "https://wa.me/524421556155?text=Hola%20Ricardo%2C%20quiero%20informaci%C3%B3n%20sobre%20patrocinio%20en%20MiFicha.",
+    href: "https://wa.me/524421556155?text=Hola%2C%20quiero%20informaci%C3%B3n%20sobre%20patrocinio%20en%20MiFicha.",
     label: "Patrocinio",
     description: "WhatsApp · solicitar información",
   },

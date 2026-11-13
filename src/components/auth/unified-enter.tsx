@@ -25,7 +25,7 @@ const CHOICES = [
     id: "patrocinio",
     title: "Patrocinio / marca",
     detail: "Pide información por WhatsApp.",
-    href: "https://wa.me/524421556155?text=Hola%20Ricardo%2C%20quiero%20informaci%C3%B3n%20sobre%20patrocinio%20en%20MiFicha.",
+    href: "https://wa.me/524421556155?text=Hola%2C%20quiero%20informaci%C3%B3n%20sobre%20patrocinio%20en%20MiFicha.",
   },
 ] as const;
 

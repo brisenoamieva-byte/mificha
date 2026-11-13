@@ -5,7 +5,7 @@ export type SponsorPlacement = "home_strip" | "tutor_card" | "footer_rail";
 
 const SPONSOR_SALES_PATH = "/fut/patrocinio";
 
-/** WhatsApp comercial MiFicha (Ricardo) — solicitud de info de patrocinio. */
+/** WhatsApp comercial MiFicha — solicitud de info de patrocinio. */
 export const SPONSOR_WHATSAPP_DISPLAY = "442 155 6155";
 export const SPONSOR_WHATSAPP_E164 = "524421556155";
 
@@ -109,6 +109,6 @@ export function listActiveSponsorBrands(): SponsorBrand[] {
 /** CTA comercial: WhatsApp (sin catálogo de paquetes en web). */
 export function sponsorInquiryHref(placement?: SponsorPlacement) {
   const slotBit = placement ? ` (espacio: ${placement})` : "";
-  const text = `Hola Ricardo, quiero información sobre patrocinio en MiFicha${slotBit}.`;
+  const text = `Hola, quiero información sobre patrocinio en MiFicha${slotBit}.`;
   return `https://wa.me/${SPONSOR_WHATSAPP_E164}?text=${encodeURIComponent(text)}`;
 }

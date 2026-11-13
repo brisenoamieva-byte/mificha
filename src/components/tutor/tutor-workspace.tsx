@@ -202,33 +202,35 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
 
   useEffect(() => {
     let cancelled = false;
-    void supabase.auth.getSession().then(({ data }) => {
-      if (cancelled) return;
-      const current = data.session?.user.email ?? null;
-      setSessionEmail(current);
-      setLoading(false);
-      if (current) {
+    void (async () => {
+      try {
+        const { data } = await supabase.auth.getSession();
+        if (cancelled) return;
+        const current = data.session?.user.email ?? null;
+        setSessionEmail(current);
+        if (!current) return;
         const savedPhone =
           typeof window !== "undefined"
             ? window.localStorage.getItem(PHONE_STORAGE_KEY) ?? ""
             : "";
-        void load(savedPhone || phone)
-          .then((rows) => {
-            if (cancelled) return;
-            if (rows.length === 0) {
-              setOnboardNotice(copy.onboardEmpty);
-            }
-          })
-          .catch((err: unknown) => {
-            if (cancelled) return;
-            setError(err instanceof Error ? err.message : "No se cargó la ficha.");
-          });
+        const rows = await load(savedPhone || phone);
+        if (cancelled) return;
+        if (rows.length === 0) {
+          setOnboardNotice(copy.onboardEmpty);
+        }
+      } catch (err: unknown) {
+        if (cancelled) return;
+        setError(err instanceof Error ? err.message : "No se cargó la ficha.");
+      } finally {
+        if (!cancelled) setLoading(false);
       }
-    });
+    })();
     return () => {
       cancelled = true;
     };
-  }, [load, phone, copy.onboardEmpty]);
+    // Solo al montar: no re-correr al hidratar el teléfono (eso reabre el estado vacío).
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- boot único
+  }, [load, copy.onboardEmpty]);
 
   useEffect(() => {
     if (loading || !sessionEmail || children.length > 0 || !onboardNotice) return;
@@ -347,13 +349,18 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
       }
     }
     setPendingConfirmEmail(null);
-    setSessionEmail(normalizedEmail);
-    const rows = await load(phone);
-    if (opts?.welcome || rows.length === 0) {
-      setOnboardNotice(
-        rows.length === 0 ? copy.onboardEmpty : copy.onboardWelcome,
-      );
-      if (rows.length === 0) scrollToCreateFicha();
+    setLoading(true);
+    try {
+      const rows = await load(phone);
+      setSessionEmail(normalizedEmail);
+      if (opts?.welcome || rows.length === 0) {
+        setOnboardNotice(
+          rows.length === 0 ? copy.onboardEmpty : copy.onboardWelcome,
+        );
+        if (rows.length === 0) scrollToCreateFicha();
+      }
+    } finally {
+      setLoading(false);
     }
   }
 

@@ -122,7 +122,6 @@ export const SPONSOR_SALES = {
     "Cierre y propuesta por WhatsApp",
   ],
   contactEmail: "hola@mificha.mx",
-  contactName: "Ricardo Briseño",
   contactPhoneDisplay: SPONSOR_WHATSAPP_DISPLAY,
 } as const;
 

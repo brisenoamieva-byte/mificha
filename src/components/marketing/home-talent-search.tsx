@@ -256,9 +256,18 @@ export function HomeTalentSearch({
                       href={`/fut/a/${academy.slug}`}
                       className="flex items-center gap-3 px-4 py-3 transition hover:bg-mf-canvas"
                     >
-                      <div className="flex h-9 w-9 items-center justify-center rounded-md bg-mf-brand-soft text-xs font-semibold text-mf-brand">
-                        {academy.name.slice(0, 2).toUpperCase()}
-                      </div>
+                      {academy.logo_url ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={academy.logo_url}
+                          alt=""
+                          className="h-9 w-9 rounded-md bg-white object-contain p-0.5 ring-1 ring-mf-border"
+                        />
+                      ) : (
+                        <div className="flex h-9 w-9 items-center justify-center rounded-md bg-mf-brand-soft text-xs font-semibold text-mf-brand">
+                          {academy.name.slice(0, 2).toUpperCase()}
+                        </div>
+                      )}
                       <div className="min-w-0">
                         <p className="truncate text-sm font-semibold text-mf-text">
                           {academy.name}

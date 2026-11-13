@@ -42,7 +42,7 @@ export default function PatrocinioPage() {
                 Pedir info por WhatsApp
               </a>
               <p className="text-sm text-mf-text-secondary">
-                {SPONSOR_SALES.contactName} · {SPONSOR_WHATSAPP_DISPLAY}
+                {SPONSOR_WHATSAPP_DISPLAY}
               </p>
             </div>
           </div>
@@ -104,10 +104,10 @@ export default function PatrocinioPage() {
               ))}
             </ul>
             <div className="mt-8 rounded-xl border border-mf-border bg-mf-canvas px-5 py-5">
-              <p className="text-sm font-semibold text-mf-gph-ink">
-                {SPONSOR_SALES.contactName}
+              <p className="text-sm font-semibold text-mf-gph-ink">MiFicha</p>
+              <p className="mt-1 text-sm text-mf-text-secondary">
+                Solicitudes de patrocinio por WhatsApp
               </p>
-              <p className="mt-1 text-sm text-mf-text-secondary">Fundador · MiFicha</p>
               <a
                 href={whatsapp}
                 target="_blank"
