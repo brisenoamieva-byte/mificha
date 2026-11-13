@@ -54,6 +54,11 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 NEXT_PUBLIC_APP_NAME=MiFicha
 NEXT_PUBLIC_LAUNCH_FREE=true
 
+# Agenda GPH (Calendly o Google Appointment Schedule)
+# Si falta, los CTAs de diagnóstico/entrenamientos caen a WhatsApp GPH.
+# NEXT_PUBLIC_GPH_DIAGNOSIS_CALENDLY_URL=https://calendly.com/tu-cuenta/diagnostico-gph
+# NEXT_PUBLIC_GPH_CALENDLY_URL=https://calendly.com/tu-cuenta/entrenamiento-gph
+
 # Desarrollo (seed + pitch privado)
 SEED_ADMIN_KEY=dev-seed-key
 SEED_OWNER_ID=tu-user-uuid-de-supabase

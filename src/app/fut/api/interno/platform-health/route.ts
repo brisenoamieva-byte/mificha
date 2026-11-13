@@ -3,6 +3,10 @@ import {
   getResendFromEmail,
   isResendProductionReady,
 } from "@/lib/email/resend-config";
+import {
+  getDiagnosisBookingConfig,
+  GPH_DIAGNOSIS_BOOKING_OPS_STEPS,
+} from "@/lib/gph-alliance";
 import { isMercadoPagoConfigured } from "@/lib/mercadopago";
 import { canAccessPitchDeck } from "@/lib/pitch-access";
 import { createSupabaseAdminClient } from "@/lib/supabase-admin";
@@ -49,6 +53,7 @@ export async function GET(request: Request) {
     process.env.RESEND_API_KEY?.trim() &&
       process.env.RESEND_API_KEY.trim() !== "re_...",
   );
+  const booking = getDiagnosisBookingConfig();
 
   return NextResponse.json({
     sql: {
@@ -74,6 +79,16 @@ export async function GET(request: Request) {
       hint: isMercadoPagoConfigured()
         ? null
         : "Falta MERCADOPAGO_ACCESS_TOKEN en este entorno.",
+    },
+    diagnosisBooking: {
+      ready: booking.ready,
+      source: booking.source,
+      hint: booking.ready
+        ? booking.source === "diagnosis"
+          ? "Calendario de diagnóstico configurado (NEXT_PUBLIC_GPH_DIAGNOSIS_CALENDLY_URL)."
+          : "Usando NEXT_PUBLIC_GPH_CALENDLY_URL compartido para diagnóstico."
+        : "Falta el link de Calendly / Google Appointment. Los CTAs siguen en WhatsApp.",
+      opsSteps: GPH_DIAGNOSIS_BOOKING_OPS_STEPS,
     },
     launchFree: process.env.NEXT_PUBLIC_LAUNCH_FREE !== "false",
     checksAvailable: scheduleKnown && guardianKnown && profileViewsKnown,

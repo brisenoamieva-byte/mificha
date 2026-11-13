@@ -3,6 +3,9 @@ import { ArrowRight, MessageCircle } from "lucide-react";
 import { DiagnosisPromoPrice } from "@/components/marketing/diagnosis-promo-price";
 import { AllianceLockup } from "@/components/ui/gph-logo";
 import {
+  diagnosisBookingCtaLabel,
+  diagnosisBookingHref,
+  diagnosisBookingIsCalendar,
   diagnosisWhatsAppHref,
   GPH_WHATSAPP_DISPLAY,
 } from "@/lib/gph-alliance";
@@ -11,6 +14,8 @@ import { cn } from "@/lib/utils";
 
 /** Oferta de conversión del hero: bloque compacto bajo el copy. */
 export function HomeHeroGphOffer({ className }: { className?: string }) {
+  const bookingHref = diagnosisBookingHref();
+  const bookingIsCalendar = diagnosisBookingIsCalendar();
   const whatsapp = diagnosisWhatsAppHref();
 
   return (
@@ -28,7 +33,7 @@ export function HomeHeroGphOffer({ className }: { className?: string }) {
       </div>
 
       <p className="mt-3 text-[11px] font-bold uppercase tracking-[0.16em] text-mf-gph">
-        Diagnóstico GPH · disponible ahora
+        Diagnóstico GPH · Querétaro
       </p>
       <p className="mt-1.5 text-sm font-semibold leading-snug text-mf-gph-ink">
         Evaluación presencial de futbol: mide el punto de partida y deja objetivos en la
@@ -43,14 +48,25 @@ export function HomeHeroGphOffer({ className }: { className?: string }) {
           <ArrowRight className="h-4 w-4" />
         </Link>
         <a
-          href={whatsapp}
+          href={bookingHref}
           target="_blank"
           rel="noopener noreferrer"
           className="mf-btn-gph-ghost"
         >
-          <MessageCircle className="h-4 w-4" />
-          WhatsApp {GPH_WHATSAPP_DISPLAY}
+          {!bookingIsCalendar ? <MessageCircle className="h-4 w-4" /> : null}
+          {diagnosisBookingCtaLabel(`WhatsApp ${GPH_WHATSAPP_DISPLAY}`)}
         </a>
+        {bookingIsCalendar ? (
+          <a
+            href={whatsapp}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mf-btn-gph-ghost"
+          >
+            <MessageCircle className="h-4 w-4" />
+            WhatsApp
+          </a>
+        ) : null}
       </div>
     </aside>
   );

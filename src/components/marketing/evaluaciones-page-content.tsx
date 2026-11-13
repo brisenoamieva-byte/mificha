@@ -16,6 +16,7 @@ import {
   GPH_WHATSAPP_DISPLAY,
   diagnosisBookingCtaLabel,
   diagnosisBookingHref,
+  diagnosisBookingIsCalendar,
   diagnosisWhatsAppHref,
 } from "@/lib/gph-alliance";
 import { DiagnosisPromoPrice } from "@/components/marketing/diagnosis-promo-price";
@@ -25,9 +26,9 @@ import { cn } from "@/lib/utils";
 const STEPS = [
   {
     icon: MessageCircle,
-    title: "Agenda o paga",
+    title: "Paga o agenda",
     description:
-      "WhatsApp para fecha y sede, o paga en línea. Coordinamos si es un jugador o un grupo.",
+      "Paga en línea o escribe por WhatsApp. Luego eliges horario (calendario GPH o coordinación directa). Sesión presencial en Querétaro.",
   },
   {
     icon: ClipboardList,
@@ -45,6 +46,8 @@ const STEPS = [
 
 export function EvaluacionesPageContent() {
   const bookingHref = diagnosisBookingHref();
+  const bookingIsCalendar = diagnosisBookingIsCalendar();
+  const whatsapp = diagnosisWhatsAppHref();
 
   return (
     <>
@@ -157,25 +160,44 @@ export function EvaluacionesPageContent() {
               Agendar diagnóstico
             </p>
             <h2 className="mt-2 text-2xl font-semibold tracking-[-0.02em] text-mf-gph-ink">
-              Pide información por WhatsApp
+              {bookingIsCalendar
+                ? "Elige horario en el calendario GPH"
+                : "Coordina fecha por WhatsApp"}
             </h2>
             <p className="mt-2 text-sm leading-7 text-mf-text-secondary">
-              Escribe para fecha, sede y si es un jugador o un grupo. Número:{" "}
-              <span className="font-semibold tabular-nums text-mf-gph-ink">
-                {GPH_WHATSAPP_DISPLAY}
-              </span>
-              .
+              {bookingIsCalendar
+                ? "Sesión presencial en Querétaro. El calendario muestra espacios libres del equipo GPH; si necesitas un grupo o dudas, escribe por WhatsApp."
+                : "Sesión presencial en Querétaro. Escribe para fecha, sede y si es un jugador o un grupo. Número: "}
+              {!bookingIsCalendar ? (
+                <span className="font-semibold tabular-nums text-mf-gph-ink">
+                  {GPH_WHATSAPP_DISPLAY}
+                </span>
+              ) : null}
+              {!bookingIsCalendar ? "." : null}
             </p>
           </div>
-          <a
-            href={whatsapp}
-            className="mf-btn-gph shrink-0 self-start sm:self-center"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <MessageCircle className="h-4 w-4" />
-            WhatsApp {GPH_WHATSAPP_DISPLAY}
-          </a>
+          <div className="flex shrink-0 flex-wrap gap-3 self-start sm:self-center">
+            <a
+              href={bookingHref}
+              className="mf-btn-gph"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {bookingIsCalendar ? null : <MessageCircle className="h-4 w-4" />}
+              {diagnosisBookingCtaLabel(`WhatsApp ${GPH_WHATSAPP_DISPLAY}`)}
+            </a>
+            {bookingIsCalendar ? (
+              <a
+                href={whatsapp}
+                className="mf-btn-gph-ghost"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <MessageCircle className="h-4 w-4" />
+                WhatsApp
+              </a>
+            ) : null}
+          </div>
         </div>
       </section>
 
@@ -187,8 +209,9 @@ export function EvaluacionesPageContent() {
               Diagnóstico + seguimiento en MiFicha
             </h2>
             <p className="mt-2 text-sm leading-7 text-mf-text-secondary">
-              Agenda por WhatsApp. El informe queda en tu cuenta; conviene tener la ficha
-              del tutor lista para el seguimiento.
+              {bookingIsCalendar
+                ? "Paga o agenda en el calendario. El informe queda en tu cuenta; conviene tener la ficha del tutor lista para el seguimiento."
+                : "Agenda por WhatsApp. El informe queda en tu cuenta; conviene tener la ficha del tutor lista para el seguimiento."}
             </p>
           </div>
           <ol className="mt-8 grid gap-3 sm:grid-cols-3 sm:gap-4">
@@ -253,13 +276,13 @@ export function EvaluacionesPageContent() {
           <div className="mt-8">
             <div className="flex flex-wrap gap-3">
               <a
-                href={whatsapp}
+                href={bookingHref}
                 className="mf-btn-gph"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <MessageCircle className="h-4 w-4" />
-                Agendar por WhatsApp
+                {!bookingIsCalendar ? <MessageCircle className="h-4 w-4" /> : null}
+                {diagnosisBookingCtaLabel("Agendar por WhatsApp")}
               </a>
               <Link href="/fut/pagar?sku=diagnosis" className="mf-btn-gph-ghost">
                 Pagar diagnóstico
@@ -269,7 +292,7 @@ export function EvaluacionesPageContent() {
               </Link>
             </div>
             <p className="mt-3 text-sm text-mf-text-secondary">
-              Para cotizar un grupo o confirmar fecha: WhatsApp{" "}
+              Para cotizar un grupo o dudas: WhatsApp{" "}
               <a
                 href={whatsapp}
                 className="font-semibold text-mf-gph hover:underline"

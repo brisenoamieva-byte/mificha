@@ -3,6 +3,10 @@
 import { useState } from "react";
 import { Copy } from "lucide-react";
 import { toast } from "@/components/ui/toast";
+import {
+  diagnosisBookingIsCalendar,
+  GPH_DIAGNOSIS_BOOKING_OPS_STEPS,
+} from "@/lib/gph-alliance";
 import { supabase } from "@/lib/supabase";
 
 export function GphPartnerPanel() {
@@ -142,6 +146,24 @@ export function GphPartnerPanel() {
           )}
         </div>
       ) : null}
+
+      <div className="rounded-2xl border border-mf-border bg-mf-canvas px-4 py-4">
+        <p className="text-sm font-semibold text-mf-gph-ink">
+          Agenda de diagnósticos (Google Calendar)
+        </p>
+        <p className="mt-1 text-sm leading-6 text-mf-text-secondary">
+          {diagnosisBookingIsCalendar()
+            ? "Calendario público configurado: los CTAs de diagnóstico abren “Elegir horario”."
+            : "Aún no hay link público: las familias agenda por WhatsApp. Completa esto con el calendario de quien coordina."}
+        </p>
+        {!diagnosisBookingIsCalendar() ? (
+          <ol className="mt-3 list-decimal space-y-1.5 pl-5 text-sm leading-6 text-mf-text-secondary">
+            {GPH_DIAGNOSIS_BOOKING_OPS_STEPS.map((step) => (
+              <li key={step}>{step}</li>
+            ))}
+          </ol>
+        ) : null}
+      </div>
 
       <p className="text-xs text-mf-text-muted">
         Antes, en Supabase SQL Editor: <code>supabase/gph-evaluators.sql</code>

@@ -16,6 +16,12 @@ type HealthPayload = {
     ready?: boolean;
     hint?: string | null;
   };
+  diagnosisBooking?: {
+    ready?: boolean;
+    source?: string;
+    hint?: string | null;
+    opsSteps?: readonly string[];
+  };
   error?: string;
 };
 
@@ -90,13 +96,15 @@ export function PlatformOpsStatus() {
 
   const mpOk = health?.mercadoPago?.ready ?? null;
   const mailOk = health?.resend?.ready ?? null;
+  const bookingOk = health?.diagnosisBooking?.ready ?? null;
+  const bookingSteps = health?.diagnosisBooking?.opsSteps ?? [];
 
   return (
     <section className="rounded-2xl border border-amber-400/25 bg-amber-500/[0.08] p-5">
       <h2 className="text-base font-semibold">Estado operativo</h2>
       <p className="mt-1 text-sm leading-6 text-white/65">
-        Cobro y correo: lo que bloquea recibos, invitaciones y el diagnóstico de
-        $2,030.
+        Cobro, correo y agenda GPH: lo que bloquea recibos, invitaciones y el
+        diagnóstico de $2,030.
       </p>
       <ul className="mt-4 space-y-2">
         {loading ? (
@@ -127,9 +135,21 @@ export function PlatformOpsStatus() {
                   : health?.resend?.hint
               }
             />
+            <StatusRow
+              ok={bookingOk}
+              label="Agenda · Calendly / Google"
+              detail={health?.diagnosisBooking?.hint}
+            />
           </>
         )}
       </ul>
+      {!loading && !health?.error && bookingOk === false && bookingSteps.length > 0 ? (
+        <ol className="mt-4 list-decimal space-y-1.5 pl-5 text-sm leading-6 text-white/70">
+          {bookingSteps.map((step) => (
+            <li key={step}>{step}</li>
+          ))}
+        </ol>
+      ) : null}
     </section>
   );
 }
