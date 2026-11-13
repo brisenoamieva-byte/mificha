@@ -14,6 +14,19 @@ export type TutorLinkedSeasonStats = {
   total_red_cards: number;
 };
 
+/** Último partido completado del plantel (para carta post-partido del niño). */
+export type TutorLastMatchHighlight = {
+  matchId: string;
+  opponent: string;
+  matchDate: string;
+  result: "win" | "draw" | "loss" | null;
+  goalsFor: number | null;
+  goalsAgainst: number | null;
+  goals: number;
+  assists: number;
+  minutes: number;
+};
+
 export type TutorLinkedPerformance = {
   playerId: string;
   slug: string | null;
@@ -23,7 +36,64 @@ export type TutorLinkedPerformance = {
   gph: PublicGphSummary | null;
   /** La ficha `/fut/j/...` está publicada con consentimiento. */
   isPublicFicha: boolean;
+  /** Jornada más reciente con stats del jugador. */
+  lastMatch: TutorLastMatchHighlight | null;
 };
+
+async function fetchLastMatchHighlight(
+  admin: SupabaseClient,
+  playerId: string,
+): Promise<TutorLastMatchHighlight | null> {
+  const { data: rows, error } = await admin
+    .from("match_stats")
+    .select(
+      "goals, assists, minutes_played, match_id, matches(id, opponent, match_date, result, goals_for, goals_against, status)",
+    )
+    .eq("player_id", playerId)
+    .limit(50);
+
+  if (error || !rows?.length) return null;
+
+  type MatchJoin = {
+    id?: string;
+    opponent?: string | null;
+    match_date?: string | null;
+    result?: string | null;
+    goals_for?: number | null;
+    goals_against?: number | null;
+    status?: string | null;
+  };
+
+  const candidates: TutorLastMatchHighlight[] = [];
+  for (const row of rows) {
+    const matchRel = row.matches as MatchJoin | MatchJoin[] | null;
+    const match = Array.isArray(matchRel) ? matchRel[0] : matchRel;
+    if (!match || match.status !== "completed") continue;
+    const matchDate = String(match.match_date ?? "").slice(0, 10);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(matchDate)) continue;
+    const resultRaw = match.result;
+    const result =
+      resultRaw === "win" || resultRaw === "draw" || resultRaw === "loss"
+        ? resultRaw
+        : null;
+    candidates.push({
+      matchId: String(match.id ?? row.match_id),
+      opponent: String(match.opponent ?? "Rival").trim() || "Rival",
+      matchDate,
+      result,
+      goalsFor: match.goals_for == null ? null : Number(match.goals_for),
+      goalsAgainst:
+        match.goals_against == null ? null : Number(match.goals_against),
+      goals: Number(row.goals ?? 0),
+      assists: Number(row.assists ?? 0),
+      minutes: Number(row.minutes_played ?? 0),
+    });
+  }
+
+  if (!candidates.length) return null;
+  candidates.sort((a, b) => b.matchDate.localeCompare(a.matchDate));
+  return candidates[0] ?? null;
+}
 
 function emptyStats(): TutorLinkedSeasonStats {
   return {
@@ -113,13 +183,18 @@ export async function fetchTutorLinkedPerformance(
     }
   }
 
-  const gph = await fetchLatestGphSummary(playerId);
+  const [gph, lastMatch] = await Promise.all([
+    fetchLatestGphSummary(playerId),
+    fetchLastMatchHighlight(admin, playerId),
+  ]);
   const isPublicFicha = Boolean(player.is_public && player.public_consent_at);
 
   const hasSignal =
     gph != null ||
+    lastMatch != null ||
     (stats != null && (stats.total_matches > 0 || stats.total_minutes > 0)) ||
-    Boolean(slug);
+    Boolean(slug) ||
+    Boolean(playerId);
 
   if (!hasSignal) return null;
 
@@ -131,5 +206,6 @@ export async function fetchTutorLinkedPerformance(
     stats,
     gph,
     isPublicFicha,
+    lastMatch,
   };
 }

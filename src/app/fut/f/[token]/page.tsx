@@ -242,6 +242,7 @@ export default async function TutorShareFichaPage({
           seasons={seasons}
           performance={performance}
           shareHref={playerSharePath}
+          absoluteShareUrl={playerModeAbsoluteUrl}
         />
 
         <div className="mt-5">

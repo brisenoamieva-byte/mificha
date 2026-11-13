@@ -5,7 +5,10 @@ import {
   type TutorMaterial,
   type TutorSeasonStat,
 } from "@/lib/tutor-family";
-import type { TutorLinkedPerformance } from "@/lib/tutor-linked-performance";
+import type {
+  TutorLastMatchHighlight,
+  TutorLinkedPerformance,
+} from "@/lib/tutor-linked-performance";
 
 export type PlayerModeMission = {
   id: string;
@@ -50,6 +53,7 @@ export function buildPlayerModeMissions(
     Pick<TutorMaterial, "kind" | "storage_path"> & { url?: string | null }
   >,
   seasons: TutorSeasonStat[],
+  performance?: TutorLinkedPerformance | null,
 ): PlayerModeMission[] {
   const hasMedia = (row: { storage_path?: string | null; url?: string | null }) =>
     Boolean(row.storage_path || row.url);
@@ -58,6 +62,7 @@ export function buildPlayerModeMissions(
   const hasSeason = seasons.some(
     (row) => row.matches > 0 || row.minutes > 0 || row.goals > 0,
   );
+  const hasLastMatch = Boolean(performance?.lastMatch);
   const hasPosition = Boolean(child.profile.position?.trim());
   const hasBirth = !isUnknownBirthDate(child.profile.birth_date);
 
@@ -75,10 +80,10 @@ export function buildPlayerModeMissions(
       hint: "Para jugar en tu Sub-X",
     },
     {
-      id: "season",
-      label: "Tu temporada (PJ / goles / min)",
-      done: hasSeason || Boolean(child.linked_player_id),
-      hint: "Números que puedes presumir",
+      id: "match",
+      label: "Tu último partido",
+      done: hasLastMatch || hasSeason,
+      hint: "Cuando la academia registra el acta, aquí se enciende",
     },
     {
       id: "video",
@@ -92,4 +97,32 @@ export function buildPlayerModeMissions(
 export function playerModeSharePath(basePath: string) {
   const sep = basePath.includes("?") ? "&" : "?";
   return `${basePath}${sep}vista=jugador`;
+}
+
+/** Texto WhatsApp / share de la carta post-partido. */
+export function buildLastMatchShareText(input: {
+  playerName: string;
+  publicCode?: string | null;
+  lastMatch: TutorLastMatchHighlight;
+  url: string;
+}) {
+  const { lastMatch, playerName, publicCode, url } = input;
+  const bits: string[] = [];
+  if (lastMatch.minutes > 0) bits.push(`${lastMatch.minutes} min`);
+  if (lastMatch.goals > 0) {
+    bits.push(`${lastMatch.goals} gol${lastMatch.goals === 1 ? "" : "es"}`);
+  }
+  if (lastMatch.assists > 0) {
+    bits.push(
+      `${lastMatch.assists} asistencia${lastMatch.assists === 1 ? "" : "s"}`,
+    );
+  }
+  if (bits.length === 0) bits.push("estuve en la convocatoria");
+
+  const score =
+    lastMatch.goalsFor != null && lastMatch.goalsAgainst != null
+      ? ` (${lastMatch.goalsFor}-${lastMatch.goalsAgainst})`
+      : "";
+  const code = publicCode ? ` (${publicCode})` : "";
+  return `Este partido vs ${lastMatch.opponent}${score}: ${bits.join(" · ")}. Carta de ${playerName}${code}: ${url}`;
 }

@@ -3,6 +3,7 @@ import { Check, Share2 } from "lucide-react";
 import { PlayerCategoryBadge } from "@/components/ui/player-category-badge";
 import { BrandWordmark } from "@/components/ui/brand-wordmark";
 import { CURRENT_SEASON_LABEL } from "@/lib/marketing-season";
+import { PlayerModeLastMatch } from "@/components/tutor/player-mode-last-match";
 import {
   buildPlayerModeMissions,
   buildPlayerModeStats,
@@ -68,6 +69,7 @@ export function PlayerModeCard({
   seasons = [],
   performance = null,
   shareHref,
+  absoluteShareUrl,
   className,
 }: {
   child: TutorChild;
@@ -75,6 +77,8 @@ export function PlayerModeCard({
   seasons?: TutorSeasonStat[];
   performance?: TutorLinkedPerformance | null;
   shareHref?: string | null;
+  /** URL absoluta para WhatsApp de la jornada (evita path relativo en SSR). */
+  absoluteShareUrl?: string | null;
   className?: string;
 }) {
   const profile = child.profile;
@@ -88,15 +92,18 @@ export function PlayerModeCard({
     [profile.club || profile.school, profile.city].filter(Boolean).join(" · ") ||
     "Arma tu club y ciudad";
   const stats = buildPlayerModeStats(seasons, performance);
-  const missions = buildPlayerModeMissions(child, materials, seasons);
+  const missions = buildPlayerModeMissions(child, materials, seasons, performance);
   const doneCount = missions.filter((m) => m.done).length;
   const hasAnyStat =
     stats.matches > 0 || stats.goals > 0 || stats.assists > 0 || stats.minutes > 0;
+  const lastMatch = performance?.lastMatch ?? null;
   const stageLabel = performance?.gph
     ? "Con evaluación GPH"
-    : hasAnyStat
-      ? "En temporada"
-      : "Armando carta";
+    : lastMatch
+      ? "Último partido listo"
+      : hasAnyStat
+        ? "En temporada"
+        : "Armando carta";
 
   return (
     <section className={cn("space-y-4", className)}>
@@ -196,6 +203,15 @@ export function PlayerModeCard({
           </div>
         </div>
       </article>
+
+      <PlayerModeLastMatch
+        playerName={child.player_name}
+        publicCode={child.public_code}
+        lastMatch={lastMatch}
+        shareHref={shareHref}
+        absoluteShareUrl={absoluteShareUrl}
+        linked={Boolean(child.linked_player_id || performance?.playerId)}
+      />
 
       <div className="rounded-2xl border border-mf-border bg-mf-canvas px-4 py-4 sm:px-5">
         <div className="flex flex-wrap items-end justify-between gap-2">
