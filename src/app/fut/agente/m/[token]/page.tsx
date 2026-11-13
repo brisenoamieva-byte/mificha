@@ -70,7 +70,7 @@ export default async function AgentMaterialsPage({ params }: PageProps) {
     const loginHref = `/fut/login?next=${encodeURIComponent(kitPath)}`;
     return (
       <div className="flex min-h-dvh flex-col bg-mf-canvas">
-        <SiteHeader actionHref={loginHref} actionLabel="Entrar" />
+        <SiteHeader actionHref="/fut/tutor" actionLabel="Mis fichas" />
         <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-8 sm:px-6 sm:py-12">
           <FichaLockedTeaser
             name={child.player_name}
@@ -79,6 +79,7 @@ export default async function AgentMaterialsPage({ params }: PageProps) {
             place={place || null}
             code={child.public_code}
             loginHref={loginHref}
+            returnPath={kitPath}
           />
         </main>
         <SiteFooter />

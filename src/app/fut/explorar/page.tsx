@@ -66,7 +66,7 @@ export default async function ExplorarPage({
 
   return (
     <div className="flex min-h-dvh flex-col bg-mf-canvas">
-      <SiteHeader actionHref="/fut/explorar#pro" actionLabel="Membresía" />
+      <SiteHeader actionHref="/fut/tutor" actionLabel="Mis fichas" />
 
       <main className="flex-1">
         <ExplorePageHero playerCount={playerCount} academyCount={academyCount} />

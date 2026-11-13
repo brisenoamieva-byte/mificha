@@ -12,10 +12,11 @@ import { scoutWhatsAppCheckoutHref } from "@/lib/scout-product";
 export function PersonaMembershipCta({
   className,
   variant = "primary",
-  nextPath = "/fut/explorar",
+  nextPath = "/fut/tutor",
 }: {
   className?: string;
   variant?: "primary" | "ghost";
+  /** Tras activar: por defecto Mis fichas (lo principal de la cuenta). */
   nextPath?: string;
 }) {
   const router = useRouter();

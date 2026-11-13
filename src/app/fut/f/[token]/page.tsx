@@ -156,7 +156,7 @@ export default async function TutorShareFichaPage({ params }: PageProps) {
     return (
       <div className="flex min-h-dvh flex-col bg-mf-canvas">
         <TutorFichaViewTracker token={access || token} />
-        <SiteHeader actionHref={loginHref} actionLabel="Entrar" />
+        <SiteHeader actionHref="/fut/tutor" actionLabel="Mis fichas" />
         <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-8 sm:px-6 sm:py-12">
           <FichaLockedTeaser
             name={playerName}
@@ -165,6 +165,7 @@ export default async function TutorShareFichaPage({ params }: PageProps) {
             place={place || null}
             code={child.public_code}
             loginHref={loginHref}
+            returnPath={sharePath}
           />
           <p className="mt-6 text-center text-xs leading-6 text-mf-text-muted">
             Busca más jugadores en{" "}
