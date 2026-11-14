@@ -13,7 +13,15 @@ export type TutorCareerSource = {
   notes: string | null;
 };
 
+export type TutorCareerBucket = {
+  matches: number;
+  goals: number;
+  assists: number;
+  minutes: number;
+};
+
 export type TutorCareerSummary = {
+  /** Totales de encabezado: preferimos oficiales si hay academia ligada. */
   matches: number;
   goals: number;
   assists: number;
@@ -24,7 +32,24 @@ export type TutorCareerSummary = {
   sources: TutorCareerSource[];
   hasAcademy: boolean;
   hasTutorStats: boolean;
+  /** Stats oficiales del plantel (si hay vínculo). */
+  official: TutorCareerBucket | null;
+  /** Torneos capturados por el tutor (aparte del plantel). */
+  tutorReported: TutorCareerBucket;
+  /** Si hay ambas fuentes, el encabezado no las mezcla. */
+  headlineKind: "academy" | "tutor" | "empty";
 };
+
+function bucketFromAcademy(
+  academy: NonNullable<TutorLinkedPerformance["stats"]>,
+): TutorCareerBucket {
+  return {
+    matches: academy.total_matches,
+    goals: academy.total_goals,
+    assists: academy.total_assists,
+    minutes: academy.total_minutes,
+  };
+}
 
 export function buildTutorCareerSummary(input: {
   seasons?: TutorSeasonStat[] | null;
@@ -36,6 +61,7 @@ export function buildTutorCareerSummary(input: {
   const academy = performance?.stats ?? null;
 
   const sources: TutorCareerSource[] = [];
+  let official: TutorCareerBucket | null = null;
 
   if (performance && academy) {
     const hasNumbers =
@@ -44,6 +70,7 @@ export function buildTutorCareerSummary(input: {
       academy.total_goals > 0 ||
       academy.total_assists > 0;
     if (hasNumbers) {
+      official = bucketFromAcademy(academy);
       sources.push({
         id: `academy-${performance.playerId}`,
         kind: "academy",
@@ -80,16 +107,46 @@ export function buildTutorCareerSummary(input: {
     });
   }
 
+  const tutorReported: TutorCareerBucket = {
+    matches: tutorTotals.matches,
+    goals: tutorTotals.goals,
+    assists: tutorTotals.assists,
+    minutes: tutorTotals.minutes,
+  };
+
+  const hasOfficial =
+    official != null &&
+    (official.matches > 0 ||
+      official.goals > 0 ||
+      official.assists > 0 ||
+      official.minutes > 0);
+  const hasTutor =
+    tutorReported.matches > 0 ||
+    tutorReported.goals > 0 ||
+    tutorReported.assists > 0 ||
+    tutorReported.minutes > 0;
+
+  // No mezclar: el encabezado muestra oficiales si existen; si no, captura del tutor.
+  const headline = hasOfficial ? official! : hasTutor ? tutorReported : null;
+  const headlineKind: TutorCareerSummary["headlineKind"] = hasOfficial
+    ? "academy"
+    : hasTutor
+      ? "tutor"
+      : "empty";
+
   return {
-    matches: tutorTotals.matches + (academy?.total_matches ?? 0),
-    goals: tutorTotals.goals + (academy?.total_goals ?? 0),
-    assists: tutorTotals.assists + (academy?.total_assists ?? 0),
-    minutes: tutorTotals.minutes + (academy?.total_minutes ?? 0),
+    matches: headline?.matches ?? 0,
+    goals: headline?.goals ?? 0,
+    assists: headline?.assists ?? 0,
+    minutes: headline?.minutes ?? 0,
     yellow_cards: academy?.total_yellow_cards ?? 0,
     red_cards: academy?.total_red_cards ?? 0,
     tournamentCount: sources.length,
     sources,
     hasAcademy: sources.some((row) => row.kind === "academy"),
     hasTutorStats: sources.some((row) => row.kind === "tutor"),
+    official,
+    tutorReported,
+    headlineKind,
   };
 }

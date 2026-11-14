@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { TutorActivityInbox } from "@/components/tutor/tutor-activity-inbox";
 import { TutorBuilderPanel } from "@/components/tutor/tutor-builder-panel";
 import { updatePassword } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
@@ -872,6 +873,8 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
           {notice}
         </p>
       ) : null}
+
+      <TutorActivityInbox />
 
       {children.length > 0 ? (
         <div className="space-y-2">

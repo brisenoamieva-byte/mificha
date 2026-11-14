@@ -3,7 +3,9 @@ import {
   dispatchMatchUpdateNotifications,
   summarizeNotificationResults,
 } from "@/lib/guardian-notifications";
+import { createSupabaseAdminClient } from "@/lib/supabase-admin";
 import { getAuthedSupabaseClient } from "@/lib/supabase-server";
+import { publishAcademyMatchActivity } from "@/lib/tutor-activity";
 
 interface MatchNotificationBody {
   match_id?: string;
@@ -72,5 +74,25 @@ export async function POST(request: Request) {
 
   const summary = summarizeNotificationResults(results);
 
-  return NextResponse.json({ summary, results });
+  let tutorInbox = 0;
+  try {
+    const admin = createSupabaseAdminClient();
+    const { data: matchRow } = await admin
+      .from("matches")
+      .select("match_date")
+      .eq("id", matchId)
+      .maybeSingle();
+    const published = await publishAcademyMatchActivity(admin, {
+      academyId,
+      matchId,
+      opponent,
+      matchDate: matchRow?.match_date ? String(matchRow.match_date).slice(0, 10) : null,
+      playerIds,
+    });
+    tutorInbox = published.length;
+  } catch {
+    // La notificación WhatsApp/email ya salió; el inbox tutor no debe tumbar el flujo.
+  }
+
+  return NextResponse.json({ summary, results, tutor_inbox: tutorInbox });
 }

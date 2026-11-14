@@ -101,11 +101,14 @@ export function TutorCareerSummaryCard({
             <p className="mt-1 text-sm text-mf-text-secondary">
               {hasNumbers
                 ? [
-                    summary.tournamentCount === 1
-                      ? "1 fuente"
-                      : `${summary.tournamentCount} fuentes`,
-                    summary.hasAcademy ? "incluye academia" : null,
-                    summary.hasTutorStats ? "incluye captura del tutor" : null,
+                    summary.headlineKind === "academy"
+                      ? "Encabezado: oficial academia"
+                      : "Encabezado: captura del tutor",
+                    summary.hasAcademy && summary.hasTutorStats
+                      ? "fuentes sin mezclar"
+                      : summary.tournamentCount === 1
+                        ? "1 fuente"
+                        : `${summary.tournamentCount} fuentes`,
                   ]
                     .filter(Boolean)
                     .join(" · ")
@@ -131,11 +134,23 @@ export function TutorCareerSummaryCard({
       </div>
 
       {hasNumbers ? (
-        <div className="grid grid-cols-2 gap-2 px-4 py-4 sm:grid-cols-4 sm:px-5">
-          <StatCell label="Partidos" value={summary.matches} emphasize />
-          <StatCell label="Goles" value={summary.goals} />
-          <StatCell label="Asistencias" value={summary.assists} />
-          <StatCell label="Minutos" value={summary.minutes} />
+        <div className="space-y-3 px-4 py-4 sm:px-5">
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+            <StatCell label="Partidos" value={summary.matches} emphasize />
+            <StatCell label="Goles" value={summary.goals} />
+            <StatCell label="Asistencias" value={summary.assists} />
+            <StatCell label="Minutos" value={summary.minutes} />
+          </div>
+          {summary.headlineKind === "academy" && summary.hasTutorStats ? (
+            <p className="text-xs leading-5 text-mf-text-muted">
+              Otros torneos del tutor (no sumados al encabezado):{" "}
+              <span className="font-semibold tabular-nums text-mf-gph-ink">
+                {summary.tutorReported.matches} PJ · {summary.tutorReported.goals}{" "}
+                goles · {summary.tutorReported.assists} asis. ·{" "}
+                {summary.tutorReported.minutes} min
+              </span>
+            </p>
+          ) : null}
         </div>
       ) : (
         <div className="px-4 py-5 sm:px-5">

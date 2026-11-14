@@ -957,6 +957,7 @@ export async function publishActaSession(
     const { dispatchMatchUpdateNotifications } = await import(
       "@/lib/guardian-notifications"
     );
+    const { publishAcademyMatchActivity } = await import("@/lib/tutor-activity");
     const homePlayerIds = homeRows.map((row) => row.player_id);
     if (homePlayerIds.length > 0) {
       await dispatchMatchUpdateNotifications({
@@ -968,6 +969,20 @@ export async function publishActaSession(
         previousPassportByPlayer: new Map(),
         achievementKeysByPlayer: new Map(),
         weeklyByPlayer: new Map(),
+      });
+      const { data: homeMatchMeta } = await admin
+        .from("matches")
+        .select("match_date")
+        .eq("id", session.home_match_id)
+        .maybeSingle();
+      await publishAcademyMatchActivity(admin, {
+        academyId: session.home_academy_id,
+        matchId: session.home_match_id,
+        opponent: session.opponent_name,
+        matchDate: homeMatchMeta?.match_date
+          ? String(homeMatchMeta.match_date).slice(0, 10)
+          : null,
+        playerIds: homePlayerIds,
       });
     }
   } catch {
