@@ -7,10 +7,13 @@ type PromoTone = "light" | "dark" | "gph";
 export function DiagnosisPromoPrice({
   size = "md",
   tone = "light",
+  showBadge = true,
   className,
 }: {
   size?: PromoSize;
   tone?: PromoTone;
+  /** Si el contenedor ya dice “promoción”, evita repetir el badge. */
+  showBadge?: boolean;
   className?: string;
 }) {
   const list = formatMxn(FAMILY_PRODUCTS.diagnosis.listPriceMxn);
@@ -36,28 +39,35 @@ export function DiagnosisPromoPrice({
 
   return (
     <div className={cn("min-w-0", className)}>
-      <div className="flex flex-wrap items-center gap-2">
-        <span
-          className={cn(
-            "inline-flex items-center rounded-md px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.14em]",
-            tone === "dark"
-              ? "bg-[#e11d48] text-white"
-              : "bg-[#e11d48] text-white shadow-sm",
-          )}
-        >
-          {percent}% de descuento
-        </span>
-        <span
-          className={cn(
-            "text-[11px] font-semibold uppercase tracking-[0.14em]",
-            tone === "dark" ? "text-[#fda4af]" : "text-[#e11d48]",
-          )}
-        >
-          Solo por tiempo limitado
-        </span>
-      </div>
+      {showBadge ? (
+        <div className="flex flex-wrap items-center gap-2">
+          <span
+            className={cn(
+              "inline-flex items-center rounded-md px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.14em]",
+              tone === "dark"
+                ? "bg-[#e11d48] text-white"
+                : "bg-[#e11d48] text-white shadow-sm",
+            )}
+          >
+            {percent}% de descuento
+          </span>
+          <span
+            className={cn(
+              "text-[11px] font-semibold uppercase tracking-[0.14em]",
+              tone === "dark" ? "text-[#fda4af]" : "text-[#e11d48]",
+            )}
+          >
+            Solo por tiempo limitado
+          </span>
+        </div>
+      ) : null}
 
-      <div className="mt-3 flex flex-wrap items-end gap-x-3 gap-y-1">
+      <div
+        className={cn(
+          "flex flex-wrap items-end gap-x-3 gap-y-1",
+          showBadge ? "mt-3" : "mt-0",
+        )}
+      >
         <p className={cn("relative font-semibold tabular-nums leading-none", muted, listSize)}>
           <span aria-hidden className="relative">
             {list}

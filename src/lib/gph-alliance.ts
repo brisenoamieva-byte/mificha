@@ -105,5 +105,5 @@ export function trainingBookingIsCalendar() {
 }
 
 export function trainingBookingCtaLabel(fallback = "Pedir por WhatsApp") {
-  return trainingBookingIsCalendar() ? "Ver horarios de clase muestra" : fallback;
+  return trainingBookingIsCalendar() ? "Ver horarios" : fallback;
 }
