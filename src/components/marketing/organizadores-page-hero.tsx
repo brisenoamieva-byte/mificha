@@ -31,8 +31,8 @@ export function OrganizadoresPageHero() {
               Cómo registrarme
               <ArrowRight className="h-4 w-4" />
             </Link>
-            <Link href="#como-funciona" className="mf-btn-accent">
-              Cómo funciona
+            <Link href="/fut/organizadores/presentacion" className="mf-btn-accent">
+              Ver presentación
             </Link>
           </div>
         </div>

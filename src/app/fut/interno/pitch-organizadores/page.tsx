@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
-import { OrganizerPitchDeckGate } from "@/components/interno/organizer-pitch-deck-gate";
+import { InternoAccessGate } from "@/components/interno/interno-access-gate";
+import { PitchDeckView } from "@/components/interno/pitch-deck-view";
+import { ORGANIZER_PITCH_SLIDES } from "@/lib/organizer-pitch-deck";
 
 export const metadata: Metadata = {
   title: "Pitch organizadores | MiFicha",
@@ -7,5 +9,16 @@ export const metadata: Metadata = {
 };
 
 export default function OrganizerPitchDeckPage() {
-  return <OrganizerPitchDeckGate />;
+  return (
+    <InternoAccessGate
+      nextPath="/fut/interno/pitch-organizadores"
+      loadingLabel="Cargando pitch organizadores…"
+    >
+      <PitchDeckView
+        slides={ORGANIZER_PITCH_SLIDES}
+        backHref="/fut/organizadores/presentacion"
+        backLabel="Versión web"
+      />
+    </InternoAccessGate>
+  );
 }
