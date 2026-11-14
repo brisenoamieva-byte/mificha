@@ -6,7 +6,13 @@ import { childMembershipForAcademy } from "@/lib/tutor-memberships";
 const OPS_BUCKET = "mificha-ops";
 const ACTIVITY_PATH = "families/tutor-activity.json";
 
-export type TutorActivityStatus = "published" | "acknowledged" | "disputed";
+export type TutorActivityStatus =
+  | "published"
+  | "acknowledged"
+  | "disputed"
+  | "resolved";
+
+export type TutorActivityResolveDecision = "confirmed" | "corrected";
 
 export interface TutorActivityEvent {
   id: string;
@@ -30,6 +36,9 @@ export interface TutorActivityEvent {
   dispute_note: string | null;
   disputed_at: string | null;
   acknowledged_at: string | null;
+  resolution_note: string | null;
+  resolved_at: string | null;
+  resolve_decision: TutorActivityResolveDecision | null;
 }
 
 async function ensureOpsBucket(admin: SupabaseClient) {
@@ -181,6 +190,9 @@ export async function publishAcademyMatchActivity(
       dispute_note: null,
       disputed_at: null,
       acknowledged_at: null,
+      resolution_note: null,
+      resolved_at: null,
+      resolve_decision: null,
     };
     rows.unshift(event);
     created.push(event);
@@ -269,6 +281,77 @@ export async function listAcademyActivityDisputes(
     .slice(0, limit);
 }
 
+/**
+ * Cierra una disputa abierta. No edita match_stats aquí:
+ * - confirmed: la academia confirma que los números publicados son correctos
+ * - corrected: relee match_stats (si ya se corrigió el acta) y notifica al tutor
+ */
+export async function resolveAcademyActivityDispute(
+  admin: SupabaseClient,
+  input: {
+    eventId: string;
+    academyId: string;
+    decision: TutorActivityResolveDecision;
+    note?: string | null;
+  },
+) {
+  const rows = await readActivity(admin);
+  const index = rows.findIndex(
+    (row) =>
+      row.id === input.eventId &&
+      row.academy_id === input.academyId &&
+      row.status === "disputed",
+  );
+  if (index < 0) {
+    throw new Error("No hay una disputa abierta con ese id.");
+  }
+
+  const prev = rows[index];
+  const now = new Date().toISOString();
+  const note = (input.note ?? "").replace(/\s+/g, " ").trim().slice(0, 500);
+
+  let goals = prev.goals;
+  let assists = prev.assists;
+  let minutes = prev.minutes;
+
+  if (input.decision === "corrected") {
+    const { data: stats } = await admin
+      .from("match_stats")
+      .select("goals, assists, minutes_played")
+      .eq("match_id", prev.match_id)
+      .eq("player_id", prev.player_id)
+      .maybeSingle();
+    if (stats) {
+      goals = Number(stats.goals ?? 0);
+      assists = Number(stats.assists ?? 0);
+      minutes = Number(stats.minutes_played ?? 0);
+    }
+  }
+
+  const defaultNote =
+    input.decision === "confirmed"
+      ? "La academia confirmó que las stats publicadas son correctas."
+      : "La academia revisó el partido y actualizó la respuesta al tutor.";
+
+  rows[index] = {
+    ...prev,
+    goals,
+    assists,
+    minutes,
+    status: "resolved",
+    resolve_decision: input.decision,
+    resolution_note: note || defaultNote,
+    resolved_at: now,
+    updated_at: now,
+    acknowledged_at: null,
+  };
+
+  await writeActivity(admin, rows);
+  return rows[index];
+}
+
 export function countUnreadTutorActivity(events: TutorActivityEvent[]) {
-  return events.filter((row) => row.status === "published").length;
+  return events.filter(
+    (row) => row.status === "published" || row.status === "resolved",
+  ).length;
 }

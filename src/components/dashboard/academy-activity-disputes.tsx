@@ -7,18 +7,22 @@ import { diagnosisAuthedFetch } from "@/lib/player-diagnosis-client";
 export function AcademyActivityDisputes({ academyId }: { academyId: string }) {
   const [events, setEvents] = useState<TutorActivityEvent[]>([]);
   const [loading, setLoading] = useState(true);
+  const [busyId, setBusyId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
       const payload = await diagnosisAuthedFetch(
         `/fut/api/academy/activity-disputes?academy_id=${encodeURIComponent(academyId)}`,
       );
-      const events = Array.isArray(payload.events)
+      const rows = Array.isArray(payload.events)
         ? (payload.events as TutorActivityEvent[])
         : [];
-      setEvents(events);
-    } catch {
+      setEvents(rows);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "No se pudieron cargar disputas.");
       setEvents([]);
     } finally {
       setLoading(false);
@@ -29,7 +33,31 @@ export function AcademyActivityDisputes({ academyId }: { academyId: string }) {
     void load();
   }, [load]);
 
-  if (loading || events.length === 0) return null;
+  async function decide(
+    eventId: string,
+    decision: "confirmed" | "corrected",
+  ) {
+    setBusyId(eventId);
+    setError(null);
+    try {
+      await diagnosisAuthedFetch("/fut/api/academy/activity-disputes", {
+        method: "POST",
+        body: JSON.stringify({
+          academy_id: academyId,
+          event_id: eventId,
+          decision,
+        }),
+      });
+      await load();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "No se pudo cerrar la disputa.");
+    } finally {
+      setBusyId(null);
+    }
+  }
+
+  if (loading && events.length === 0) return null;
+  if (!loading && events.length === 0 && !error) return null;
 
   return (
     <section className="rounded-2xl border border-amber-200 bg-amber-50/70 px-4 py-4 sm:px-5">
@@ -37,9 +65,14 @@ export function AcademyActivityDisputes({ academyId }: { academyId: string }) {
         Revisiones de tutores
       </p>
       <p className="mt-1 text-sm text-amber-950/80">
-        Un tutor pidió corregir stats oficiales. Revisa el acta o el partido y
-        vuelve a capturar si hace falta.
+        Un tutor pidió corregir stats. Si ya ajustaste el acta o el partido, marca
+        “Ya corregí”. Si los números están bien, confirma.
       </p>
+
+      {error ? (
+        <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>
+      ) : null}
+
       <ul className="mt-3 space-y-3">
         {events.map((event) => (
           <li
@@ -62,6 +95,24 @@ export function AcademyActivityDisputes({ academyId }: { academyId: string }) {
                 {event.dispute_note}
               </p>
             ) : null}
+            <div className="mt-2 flex flex-wrap gap-2">
+              <button
+                type="button"
+                disabled={busyId === event.id}
+                onClick={() => void decide(event.id, "corrected")}
+                className="rounded-xl bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-slate-800 disabled:opacity-60"
+              >
+                Ya corregí / releer stats
+              </button>
+              <button
+                type="button"
+                disabled={busyId === event.id}
+                onClick={() => void decide(event.id, "confirmed")}
+                className="rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-50 disabled:opacity-60"
+              >
+                Confirmar que está bien
+              </button>
+            </div>
           </li>
         ))}
       </ul>

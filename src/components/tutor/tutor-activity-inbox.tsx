@@ -82,8 +82,12 @@ export function TutorActivityInbox({ className }: { className?: string }) {
     }
   }
 
-  const visible = events.filter((row) => row.status !== "acknowledged").slice(0, 8);
-  const unread = events.filter((row) => row.status === "published").length;
+  const visible = events
+    .filter((row) => row.status !== "acknowledged")
+    .slice(0, 8);
+  const unread = events.filter(
+    (row) => row.status === "published" || row.status === "resolved",
+  ).length;
 
   if (loading && events.length === 0) {
     return null;
@@ -128,6 +132,10 @@ export function TutorActivityInbox({ className }: { className?: string }) {
                     <span className="ml-2 rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-amber-800">
                       En revisión
                     </span>
+                  ) : event.status === "resolved" ? (
+                    <span className="ml-2 rounded-full bg-sky-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-sky-800">
+                      Revisado
+                    </span>
                   ) : (
                     <span className="ml-2 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-emerald-800">
                       Oficial
@@ -141,6 +149,11 @@ export function TutorActivityInbox({ className }: { className?: string }) {
                 {event.status === "disputed" && event.dispute_note ? (
                   <p className="mt-1 text-xs leading-5 text-amber-900/80">
                     Tu nota: {event.dispute_note}
+                  </p>
+                ) : null}
+                {event.status === "resolved" && event.resolution_note ? (
+                  <p className="mt-1 text-xs leading-5 text-sky-900/80">
+                    Academia: {event.resolution_note}
                   </p>
                 ) : null}
               </div>
@@ -166,6 +179,16 @@ export function TutorActivityInbox({ className }: { className?: string }) {
                     Pedir revisión
                   </button>
                 </div>
+              ) : null}
+              {event.status === "resolved" ? (
+                <button
+                  type="button"
+                  disabled={busyId === event.id}
+                  onClick={() => void postAction("acknowledge", event.id)}
+                  className="rounded-lg border border-mf-border bg-white px-3 py-1.5 text-xs font-semibold text-mf-gph-ink hover:border-mf-gph/40"
+                >
+                  Entendido
+                </button>
               ) : null}
             </div>
 
