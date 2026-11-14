@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { TutorBuilderPanel } from "@/components/tutor/tutor-builder-panel";
-import { signIn, signUp, updatePassword } from "@/lib/auth";
-import { LEGAL_ROUTES, TERMS_ACCEPTANCE_LABEL } from "@/lib/legal";
+import { updatePassword } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { guardianWorkspaceCopy } from "@/lib/guardian-workspace-copy";
 import {
@@ -154,14 +154,9 @@ async function authed(path: string, init?: RequestInit) {
 }
 
 export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
+  const router = useRouter();
   const copy = guardianWorkspaceCopy();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [passwordConfirm, setPasswordConfirm] = useState("");
-  const [acceptedTerms, setAcceptedTerms] = useState(false);
-  const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
-  const [mode, setMode] = useState<"login" | "signup">("login");
   const [sessionEmail, setSessionEmail] = useState<string | null>(null);
   const [children, setChildren] = useState<TutorChildCard[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -176,9 +171,6 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
   const [linkSuggestions, setLinkSuggestions] = useState<LinkSuggestion[]>([]);
   const [linkBusy, setLinkBusy] = useState(false);
   const [onboardNotice, setOnboardNotice] = useState<string | null>(null);
-  const [pendingConfirmEmail, setPendingConfirmEmail] = useState<string | null>(
-    null,
-  );
   const [showPasswordPanel, setShowPasswordPanel] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [newPasswordConfirm, setNewPasswordConfirm] = useState("");
@@ -217,7 +209,10 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
         if (cancelled) return;
         const current = data.session?.user.email ?? null;
         setSessionEmail(current);
-        if (!current) return;
+        if (!current) {
+          router.replace(`/fut/entrar?next=${encodeURIComponent(copy.path)}`);
+          return;
+        }
         const savedPhone =
           typeof window !== "undefined"
             ? window.localStorage.getItem(PHONE_STORAGE_KEY) ?? ""
@@ -239,7 +234,7 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
     };
     // Solo al montar: no re-correr al hidratar el teléfono (eso reabre el estado vacío).
     // eslint-disable-next-line react-hooks/exhaustive-deps -- boot único
-  }, [load, copy.onboardEmpty]);
+  }, [load, copy.onboardEmpty, copy.path, router]);
 
   useEffect(() => {
     if (loading || !sessionEmail || children.length > 0 || !onboardNotice) return;
@@ -357,42 +352,8 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
     }, 80);
   }
 
-  async function enterWorkspace(opts?: { welcome?: boolean }) {
-    const normalizedEmail = email.trim().toLowerCase();
-    if (phone) {
-      try {
-        window.localStorage.setItem(PHONE_STORAGE_KEY, phone);
-      } catch {
-        /* ignore */
-      }
-    }
-    setPendingConfirmEmail(null);
-    setLoading(true);
-    try {
-      const rows = await load(phone);
-      setSessionEmail(normalizedEmail);
-      if (opts?.welcome || rows.length === 0) {
-        setOnboardNotice(
-          rows.length === 0 ? copy.onboardEmpty : copy.onboardWelcome,
-        );
-        if (rows.length === 0) scrollToCreateFicha();
-      }
-    } finally {
-      setLoading(false);
-    }
-  }
-
   function authErrorMessage(err: unknown) {
-    if (!(err instanceof Error)) return "No se pudo entrar.";
-    if (err.message.includes("Invalid login credentials")) {
-      return "Correo o contraseña incorrectos.";
-    }
-    if (err.message.includes("Email not confirmed")) {
-      return "Confirma tu correo con el link que te enviamos y vuelve a entrar.";
-    }
-    if (err.message.includes("User already registered")) {
-      return "Este correo ya tiene cuenta. Entra con tu contraseña o recupérala.";
-    }
+    if (!(err instanceof Error)) return "No se pudo actualizar.";
     if (err.message.includes("Password should be at least")) {
       return "La contraseña debe tener al menos 6 caracteres.";
     }
@@ -400,65 +361,9 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
       err.message.includes("rate limit") ||
       err.message.includes("over_email_send_rate_limit")
     ) {
-      return "Demasiados intentos de correo. Espera unos minutos e inténtalo de nuevo.";
+      return "Demasiados intentos. Espera unos minutos e inténtalo de nuevo.";
     }
     return err.message;
-  }
-
-  async function onAuth(event: React.FormEvent) {
-    event.preventDefault();
-    setError(null);
-    setOnboardNotice(null);
-    setPendingConfirmEmail(null);
-    const normalizedEmail = email.trim().toLowerCase();
-
-    if (mode === "signup") {
-      if (!acceptedTerms) {
-        setError("Debes aceptar los Términos y el Aviso de Privacidad.");
-        return;
-      }
-      if (password !== passwordConfirm) {
-        setError("Las contraseñas no coinciden.");
-        return;
-      }
-    }
-
-    setBusy(true);
-    try {
-      if (mode === "signup") {
-        const created = await signUp(
-          normalizedEmail,
-          password,
-          "academy_admin",
-          fullName,
-          { emailRedirectTo: `${window.location.origin}${copy.path}` },
-        );
-        if (!created.session) {
-          // Algunos proyectos piden confirmar correo: intentamos entrar igual;
-          // si falla, guiamos al login sin dejar al tutor “colgado”.
-          try {
-            await signIn(normalizedEmail, password);
-            await enterWorkspace({ welcome: true });
-            return;
-          } catch {
-            setPendingConfirmEmail(normalizedEmail);
-            setMode("login");
-            setPassword("");
-            setPasswordConfirm("");
-            return;
-          }
-        }
-        await enterWorkspace({ welcome: true });
-        return;
-      }
-
-      await signIn(normalizedEmail, password);
-      await enterWorkspace({ welcome: true });
-    } catch (err: unknown) {
-      setError(authErrorMessage(err));
-    } finally {
-      setBusy(false);
-    }
   }
 
   async function onChangePassword(event: React.FormEvent) {
@@ -787,194 +692,15 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
 
   if (!sessionEmail) {
     return (
-      <div className="mx-auto max-w-md space-y-6">
-        <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
-            {TUTOR_PILOT_FREE ? "Piloto · cuenta persona" : copy.eyebrow}
-          </p>
-          <h2 className="mt-2 text-xl font-semibold tracking-tight text-mf-gph-ink">
-            {copy.authTitle}
-          </h2>
-          <p className="mt-2 text-sm leading-7 text-mf-text-secondary">
-            {copy.authDetail}{" "}
-            {TUTOR_PILOT_FREE ? TUTOR_PILOT_LABEL : "Incluido con la membresía anual."}
-          </p>
-        </div>
-
-        {pendingConfirmEmail ? (
-          <div className="space-y-3 rounded-xl border border-mf-gph/30 bg-mf-gph-soft p-5">
-            <p className="text-sm font-semibold text-mf-gph-ink">Cuenta creada</p>
-            <p className="text-sm leading-6 text-mf-text-secondary">
-              Si tu proyecto pide confirmación, revisa el correo de{" "}
-              <span className="font-medium text-mf-gph-ink">{pendingConfirmEmail}</span>{" "}
-              (bandeja y spam). Después entra aquí para crear la ficha.
-            </p>
-            <button
-              type="button"
-              className="mf-btn-gph w-full justify-center"
-              onClick={() => {
-                setMode("login");
-                setEmail(pendingConfirmEmail);
-                setPendingConfirmEmail(null);
-              }}
-            >
-              Continuar a entrar
-            </button>
-            <p className="text-center text-xs text-mf-text-muted">
-              ¿No llegó el correo?{" "}
-              <Link
-                href={`/fut/recuperar?next=${encodeURIComponent(copy.path)}`}
-                className="font-semibold text-mf-gph hover:underline"
-              >
-                Recuperar acceso
-              </Link>
-            </p>
-          </div>
-        ) : null}
-
-        <form onSubmit={(event) => void onAuth(event)} className="space-y-4 rounded-xl border border-mf-border bg-white p-5">
-          <div className="flex gap-2 text-sm font-semibold">
-            <button
-              type="button"
-              className={mode === "login" ? "text-mf-gph" : "text-mf-text-muted"}
-              onClick={() => setMode("login")}
-            >
-              Entrar
-            </button>
-            <button
-              type="button"
-              className={mode === "signup" ? "text-mf-gph" : "text-mf-text-muted"}
-              onClick={() => {
-                setMode("signup");
-                setPendingConfirmEmail(null);
-              }}
-            >
-              Crear cuenta
-            </button>
-          </div>
-          {mode === "login" ? (
-            <p className="text-sm leading-6 text-mf-text-secondary">
-              Si ya tienes cuenta, solo correo y contraseña. En el celular la sesión es de
-              este navegador (no se comparte con la computadora).
-            </p>
-          ) : null}
-          {mode === "signup" ? (
-            <label className="block text-sm font-medium text-mf-text">
-              Tu nombre
-              <input
-                required
-                value={fullName}
-                onChange={(event) => setFullName(event.target.value)}
-                className={inputClass}
-              />
-            </label>
-          ) : null}
-          <label className="block text-sm font-medium text-mf-text">
-            Correo
-            <input
-              required
-              type="email"
-              autoComplete="email"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              className={inputClass}
-            />
-          </label>
-          {mode === "signup" ? (
-            <label className="block text-sm font-medium text-mf-text">
-              WhatsApp
-              <input
-                value={phone}
-                onChange={(event) => setPhone(event.target.value)}
-                className={inputClass}
-                placeholder="10 dígitos"
-                inputMode="tel"
-                autoComplete="tel"
-              />
-            </label>
-          ) : null}
-          <label className="block text-sm font-medium text-mf-text">
-            Contraseña
-            <input
-              required
-              type="password"
-              minLength={6}
-              autoComplete={mode === "login" ? "current-password" : "new-password"}
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              className={inputClass}
-              placeholder="Mínimo 6 caracteres"
-            />
-          </label>
-          {mode === "signup" ? (
-            <label className="block text-sm font-medium text-mf-text">
-              Confirmar contraseña
-              <input
-                required
-                type="password"
-                minLength={6}
-                autoComplete="new-password"
-                value={passwordConfirm}
-                onChange={(event) => setPasswordConfirm(event.target.value)}
-                className={inputClass}
-                placeholder="Repite la contraseña"
-              />
-            </label>
-          ) : (
-            <p className="-mt-1 text-right text-sm">
-              <Link
-                href={`/fut/recuperar?next=${encodeURIComponent(copy.path)}`}
-                className="font-semibold text-mf-gph hover:underline"
-              >
-                Olvidé mi contraseña
-              </Link>
-            </p>
-          )}
-          {mode === "signup" ? (
-            <label className="flex items-start gap-3">
-              <input
-                type="checkbox"
-                checked={acceptedTerms}
-                onChange={(event) => setAcceptedTerms(event.target.checked)}
-                required
-                className="mt-1 h-4 w-4 rounded border-mf-border text-mf-gph"
-              />
-              <span className="text-sm leading-6 text-mf-text-secondary">
-                {TERMS_ACCEPTANCE_LABEL}{" "}
-                <Link
-                  href={LEGAL_ROUTES.terms}
-                  className="font-semibold text-mf-gph hover:underline"
-                >
-                  Términos
-                </Link>{" "}
-                ·{" "}
-                <Link
-                  href={LEGAL_ROUTES.privacy}
-                  className="font-semibold text-mf-gph hover:underline"
-                >
-                  Privacidad
-                </Link>
-              </span>
-            </label>
-          ) : null}
-          {error ? <p className="text-sm text-mf-danger">{error}</p> : null}
-          <button type="submit" disabled={busy} className="mf-btn-gph w-full justify-center">
-            {busy
-              ? mode === "login"
-                ? "Entrando…"
-                : "Creando cuenta…"
-              : mode === "login"
-                ? "Entrar y continuar"
-                : "Crear cuenta y continuar"}
-          </button>
-          <p className="text-center text-xs leading-5 text-mf-text-muted">
-            {copy.afterAuthHint.replace(
-              "{action}",
-              mode === "login" ? "entrar" : "registrarte",
-            )}
-          </p>
-        </form>
-      </div>
+      <p className="text-sm text-mf-text-muted">
+        Te llevamos a Entrar…{" "}
+        <Link
+          href={`/fut/entrar?next=${encodeURIComponent(copy.path)}`}
+          className="font-semibold text-mf-gph hover:underline"
+        >
+          Continuar
+        </Link>
+      </p>
     );
   }
 

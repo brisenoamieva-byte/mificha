@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { SiteFooter, SiteHeader } from "@/components/marketing/site-header";
 import { TutorWorkspace } from "@/components/tutor/tutor-workspace";
+import { createSupabaseServerClient } from "@/lib/supabase-server";
 
 export const metadata: Metadata = {
   title: "Tus fichas | MiFicha",
@@ -9,7 +11,16 @@ export const metadata: Metadata = {
     "Cuenta persona: arma fichas de jugadores, seguimiento y visibilidad en Explorar.",
 };
 
-export default function TutorPage() {
+export default async function TutorPage() {
+  // Misma puerta que “Entrar”: sin sesión → /fut/entrar (un solo login).
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    redirect("/fut/entrar?next=/fut/tutor");
+  }
+
   return (
     <div className="flex min-h-dvh flex-col bg-mf-canvas">
       <SiteHeader actionHref="/fut/tutor" actionLabel="Mis fichas" />
