@@ -253,21 +253,25 @@ export function HomeTalentSearch({
           </form>
 
           <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-white/70">
-            <Link href="/fut/entrar" className="hover:text-white">
+            <Link href="/fut/tutor" className="hover:text-white">
               Publicar ficha
             </Link>
+            {!access.unlocked ? (
+              <>
+                <span className="hidden text-white/30 sm:inline" aria-hidden>
+                  ·
+                </span>
+                <Link href="#pro" className="hover:text-white">
+                  Membresía gratis
+                </Link>
+              </>
+            ) : null}
             <span className="hidden text-white/30 sm:inline" aria-hidden>
               ·
             </span>
-            <Link href="/fut/explorar#pro" className="hover:text-white">
-              Membresía · gratis ahora
-            </Link>
-            <span className="hidden text-white/30 sm:inline" aria-hidden>
-              ·
-            </span>
-            <Link href="/fut/explorar#directorio" className="font-semibold text-emerald-300 hover:text-emerald-200">
-              Ver directorio
-            </Link>
+            <a href="#directorio" className="font-semibold text-emerald-300 hover:text-emerald-200">
+              Ver resultados
+            </a>
           </div>
         </div>
       </section>
