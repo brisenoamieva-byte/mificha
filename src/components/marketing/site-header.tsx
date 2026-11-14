@@ -8,11 +8,14 @@ import { LEGAL_ROUTES } from "@/lib/legal";
 interface SiteHeaderProps {
   actionHref?: string;
   actionLabel?: string;
+  /** En cuenta persona (tutor) no mostrar atajo a academia. */
+  showAcademyLink?: boolean;
 }
 
 export function SiteHeader({
   actionHref = "/fut/entrar",
   actionLabel = "Entrar",
+  showAcademyLink = true,
 }: SiteHeaderProps) {
   return (
     <header className="mf-safe-top relative sticky top-0 z-50">
@@ -29,16 +32,22 @@ export function SiteHeader({
         </div>
 
         <div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-2">
-          <Link
-            href="/fut/dashboard"
-            className="hidden text-sm font-medium text-mf-text-secondary transition hover:text-mf-text lg:inline-flex"
-          >
-            Academia
-          </Link>
+          {showAcademyLink ? (
+            <Link
+              href="/fut/dashboard"
+              className="hidden text-sm font-medium text-mf-text-secondary transition hover:text-mf-text lg:inline-flex"
+            >
+              Academia
+            </Link>
+          ) : null}
           <Link href={actionHref} className="mf-btn-gph hidden sm:inline-flex">
             {actionLabel}
           </Link>
-          <SiteNavMobile actionHref={actionHref} actionLabel={actionLabel} />
+          <SiteNavMobile
+            actionHref={actionHref}
+            actionLabel={actionLabel}
+            showAcademyLink={showAcademyLink}
+          />
         </div>
       </div>
     </header>

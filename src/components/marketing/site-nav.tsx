@@ -117,9 +117,11 @@ export function SiteNavDesktop() {
 export function SiteNavMobile({
   actionHref = "/fut/entrar",
   actionLabel = "Entrar",
+  showAcademyLink = true,
 }: {
   actionHref?: string;
   actionLabel?: string;
+  showAcademyLink?: boolean;
 }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -218,13 +220,15 @@ export function SiteNavMobile({
                 >
                   {actionLabel}
                 </Link>
-                <Link
-                  href="/fut/dashboard"
-                  className="block rounded-lg px-2 py-2.5 text-center text-sm font-medium text-mf-text-secondary hover:bg-mf-brand-soft"
-                  onClick={() => setMobileOpen(false)}
-                >
-                  Academia
-                </Link>
+                {showAcademyLink ? (
+                  <Link
+                    href="/fut/dashboard"
+                    className="block rounded-lg px-2 py-2.5 text-center text-sm font-medium text-mf-text-secondary hover:bg-mf-brand-soft"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    Academia
+                  </Link>
+                ) : null}
               </div>
             </div>
           </>,
