@@ -1,4 +1,4 @@
-/** Modelo comercial MiFicha — academia = canal; organizador paga temporada; familias pagan GPH. */
+/** Modelo comercial MiFicha — academia = canal; organizador registra gratis; familias pagan GPH. */
 
 import { DIAGNOSIS_PROMO, FAMILY_PRODUCTS } from "@/lib/gph-commerce";
 import { ACADEMY_COMMERCIAL } from "@/lib/academy-role";
@@ -28,38 +28,21 @@ export interface OrganizerPricingPlan {
 }
 
 export const ORGANIZER_PRICING = {
-  title: "Precios",
+  title: "Registro gratis",
   subtitle:
-    "Las academias operan plantel y partidos sin cuota. El organizador elige tarifa por categoría o por jugador — puedes incluirla en la inscripción del torneo.",
-  footnote: "Temporada 2026 · Querétaro · Cupos limitados para torneos fundadores.",
-  costExample: {
-    label: "Ejemplo por jugador",
-    summary: "12 equipos × 18 jugadores = 216 → $4,320 MXN ($20/jugador).",
-    note: "Súmalo a la cuota de inscripción si prefieres.",
-  },
+    "Registrar tu torneo en MiFicha no tiene costo. Publicas calendario y acta; las academias y tutores reciben las stats en cada ficha.",
+  footnote: "Temporada 2026 · Querétaro · Abrimos cupos de acompañamiento al cargar calendario y acta.",
+  costExample: null,
   plans: [
     {
-      id: "piloto-fundador",
-      label: "Torneo fundador",
+      id: "registro-gratis",
+      label: "Organizadores de torneo",
       priceLabel: "Gratis",
-      period: "1 categoría · 1 torneo",
-      description: "Primera temporada con MiFicha. Te ayudamos a cargar calendario y acta.",
+      period: "Registro · calendario · acta · fichas",
+      description:
+        "Conecta jornadas y datos oficiales con planteles y tutores. Sin cuota de plataforma por registrar tu torneo.",
       highlight: true,
-      badge: "Piloto",
-    },
-    {
-      id: "temporada-categoria",
-      label: "Por categoría",
-      priceLabel: "$1,999",
-      period: "MXN / categoría / torneo",
-      description: "Calendario, acta, fichas de todas las academias y visibilidad en Explorar.",
-    },
-    {
-      id: "por-jugador",
-      label: "Por jugador",
-      priceLabel: "$20",
-      period: "MXN / jugador / torneo",
-      description: "Pagas solo por jugadores inscritos. Ideal para sumar a la cuota del torneo.",
+      badge: "Sin costo",
     },
   ] satisfies OrganizerPricingPlan[],
 } as const;

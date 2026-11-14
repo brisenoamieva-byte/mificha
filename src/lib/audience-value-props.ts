@@ -85,8 +85,8 @@ export const AUDIENCE_VALUE_PROPS: AudienceValueProp[] = [
     reasons: [
       "Publicas calendario, marcador y acta.",
       "MiFicha sincroniza stats con cada plantel.",
-      "Tutores reciben aviso; academias sin cuota.",
-      "Desde $1,999/categoría o $20/jugador · piloto fundador gratis.",
+      "Tutores reciben aviso tras cada partido.",
+      "Registro del torneo gratis.",
     ],
     href: "/fut/organizadores",
     cta: "Registrar torneo",

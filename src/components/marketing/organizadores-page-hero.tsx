@@ -26,7 +26,7 @@ export function OrganizadoresPageHero({ mailtoHref }: OrganizadoresPageHeroProps
           <p className="mt-5 text-base leading-8 text-mf-text-secondary sm:text-[1.0625rem]">
             <WithBrandName>
               Tú publicas calendario y acta. MiFicha actualiza la ficha de cada jugador
-              y avisa al tutor. Las academias no pagan.
+              y avisa al tutor. El registro de tu torneo es gratis.
             </WithBrandName>
           </p>
 
