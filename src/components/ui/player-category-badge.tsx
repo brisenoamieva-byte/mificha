@@ -5,6 +5,7 @@ import {
   getPlayerGeneration,
   getSubCategoryLabel,
   isUnknownBirthDate,
+  parseCategoryFilter,
 } from "@/lib/player-category";
 import { cn } from "@/lib/utils";
 
@@ -66,15 +67,7 @@ export function CategoryFilterSummary({
 }: {
   categoryValue: string;
 }) {
-  const label = getCategoryFilterLabel(
-    categoryValue === "all"
-      ? { kind: "all" }
-      : categoryValue.startsWith("age:")
-        ? { kind: "age", age: Number(categoryValue.slice(4)) }
-        : categoryValue.startsWith("gen:")
-          ? { kind: "generation", year: Number(categoryValue.slice(4)) }
-          : { kind: "all" },
-  );
+  const label = getCategoryFilterLabel(parseCategoryFilter(categoryValue));
 
   if (!label) return null;
 

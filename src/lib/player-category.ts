@@ -1,7 +1,16 @@
 export type PlayerCategoryFilter =
   | { kind: "all" }
   | { kind: "age"; age: number }
+  | { kind: "adult" }
   | { kind: "generation"; year: number };
+
+/** Sub-X solo para cantera. A partir de 20 se muestra «Mayor», no Sub-25. */
+export const YOUTH_SUB_MIN_AGE = 4;
+export const YOUTH_SUB_MAX_AGE = 19;
+
+export function isYouthSubAge(age: number) {
+  return age >= YOUTH_SUB_MIN_AGE && age <= YOUTH_SUB_MAX_AGE;
+}
 
 export interface CategoryFilterOption {
   value: string;
@@ -46,10 +55,13 @@ export function getPlayerGeneration(birthDate: string): number {
 }
 
 export function getSubCategoryLabel(age: number): string {
+  if (!Number.isFinite(age) || age < YOUTH_SUB_MIN_AGE) return "Sin categoría";
+  if (age > YOUTH_SUB_MAX_AGE) return "Mayor";
   return `Sub-${age}`;
 }
 
 export function getCategoryOptionLabel(age: number): string {
+  if (!isYouthSubAge(age)) return "Mayor";
   return `Sub-${age} · ${age} años`;
 }
 
@@ -60,11 +72,18 @@ export function getGenerationLabel(year: number): string {
 export function formatPlayerCategory(birthDate: string | null | undefined): string {
   if (isUnknownBirthDate(birthDate)) return "Sin categoría";
   const age = getPlayerAge(birthDate!);
+  if (!isYouthSubAge(age)) {
+    if (age > YOUTH_SUB_MAX_AGE) {
+      return `Mayor · ${getGenerationLabel(getPlayerGeneration(birthDate!))}`;
+    }
+    return "Sin categoría";
+  }
   return `${getSubCategoryLabel(age)} · ${getGenerationLabel(getPlayerGeneration(birthDate!))}`;
 }
 
 export function parseCategoryFilter(value: string): PlayerCategoryFilter {
   if (!value || value === "all") return { kind: "all" };
+  if (value === "age:adult") return { kind: "adult" };
   if (value.startsWith("age:")) {
     const age = Number(value.slice(4));
     return Number.isFinite(age) ? { kind: "age", age } : { kind: "all" };
@@ -78,6 +97,7 @@ export function parseCategoryFilter(value: string): PlayerCategoryFilter {
 
 export function serializeCategoryFilter(filter: PlayerCategoryFilter): string {
   if (filter.kind === "age") return `age:${filter.age}`;
+  if (filter.kind === "adult") return "age:adult";
   if (filter.kind === "generation") return `gen:${filter.year}`;
   return "all";
 }
@@ -92,6 +112,9 @@ export function matchesCategoryFilter(
   if (filter.kind === "age") {
     return getPlayerAge(birthDate) === filter.age;
   }
+  if (filter.kind === "adult") {
+    return getPlayerAge(birthDate) > YOUTH_SUB_MAX_AGE;
+  }
 
   return getPlayerGeneration(birthDate) === filter.year;
 }
@@ -99,6 +122,7 @@ export function matchesCategoryFilter(
 export function getCategoryFilterLabel(filter: PlayerCategoryFilter): string | null {
   if (filter.kind === "all") return null;
   if (filter.kind === "age") return getCategoryOptionLabel(filter.age);
+  if (filter.kind === "adult") return "Mayor";
   return getGenerationLabel(filter.year);
 }
 
@@ -109,10 +133,13 @@ export function buildCategoryFilterOptions(
   const { includeAll = true } = options;
   const ages = new Set<number>();
   const generations = new Set<number>();
+  let hasAdult = false;
 
   for (const birthDate of birthDates) {
     if (isUnknownBirthDate(birthDate)) continue;
-    ages.add(getPlayerAge(birthDate!));
+    const age = getPlayerAge(birthDate!);
+    if (isYouthSubAge(age)) ages.add(age);
+    else if (age > YOUTH_SUB_MAX_AGE) hasAdult = true;
     generations.add(getPlayerGeneration(birthDate!));
   }
 
@@ -126,6 +153,13 @@ export function buildCategoryFilterOptions(
     filterOptions.push({
       value: `age:${age}`,
       label: getCategoryOptionLabel(age),
+      group: "age",
+    });
+  }
+  if (hasAdult) {
+    filterOptions.push({
+      value: "age:adult",
+      label: "Mayor",
       group: "age",
     });
   }
@@ -148,8 +182,9 @@ export function getDefaultCategoryFilter(
   const ageCounts = new Map<number, number>();
 
   for (const birthDate of birthDates) {
-    if (!birthDate) continue;
-    const age = getPlayerAge(birthDate);
+    if (isUnknownBirthDate(birthDate)) continue;
+    const age = getPlayerAge(birthDate!);
+    if (!isYouthSubAge(age)) continue;
     ageCounts.set(age, (ageCounts.get(age) ?? 0) + 1);
   }
 
