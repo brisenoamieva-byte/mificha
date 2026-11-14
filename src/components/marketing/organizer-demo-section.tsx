@@ -50,12 +50,12 @@ export function OrganizerDemoSection() {
               ))}
             </ol>
             <div className="flex flex-wrap gap-3">
-              <Link href={ORGANIZER_ONE_PAGER.demoFichaHref} className="mf-btn-primary">
-                Ver Explorar
+              <Link href={ORGANIZER_ONE_PAGER.demoExploreHref} className="mf-btn-primary">
+                Ver red en Explorar
                 <ArrowRight className="h-4 w-4" />
               </Link>
-              <Link href={ORGANIZER_ONE_PAGER.demoExploreHref} className="mf-btn-accent">
-                Ver red en Explorar
+              <Link href={ORGANIZER_ONE_PAGER.demoRegisterHref} className="mf-btn-accent">
+                Registrar mi torneo
               </Link>
             </div>
           </div>
