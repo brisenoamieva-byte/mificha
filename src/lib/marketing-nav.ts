@@ -8,7 +8,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { CRACKS_TRYOUTS_PATH } from "@/lib/cracks-tryouts";
-import { trainingBookingHref } from "@/lib/gph-alliance";
+import { GPH_SAMPLE_CLASS, trainingBookingHref } from "@/lib/gph-alliance";
 import { GPH_PACHUCA_PATH } from "@/lib/gph-pachuca-segunda-fase";
 import { academyMembershipPublicCopy } from "@/lib/academy-membership";
 import { personaMembershipPublicCopy } from "@/lib/persona-membership";
@@ -66,8 +66,8 @@ export const MARKETING_NAV: NavSection[] = [
       },
       {
         href: trainingBookingHref(),
-        label: "Clase muestra GPH",
-        description: "Gratis · ver horarios en Calendly",
+        label: `${GPH_SAMPLE_CLASS.title} GPH`,
+        description: "Gratis · sesión práctica, sin informe de diagnóstico",
       },
     ],
   },

@@ -13,6 +13,7 @@ import { BrandWordmark, WithBrandName } from "@/components/ui/brand-wordmark";
 import { CURRENT_SEASON_LABEL } from "@/lib/marketing-season";
 import {
   GPH_ALLIANCE,
+  GPH_SAMPLE_CLASS,
   GPH_WHATSAPP_DISPLAY,
   diagnosisBookingCtaLabel,
   diagnosisBookingHref,
@@ -138,14 +139,16 @@ export function EvaluacionesPageContent() {
               className="flex flex-col rounded-xl border border-mf-border bg-mf-canvas px-5 py-5"
             >
               <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-mf-text-muted">
-                Gratis
+                {GPH_SAMPLE_CLASS.badge}
               </p>
               <h3 className="mt-2 text-base font-semibold text-mf-gph-ink">
-                Clase muestra
+                {GPH_SAMPLE_CLASS.title}
               </h3>
               <p className="mt-1.5 flex-1 text-sm leading-6 text-mf-text-secondary">
-                Sesión de especialización sin costo. Mira los espacios libres en
-                Calendly.
+                {GPH_SAMPLE_CLASS.summary}
+              </p>
+              <p className="mt-2 text-xs text-mf-text-muted">
+                {GPH_SAMPLE_CLASS.ctaHint}
               </p>
               <a
                 href={trainingHref}

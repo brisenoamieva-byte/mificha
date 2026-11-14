@@ -39,6 +39,18 @@ export const GPH_TRAINING_CALENDLY_DEFAULT =
   "https://calendly.com/gkperformancehub/clase-muestra-gratuita";
 
 /**
+ * Qué es la clase muestra (copy corto, una sola fuente).
+ * No es el diagnóstico: es una sesión práctica de especialización para conocer a GPH.
+ */
+export const GPH_SAMPLE_CLASS = {
+  title: "Clase muestra",
+  badge: "Gratis",
+  summary:
+    "Es una sesión práctica gratuita de especialización con el equipo GPH en Querétaro: el jugador entrena con su metodología y la familia conoce el estilo de trabajo, sin evaluación formal ni informe. Si después quieren medir etapa y objetivos, eso es el diagnóstico de pago.",
+  ctaHint: "Elige un horario libre en el calendario.",
+} as const;
+
+/**
  * Calendly del coordinador GPH.
  * Prioridad: env diagnóstico → default diagnóstico → env entrenamiento → WhatsApp.
  */

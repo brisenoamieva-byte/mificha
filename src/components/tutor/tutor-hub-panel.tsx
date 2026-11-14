@@ -4,6 +4,7 @@ import {
   OPPORTUNITY_ROADMAP_NOTE,
   OPPORTUNITY_STATUS_LABEL,
 } from "@/lib/opportunities";
+import { GPH_SAMPLE_CLASS } from "@/lib/gph-alliance";
 import {
   gphFreeTrainingBookingHref,
   gphFreeTrainingBookingIsCalendly,
@@ -132,12 +133,13 @@ export function TutorHubPanel() {
           GPH · especialización
         </p>
         <h2 className="mt-2 text-xl font-semibold tracking-tight text-mf-gph-ink sm:text-2xl">
-          Clase muestra gratuita con GPH
+          {GPH_SAMPLE_CLASS.title} gratuita con GPH
         </h2>
         <p className="mt-2 max-w-2xl text-sm leading-7 text-mf-text-secondary">
+          {GPH_SAMPLE_CLASS.summary}
           {isCalendly
-            ? "Elige un horario disponible en el calendario GPH. Sesión de especialización sin costo."
-            : "Revisa disponibilidad con GPH por WhatsApp."}
+            ? ` ${GPH_SAMPLE_CLASS.ctaHint}`
+            : " Revisa disponibilidad con GPH por WhatsApp."}
         </p>
         <div className="mt-5 flex flex-wrap gap-3">
           <a

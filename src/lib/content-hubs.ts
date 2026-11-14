@@ -1,5 +1,5 @@
 import { CRACKS_TRYOUTS, CRACKS_TRYOUTS_PATH } from "@/lib/cracks-tryouts";
-import { trainingBookingHref } from "@/lib/gph-alliance";
+import { GPH_SAMPLE_CLASS, trainingBookingHref } from "@/lib/gph-alliance";
 import {
   GPH_PACHUCA_PATH,
   GPH_PACHUCA_SEGUNDA_FASE,
@@ -62,8 +62,8 @@ export const PRODUCTOS_HUB = {
     },
     {
       id: "entrenamientos",
-      title: "Clase muestra GPH",
-      detail: "Sesión gratuita de especialización. Elige horario en el calendario GPH.",
+      title: `${GPH_SAMPLE_CLASS.title} GPH`,
+      detail: GPH_SAMPLE_CLASS.summary,
       meta: "Gratis · Calendly",
       href: trainingBookingHref(),
       cta: "Ver horarios",
