@@ -21,12 +21,6 @@ const CHOICES = [
     detail: "Plantel, partidos y código MF · canal sin cuota.",
     href: "/fut/signup",
   },
-  {
-    id: "patrocinio",
-    title: "Patrocinio / marca",
-    detail: "Pide información por WhatsApp.",
-    href: "https://wa.me/524421556155?text=Hola%2C%20quiero%20informaci%C3%B3n%20sobre%20patrocinio%20en%20MiFicha.",
-  },
 ] as const;
 
 function getErrorMessage(error: unknown) {
@@ -182,8 +176,7 @@ export function UnifiedEnter() {
     return (
       <div className="space-y-4">
         <p className="text-sm leading-6 text-mf-text-secondary">
-          Dos cuentas principales: persona (tutor o representante) o academia. Patrocinio es
-          solo contacto comercial.
+          Elige tu tipo de cuenta: persona (tutor o representante) o academia.
         </p>
         <ul className="space-y-2">
           {CHOICES.map((choice) => {
