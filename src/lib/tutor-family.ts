@@ -419,7 +419,11 @@ async function ensureOpsBucket(admin: SupabaseClient) {
 }
 
 async function readJson<T>(admin: SupabaseClient, path: string): Promise<T[]> {
-  const { data, error } = await admin.storage.from(OPS_BUCKET).download(path);
+  // JSON muta seguido: sin cache-bust, Storage/CDN puede devolver la versión vieja
+  // (p. ej. Eliminar torneo “no hace nada” porque el reload relee el archivo cacheado).
+  const { data, error } = await admin.storage
+    .from(OPS_BUCKET)
+    .download(path, { cacheNonce: String(Date.now()) }, { cache: "no-store" });
   if (error || !data) return [];
   try {
     const parsed = JSON.parse(await data.text()) as T[];
@@ -432,9 +436,11 @@ async function readJson<T>(admin: SupabaseClient, path: string): Promise<T[]> {
 async function writeJson(admin: SupabaseClient, path: string, rows: unknown[]) {
   await ensureOpsBucket(admin);
   const body = new Blob([JSON.stringify(rows)], { type: "application/json" });
-  const { error } = await admin.storage
-    .from(OPS_BUCKET)
-    .upload(path, body, { upsert: true, contentType: "application/json" });
+  const { error } = await admin.storage.from(OPS_BUCKET).upload(path, body, {
+    upsert: true,
+    contentType: "application/json",
+    cacheControl: "0",
+  });
   if (error) throw new Error(error.message);
 }
 
@@ -1312,7 +1318,10 @@ export async function deleteTutorSeason(
         row.guardian_user_id === child.guardian_user_id
       ),
   );
-  if (next.length === rows.length) throw new Error("No encontramos ese registro.");
+  // Idempotente: si ya no está (o la UI veía una fila fantasma por caché), OK.
+  if (next.length === rows.length) {
+    return { ok: true as const, id: seasonId, missing: true as const };
+  }
   await writeJson(admin, SEASONS, next);
   return { ok: true as const, id: seasonId };
 }

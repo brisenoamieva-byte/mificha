@@ -54,7 +54,9 @@ function splitPlayerName(fullName: string) {
 }
 
 async function readOpsJson<T>(admin: SupabaseClient, path: string): Promise<T[]> {
-  const { data, error } = await admin.storage.from(OPS_BUCKET).download(path);
+  const { data, error } = await admin.storage
+    .from(OPS_BUCKET)
+    .download(path, { cacheNonce: String(Date.now()) }, { cache: "no-store" });
   if (error || !data) return [];
   try {
     const parsed = JSON.parse(await data.text()) as T[];

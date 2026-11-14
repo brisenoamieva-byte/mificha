@@ -718,20 +718,32 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
     if (!child) return;
     const ok = window.confirm("¿Eliminar este torneo de la ficha?");
     if (!ok) return;
+    const childId = child.id;
     setBusy(true);
     setError(null);
+    setChildren((prev) =>
+      prev.map((row) =>
+        row.id !== childId
+          ? row
+          : {
+              ...row,
+              seasons: (row.seasons ?? []).filter((season) => season.id !== seasonId),
+            },
+      ),
+    );
     try {
       await authed("/fut/api/tutor/seasons", {
         method: "POST",
         body: JSON.stringify({
           action: "delete",
-          child_id: child.id,
+          child_id: childId,
           season_id: seasonId,
         }),
       });
-      await load(phone);
+      await load(phone, childId);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "No se eliminó el torneo.");
+      await load(phone, childId);
     } finally {
       setBusy(false);
     }
