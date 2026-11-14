@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { ArrowRight, Trophy } from "lucide-react";
 import { OrganizadoresPageHero } from "@/components/marketing/organizadores-page-hero";
-import { OrganizerAcademyKit } from "@/components/marketing/organizer-academy-kit";
 import { OrganizerDemoSection } from "@/components/marketing/organizer-demo-section";
 import { OrganizerPricingSection } from "@/components/marketing/organizer-pricing-section";
 import { SiteFooter, SiteHeader } from "@/components/marketing/site-header";
@@ -61,8 +60,6 @@ export default function OrganizadoresPage() {
                 </ul>
               </div>
             </div>
-
-            <OrganizerAcademyKit embedded />
           </div>
         </section>
       </main>

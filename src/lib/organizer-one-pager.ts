@@ -29,7 +29,7 @@ export const ORGANIZER_ONE_PAGER = {
   askPoints: [
     "Calendario de jornadas — lo cargamos contigo al inicio.",
     "Marcador y acta oficial tras cada partido.",
-    "Que academias activen plantel (usa el guión de abajo).",
+    "Que las academias activen su plantel en MiFicha.",
   ],
   governanceTitle: "Quién hace qué",
   governancePoints: [
