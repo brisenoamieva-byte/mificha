@@ -22,8 +22,9 @@ export const ORGANIZER_ONE_PAGER = {
     "El padre recibe link automático a la ficha.",
   ],
   demoExploreHref: "/fut/explorar",
-  academyKitTitle: "Guión para academias",
-  academyKitDescription: "Copia y pega en WhatsApp cuando abras inscripciones.",
+  academyKitTitle: "Mensaje listo para tus academias",
+  academyKitDescription:
+    "Esto no es para ti: es un texto que puedes reenviar a las escuelas cuando abras inscripciones, para que carguen su plantel en MiFicha.",
   askTitle: "Qué necesitamos de ti",
   askPoints: [
     "Calendario de jornadas — lo cargamos contigo al inicio.",
@@ -80,18 +81,19 @@ export function buildOrganizerAcademyBlastText(options: {
   tournamentName: string;
   signupUrl?: string;
 }) {
+  const name = options.tournamentName.trim() || "nuestro torneo";
   const url = options.signupUrl ?? "https://mificha.mx/fut/signup";
   return [
-    `Torneo ${options.tournamentName} · MiFicha activo`,
+    `Hola, les escribimos por el torneo ${name}.`,
     "",
-    "Este torneo usa MiFicha para fichas verificadas por jugador.",
+    "Este torneo va a usar MiFicha para las fichas de los jugadores (calendario, acta y stats).",
     "",
-    "Tu academia debe:",
-    "1. Crear cuenta y cargar plantel",
-    "2. Activar consentimiento y contacto del tutor",
-    "3. Mantener plantel y consentimiento al día — MiFicha avisa al tutor al sincronizar el acta",
+    "Por favor, en su academia:",
+    "1. Creen su cuenta y carguen el plantel",
+    "2. Activen el consentimiento y el contacto del tutor de cada jugador",
+    "3. Mantengan el plantel al día",
     "",
-    `Registro: ${url}`,
-    "Dudas: hola@mificha.mx",
+    `Registro de academia: ${url}`,
+    "Si tienen dudas técnicas: hola@mificha.mx",
   ].join("\n");
 }
