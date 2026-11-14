@@ -56,6 +56,12 @@ RESEND_FROM_EMAIL=MiFicha <notificaciones@mificha.mx>
 # DNS: SPF de mificha.mx debe incluir Resend e Improvmx:
 # v=spf1 include:spf.improvmx.com include:resend.com ~all
 
+# Auth emails: Site URL = https://www.mificha.mx
+# Plantilla Confirm signup (enlace en mificha.mx, no supabase.co):
+# <a href="{{ .SiteURL }}/fut/confirmar?token_hash={{ .TokenHash }}&type=signup">Confirmar correo</a>
+# Plantilla Reset password:
+# <a href="{{ .SiteURL }}/fut/recuperar/nueva?token_hash={{ .TokenHash }}&type=recovery">Restablecer</a>
+
 # App
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 NEXT_PUBLIC_APP_NAME=MiFicha

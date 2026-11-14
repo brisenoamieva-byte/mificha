@@ -1,6 +1,21 @@
 import type { EmailOtpType } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 
+const EMAIL_OTP_TYPES: EmailOtpType[] = [
+  "signup",
+  "invite",
+  "magiclink",
+  "recovery",
+  "email_change",
+  "email",
+];
+
+export function normalizeEmailOtpType(value: string | null | undefined): EmailOtpType | null {
+  const raw = String(value ?? "").trim().toLowerCase();
+  if (!raw) return null;
+  return EMAIL_OTP_TYPES.includes(raw as EmailOtpType) ? (raw as EmailOtpType) : null;
+}
+
 function hashParams() {
   if (typeof window === "undefined") return new URLSearchParams();
   return new URLSearchParams(window.location.hash.replace(/^#/, ""));
@@ -67,11 +82,12 @@ export async function consumeAuthRedirect() {
     }
 
     const tokenHash = search.get("token_hash") ?? hash.get("token_hash");
-    const type = (search.get("type") ?? hash.get("type")) as EmailOtpType | null;
-    if (tokenHash && (type === "recovery" || type === "magiclink" || type === "email")) {
+    const rawType = (search.get("type") ?? hash.get("type") ?? "").trim();
+    const otpType = normalizeEmailOtpType(rawType);
+    if (tokenHash && otpType) {
       const { error: otpError } = await supabase.auth.verifyOtp({
         token_hash: tokenHash,
-        type: type === "email" ? "email" : "recovery",
+        type: otpType,
       });
       if (!otpError) {
         stripAuthParamsFromUrl();
