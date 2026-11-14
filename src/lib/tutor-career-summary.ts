@@ -54,40 +54,74 @@ function bucketFromAcademy(
 export function buildTutorCareerSummary(input: {
   seasons?: TutorSeasonStat[] | null;
   performance?: TutorLinkedPerformance | null;
+  /** Si hay varias academias ligadas, se listan todas como fuentes oficiales. */
+  performances?: TutorLinkedPerformance[] | null;
 }): TutorCareerSummary {
   const seasons = input.seasons ?? [];
-  const performance = input.performance ?? null;
+  const performances =
+    input.performances && input.performances.length > 0
+      ? input.performances
+      : input.performance
+        ? [input.performance]
+        : [];
   const tutorTotals = summarizeTutorSeasons(seasons);
-  const academy = performance?.stats ?? null;
 
   const sources: TutorCareerSource[] = [];
   let official: TutorCareerBucket | null = null;
 
-  if (performance && academy) {
+  for (const performance of performances) {
+    const academy = performance.stats ?? null;
+    if (!academy) continue;
     const hasNumbers =
       academy.total_matches > 0 ||
       academy.total_minutes > 0 ||
       academy.total_goals > 0 ||
       academy.total_assists > 0;
-    if (hasNumbers) {
-      official = bucketFromAcademy(academy);
-      sources.push({
-        id: `academy-${performance.playerId}`,
-        kind: "academy",
-        title: performance.academyName
-          ? `Academia · ${performance.academyName}`
-          : "Academia ligada",
-        subtitle: [performance.seasonName, "Stats oficiales"]
-          .filter(Boolean)
-          .join(" · "),
-        matches: academy.total_matches,
-        goals: academy.total_goals,
-        assists: academy.total_assists,
-        minutes: academy.total_minutes,
-        notes: null,
-      });
+    if (!hasNumbers) continue;
+    const bucket = bucketFromAcademy(academy);
+    if (!official) {
+      official = { ...bucket };
+    } else {
+      official = {
+        matches: official.matches + bucket.matches,
+        goals: official.goals + bucket.goals,
+        assists: official.assists + bucket.assists,
+        minutes: official.minutes + bucket.minutes,
+      };
     }
+    sources.push({
+      id: `academy-${performance.playerId}`,
+      kind: "academy",
+      title: performance.academyName
+        ? `Academia · ${performance.academyName}`
+        : "Academia ligada",
+      subtitle: [performance.seasonName, "Stats oficiales"]
+        .filter(Boolean)
+        .join(" · "),
+      matches: academy.total_matches,
+      goals: academy.total_goals,
+      assists: academy.total_assists,
+      minutes: academy.total_minutes,
+      notes: null,
+    });
   }
+
+  const academy = official
+    ? {
+        total_matches: official.matches,
+        total_goals: official.goals,
+        total_assists: official.assists,
+        total_minutes: official.minutes,
+        total_yellow_cards: performances.reduce(
+          (sum, row) => sum + (row.stats?.total_yellow_cards ?? 0),
+          0,
+        ),
+        total_red_cards: performances.reduce(
+          (sum, row) => sum + (row.stats?.total_red_cards ?? 0),
+          0,
+        ),
+      }
+      : null;
 
   for (const row of seasons) {
     if (!row.tournament_name.trim()) continue;

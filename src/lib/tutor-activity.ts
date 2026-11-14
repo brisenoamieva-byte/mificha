@@ -1,6 +1,7 @@
 import { randomUUID } from "crypto";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { listAllTutorChildrenForOps, type TutorChild } from "@/lib/tutor-family";
+import { childMembershipForAcademy } from "@/lib/tutor-memberships";
 
 const OPS_BUCKET = "mificha-ops";
 const ACTIVITY_PATH = "families/tutor-activity.json";
@@ -65,12 +66,10 @@ function linkedChildrenForPlayers(
   academyId: string,
 ) {
   const wanted = new Set(playerIds);
-  return roster.filter(
-    (child) =>
-      child.linked_academy_id === academyId &&
-      child.linked_player_id &&
-      wanted.has(child.linked_player_id),
-  );
+  return roster.filter((child) => {
+    const membership = childMembershipForAcademy(child, academyId);
+    return Boolean(membership && wanted.has(membership.player_id));
+  });
 }
 
 export async function publishAcademyMatchActivity(
@@ -96,7 +95,9 @@ export async function publishAcademyMatchActivity(
     .eq("match_id", input.matchId)
     .in(
       "player_id",
-      linked.map((child) => child.linked_player_id as string),
+      linked
+        .map((child) => childMembershipForAcademy(child, input.academyId)?.player_id)
+        .filter((id): id is string => Boolean(id)),
     );
 
   const statsByPlayer = new Map(
@@ -125,7 +126,9 @@ export async function publishAcademyMatchActivity(
   const created: TutorActivityEvent[] = [];
 
   for (const child of linked) {
-    const playerId = child.linked_player_id as string;
+    const membership = childMembershipForAcademy(child, input.academyId);
+    if (!membership) continue;
+    const playerId = membership.player_id;
     const stats = statsByPlayer.get(playerId) ?? {
       goals: 0,
       assists: 0,

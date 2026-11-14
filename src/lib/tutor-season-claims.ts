@@ -1,6 +1,7 @@
 import { randomUUID } from "crypto";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { TutorChild, TutorSeasonStat } from "@/lib/tutor-family";
+import { childMemberships } from "@/lib/tutor-memberships";
 
 const OPS_BUCKET = "mificha-ops";
 const CLAIMS_PATH = "families/tutor-season-claims.json";
@@ -70,7 +71,8 @@ export async function syncSeasonClaimForLinkedChild(
   child: TutorChild,
   season: TutorSeasonStat,
 ): Promise<TutorSeasonClaim | null> {
-  if (!child.linked_player_id || !child.linked_academy_id) return null;
+  const memberships = childMemberships(child);
+  if (memberships.length === 0) return null;
 
   const hasNumbers =
     season.matches > 0 ||
@@ -81,58 +83,64 @@ export async function syncSeasonClaimForLinkedChild(
 
   const rows = await readClaims(admin);
   const now = new Date().toISOString();
-  const existingIndex = rows.findIndex(
-    (row) =>
-      row.season_id === season.id &&
-      row.child_id === child.id &&
-      (row.status === "pending" || row.status === "accepted"),
-  );
+  let first: TutorSeasonClaim | null = null;
 
-  const base = {
-    season_id: season.id,
-    child_id: child.id,
-    guardian_user_id: child.guardian_user_id,
-    child_name: child.player_name,
-    player_id: child.linked_player_id,
-    academy_id: child.linked_academy_id,
-    academy_name: child.linked_academy_name,
-    tournament_name: season.tournament_name,
-    season_label: season.season_label,
-    team_name: season.team_name,
-    matches: season.matches,
-    goals: season.goals,
-    assists: season.assists,
-    minutes: season.minutes,
-    notes: season.notes,
-    updated_at: now,
-  };
+  for (const membership of memberships) {
+    const existingIndex = rows.findIndex(
+      (row) =>
+        row.season_id === season.id &&
+        row.child_id === child.id &&
+        row.academy_id === membership.academy_id &&
+        (row.status === "pending" || row.status === "accepted"),
+    );
 
-  if (existingIndex >= 0) {
-    const prev = rows[existingIndex];
-    // Si ya estaba aceptado y cambian números, vuelve a pending para re-revisión.
-    const next: TutorSeasonClaim = {
-      ...prev,
-      ...base,
+    const base = {
+      season_id: season.id,
+      child_id: child.id,
+      guardian_user_id: child.guardian_user_id,
+      child_name: child.player_name,
+      player_id: membership.player_id,
+      academy_id: membership.academy_id,
+      academy_name: membership.academy_name,
+      tournament_name: season.tournament_name,
+      season_label: season.season_label,
+      team_name: season.team_name,
+      matches: season.matches,
+      goals: season.goals,
+      assists: season.assists,
+      minutes: season.minutes,
+      notes: season.notes,
+      updated_at: now,
+    };
+
+    if (existingIndex >= 0) {
+      const prev = rows[existingIndex];
+      const next: TutorSeasonClaim = {
+        ...prev,
+        ...base,
+        status: "pending",
+        resolved_at: null,
+        resolve_note: null,
+      };
+      rows[existingIndex] = next;
+      first = first ?? next;
+      continue;
+    }
+
+    const claim: TutorSeasonClaim = {
+      id: randomUUID(),
       status: "pending",
+      created_at: now,
       resolved_at: null,
       resolve_note: null,
+      ...base,
     };
-    rows[existingIndex] = next;
-    await writeClaims(admin, rows);
-    return next;
+    rows.unshift(claim);
+    first = first ?? claim;
   }
 
-  const claim: TutorSeasonClaim = {
-    id: randomUUID(),
-    status: "pending",
-    created_at: now,
-    resolved_at: null,
-    resolve_note: null,
-    ...base,
-  };
-  rows.unshift(claim);
   await writeClaims(admin, rows);
-  return claim;
+  return first;
 }
 
 export async function listSeasonClaimsForGuardian(

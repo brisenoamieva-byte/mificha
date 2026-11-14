@@ -5,12 +5,19 @@ import {
   readPlayerPublicCodeMap,
 } from "@/lib/public-player-code";
 import {
+  addTutorChildMembership,
   getTutorChildForGuardian,
   listTutorPublicCodes,
+  removeTutorChildMembership,
   setTutorChildPublicCode,
   updateTutorChildLink,
   type TutorChild,
 } from "@/lib/tutor-family";
+import {
+  childHasPlayerMembership,
+  childMemberships,
+  linkedPlayerIds,
+} from "@/lib/tutor-memberships";
 
 function phoneKey(value: string | null | undefined) {
   const digits = String(value ?? "").replace(/\D/g, "");
@@ -124,29 +131,31 @@ async function hydratePlayerSuggestion(
   };
 }
 
-/** Candidatos de plantel: primero mismo código MF, luego contacto+nombre. */
+/** Candidatos de plantel: excluye membresías ya ligadas; permite otras academias. */
 export async function suggestAcademyPlayersForChild(
   admin: SupabaseClient,
   child: TutorChild,
 ): Promise<TutorLinkSuggestion[]> {
-  if (child.linked_player_id) return [];
-
+  const already = new Set(linkedPlayerIds(child));
+  const linkedAcademyIds = new Set(childMemberships(child).map((row) => row.academy_id));
   const byId = new Map<string, TutorLinkSuggestion>();
   const code = normalizePublicCode(child.public_code);
 
   if (code) {
     const playerMap = await readPlayerPublicCodeMap(admin);
-    const playerId = Object.entries(playerMap).find(
-      ([, value]) => normalizePublicCode(value) === code,
-    )?.[0];
-    if (playerId) {
+    // Un código puede apuntar a un player; también buscamos todos los players con ese code en map.
+    for (const [playerId, value] of Object.entries(playerMap)) {
+      if (normalizePublicCode(value) !== code) continue;
+      if (already.has(playerId)) continue;
       const suggestion = await hydratePlayerSuggestion(
         admin,
         playerId,
         `Mismo código ${code}`,
         "code",
       );
-      if (suggestion) byId.set(suggestion.player_id, suggestion);
+      if (suggestion && !linkedAcademyIds.has(suggestion.academy_id)) {
+        byId.set(suggestion.player_id, suggestion);
+      }
     }
   }
 
@@ -163,7 +172,8 @@ export async function suggestAcademyPlayersForChild(
       const playerName = `${row.first_name ?? ""} ${row.last_name ?? ""}`.trim();
       if (!namesLikelySame(child.player_name, playerName)) continue;
       const id = String(row.id);
-      if (byId.has(id)) continue;
+      if (already.has(id) || byId.has(id)) continue;
+      if (linkedAcademyIds.has(String(row.academy_id))) continue;
       const academyRel = (row as { academies?: { name?: string } | { name?: string }[] | null })
         .academies;
       const academyName = Array.isArray(academyRel)
@@ -184,56 +194,42 @@ export async function suggestAcademyPlayersForChild(
   const email = child.guardian_email.trim().toLowerCase();
   const phone = phoneKey(child.guardian_phone);
   if (email || phone) {
-    const filters: string[] = [];
-    if (email) filters.push(`guardian_email.eq.${email}`);
-    if (phone) filters.push(`guardian_phone.eq.${phone}`);
-
-    const { data: players, error } = await admin
+    let query = admin
       .from("players")
       .select(
         "id, first_name, last_name, slug, academy_id, guardian_email, guardian_phone, academies(name)",
       )
-      .or(filters.join(","))
-      .limit(40);
-
-    const rows = error
-      ? (
-          await admin
-            .from("players")
-            .select(
-              "id, first_name, last_name, slug, academy_id, guardian_email, guardian_phone",
-            )
-            .or(filters.join(","))
-            .limit(40)
-        ).data ?? []
-      : players ?? [];
-
-    if (error) {
-      const enriched = await enrichSuggestions(admin, child, rows as Array<Record<string, unknown>>);
-      for (const item of enriched) {
-        if (!byId.has(item.player_id)) byId.set(item.player_id, item);
-      }
+      .limit(80);
+    if (email && phone) {
+      query = query.or(
+        `guardian_email.eq.${email},guardian_phone.ilike.%${phone.slice(-10)}%`,
+      );
+    } else if (email) {
+      query = query.eq("guardian_email", email);
     } else {
-      for (const row of rows) {
-        const playerName = `${row.first_name ?? ""} ${row.last_name ?? ""}`.trim();
-        if (!namesLikelySame(child.player_name, playerName)) continue;
-        const id = String(row.id);
-        if (byId.has(id)) continue;
-        const academyRel = (row as { academies?: { name?: string } | { name?: string }[] | null })
-          .academies;
-        const academyName = Array.isArray(academyRel)
-          ? academyRel[0]?.name
-          : academyRel?.name;
-        byId.set(id, {
-          player_id: id,
-          academy_id: String(row.academy_id),
-          academy_name: academyName || "Academia",
-          player_name: playerName,
-          slug: String(row.slug ?? ""),
-          reason: "Mismo contacto de tutor y nombre parecido",
-          match: "contact",
-        });
-      }
+      query = query.ilike("guardian_phone", `%${phone.slice(-10)}%`);
+    }
+    const { data: byContact } = await query;
+    for (const row of byContact ?? []) {
+      const playerName = `${row.first_name ?? ""} ${row.last_name ?? ""}`.trim();
+      if (!namesLikelySame(child.player_name, playerName)) continue;
+      const id = String(row.id);
+      if (already.has(id) || byId.has(id)) continue;
+      if (linkedAcademyIds.has(String(row.academy_id))) continue;
+      const academyRel = (row as { academies?: { name?: string } | { name?: string }[] | null })
+        .academies;
+      const academyName = Array.isArray(academyRel)
+        ? academyRel[0]?.name
+        : academyRel?.name;
+      byId.set(id, {
+        player_id: id,
+        academy_id: String(row.academy_id),
+        academy_name: academyName || "Academia",
+        player_name: playerName,
+        slug: String(row.slug ?? ""),
+        reason: "Mismo contacto de tutor y nombre parecido",
+        match: "contact",
+      });
     }
   }
 
@@ -244,37 +240,7 @@ export async function suggestAcademyPlayersForChild(
   });
 }
 
-async function enrichSuggestions(
-  admin: SupabaseClient,
-  child: TutorChild,
-  rows: Array<Record<string, unknown>>,
-) {
-  const academyIds = [...new Set(rows.map((row) => String(row.academy_id)))];
-  const { data: academies } = await admin
-    .from("academies")
-    .select("id, name")
-    .in("id", academyIds);
-  const academyMap = new Map(
-    (academies ?? []).map((row) => [String(row.id), String(row.name ?? "Academia")]),
-  );
-
-  const suggestions: TutorLinkSuggestion[] = [];
-  for (const row of rows) {
-    const playerName = `${row.first_name ?? ""} ${row.last_name ?? ""}`.trim();
-    if (!namesLikelySame(child.player_name, playerName)) continue;
-    suggestions.push({
-      player_id: String(row.id),
-      academy_id: String(row.academy_id),
-      academy_name: academyMap.get(String(row.academy_id)) || "Academia",
-      player_name: playerName,
-      slug: String(row.slug ?? ""),
-      reason: "Mismo contacto de tutor y nombre parecido",
-      match: "contact",
-    });
-  }
-  return suggestions;
-}
-
+/** Añade membresía (no reemplaza otras academias). */
 export async function linkTutorChildToPlayer(
   admin: SupabaseClient,
   userId: string,
@@ -283,6 +249,10 @@ export async function linkTutorChildToPlayer(
 ) {
   const child = await getTutorChildForGuardian(admin, userId, childId);
   if (!child) throw new Error("No encontramos a ese jugador en tu cuenta de tutor.");
+
+  if (childHasPlayerMembership(child, playerId)) {
+    return child;
+  }
 
   const { data: player, error } = await admin
     .from("players")
@@ -297,11 +267,16 @@ export async function linkTutorChildToPlayer(
     ? academyRel[0]?.name
     : academyRel?.name;
 
-  const updated = await updateTutorChildLink(admin, userId, childId, {
-    linked_player_id: String(player.id),
-    linked_academy_id: String(player.academy_id),
-    linked_academy_name: academyName || "Academia",
-    linked_player_slug: String(player.slug ?? ""),
+  const academyId = String(player.academy_id);
+  if (childMemberships(child).some((row) => row.academy_id === academyId)) {
+    throw new Error("Ya hay un vínculo con esa academia. Desvincúlalo antes de cambiarlo.");
+  }
+
+  const updated = await addTutorChildMembership(admin, userId, childId, {
+    player_id: String(player.id),
+    academy_id: academyId,
+    academy_name: academyName || "Academia",
+    player_slug: String(player.slug ?? ""),
     linked_at: new Date().toISOString(),
   });
 
@@ -319,18 +294,30 @@ export async function linkTutorChildToPlayer(
   return updated;
 }
 
+/** Quita todas las membresías. */
 export async function unlinkTutorChild(
   admin: SupabaseClient,
   userId: string,
   childId: string,
 ) {
   return updateTutorChildLink(admin, userId, childId, {
+    memberships: [],
     linked_player_id: null,
     linked_academy_id: null,
     linked_academy_name: null,
     linked_player_slug: null,
     linked_at: null,
   });
+}
+
+/** Quita una membresía concreta. */
+export async function unlinkTutorChildPlayer(
+  admin: SupabaseClient,
+  userId: string,
+  childId: string,
+  playerId: string,
+) {
+  return removeTutorChildMembership(admin, userId, childId, playerId);
 }
 
 /** Candidatos tutor al dar de alta / editar en plantel de academia. */
@@ -356,7 +343,8 @@ export async function findTutorMatchesForAcademyPlayer(
   const name = String(input.name ?? "").trim();
 
   for (const child of roster) {
-    if (child.linked_player_id) continue;
+    // Ya no excluimos si tiene otras membresías; solo si… no, aún puede ligarse a otra academia.
+    // Si el match es por código y ya tiene ese player, skip happens at link time.
 
     if (code && normalizePublicCode(child.public_code) === code) {
       byId.set(child.id, {
@@ -413,7 +401,6 @@ export async function findTutorMatchesForAcademyPlayer(
 
 /**
  * Academia conecta un player de plantel con una ficha tutor.
- * La autorización (owner/staff/GPH) la hace el caller; aquí solo valida pertenencia.
  */
 export async function linkAcademyPlayerToTutorChild(
   admin: SupabaseClient,
@@ -437,8 +424,8 @@ export async function linkAcademyPlayerToTutorChild(
   const roster = await listAllTutorChildrenForOps(admin);
   const target = roster.find((row) => row.id === childId);
   if (!target) throw new Error("No encontramos la ficha tutor.");
-  if (target.linked_player_id && target.linked_player_id !== playerId) {
-    throw new Error("Esa ficha tutor ya está vinculada a otro jugador.");
+  if (childHasPlayerMembership(target, playerId)) {
+    return target;
   }
 
   return linkTutorChildToPlayer(admin, target.guardian_user_id, childId, playerId);

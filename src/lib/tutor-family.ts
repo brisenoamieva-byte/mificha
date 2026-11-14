@@ -8,6 +8,13 @@ import {
   normalizePublicCode,
   releaseTutorPublicCode,
 } from "@/lib/public-player-code";
+import {
+  normalizeMemberships,
+  syncLegacyLinkFields,
+  type TutorMembership,
+} from "@/lib/tutor-memberships";
+
+export type { TutorMembership };
 
 const OPS_BUCKET = "mificha-ops";
 const ROSTER = "families/roster.json";
@@ -83,7 +90,12 @@ export interface TutorChild {
   public_code: string;
   profile: TutorChildProfile;
   created_at: string;
-  /** Vínculo opcional con jugador de plantel (misma persona). */
+  /**
+   * Membresías activas (N academias / planteles).
+   * linked_* legacy = membresía primaria (primera), para compat.
+   */
+  memberships: TutorMembership[];
+  /** @deprecated Preferir memberships; se mantiene sincronizado. */
   linked_player_id: string | null;
   linked_academy_id: string | null;
   linked_academy_name: string | null;
@@ -288,11 +300,7 @@ function normalizeChild(raw: TutorChild): TutorChild {
         detail: string;
       }>,
     },
-    linked_player_id: raw.linked_player_id ?? null,
-    linked_academy_id: raw.linked_academy_id ?? null,
-    linked_academy_name: raw.linked_academy_name ?? null,
-    linked_player_slug: raw.linked_player_slug ?? null,
-    linked_at: raw.linked_at ?? null,
+    ...syncLegacyLinkFields(normalizeMemberships(raw)),
     explore_opt_in: Boolean(raw.explore_opt_in),
     explore_opt_in_at: raw.explore_opt_in_at ?? null,
   };
@@ -543,6 +551,7 @@ export async function syncTutorChildren(
       public_code: publicCode,
       profile: emptyProfile(),
       created_at: new Date().toISOString(),
+      memberships: [],
       linked_player_id: null,
       linked_academy_id: null,
       linked_academy_name: null,
@@ -666,6 +675,7 @@ export async function syncTutorChildren(
           city: reg.city || null,
         },
         created_at: new Date().toISOString(),
+        memberships: [],
         linked_player_id: null,
         linked_academy_id: null,
         linked_academy_name: null,
@@ -756,6 +766,7 @@ export async function createTutorChild(
     public_code: publicCode,
     profile: profileFromInput(input),
     created_at: new Date().toISOString(),
+    memberships: [],
     linked_player_id: null,
     linked_academy_id: null,
     linked_academy_name: null,
@@ -976,6 +987,8 @@ export async function updateTutorChildLink(
     linked_academy_name: string | null;
     linked_player_slug: string | null;
     linked_at: string | null;
+    /** Si se pasa, reemplaza el arreglo completo. */
+    memberships?: TutorMembership[];
   },
 ) {
   const { roster } = await loadRoster(admin);
@@ -983,7 +996,80 @@ export async function updateTutorChildLink(
     (child) => child.id === childId && child.guardian_user_id === userId,
   );
   if (index < 0) throw new Error("No encontramos a ese jugador.");
-  roster[index] = { ...roster[index], ...link };
+
+  const memberships =
+    link.memberships ??
+    normalizeMemberships({
+      linked_player_id: link.linked_player_id,
+      linked_academy_id: link.linked_academy_id,
+      linked_academy_name: link.linked_academy_name,
+      linked_player_slug: link.linked_player_slug,
+      linked_at: link.linked_at,
+      memberships: link.linked_player_id
+        ? [
+            {
+              player_id: link.linked_player_id,
+              academy_id: link.linked_academy_id || "",
+              academy_name: link.linked_academy_name || "Academia",
+              player_slug: link.linked_player_slug || "",
+              linked_at: link.linked_at || new Date().toISOString(),
+            },
+          ]
+        : [],
+    });
+
+  roster[index] = normalizeChild({
+    ...roster[index],
+    ...syncLegacyLinkFields(memberships),
+  });
+  await writeJson(admin, ROSTER, roster);
+  return roster[index];
+}
+
+/** Añade o actualiza una membresía sin borrar las demás. */
+export async function addTutorChildMembership(
+  admin: SupabaseClient,
+  userId: string,
+  childId: string,
+  membership: TutorMembership,
+) {
+  const { roster } = await loadRoster(admin);
+  const index = roster.findIndex(
+    (child) => child.id === childId && child.guardian_user_id === userId,
+  );
+  if (index < 0) throw new Error("No encontramos a ese jugador.");
+  const current = normalizeMemberships(roster[index]);
+  const { upsertMembershipList } = await import("@/lib/tutor-memberships");
+  const memberships = upsertMembershipList(current, membership);
+  roster[index] = normalizeChild({
+    ...roster[index],
+    ...syncLegacyLinkFields(memberships),
+  });
+  await writeJson(admin, ROSTER, roster);
+  return roster[index];
+}
+
+/** Quita una membresía por player_id. */
+export async function removeTutorChildMembership(
+  admin: SupabaseClient,
+  userId: string,
+  childId: string,
+  playerId: string,
+) {
+  const { roster } = await loadRoster(admin);
+  const index = roster.findIndex(
+    (child) => child.id === childId && child.guardian_user_id === userId,
+  );
+  if (index < 0) throw new Error("No encontramos a ese jugador.");
+  const { removeMembershipByPlayer } = await import("@/lib/tutor-memberships");
+  const memberships = removeMembershipByPlayer(
+    normalizeMemberships(roster[index]),
+    playerId,
+  );
+  roster[index] = normalizeChild({
+    ...roster[index],
+    ...syncLegacyLinkFields(memberships),
+  });
   await writeJson(admin, ROSTER, roster);
   return roster[index];
 }
@@ -1037,20 +1123,23 @@ export async function grantTutorLinkedAcademyConsent(
   );
   if (index < 0) throw new Error("No encontramos a ese jugador.");
   const child = roster[index];
-  if (!child.linked_player_id) {
+  const memberships = normalizeMemberships(child);
+  if (memberships.length === 0) {
     throw new Error("Este jugador aún no está vinculado a un plantel de academia.");
   }
 
   const now = new Date().toISOString();
-  const { error } = await admin
-    .from("players")
-    .update({
-      public_consent_at: now,
-      is_public: true,
-      is_discoverable: true,
-    })
-    .eq("id", child.linked_player_id);
-  if (error) throw new Error(error.message || "No se pudo guardar el consentimiento.");
+  for (const membership of memberships) {
+    const { error } = await admin
+      .from("players")
+      .update({
+        public_consent_at: now,
+        is_public: true,
+        is_discoverable: true,
+      })
+      .eq("id", membership.player_id);
+    if (error) throw new Error(error.message || "No se pudo guardar el consentimiento.");
+  }
 
   roster[index] = {
     ...child,
@@ -1095,19 +1184,29 @@ export async function setTutorChildPublicCode(
 export async function listTutorLinksByAcademy(admin: SupabaseClient, academyId: string) {
   const { roster, changed } = await loadRoster(admin);
   if (changed) await writeJson(admin, ROSTER, roster);
-  return roster
-    .filter(
-      (child) =>
-        child.linked_academy_id === academyId && Boolean(child.linked_player_id),
-    )
-    .map((child) => ({
-      player_id: child.linked_player_id as string,
+  const out: Array<{
+    player_id: string;
+    tutor_child_id: string;
+    player_name: string;
+    share_token: string;
+    public_code: string;
+    guardian_email: string;
+  }> = [];
+  for (const child of roster) {
+    const membership = normalizeMemberships(child).find(
+      (row) => row.academy_id === academyId,
+    );
+    if (!membership) continue;
+    out.push({
+      player_id: membership.player_id,
       tutor_child_id: child.id,
       player_name: child.player_name,
       share_token: child.share_token,
       public_code: child.public_code,
       guardian_email: child.guardian_email,
-    }));
+    });
+  }
+  return out;
 }
 
 export async function listTutorPublicCodes(admin: SupabaseClient): Promise<string[]> {
@@ -1559,6 +1658,7 @@ export async function seedTutorFromVisoriaRegistration(
       city: reg.city || null,
     },
     created_at: new Date().toISOString(),
+    memberships: [],
     linked_player_id: null,
     linked_academy_id: null,
     linked_academy_name: null,

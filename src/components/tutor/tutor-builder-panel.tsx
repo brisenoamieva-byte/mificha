@@ -30,6 +30,8 @@ import {
   claimStatusLabel,
   type TutorSeasonClaim,
 } from "@/lib/tutor-season-claims";
+import type { TutorMembership } from "@/lib/tutor-memberships";
+import { childHasAnyMembership, childMemberships } from "@/lib/tutor-memberships";
 import { parseLinesToList, parseTitleDetailLines } from "@/lib/tutor-family";
 import { cn } from "@/lib/utils";
 
@@ -63,7 +65,9 @@ export interface TutorBuilderChild {
   linked_academy_name?: string | null;
   linked_player_slug?: string | null;
   linked_at?: string | null;
+  memberships?: TutorMembership[];
   linked_performance?: TutorLinkedPerformance | null;
+  linked_performances?: TutorLinkedPerformance[] | null;
   seasons?: TutorSeasonStat[];
   season_claims?: Record<string, TutorSeasonClaim>;
   view_stats?: {
@@ -148,7 +152,7 @@ interface TutorBuilderPanelProps {
   onCopyShare: () => void;
   onCopyPublicCode: () => void;
   onLinkPlayer: (playerId: string, match?: TutorLinkSuggestion["match"]) => void;
-  onUnlinkPlayer: () => void;
+  onUnlinkPlayer: (playerId?: string) => void;
   onToggleExploreOptIn: (enabled: boolean) => void;
   onSignLinkedAcademyConsent?: () => void;
   workspace?: GuardianKind;
@@ -223,6 +227,14 @@ export function TutorBuilderPanel({
 
   const seasons = child.seasons ?? [];
   const seasonClaims = child.season_claims ?? {};
+  const memberships = childMemberships(child);
+  const hasLinkedAcademy = childHasAnyMembership(child);
+  const linkedPerformances =
+    child.linked_performances && child.linked_performances.length > 0
+      ? child.linked_performances
+      : child.linked_performance
+        ? [child.linked_performance]
+        : [];
 
   const progress = useMemo(
     () =>
@@ -231,10 +243,10 @@ export function TutorBuilderPanel({
         profile: draftProfile,
         materials: child.materials,
         seasons,
-        hasLinkedAcademy: Boolean(child.linked_player_id),
+        hasLinkedAcademy,
       }),
     [
-      child.linked_player_id,
+      hasLinkedAcademy,
       child.materials,
       child.player_name,
       draftProfile,
@@ -247,7 +259,7 @@ export function TutorBuilderPanel({
   const shareAccess = child.public_code || child.share_token;
   const shareHref = shareAccess ? tutorSharePath(shareAccess) : null;
   const materialsHref = shareAccess ? agentMaterialsPath(shareAccess) : null;
-  const showAcademy = Boolean(child.linked_player_id) || linkSuggestions.length > 0;
+  const showAcademy = hasLinkedAcademy || linkSuggestions.length > 0;
 
   useEffect(() => {
     const key = `${child.id}:${child.materials.length}:${child.player_name}:${child.profile.bio ?? ""}:${child.profile.position ?? ""}`;
@@ -268,6 +280,7 @@ export function TutorBuilderPanel({
     public_code: child.public_code || "",
     profile: draftProfile,
     created_at: "",
+    memberships,
     linked_player_id: child.linked_player_id ?? null,
     linked_academy_id: child.linked_academy_id ?? null,
     linked_academy_name: child.linked_academy_name ?? null,
@@ -381,6 +394,7 @@ export function TutorBuilderPanel({
         <TutorCareerSummaryCard
           seasons={seasons}
           performance={child.linked_performance ?? null}
+          performances={linkedPerformances}
           title="Dashboard del alumno"
           exploreOptIn={Boolean(child.explore_opt_in)}
           onAddTournament={() => setStep("rendimiento")}
@@ -1215,7 +1229,7 @@ export function TutorBuilderPanel({
                             >
                               {claimStatusLabel(claim.status)}
                             </span>
-                          ) : child.linked_player_id ? (
+                          ) : hasLinkedAcademy ? (
                             <span className="ml-2 rounded-full bg-mf-canvas px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-mf-text-muted">
                               Solo en tu ficha
                             </span>
@@ -1281,7 +1295,7 @@ export function TutorBuilderPanel({
                 ? "Lista para presentar."
                 : `Siguiente: ${progress.next.label.toLowerCase()}.`}
             </p>
-            {!child.linked_player_id && seasons.length === 0 ? (
+            {!hasLinkedAcademy && seasons.length === 0 ? (
               <div className="rounded-xl border border-mf-gph/25 bg-mf-gph-soft px-4 py-3">
                 <p className="text-sm font-semibold text-mf-gph-ink">
                   Falta rendimiento en el link público
@@ -1487,40 +1501,48 @@ export function TutorBuilderPanel({
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
               Academia
             </p>
-            {child.linked_player_id ? (
-              <div className="mt-3 space-y-3">
-                <p className="text-sm leading-6 text-mf-text-secondary">
-                  Ligado a{" "}
-                  <span className="font-semibold text-mf-gph-ink">
-                    {child.linked_academy_name}
-                  </span>
-                  . En el link que compartes aparecen minutos, goles, asistencias y la
-                  evaluación GPH cuando existan
-                  {child.linked_player_slug ? (
-                    <>
-                      {" "}
-                      ·{" "}
-                      <Link
-                        href={`/fut/j/${child.linked_player_slug}`}
-                        className="font-semibold text-mf-gph hover:underline"
-                        target="_blank"
-                      >
-                        ver ficha de torneo
-                      </Link>
-                    </>
-                  ) : null}
-                  .
-                </p>
-                <button
-                  type="button"
-                  disabled={linkBusy}
-                  onClick={onUnlinkPlayer}
-                  className="text-xs font-semibold text-mf-text-muted hover:text-mf-danger"
-                >
-                  Quitar vínculo
-                </button>
-              </div>
-            ) : (
+            <p className="mt-2 text-sm text-mf-text-secondary">
+              Un jugador puede pertenecer a varias academias. Cada vínculo suma stats
+              oficiales de ese plantel.
+            </p>
+            {memberships.length > 0 ? (
+              <ul className="mt-3 space-y-2">
+                {memberships.map((membership) => (
+                  <li
+                    key={membership.player_id}
+                    className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-mf-border px-3 py-3"
+                  >
+                    <div>
+                      <p className="text-sm font-semibold text-mf-gph-ink">
+                        {membership.academy_name}
+                      </p>
+                      <p className="text-xs text-mf-text-muted">
+                        {membership.player_slug ? (
+                          <Link
+                            href={`/fut/j/${membership.player_slug}`}
+                            className="font-semibold text-mf-gph hover:underline"
+                            target="_blank"
+                          >
+                            Ver ficha de plantel
+                          </Link>
+                        ) : (
+                          "Plantel ligado"
+                        )}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      disabled={linkBusy}
+                      onClick={() => onUnlinkPlayer(membership.player_id)}
+                      className="text-xs font-semibold text-mf-text-muted hover:text-mf-danger"
+                    >
+                      Quitar
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+            {linkSuggestions.length > 0 ? (
               <ul className="mt-3 space-y-2">
                 {linkSuggestions.map((item) => (
                   <li
@@ -1548,14 +1570,16 @@ export function TutorBuilderPanel({
                         ? "Enviando…"
                         : item.match === "code"
                           ? "Usar mismo código"
-                          : item.match === "birth"
-                            ? "Solicitar vínculo (nombre y nacimiento)"
-                            : "Solicitar vínculo"}
+                          : memberships.length > 0
+                            ? "Agregar academia"
+                            : item.match === "birth"
+                              ? "Solicitar vínculo (nombre y nacimiento)"
+                              : "Solicitar vínculo"}
                     </button>
                   </li>
                 ))}
               </ul>
-            )}
+            ) : null}
           </section>
         ) : null}
       </div>

@@ -7,7 +7,10 @@ import {
   normalizeGuardianKind,
 } from "@/lib/tutor-family";
 import { getTutorFichaViewStats } from "@/lib/tutor-ficha-views";
-import { fetchTutorLinkedPerformance } from "@/lib/tutor-linked-performance";
+import {
+  fetchTutorLinkedPerformance,
+  fetchTutorLinkedPerformances,
+} from "@/lib/tutor-linked-performance";
 import { getSeasonClaimMapForChild } from "@/lib/tutor-season-claims";
 import { createSupabaseAdminClient } from "@/lib/supabase-admin";
 import { getAuthedSupabaseClient } from "@/lib/supabase-server";
@@ -37,6 +40,8 @@ export async function GET(request: Request) {
         seasons: await listTutorSeasons(admin, child),
         season_claims: await getSeasonClaimMapForChild(admin, child.id),
         linked_performance: await fetchTutorLinkedPerformance(admin, child),
+        linked_performances: await fetchTutorLinkedPerformances(admin, child),
+        memberships: child.memberships ?? [],
         view_stats: await getTutorFichaViewStats(admin, child.id),
       })),
     );

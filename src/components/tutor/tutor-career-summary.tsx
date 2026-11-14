@@ -61,6 +61,7 @@ function MiniCell({ label, value }: { label: string; value: number }) {
 export function TutorCareerSummaryCard({
   seasons,
   performance,
+  performances,
   className,
   title = "Resumen de carrera",
   onAddTournament,
@@ -68,21 +69,24 @@ export function TutorCareerSummaryCard({
 }: {
   seasons?: TutorSeasonStat[] | null;
   performance?: TutorLinkedPerformance | null;
+  performances?: TutorLinkedPerformance[] | null;
   className?: string;
   title?: string;
   onAddTournament?: () => void;
   exploreOptIn?: boolean;
 }) {
-  const summary = buildTutorCareerSummary({ seasons, performance });
+  const summary = buildTutorCareerSummary({ seasons, performance, performances });
   const hasNumbers =
     summary.matches > 0 ||
     summary.minutes > 0 ||
     summary.goals > 0 ||
     summary.assists > 0;
-  const officialHref = performance?.slug ? `/fut/j/${performance.slug}` : null;
+  const primary =
+    (performances && performances[0]) || performance || null;
+  const officialHref = primary?.slug ? `/fut/j/${primary.slug}` : null;
   const gphHref =
-    performance?.slug && performance.gph
-      ? buildPublicGphEvaluationPath(performance.slug)
+    primary?.slug && primary.gph
+      ? buildPublicGphEvaluationPath(primary.slug)
       : null;
 
   return (

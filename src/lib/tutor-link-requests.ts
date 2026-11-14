@@ -13,6 +13,7 @@ import {
   linkTutorChildToPlayer,
   unlinkTutorChild,
 } from "@/lib/tutor-player-link";
+import { childHasPlayerMembership } from "@/lib/tutor-memberships";
 
 const OPS_BUCKET = "mificha-ops";
 const REQUESTS_PATH = "families/link-requests.json";
@@ -144,8 +145,8 @@ export async function requestLinkFromTutor(
 ) {
   const child = await getTutorChildForGuardian(admin, guardianUserId, childId);
   if (!child) throw new Error("No encontramos a ese jugador en tu cuenta de tutor.");
-  if (child.linked_player_id) {
-    throw new Error("Este jugador ya está vinculado a una academia.");
+  if (childHasPlayerMembership(child, playerId)) {
+    return { mode: "active" as const, child, request: null };
   }
 
   const meta = await loadPlayerMeta(admin, playerId);
@@ -226,10 +227,7 @@ export async function requestLinkFromAcademy(
   const roster = await listAllTutorChildrenForOps(admin);
   const child = roster.find((row) => row.id === childId);
   if (!child) throw new Error("No encontramos la ficha tutor.");
-  if (child.linked_player_id && child.linked_player_id !== playerId) {
-    throw new Error("Esa ficha tutor ya está vinculada a otro jugador.");
-  }
-  if (child.linked_player_id === playerId) {
+  if (childHasPlayerMembership(child, playerId)) {
     return { mode: "active" as const, child, request: null };
   }
 

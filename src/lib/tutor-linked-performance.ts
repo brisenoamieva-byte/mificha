@@ -4,6 +4,7 @@ import {
   type PublicGphSummary,
 } from "@/lib/gph-player-link";
 import type { TutorChild } from "@/lib/tutor-family";
+import { childMemberships, primaryMembership } from "@/lib/tutor-memberships";
 
 export type TutorLinkedSeasonStats = {
   total_matches: number;
@@ -106,29 +107,11 @@ function emptyStats(): TutorLinkedSeasonStats {
   };
 }
 
-/**
- * Resumen de torneo + GPH para un hijo tutor ligado a plantel.
- * Usa service role: la ficha tutor es opt-in del tutor aunque `/fut/j` aún no sea pública.
- */
-export async function fetchTutorLinkedPerformance(
+async function fetchPerformanceForPlayer(
   admin: SupabaseClient,
-  child: Pick<TutorChild, "linked_player_id" | "linked_player_slug" | "linked_academy_name">,
+  playerId: string,
+  fallbackAcademyName: string | null,
 ): Promise<TutorLinkedPerformance | null> {
-  let playerId = child.linked_player_id;
-  let slug = child.linked_player_slug;
-
-  if (!playerId && slug) {
-    const { data } = await admin
-      .from("players")
-      .select("id,slug,academy_id,is_public,public_consent_at,academies(name)")
-      .eq("slug", slug)
-      .maybeSingle();
-    if (!data?.id) return null;
-    playerId = String(data.id);
-  }
-
-  if (!playerId) return null;
-
   const { data: player } = await admin
     .from("players")
     .select("id,slug,academy_id,is_public,public_consent_at,academies(name)")
@@ -139,10 +122,10 @@ export async function fetchTutorLinkedPerformance(
 
   const academyJoin = player.academies as { name?: string } | { name?: string }[] | null;
   const academyName = Array.isArray(academyJoin)
-    ? academyJoin[0]?.name ?? child.linked_academy_name
-    : academyJoin?.name ?? child.linked_academy_name;
+    ? academyJoin[0]?.name ?? fallbackAcademyName
+    : academyJoin?.name ?? fallbackAcademyName;
 
-  slug = player.slug ? String(player.slug) : slug;
+  const slug = player.slug ? String(player.slug) : null;
   const academyId = player.academy_id ? String(player.academy_id) : null;
 
   let seasonName: string | null = null;
@@ -208,4 +191,70 @@ export async function fetchTutorLinkedPerformance(
     isPublicFicha,
     lastMatch,
   };
+}
+
+/** Todas las membresías ligadas (N academias). */
+export async function fetchTutorLinkedPerformances(
+  admin: SupabaseClient,
+  child: Pick<
+    TutorChild,
+    | "memberships"
+    | "linked_player_id"
+    | "linked_player_slug"
+    | "linked_academy_name"
+    | "linked_academy_id"
+    | "linked_at"
+  >,
+): Promise<TutorLinkedPerformance[]> {
+  const memberships = childMemberships(child);
+  if (memberships.length === 0) {
+    // Fallback legacy slug-only.
+    if (!child.linked_player_id && child.linked_player_slug) {
+      const { data } = await admin
+        .from("players")
+        .select("id")
+        .eq("slug", child.linked_player_slug)
+        .maybeSingle();
+      if (data?.id) {
+        const one = await fetchPerformanceForPlayer(
+          admin,
+          String(data.id),
+          child.linked_academy_name,
+        );
+        return one ? [one] : [];
+      }
+    }
+    return [];
+  }
+
+  const rows = await Promise.all(
+    memberships.map((membership) =>
+      fetchPerformanceForPlayer(admin, membership.player_id, membership.academy_name),
+    ),
+  );
+  return rows.filter((row): row is TutorLinkedPerformance => Boolean(row));
+}
+
+/**
+ * Resumen primario (primera membresía) — compat con UI existente.
+ */
+export async function fetchTutorLinkedPerformance(
+  admin: SupabaseClient,
+  child: Pick<
+    TutorChild,
+    | "memberships"
+    | "linked_player_id"
+    | "linked_player_slug"
+    | "linked_academy_name"
+    | "linked_academy_id"
+    | "linked_at"
+  >,
+): Promise<TutorLinkedPerformance | null> {
+  const all = await fetchTutorLinkedPerformances(admin, child);
+  if (all.length === 0) return null;
+  const primary = primaryMembership(child);
+  if (primary) {
+    return all.find((row) => row.playerId === primary.player_id) ?? all[0];
+  }
+  return all[0];
 }

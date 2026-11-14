@@ -52,6 +52,14 @@ interface TutorChildCard {
   linked_player_slug?: string | null;
   linked_at?: string | null;
   linked_performance?: TutorLinkedPerformance | null;
+  linked_performances?: TutorLinkedPerformance[] | null;
+  memberships?: Array<{
+    player_id: string;
+    academy_id: string;
+    academy_name: string;
+    player_slug: string;
+    linked_at: string;
+  }>;
   seasons?: TutorSeasonStat[];
   season_claims?: Record<string, TutorSeasonClaim>;
   view_stats?: {
@@ -296,7 +304,7 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
   }, [child]);
 
   useEffect(() => {
-    if (!child || child.linked_player_id) {
+    if (!child) {
       setLinkSuggestions([]);
       return;
     }
@@ -344,17 +352,25 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
     }
   }
 
-  async function unlinkPlayer() {
+  async function unlinkPlayer(playerId?: string) {
     if (!child) return;
     setLinkBusy(true);
     setError(null);
     try {
       await authed("/fut/api/tutor/links", {
         method: "POST",
-        body: JSON.stringify({ action: "unlink", child_id: child.id }),
+        body: JSON.stringify({
+          action: "unlink",
+          child_id: child.id,
+          player_id: playerId || undefined,
+        }),
       });
       await load(phone, child.id);
-      setNotice("Se quitó el vínculo con la academia.");
+      setNotice(
+        playerId
+          ? "Se quitó el vínculo con esa academia."
+          : "Se quitaron los vínculos con academias.",
+      );
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "No se pudo desligar.");
     } finally {
@@ -1067,7 +1083,7 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
             onToggleExploreOptIn={(enabled) => void toggleExploreOptIn(enabled)}
             onSignLinkedAcademyConsent={() => void signLinkedAcademyConsent()}
             onLinkPlayer={(playerId, match) => void linkPlayer(playerId, match)}
-            onUnlinkPlayer={() => void unlinkPlayer()}
+            onUnlinkPlayer={(playerId) => void unlinkPlayer(playerId)}
           />
         </div>
       ) : null}

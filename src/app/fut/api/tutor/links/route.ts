@@ -7,7 +7,11 @@ import {
   rejectLinkRequest,
   requestLinkFromTutor,
 } from "@/lib/tutor-link-requests";
-import { suggestAcademyPlayersForChild } from "@/lib/tutor-player-link";
+import {
+  suggestAcademyPlayersForChild,
+  unlinkTutorChildPlayer,
+} from "@/lib/tutor-player-link";
+import { childMemberships } from "@/lib/tutor-memberships";
 import { createSupabaseAdminClient } from "@/lib/supabase-admin";
 import { getAuthedSupabaseClient } from "@/lib/supabase-server";
 
@@ -38,6 +42,7 @@ export async function GET(request: Request) {
     return NextResponse.json({
       child: {
         id: child.id,
+        memberships: childMemberships(child),
         linked_player_id: child.linked_player_id,
         linked_academy_id: child.linked_academy_id,
         linked_academy_name: child.linked_academy_name,
@@ -76,6 +81,11 @@ export async function POST(request: Request) {
       const childId = String(body.child_id ?? "").trim();
       if (!childId) {
         return NextResponse.json({ error: "child_id es obligatorio." }, { status: 400 });
+      }
+      const playerId = String(body.player_id ?? "").trim();
+      if (playerId) {
+        const child = await unlinkTutorChildPlayer(admin, user.id, childId, playerId);
+        return NextResponse.json({ ok: true, child });
       }
       const child = await cancelActiveLinkAsTutor(admin, user.id, childId);
       return NextResponse.json({ ok: true, child });
