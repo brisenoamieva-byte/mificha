@@ -47,6 +47,13 @@ export const SPONSOR_BRANDS: Record<string, SponsorBrand> = {
     href: "https://gabi.mx",
     logoPath: "/sponsors/gabi.png",
   },
+  rustico: {
+    id: "rustico",
+    name: "Rústico El Once",
+    tagline: "Finca Campestre",
+    href: "https://rusticoelonce.com/",
+    logoPath: "/sponsors/rustico-el-once.png",
+  },
 };
 
 export interface SponsorSlotDefinition {
@@ -67,19 +74,19 @@ export const SPONSOR_SLOTS: Record<SponsorPlacement, SponsorSlotDefinition> = {
     placement: "home_strip",
     eyebrow: "Patrocinadores",
     availableLabel: "Tu marca en la home de MiFicha",
-    brandIds: ["gabi", "gph", "ctm", "cracks"],
+    brandIds: ["gabi", "gph", "ctm", "cracks", "rustico"],
   },
   tutor_card: {
     placement: "tutor_card",
     eyebrow: "Patrocinado",
     availableLabel: "Espacio para marca aliada en el hub de tutores",
-    brandIds: ["gabi", "gph"],
+    brandIds: ["gabi", "gph", "rustico"],
   },
   footer_rail: {
     placement: "footer_rail",
     eyebrow: "Aliados",
     availableLabel: "Suma tu marca",
-    brandIds: ["gabi", "gph", "ctm", "cracks"],
+    brandIds: ["gabi", "gph", "ctm", "cracks", "rustico"],
   },
 };
 
