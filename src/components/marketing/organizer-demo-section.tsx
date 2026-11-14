@@ -6,7 +6,7 @@ export function OrganizerDemoSection() {
   const { demoMatch } = ORGANIZER_ONE_PAGER;
 
   return (
-    <section className="border-b border-mf-border bg-mf-canvas">
+    <section id="como-funciona" className="scroll-mt-24 border-b border-mf-border bg-mf-canvas">
       <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:py-16">
         <div className="max-w-2xl">
           <p className="mf-marketing-eyebrow">Cómo funciona</p>
@@ -49,13 +49,10 @@ export function OrganizerDemoSection() {
                 </li>
               ))}
             </ol>
-            <div className="flex flex-wrap gap-3">
+            <div>
               <Link href={ORGANIZER_ONE_PAGER.demoExploreHref} className="mf-btn-primary">
                 Ver red en Explorar
                 <ArrowRight className="h-4 w-4" />
-              </Link>
-              <Link href={ORGANIZER_ONE_PAGER.demoRegisterHref} className="mf-btn-accent">
-                Registrar mi torneo
               </Link>
             </div>
           </div>

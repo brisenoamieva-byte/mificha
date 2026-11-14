@@ -2,8 +2,6 @@ import Link from "next/link";
 import { ArrowRight, CalendarDays, ClipboardCheck, Link2 } from "lucide-react";
 import { BrandWordmark } from "@/components/ui/brand-wordmark";
 
-const CONTACT_EMAIL = "hola@mificha.mx";
-
 const BENEFITS = [
   {
     icon: CalendarDays,
@@ -23,10 +21,6 @@ const BENEFITS = [
 ] as const;
 
 export function HomeOrganizersInvite() {
-  const mailto = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
-    "Registrar torneo · MiFicha",
-  )}`;
-
   return (
     <section
       id="organizadores"
@@ -42,7 +36,7 @@ export function HomeOrganizersInvite() {
           </h2>
           <p className="mt-3 text-sm leading-7 text-white/80 sm:text-base">
             Conecta calendario y datos oficiales con academias, fichas y tutores.
-            Tú mantienes el control del marcador y el acta; MiFicha hace el resto.
+            Registro gratis por WhatsApp o correo.
           </p>
         </div>
 
@@ -60,20 +54,14 @@ export function HomeOrganizersInvite() {
           ))}
         </ul>
 
-        <div className="mt-8 flex flex-wrap gap-3">
+        <div className="mt-8">
           <Link
-            href="/fut/organizadores"
+            href="/fut/organizadores#registro"
             className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-mf-brand transition hover:bg-white/90"
           >
-            Registrar torneo
+            Ver registro gratis
             <ArrowRight className="h-4 w-4" />
           </Link>
-          <a
-            href={mailto}
-            className="inline-flex items-center justify-center gap-2 rounded-full border border-white/30 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10"
-          >
-            Escribir a MiFicha
-          </a>
         </div>
       </div>
     </section>

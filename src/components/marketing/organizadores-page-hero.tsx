@@ -3,11 +3,7 @@ import { ArrowRight } from "lucide-react";
 import { WithBrandName } from "@/components/ui/brand-wordmark";
 import { CURRENT_SEASON_LABEL } from "@/lib/marketing-season";
 
-interface OrganizadoresPageHeroProps {
-  mailtoHref: string;
-}
-
-export function OrganizadoresPageHero({ mailtoHref }: OrganizadoresPageHeroProps) {
+export function OrganizadoresPageHero() {
   return (
     <section className="relative overflow-hidden border-b border-mf-border bg-mf-surface">
       <div
@@ -21,22 +17,22 @@ export function OrganizadoresPageHero({ mailtoHref }: OrganizadoresPageHeroProps
             Organizadores · {CURRENT_SEASON_LABEL}
           </p>
           <h1 className="mt-4 text-[2rem] font-semibold leading-[1.08] tracking-[-0.035em] text-mf-text sm:text-[2.5rem]">
-            Registra tu torneo y conecta calendario y datos
+            Registra tu torneo gratis
           </h1>
           <p className="mt-5 text-base leading-8 text-mf-text-secondary sm:text-[1.0625rem]">
             <WithBrandName>
-              Tú publicas calendario y acta. MiFicha actualiza la ficha de cada jugador
-              y avisa al tutor. El registro de tu torneo es gratis.
+              Tú publicas calendario y acta. MiFicha sincroniza stats con cada plantel y
+              avisa al tutor. Sin costo de plataforma.
             </WithBrandName>
           </p>
 
           <div className="mt-8 flex flex-wrap gap-3">
-            <a href={mailtoHref} className="mf-btn-primary">
-              Registrar mi torneo
+            <Link href="#registro" className="mf-btn-primary">
+              Cómo registrarme
               <ArrowRight className="h-4 w-4" />
-            </a>
-            <Link href="#precios" className="mf-btn-accent">
-              Ver precios
+            </Link>
+            <Link href="#como-funciona" className="mf-btn-accent">
+              Cómo funciona
             </Link>
           </div>
         </div>

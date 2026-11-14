@@ -10,28 +10,20 @@ import { ORGANIZER_ONE_PAGER } from "@/lib/organizer-one-pager";
 export const metadata: Metadata = {
   title: "Organizadores de torneo | MiFicha",
   description:
-    "Torneos interescolares con calendario oficial, acta verificada y fichas por jugador. MiFicha complementa tu operación en Querétaro.",
+    "Registra tu torneo gratis en MiFicha: calendario oficial, acta verificada y fichas por jugador en Querétaro.",
 };
 
-const CONTACT_EMAIL = "hola@mificha.mx";
-
 export default function OrganizadoresPage() {
-  const mailto = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
-    "Torneo interescolar · MiFicha Querétaro",
-  )}`;
-
   return (
     <div className="flex min-h-dvh flex-col bg-mf-canvas">
       <SiteHeader />
 
       <main className="flex-1">
-        <OrganizadoresPageHero mailtoHref={mailto} />
-
+        <OrganizadoresPageHero />
         <OrganizerDemoSection />
+        <OrganizerPricingSection />
 
-        <OrganizerPricingSection mailtoHref={mailto} />
-
-        <section className="border-t border-mf-border bg-mf-surface">
+        <section className="border-t border-mf-border bg-white">
           <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:py-16">
             <div className="grid gap-10 lg:grid-cols-2">
               <div>

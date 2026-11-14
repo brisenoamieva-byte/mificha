@@ -1,65 +1,38 @@
-import { ArrowRight } from "lucide-react";
 import { ORGANIZER_PRICING } from "@/lib/pricing";
-import { cn } from "@/lib/utils";
+import { OrganizerContactActions } from "@/components/marketing/organizer-contact-actions";
+import { ORGANIZER_CONTACT } from "@/lib/organizer-contact";
 
-interface OrganizerPricingSectionProps {
-  mailtoHref: string;
-}
-
-export function OrganizerPricingSection({ mailtoHref }: OrganizerPricingSectionProps) {
+/** Bloque único de registro gratis + contacto (WhatsApp / correo). */
+export function OrganizerPricingSection() {
   return (
-    <section id="precios" className="border-y border-mf-border bg-mf-surface">
+    <section id="registro" className="scroll-mt-24 border-y border-mf-border bg-mf-surface">
       <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:py-16">
         <div className="max-w-2xl">
-          <p className="mf-marketing-eyebrow">Modelo</p>
+          <p className="mf-marketing-eyebrow">Registro</p>
           <h2 className="mt-3 text-2xl font-semibold tracking-[-0.02em] text-mf-text">
             {ORGANIZER_PRICING.title}
           </h2>
           <p className="mt-3 text-sm leading-7 text-mf-text-secondary sm:text-base">
             {ORGANIZER_PRICING.subtitle}
           </p>
+          <p className="mt-4 text-3xl font-semibold tracking-tight text-mf-brand">
+            {ORGANIZER_PRICING.plans[0]?.priceLabel ?? "Gratis"}
+          </p>
+          <p className="mt-1 text-sm text-mf-text-muted">
+            {ORGANIZER_PRICING.plans[0]?.period}
+          </p>
+          <p className="mt-4 text-sm leading-7 text-mf-text-secondary">
+            {ORGANIZER_PRICING.plans[0]?.description}
+          </p>
+          <p className="mt-3 text-xs text-mf-text-muted">{ORGANIZER_PRICING.footnote}</p>
         </div>
 
-        <div
-          className={cn(
-            "mt-8 grid gap-4",
-            ORGANIZER_PRICING.plans.length > 1 ? "lg:grid-cols-3" : "max-w-md",
-          )}
-        >
-          {ORGANIZER_PRICING.plans.map((plan) => (
-            <article
-              key={plan.id}
-              className={cn(
-                "relative flex flex-col rounded-xl border p-5 sm:p-6",
-                plan.highlight
-                  ? "border-mf-brand bg-mf-brand-soft/40"
-                  : "border-mf-border bg-white",
-              )}
-            >
-              {plan.badge ? (
-                <span className="mb-3 inline-flex w-fit rounded-full bg-mf-brand px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">
-                  {plan.badge}
-                </span>
-              ) : null}
-              <p className="text-sm font-semibold text-mf-text">{plan.label}</p>
-              <p className="mt-2 text-3xl font-semibold tracking-tight text-mf-brand">
-                {plan.priceLabel}
-              </p>
-              <p className="mt-1 text-xs font-medium text-mf-text-muted">{plan.period}</p>
-              <p className="mt-4 flex-1 text-sm leading-7 text-mf-text-secondary">
-                {plan.description}
-              </p>
-            </article>
-          ))}
-        </div>
-
-        <p className="mt-4 text-xs text-mf-text-muted">{ORGANIZER_PRICING.footnote}</p>
-
-        <div className="mt-8">
-          <a href={mailtoHref} className="mf-btn-primary">
-            Registrar mi torneo
-            <ArrowRight className="h-4 w-4" />
-          </a>
+        <div className="mt-8 max-w-xl rounded-xl border border-mf-border bg-white p-5 sm:p-6">
+          <p className="text-sm font-semibold text-mf-text">Escríbenos para activar tu torneo</p>
+          <p className="mt-1 text-sm leading-6 text-mf-text-secondary">
+            WhatsApp al {ORGANIZER_CONTACT.phoneDisplay} o correo a {ORGANIZER_CONTACT.email}.
+          </p>
+          <OrganizerContactActions className="mt-4" variant="band" />
         </div>
       </div>
     </section>

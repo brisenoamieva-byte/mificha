@@ -30,7 +30,6 @@ export const ORGANIZER_ONE_PAGER = {
     "El padre recibe link automático a la ficha.",
   ],
   demoExploreHref: "/fut/explorar",
-  demoRegisterHref: "/fut/organizadores#precios",
   academyKitTitle: "Guión para academias",
   academyKitDescription: "Copia y pega en WhatsApp cuando abras inscripciones.",
   askTitle: "Qué necesitamos de ti",
@@ -49,6 +48,7 @@ export const ORGANIZER_ONE_PAGER = {
   contact: {
     name: "Ricardo Briseño",
     email: "hola@mificha.mx",
+    phoneDisplay: "442 155 6155",
     web: "mificha.mx/fut/organizadores",
   },
 } as const;
@@ -80,7 +80,7 @@ export function buildOrganizerOnePagerPlainText(options?: {
     ...(season ? [`Temporada ${season}.`, ""] : []),
     "¿20 min esta semana para ver cómo cargaríamos tu jornada?",
     "",
-    "Ricardo · mificha.mx · hola@mificha.mx",
+    "Ricardo · WhatsApp 442 155 6155 · hola@mificha.mx · mificha.mx",
   ].join("\n");
 }
 

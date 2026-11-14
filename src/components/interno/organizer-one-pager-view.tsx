@@ -159,8 +159,9 @@ export function OrganizerOnePagerView() {
         <footer className="mt-10 border-t border-slate-200 pt-6 text-sm text-slate-600">
           <p className="font-semibold text-slate-900">{ORGANIZER_ONE_PAGER.cta}</p>
           <p className="mt-2">
-            {ORGANIZER_ONE_PAGER.contact.name} · {ORGANIZER_ONE_PAGER.contact.email} ·{" "}
-            {ORGANIZER_ONE_PAGER.contact.web}
+            {ORGANIZER_ONE_PAGER.contact.name} · WhatsApp{" "}
+            {ORGANIZER_ONE_PAGER.contact.phoneDisplay} ·{" "}
+            {ORGANIZER_ONE_PAGER.contact.email} · {ORGANIZER_ONE_PAGER.contact.web}
           </p>
         </footer>
       </article>
