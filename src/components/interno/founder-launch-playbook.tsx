@@ -10,6 +10,7 @@ import {
   MessageCircle,
   Sparkles,
 } from "lucide-react";
+import { LaunchCloseChecklist } from "@/components/interno/launch-close-checklist";
 import { PlatformOpsStatus } from "@/components/interno/platform-ops-status";
 import {
   buildFounderOutreachMessage,
@@ -84,6 +85,7 @@ export function FounderLaunchPlaybook() {
       </header>
 
       <main className="mx-auto max-w-3xl space-y-6 px-6 py-8 sm:px-10">
+        <LaunchCloseChecklist />
         <PlatformOpsStatus />
 
         <section className="rounded-2xl border border-sky-400/25 bg-sky-500/[0.08] p-5">
