@@ -172,6 +172,9 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
   const [linkBusy, setLinkBusy] = useState(false);
   const [onboardNotice, setOnboardNotice] = useState<string | null>(null);
   const [showPasswordPanel, setShowPasswordPanel] = useState(false);
+  const [showDeleteAccountPanel, setShowDeleteAccountPanel] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
+  const [deleteAccountBusy, setDeleteAccountBusy] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [newPasswordConfirm, setNewPasswordConfirm] = useState("");
   const [passwordBusy, setPasswordBusy] = useState(false);
@@ -719,6 +722,27 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
     window.setTimeout(() => setCopied(false), 2000);
   }
 
+  async function onDeleteAccount(event: React.FormEvent) {
+    event.preventDefault();
+    setError(null);
+    setNotice(null);
+    setDeleteAccountBusy(true);
+    try {
+      await authed("/fut/api/tutor/account", {
+        method: "POST",
+        body: JSON.stringify({
+          action: "delete",
+          confirm: deleteConfirmText.trim(),
+        }),
+      });
+      await supabase.auth.signOut();
+      window.location.assign("/fut/entrar");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "No se pudo eliminar la cuenta.");
+      setDeleteAccountBusy(false);
+    }
+  }
+
   if (loading) {
     return <p className="text-sm text-mf-text-muted">Cargando…</p>;
   }
@@ -752,6 +776,7 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
             className="text-sm font-semibold text-mf-text-muted hover:text-mf-text"
             onClick={() => {
               setShowPasswordPanel((open) => !open);
+              setShowDeleteAccountPanel(false);
               setError(null);
             }}
           >
@@ -764,6 +789,7 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
               void supabase.auth.signOut().then(() => {
                 setSessionEmail(null);
                 setShowPasswordPanel(false);
+                setShowDeleteAccountPanel(false);
                 setNewPassword("");
                 setNewPasswordConfirm("");
               })
@@ -826,6 +852,68 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
           </div>
         </form>
       ) : null}
+
+      {showDeleteAccountPanel ? (
+        <form
+          onSubmit={(event) => void onDeleteAccount(event)}
+          className="mx-auto max-w-md space-y-3 rounded-xl border border-mf-danger/30 bg-white p-4 sm:p-5"
+        >
+          <p className="text-sm font-semibold text-mf-gph-ink">Eliminar mi cuenta</p>
+          <p className="text-sm leading-6 text-mf-text-secondary">
+            Se borran todas tus fichas (fotos, videos, torneos y links públicos) y el acceso
+            con este correo. No se puede deshacer. El plantel de una academia no se toca.
+          </p>
+          <label className="block text-sm font-medium text-mf-text">
+            Escribe ELIMINAR para confirmar
+            <input
+              required
+              value={deleteConfirmText}
+              onChange={(event) => setDeleteConfirmText(event.target.value)}
+              className={inputClass}
+              autoComplete="off"
+              spellCheck={false}
+              placeholder="ELIMINAR"
+            />
+          </label>
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="submit"
+              disabled={
+                deleteAccountBusy ||
+                deleteConfirmText.trim().toUpperCase() !== "ELIMINAR"
+              }
+              className="rounded-lg bg-mf-danger px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+            >
+              {deleteAccountBusy ? "Eliminando…" : "Eliminar cuenta"}
+            </button>
+            <button
+              type="button"
+              className="rounded-lg px-3 py-2 text-sm font-semibold text-mf-text-muted hover:text-mf-text"
+              onClick={() => {
+                setShowDeleteAccountPanel(false);
+                setDeleteConfirmText("");
+              }}
+            >
+              Cancelar
+            </button>
+          </div>
+        </form>
+      ) : (
+        <p className="text-right">
+          <button
+            type="button"
+            className="text-xs font-medium text-mf-text-muted hover:text-mf-danger"
+            onClick={() => {
+              setShowDeleteAccountPanel(true);
+              setShowPasswordPanel(false);
+              setError(null);
+              setNotice(null);
+            }}
+          >
+            Eliminar mi cuenta
+          </button>
+        </p>
+      )}
 
       {error ? (
         <p className="rounded-lg bg-mf-danger-soft px-4 py-3 text-sm text-mf-danger">{error}</p>

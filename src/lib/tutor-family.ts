@@ -839,6 +839,80 @@ export async function deleteTutorChild(
   return { ok: true as const, id: childId, player_name: removed.player_name };
 }
 
+/**
+ * Borra todas las fichas persona de un usuario (sin tocar Auth ni academia).
+ * Devuelve cuántas fichas se eliminaron.
+ */
+export async function deleteAllTutorChildrenForUser(
+  admin: SupabaseClient,
+  userId: string,
+) {
+  const { roster } = await loadRoster(admin);
+  const mine = roster.filter((child) => child.guardian_user_id === userId);
+  for (const child of mine) {
+    await deleteTutorChild(admin, userId, child.id);
+  }
+  return { ok: true as const, deleted: mine.length };
+}
+
+/**
+ * ¿La cuenta también opera academia / staff? Si sí, no se puede borrar Auth desde tutor.
+ */
+export async function personaAccountHasAcademyOrStaff(
+  admin: SupabaseClient,
+  userId: string,
+) {
+  const { data: profile } = await admin
+    .from("profiles")
+    .select("role")
+    .eq("id", userId)
+    .maybeSingle();
+  const role = (profile as { role?: string } | null)?.role ?? null;
+  if (role === "admin" || role === "scout") return true;
+
+  const { data: owned } = await admin
+    .from("academies")
+    .select("id")
+    .eq("owner_id", userId)
+    .limit(1)
+    .maybeSingle();
+  if (owned) return true;
+
+  const { data: membership } = await admin
+    .from("academy_members")
+    .select("academy_id")
+    .eq("user_id", userId)
+    .limit(1)
+    .maybeSingle();
+  return Boolean(membership);
+}
+
+/**
+ * Elimina cuenta persona: fichas + Auth.
+ * Bloquea si también opera academia/staff (no toca plantel).
+ */
+export async function deletePersonaAccount(
+  admin: SupabaseClient,
+  userId: string,
+) {
+  if (await personaAccountHasAcademyOrStaff(admin, userId)) {
+    throw new Error(
+      "Esta cuenta también opera academia o staff. No se puede borrar aquí: escribe a hola@mificha.mx o cierra primero el panel academia.",
+    );
+  }
+
+  const fichas = await deleteAllTutorChildrenForUser(admin, userId);
+
+  await admin.from("profiles").delete().eq("id", userId);
+
+  const { error } = await admin.auth.admin.deleteUser(userId);
+  if (error) {
+    throw new Error(error.message || "No se pudo borrar la cuenta de acceso.");
+  }
+
+  return { ok: true as const, deleted_fichas: fichas.deleted };
+}
+
 function compareTutorMaterials(a: TutorMaterial, b: TutorMaterial) {
   const aCover = a.kind === "photo" && Boolean(a.is_cover);
   const bCover = b.kind === "photo" && Boolean(b.is_cover);
