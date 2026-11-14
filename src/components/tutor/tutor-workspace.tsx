@@ -635,6 +635,39 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
     }
   }
 
+  async function deleteChild() {
+    if (!child) return;
+    const ok = window.confirm(
+      `¿Eliminar la ficha de ${child.player_name}? Se borran fotos, videos, torneos y el link público. No se puede deshacer.`,
+    );
+    if (!ok) return;
+    setBusy(true);
+    setError(null);
+    setNotice(null);
+    try {
+      await authed("/fut/api/tutor/children", {
+        method: "POST",
+        body: JSON.stringify({
+          action: "delete",
+          child_id: child.id,
+        }),
+      });
+      const rows = await load(phone);
+      setSelectedId(rows[0]?.id ?? null);
+      setForm(emptyForm);
+      setOnboardNotice(rows.length === 0 ? copy.onboardEmpty : null);
+      setNotice(
+        rows.length === 0
+          ? "Ficha eliminada. Puedes crear otra cuando quieras."
+          : `Se eliminó la ficha de ${child.player_name}.`,
+      );
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "No se pudo eliminar el jugador.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function deleteSeason(seasonId: string) {
     if (!child) return;
     const ok = window.confirm("¿Eliminar este torneo de la ficha?");
@@ -854,6 +887,18 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
               {copy.addAnother}
             </button>
           </div>
+          {child ? (
+            <p className="pt-1">
+              <button
+                type="button"
+                disabled={busy}
+                onClick={() => void deleteChild()}
+                className="text-xs font-semibold text-mf-text-muted hover:text-mf-danger disabled:opacity-60"
+              >
+                Eliminar ficha de {child.player_name}
+              </button>
+            </p>
+          ) : null}
         </div>
       ) : (
         <p className="rounded-lg border border-dashed border-mf-border bg-white px-4 py-3 text-sm text-mf-text-secondary">

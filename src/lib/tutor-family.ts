@@ -6,6 +6,7 @@ import {
   ensureTutorPublicCodes,
   mintPublicCode,
   normalizePublicCode,
+  releaseTutorPublicCode,
 } from "@/lib/public-player-code";
 
 const OPS_BUCKET = "mificha-ops";
@@ -791,6 +792,51 @@ export async function updateTutorChild(
   };
   await writeJson(admin, ROSTER, roster);
   return roster[index];
+}
+
+/** Borra la ficha del tutor: roster, materiales, torneos y libera MF- propio. */
+export async function deleteTutorChild(
+  admin: SupabaseClient,
+  userId: string,
+  childId: string,
+) {
+  const loaded = await loadRoster(admin);
+  const roster = loaded.roster;
+  const index = roster.findIndex(
+    (child) => child.id === childId && child.guardian_user_id === userId,
+  );
+  if (index < 0) throw new Error("No encontramos a ese jugador.");
+
+  const [removed] = roster.splice(index, 1);
+  await writeJson(admin, ROSTER, roster);
+
+  const materials = await readJson<TutorMaterial>(admin, MATERIALS);
+  const keepMaterials: TutorMaterial[] = [];
+  const storagePaths: string[] = [];
+  for (const row of materials) {
+    if (row.child_id === childId && row.guardian_user_id === userId) {
+      if (row.storage_path) storagePaths.push(row.storage_path);
+      continue;
+    }
+    keepMaterials.push(row);
+  }
+  if (keepMaterials.length !== materials.length) {
+    await writeJson(admin, MATERIALS, keepMaterials);
+  }
+  if (storagePaths.length > 0) {
+    await admin.storage.from(OPS_BUCKET).remove(storagePaths);
+  }
+
+  const seasons = await readJson<TutorSeasonStat>(admin, SEASONS);
+  const keepSeasons = seasons.filter(
+    (row) => !(row.child_id === childId && row.guardian_user_id === userId),
+  );
+  if (keepSeasons.length !== seasons.length) {
+    await writeJson(admin, SEASONS, keepSeasons);
+  }
+
+  await releaseTutorPublicCode(admin, childId, removed.public_code);
+  return { ok: true as const, id: childId, player_name: removed.player_name };
 }
 
 function compareTutorMaterials(a: TutorMaterial, b: TutorMaterial) {

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { fireAndForgetOpsNotify } from "@/lib/email/ops-notify";
 import {
   createTutorChild,
+  deleteTutorChild,
   grantTutorLinkedAcademyConsent,
   listGuardianChildren,
   normalizeGuardianKind,
@@ -116,6 +117,11 @@ export async function POST(request: Request) {
         consentAck: body.consent_ack === true,
       });
       return NextResponse.json({ ok: true, child });
+    }
+
+    if (childId && body.action === "delete") {
+      const result = await deleteTutorChild(admin, user.id, childId);
+      return NextResponse.json(result);
     }
 
     const input = parseInput(body);

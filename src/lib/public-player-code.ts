@@ -436,6 +436,21 @@ export async function ensureTutorPublicCodes(
   return result;
 }
 
+/** Libera el MF- del registro solo si el dueño es esta ficha tutor. */
+export async function releaseTutorPublicCode(
+  admin: SupabaseClient,
+  childId: string,
+  publicCode: string | null | undefined,
+) {
+  const code = normalizePublicCode(publicCode);
+  if (!code || !childId) return;
+  const registry = await readPublicCodeRegistry(admin);
+  const owner = registry[code];
+  if (!owner || owner.kind !== "tutor" || owner.id !== childId) return;
+  delete registry[code];
+  await writePublicCodeRegistry(admin, registry);
+}
+
 /** Unifica el mismo código entre ficha tutor y jugador de academia. */
 export async function bindPlayerPublicCode(
   admin: SupabaseClient,
