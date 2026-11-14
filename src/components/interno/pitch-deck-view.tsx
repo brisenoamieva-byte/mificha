@@ -12,6 +12,12 @@ import {
   X,
 } from "lucide-react";
 import { PITCH_SLIDES, type PitchSlide } from "@/lib/pitch-deck-content";
+
+type PitchDeckViewProps = {
+  slides?: PitchSlide[];
+  backHref?: string;
+  backLabel?: string;
+};
 import {
   MARKETING_MEDIA,
   marketingPhotoStyle,
@@ -302,11 +308,15 @@ function PitchSlideFrame({
   );
 }
 
-export function PitchDeckView() {
+export function PitchDeckView({
+  slides = PITCH_SLIDES,
+  backHref = "/fut/dashboard",
+  backLabel = "Dashboard",
+}: PitchDeckViewProps) {
   const [index, setIndex] = useState(0);
   const [presenting, setPresenting] = useState(false);
-  const slide = PITCH_SLIDES[index];
-  const total = PITCH_SLIDES.length;
+  const slide = slides[index] ?? slides[0];
+  const total = slides.length;
 
   const goNext = useCallback(() => {
     setIndex((current) => Math.min(current + 1, total - 1));
@@ -378,11 +388,11 @@ export function PitchDeckView() {
               Guión demo
             </Link>
             <Link
-              href="/fut/dashboard"
+              href={backHref}
               className="inline-flex items-center gap-2 rounded-full px-3 py-2 text-sm font-medium text-white/70 transition hover:bg-white/10 hover:text-white"
             >
               <LayoutDashboard className="h-4 w-4" />
-              <span className="hidden sm:inline">Dashboard</span>
+              <span className="hidden sm:inline">{backLabel}</span>
             </Link>
             <a
               href="https://www.mificha.mx"
@@ -421,7 +431,7 @@ export function PitchDeckView() {
             <>
               <div className="mx-auto flex max-w-6xl flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-center gap-2 overflow-x-auto pb-1">
-                  {PITCH_SLIDES.map((item, i) => (
+                  {slides.map((item, i) => (
                     <button
                       key={item.id}
                       type="button"
