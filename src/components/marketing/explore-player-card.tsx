@@ -96,7 +96,7 @@ export function ExplorePlayerCard({
             </p>
             <p className="mt-0.5 text-xs text-mf-text-secondary">
               {getPositionLabel(player.position)}
-              {isTutor && player.public_code ? (
+              {player.public_code ? (
                 <span className="font-mono text-mf-gph"> · {player.public_code}</span>
               ) : null}
             </p>

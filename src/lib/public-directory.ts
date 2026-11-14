@@ -278,14 +278,24 @@ export async function fetchPublicDirectory(): Promise<PublicDirectoryData> {
     const playerIds = consented
       .map((player) => player.id)
       .filter((id): id is string => Boolean(id));
-    const [gphScores, seasonStatsById] = await Promise.all([
+    const [{ createSupabaseAdminClient }, { ensurePlayerPublicCodes }] =
+      await Promise.all([
+        import("@/lib/supabase-admin"),
+        import("@/lib/public-player-code"),
+      ]);
+    const admin = createSupabaseAdminClient();
+    const [gphScores, seasonStatsById, publicCodes] = await Promise.all([
       fetchLatestGphScoresByPlayerId(playerIds),
       fetchActiveSeasonStatsByPlayerId(playerIds, url, key),
+      ensurePlayerPublicCodes(admin, playerIds).catch(
+        () => ({} as Record<string, string>),
+      ),
     ]);
     const players = await Promise.all(
       consented.map(async (player) => ({
         ...player,
         source: "academy" as const,
+        public_code: player.id ? publicCodes[player.id] ?? null : null,
         academies: asAcademyEmbed(player.academies),
         photo_url: await signPlayerPhotoUrl(player.photo_url),
         has_gph_evaluation: Boolean(player.id && gphScores.has(player.id)),
