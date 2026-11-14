@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Presentation, Rocket } from "lucide-react";
+import { Rocket } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
+/** Enlace interno de playbook (misma autorización que el resto de /interno). */
 export function PitchDeckNavLink({ onClose }: { onClose?: () => void }) {
   const [allowed, setAllowed] = useState(false);
 
@@ -39,16 +40,6 @@ export function PitchDeckNavLink({ onClose }: { onClose?: () => void }) {
 
   return (
     <div className="mt-2 space-y-1 border-t border-mf-border pt-3">
-      <Link
-        href="/fut/interno/pitch"
-        target="_blank"
-        rel="noopener noreferrer"
-        onClick={onClose}
-        className="mf-nav-link"
-      >
-        <Presentation className="h-[18px] w-[18px] shrink-0" />
-        Pitch deck
-      </Link>
       <Link
         href="/fut/interno/lanzamiento"
         target="_blank"

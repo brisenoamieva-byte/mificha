@@ -136,7 +136,7 @@ En la app, valida este flujo con tu academia real:
 6. Plantel → tutores → enviar link / avisos automáticos
 7. Reportes → preview (email requiere Resend con dominio verificado)
 
-Pitch deck privado: `/interno/pitch` · one-pager: `/interno/demo-one-pager` · playbook: `/interno/lanzamiento`
+Pitch organizadores: `/fut/organizadores/presentacion` · one-pager: `/interno/demo-one-pager` · playbook: `/interno/lanzamiento`
 
 ## Rutas principales
 
@@ -152,7 +152,7 @@ Pitch deck privado: `/interno/pitch` · one-pager: `/interno/demo-one-pager` · 
 | `/dashboard/partidos` | Partidos · convocados y minutos |
 | `/dashboard/rendimiento` | Rendimiento y reportes |
 | `/dashboard/configuracion` | Configuración de academia |
-| `/interno/pitch` | Pitch deck (privado) |
+| `/fut/organizadores/presentacion` | Pitch organizadores (público) |
 | `/interno/lanzamiento` | Playbook venta + demo |
 | `/j/[slug]` | Ficha pública del jugador |
 | `/a/[slug]` | Landing pública de academia |
@@ -199,7 +199,7 @@ Vercel despliega automáticamente en cada push a `master`.
 
 | Uso | Ruta |
 |-----|------|
-| Presentar | `/interno/pitch` (F) |
+| Presentar | `/fut/organizadores/presentacion` |
 | One-pager | `/interno/demo-one-pager` |
 | Guión demo | `/interno/lanzamiento` |
 | Quién hace qué | `/interno/gobernanza` |

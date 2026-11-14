@@ -11,10 +11,10 @@ import {
   Maximize2,
   X,
 } from "lucide-react";
-import { PITCH_SLIDES, type PitchSlide } from "@/lib/pitch-deck-content";
+import type { PitchSlide } from "@/lib/pitch-deck-content";
 
 type PitchDeckViewProps = {
-  slides?: PitchSlide[];
+  slides: PitchSlide[];
   backHref?: string;
   backLabel?: string;
 };
@@ -309,7 +309,7 @@ function PitchSlideFrame({
 }
 
 export function PitchDeckView({
-  slides = PITCH_SLIDES,
+  slides,
   backHref = "/fut/dashboard",
   backLabel = "Dashboard",
 }: PitchDeckViewProps) {

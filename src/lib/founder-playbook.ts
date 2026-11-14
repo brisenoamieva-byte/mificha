@@ -93,7 +93,7 @@ export const FOUNDER_CONVERSION_CRITERIA = [
 export const FOUNDER_DEMO_PRECHECK = [
   "Academia demo con temporada y 1 jornada publicada",
   "3–5 jugadores con consentimiento y contacto del tutor",
-  "Pitch ensayado (6 slides · /fut/interno/pitch · tecla F)",
+  "Pitch organizadores listo (/fut/organizadores/presentacion)",
   "One-pager listo (/fut/interno/demo-one-pager)",
   "Un ensayo completo del guión antes de la llamada",
   "Mercado Pago: checkout de diagnóstico $2,030 responde",
@@ -112,8 +112,8 @@ export const FOUNDER_LIVE_DEMO_SCRIPT: FounderDemoStep[] = [
     minute: "0–4",
     title: "Presentación",
     action:
-      "6 slides: problema → tres pasos → colegio → red completa → cierre. Termina con «¿Lo vemos en vivo?»",
-    href: "/fut/interno/pitch",
+      "Pitch de organizadores: problema → para qué sirve → cómo → cierre. Termina proponiendo ver el calendario.",
+    href: "/fut/organizadores/presentacion",
   },
   {
     minute: "4–7",

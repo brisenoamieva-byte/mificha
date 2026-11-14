@@ -30,8 +30,7 @@ const defaultOutreach = buildFounderOutreachMessage({
 });
 
 const QUICK_LINKS: Array<{ href: string; label: string; primary?: boolean }> = [
-  { href: "/fut/interno/pitch", label: "Presentación", primary: true },
-  { href: "/fut/interno/pitch-organizadores", label: "Pitch organizadores" },
+  { href: "/fut/organizadores/presentacion", label: "Pitch organizadores", primary: true },
   { href: "/fut/interno/demo-one-pager", label: "One-pager" },
   { href: "/fut/interno/organizadores", label: "Organizador" },
   { href: "/fut/interno/gph", label: "Socio GPH" },
