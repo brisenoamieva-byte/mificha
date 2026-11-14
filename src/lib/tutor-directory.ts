@@ -81,6 +81,8 @@ export async function fetchTutorDirectoryPlayers(
 
   const candidates = roster.filter((child) => {
     if (!child.explore_opt_in) return false;
+    // Si ya hay plantel ligado, Explorar muestra la ficha de academia (evita duplicado).
+    if (child.linked_player_id) return false;
     const code = normalizePublicCode(child.public_code);
     if (!code) return false;
     if (!child.player_name?.trim()) return false;

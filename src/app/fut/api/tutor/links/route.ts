@@ -1,10 +1,13 @@
 import { NextResponse } from "next/server";
 import { getTutorChild } from "@/lib/tutor-family";
 import {
-  linkTutorChildToPlayer,
-  suggestAcademyPlayersForChild,
-  unlinkTutorChild,
-} from "@/lib/tutor-player-link";
+  acceptLinkRequest,
+  cancelActiveLinkAsTutor,
+  listPendingLinkRequestsForTutor,
+  rejectLinkRequest,
+  requestLinkFromTutor,
+} from "@/lib/tutor-link-requests";
+import { suggestAcademyPlayersForChild } from "@/lib/tutor-player-link";
 import { createSupabaseAdminClient } from "@/lib/supabase-admin";
 import { getAuthedSupabaseClient } from "@/lib/supabase-server";
 
@@ -15,18 +18,23 @@ export async function GET(request: Request) {
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Inicia sesión." }, { status: 401 });
 
-  const childId = new URL(request.url).searchParams.get("child_id")?.trim();
-  if (!childId) {
-    return NextResponse.json({ error: "child_id es obligatorio." }, { status: 400 });
-  }
+  const url = new URL(request.url);
+  const childId = url.searchParams.get("child_id")?.trim();
+  const pendingOnly = url.searchParams.get("pending") === "1";
 
   try {
     const admin = createSupabaseAdminClient();
+    if (pendingOnly || !childId) {
+      const pending = await listPendingLinkRequestsForTutor(admin, user.id);
+      return NextResponse.json({ pending });
+    }
+
     const child = await getTutorChild(admin, user.id, childId);
     if (!child) {
       return NextResponse.json({ error: "Jugador no encontrado." }, { status: 404 });
     }
     const suggestions = await suggestAcademyPlayersForChild(admin, child);
+    const pending = await listPendingLinkRequestsForTutor(admin, user.id);
     return NextResponse.json({
       child: {
         id: child.id,
@@ -37,6 +45,7 @@ export async function GET(request: Request) {
         linked_at: child.linked_at,
       },
       suggestions,
+      pending: pending.filter((row) => row.child_id === childId),
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "No se pudo buscar.";
@@ -55,19 +64,47 @@ export async function POST(request: Request) {
     action?: string;
     child_id?: string;
     player_id?: string;
+    request_id?: string;
+    match?: "code" | "birth" | "contact" | "manual";
     confirm?: boolean;
   };
 
-  const childId = String(body.child_id ?? "").trim();
-  if (!childId) {
-    return NextResponse.json({ error: "child_id es obligatorio." }, { status: 400 });
-  }
-
   try {
     const admin = createSupabaseAdminClient();
+
     if (body.action === "unlink") {
-      const child = await unlinkTutorChild(admin, user.id, childId);
+      const childId = String(body.child_id ?? "").trim();
+      if (!childId) {
+        return NextResponse.json({ error: "child_id es obligatorio." }, { status: 400 });
+      }
+      const child = await cancelActiveLinkAsTutor(admin, user.id, childId);
       return NextResponse.json({ ok: true, child });
+    }
+
+    if (body.action === "accept") {
+      const requestId = String(body.request_id ?? "").trim();
+      if (!requestId) {
+        return NextResponse.json({ error: "request_id es obligatorio." }, { status: 400 });
+      }
+      const result = await acceptLinkRequest(admin, {
+        requestId,
+        actor: "tutor",
+        guardianUserId: user.id,
+      });
+      return NextResponse.json({ ok: true, ...result });
+    }
+
+    if (body.action === "reject") {
+      const requestId = String(body.request_id ?? "").trim();
+      if (!requestId) {
+        return NextResponse.json({ error: "request_id es obligatorio." }, { status: 400 });
+      }
+      const requestRow = await rejectLinkRequest(admin, {
+        requestId,
+        actor: "tutor",
+        guardianUserId: user.id,
+      });
+      return NextResponse.json({ ok: true, request: requestRow });
     }
 
     if (body.confirm !== true) {
@@ -77,12 +114,29 @@ export async function POST(request: Request) {
       );
     }
 
+    const childId = String(body.child_id ?? "").trim();
     const playerId = String(body.player_id ?? "").trim();
-    if (!playerId) {
-      return NextResponse.json({ error: "player_id es obligatorio." }, { status: 400 });
+    if (!childId || !playerId) {
+      return NextResponse.json(
+        { error: "child_id y player_id son obligatorios." },
+        { status: 400 },
+      );
     }
-    const child = await linkTutorChildToPlayer(admin, user.id, childId, playerId);
-    return NextResponse.json({ ok: true, child });
+
+    const result = await requestLinkFromTutor(
+      admin,
+      user.id,
+      childId,
+      playerId,
+      body.match ?? "manual",
+    );
+
+    return NextResponse.json({
+      ok: true,
+      mode: result.mode,
+      child: result.child,
+      request: result.request,
+    });
   } catch (error) {
     const message = error instanceof Error ? error.message : "No se pudo vincular.";
     return NextResponse.json({ error: message }, { status: 400 });

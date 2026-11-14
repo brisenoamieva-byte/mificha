@@ -66,6 +66,7 @@ async function authedFetch(path: string, init?: RequestInit) {
   const payload = (await response.json().catch(() => ({}))) as {
     error?: string;
     matches?: TutorMatchRow[];
+    mode?: "active" | "pending";
   };
   if (!response.ok) throw new Error(payload.error || "No se pudo completar.");
   return payload;
@@ -297,7 +298,7 @@ export function PlayerModal({
       }
 
       if (selectedChildId) {
-        await authedFetch("/fut/api/players/link-tutor", {
+        const linkResult = (await authedFetch("/fut/api/players/link-tutor", {
           method: "POST",
           body: JSON.stringify({
             academy_id: academyId,
@@ -306,11 +307,16 @@ export function PlayerModal({
             public_code: publicCode.trim() || undefined,
             confirm: true,
           }),
-        });
+        })) as { mode?: "active" | "pending" };
+        const pending = linkResult.mode === "pending";
         onSaved(
           isEditing
-            ? "Jugador actualizado y vinculado a la ficha tutor."
-            : "Ficha creada y vinculada a la ficha tutor (mismo código MF).",
+            ? pending
+              ? "Jugador actualizado. El tutor debe aceptar el vínculo."
+              : "Jugador actualizado y vinculado a la ficha tutor."
+            : pending
+              ? "Ficha creada. El tutor debe aceptar el vínculo."
+              : "Ficha creada y vinculada a la ficha tutor (mismo código MF).",
         );
       } else {
         onSaved(

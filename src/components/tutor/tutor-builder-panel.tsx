@@ -142,7 +142,7 @@ interface TutorBuilderPanelProps {
   onDeleteSeason: (seasonId: string) => void;
   onCopyShare: () => void;
   onCopyPublicCode: () => void;
-  onLinkPlayer: (playerId: string) => void;
+  onLinkPlayer: (playerId: string, match?: TutorLinkSuggestion["match"]) => void;
   onUnlinkPlayer: () => void;
   onToggleExploreOptIn: (enabled: boolean) => void;
   onSignLinkedAcademyConsent?: () => void;
@@ -1514,16 +1514,16 @@ export function TutorBuilderPanel({
                     <button
                       type="button"
                       disabled={linkBusy}
-                      onClick={() => onLinkPlayer(item.player_id)}
+                      onClick={() => onLinkPlayer(item.player_id, item.match)}
                       className="mf-btn-gph"
                     >
                       {linkBusy
-                        ? "Ligando…"
+                        ? "Enviando…"
                         : item.match === "code"
                           ? "Usar mismo código"
                           : item.match === "birth"
-                            ? "Confirmar (mismo nombre y nacimiento)"
-                            : "Es el mismo"}
+                            ? "Solicitar vínculo (nombre y nacimiento)"
+                            : "Solicitar vínculo"}
                     </button>
                   </li>
                 ))}

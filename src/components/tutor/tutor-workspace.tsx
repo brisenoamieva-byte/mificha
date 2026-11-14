@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { TutorActivityInbox } from "@/components/tutor/tutor-activity-inbox";
 import { TutorBuilderPanel } from "@/components/tutor/tutor-builder-panel";
+import { TutorLinkRequestsInbox } from "@/components/tutor/tutor-link-requests-inbox";
 import { updatePassword } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { guardianWorkspaceCopy } from "@/lib/guardian-workspace-copy";
@@ -149,6 +150,7 @@ async function authed(path: string, init?: RequestInit) {
     path?: string;
     child?: TutorChildCard;
     suggestions?: LinkSuggestion[];
+    mode?: "active" | "pending";
   };
   if (!response.ok) throw new Error(payload.error || "No se pudo completar.");
   return payload;
@@ -309,22 +311,29 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
     };
   }, [child]);
 
-  async function linkPlayer(playerId: string) {
+  async function linkPlayer(playerId: string, match?: LinkSuggestion["match"]) {
     if (!child) return;
     setLinkBusy(true);
     setError(null);
     try {
-      await authed("/fut/api/tutor/links", {
+      const payload = await authed("/fut/api/tutor/links", {
         method: "POST",
         body: JSON.stringify({
           child_id: child.id,
           player_id: playerId,
+          match: match ?? "manual",
           confirm: true,
         }),
       });
       await load(phone, child.id);
-      setNotice("Jugador ligado con su academia. Es la misma persona en ambos lados.");
-      setLinkSuggestions([]);
+      if (payload.mode === "pending") {
+        setNotice(
+          "Solicitud enviada a la academia. Cuando la confirmen, verás stats oficiales aquí.",
+        );
+      } else {
+        setNotice("Jugador ligado con su academia. Es la misma persona en ambos lados.");
+        setLinkSuggestions([]);
+      }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "No se pudo ligar.");
     } finally {
@@ -874,6 +883,7 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
         </p>
       ) : null}
 
+      <TutorLinkRequestsInbox onChanged={() => void load(phone, selectedId)} />
       <TutorActivityInbox />
 
       {children.length > 0 ? (
@@ -1047,7 +1057,7 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
             onCopyPublicCode={() => void copyPublicCode()}
             onToggleExploreOptIn={(enabled) => void toggleExploreOptIn(enabled)}
             onSignLinkedAcademyConsent={() => void signLinkedAcademyConsent()}
-            onLinkPlayer={(playerId) => void linkPlayer(playerId)}
+            onLinkPlayer={(playerId, match) => void linkPlayer(playerId, match)}
             onUnlinkPlayer={() => void unlinkPlayer()}
           />
         </div>
