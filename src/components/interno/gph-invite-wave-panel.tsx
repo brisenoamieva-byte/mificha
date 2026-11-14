@@ -13,7 +13,7 @@ import {
   gphInviteWhatsAppText,
 } from "@/lib/gph-invite-wave";
 
-export function GphInviteWavePanel() {
+export function GphInviteWavePanel({ embedded = false }: { embedded?: boolean }) {
   const [tutorName, setTutorName] = useState("María");
   const [playerName, setPlayerName] = useState("Diego");
   const [phone, setPhone] = useState("524426121214");
@@ -44,24 +44,20 @@ export function GphInviteWavePanel() {
   }
 
   return (
-    <div className="mx-auto max-w-4xl space-y-8 px-4 py-10 sm:px-6">
+    <div className={embedded ? "space-y-8" : "mx-auto max-w-4xl space-y-8 px-4 py-10 sm:px-6"}>
       <div>
         <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
-          Interno · GPH
+          Interno · plantillas
         </p>
         <h1 className="mt-2 text-2xl font-semibold text-mf-gph-ink">
-          {GPH_INVITE_PLAYBOOK.title}
+          {embedded ? "Plantillas WhatsApp / email" : GPH_INVITE_PLAYBOOK.title}
         </h1>
         <p className="mt-2 text-sm leading-7 text-mf-text-secondary">
-          Landing público:{" "}
+          Landing:{" "}
           <a href={GPH_INVITE_LANDING_PATH} className="font-semibold text-mf-gph hover:underline">
             {GPH_INVITE_LANDING_PATH}
           </a>
-          . No subas 3000 cuentas: invita por oleadas.
-        </p>
-        <p className="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-950">
-          <strong>Pausada.</strong> No operar la ola hasta que la plataforma esté al 100%.
-          Esta pantalla es solo preparación interna.
+          . El seguimiento de contactos está arriba en la lista de la ola (no uses Sheet).
         </p>
       </div>
 

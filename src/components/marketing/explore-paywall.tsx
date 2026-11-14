@@ -5,6 +5,7 @@ import {
   PERSONA_MEMBERSHIP_FREE_PROMO,
   personaMembershipPublicCopy,
 } from "@/lib/persona-membership";
+import { formatPublicLockedName } from "@/lib/privacy";
 import {
   SCOUT_PRODUCT,
   type ExploreAccess,
@@ -129,6 +130,7 @@ export function FichaLockedTeaser({
   const afterActivate = returnPath || "/fut/tutor";
   const enterHref =
     loginHref || `/fut/login?next=${encodeURIComponent(afterActivate)}`;
+  const publicName = formatPublicLockedName(name);
 
   return (
     <div className="overflow-hidden rounded-2xl border border-mf-border bg-white">
@@ -137,7 +139,9 @@ export function FichaLockedTeaser({
           <Lock className="h-3.5 w-3.5" aria-hidden />
           Vista básica
         </p>
-        <h1 className="mt-3 text-2xl font-semibold tracking-tight sm:text-3xl">{name}</h1>
+        <h1 className="mt-3 text-2xl font-semibold tracking-tight sm:text-3xl">
+          {publicName}
+        </h1>
         <p className="mt-2 text-sm text-white/75">
           {[position, category, place].filter(Boolean).join(" · ") || "Jugador en MiFicha"}
         </p>

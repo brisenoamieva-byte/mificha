@@ -114,18 +114,18 @@ export function gphInviteEmailMailto(opts?: {
 export const GPH_INVITE_PLAYBOOK = {
   title: "Ola de invitación GPH → MiFicha",
   steps: [
-    "Limpiar CSV con las columnas canónicas (tutor, teléfono, email, jugador, segmento).",
-    "Ola 1 = solo calientes (evaluados / clientes recientes), 200–400 por día.",
-    "Canal prioritario: WhatsApp desde el número GPH con la plantilla.",
-    "Refuerzo a 5–7 días: 1 email corto a quien no abrió o no creó cuenta.",
-    "Medir: clicks al landing, cuentas tutor, fichas con foto.",
-    "Ajustar copy y seguir con tibios; fríos solo por email.",
+    "Cargar contactos en /fut/interno/gph-ola (ola piloto en plataforma).",
+    "Ola 1 pequeña: ~20 calientes (evaluados / clientes recientes).",
+    "Canal prioritario: WhatsApp 1:1 con la plantilla; marcar invitado en la lista.",
+    "Día 3–5: recordatorio a quien no entró; actualizar estado (entró / ficha / feedback).",
+    "Medir en la misma pantalla: invitados, entraron, fichas listas.",
+    "Con feedback de 5+, ajustar copy y abrir otra oleada.",
   ],
   metrics: [
-    "Click en link / enviados",
-    "Signup tutor / clicks",
-    "Ficha creada con foto / signups",
+    "Invitados / total en lista",
+    "Entraron / invitados",
+    "Ficha lista / entraron",
   ],
   targetsWave1:
-    "De ~300 calientes: ≥15–25% click, ≥8–12% cuenta, ≥5% ficha con foto.",
+    "De ~20 calientes: ≥12 invitados con respuesta, ≥8 cuentas, ≥5 fichas con foto.",
 } as const;

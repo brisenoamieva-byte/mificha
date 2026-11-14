@@ -43,14 +43,14 @@ export const MARKETING_NAV: NavSection[] = [
     icon: Package,
     links: [
       {
-        href: "/fut/planes",
+        href: "/fut/tutor",
         label: "Tutor o representante",
-        description: `Fichas + Explorar Pro · ${personaCopy.short}`,
+        description: `Mis fichas · Explorar Pro · ${personaCopy.short}`,
       },
       {
-        href: "/fut/planes",
+        href: "/fut/dashboard",
         label: "Academia",
-        description: `Canal academia · plantel, partidos y MF · ${academyCopy.short}`,
+        description: `Panel academia · plantel, partidos y MF · ${academyCopy.short}`,
       },
     ],
   },

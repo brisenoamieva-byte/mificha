@@ -10,6 +10,7 @@ import {
 } from "@/lib/explore-demo-data";
 import type { DirectoryPlayer } from "@/lib/public-directory";
 import { CURRENT_SEASON_LABEL } from "@/lib/marketing-season";
+import { formatPublicLockedNameParts } from "@/lib/privacy";
 import { cn } from "@/lib/utils";
 
 type ExplorePlayerCardProps = {
@@ -29,7 +30,7 @@ export function ExplorePlayerCard({
   const fullName = `${player.first_name} ${player.last_name}`.trim();
   const basicName = unlocked
     ? fullName
-    : `${player.first_name} ${(player.last_name?.[0] ?? "").toUpperCase()}.`.trim();
+    : formatPublicLockedNameParts(player.first_name, player.last_name);
   const href = demo
     ? player.example_href
     : isTutor && player.public_code

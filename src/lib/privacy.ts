@@ -22,6 +22,37 @@ export function isMinor(birthDate: string | null | undefined): boolean {
   return getPlayerAge(birthDate!) < MINOR_AGE_THRESHOLD;
 }
 
+/**
+ * Vista básica / sin membresía: solo nombre de pila + inicial del primer apellido.
+ * Ej. "Carlos Roberto Alvarado Serna" → "Carlos A."
+ */
+export function formatPublicLockedName(fullName: string | null | undefined): string {
+  const parts = String(fullName ?? "")
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+  if (parts.length === 0) return "Jugador";
+  if (parts.length === 1) return parts[0];
+  const firstName = parts[0];
+  const firstSurname = parts.length >= 3 ? parts[parts.length - 2] : parts[1];
+  const initial = firstSurname.charAt(0).toLocaleUpperCase("es-MX");
+  if (!initial) return firstName;
+  return `${firstName} ${initial}.`;
+}
+
+export function formatPublicLockedNameParts(
+  firstName: string | null | undefined,
+  lastName: string | null | undefined,
+): string {
+  const first = String(firstName ?? "").trim().split(/\s+/).filter(Boolean)[0];
+  const surname = String(lastName ?? "").trim().split(/\s+/).filter(Boolean)[0];
+  if (!first && !surname) return "Jugador";
+  if (!first) return formatPublicLockedName(surname);
+  if (!surname) return first;
+  const initial = surname.charAt(0).toLocaleUpperCase("es-MX");
+  return initial ? `${first} ${initial}.` : first;
+}
+
 export function hasPublicConsent(player: {
   is_public: boolean;
   public_consent_at?: string | null;

@@ -1,3 +1,4 @@
+import type { AccountHome } from "@/lib/account-home";
 import { CRACKS_TRYOUTS, CRACKS_TRYOUTS_PATH } from "@/lib/cracks-tryouts";
 import { GPH_SAMPLE_CLASS, trainingBookingHref } from "@/lib/gph-alliance";
 import {
@@ -34,7 +35,7 @@ export const PLANES_HUB = {
       title: "Tutor o representante",
       detail: SCOUT_PRODUCT.summary,
       meta: personaCopy.meta,
-      href: "/fut/explorar#pro",
+      href: "/fut/tutor",
       cta: personaCopy.cta,
     },
     {
@@ -47,6 +48,52 @@ export const PLANES_HUB = {
     },
   ] satisfies HubItem[],
 } as const;
+
+/** Si ya hay sesión, no empujar “Activar gratis / Registrar”: ir al espacio real. */
+export function planesHubItemsForAccount(home: AccountHome | null): HubItem[] {
+  return PLANES_HUB.items.map((item) => {
+    if (item.id === "persona") {
+      const hasPersona =
+        Boolean(home?.kinds?.length) ||
+        home?.kind === "tutor" ||
+        home?.kind === "agente";
+      if (hasPersona) {
+        return {
+          ...item,
+          href: "/fut/tutor",
+          cta: "Ir a mis fichas",
+          meta: "Tu cuenta · activa",
+          detail:
+            "Ya tienes el espacio persona. Continúa con fichas, material y consentimiento.",
+        };
+      }
+      if (home) {
+        return {
+          ...item,
+          href: "/fut/tutor",
+          cta: "Abrir mis fichas",
+        };
+      }
+      return item;
+    }
+
+    if (item.id === "academia") {
+      if (home?.kind === "academia" || home?.kind === "admin") {
+        return {
+          ...item,
+          href: "/fut/dashboard",
+          cta: "Ir al panel",
+          meta: "Tu academia · activa",
+          detail:
+            "Ya tienes el canal academia. Sigue en plantel, partidos y códigos MF.",
+        };
+      }
+      return item;
+    }
+
+    return { ...item };
+  });
+}
 
 export const PRODUCTOS_HUB = {
   title: "Productos",
