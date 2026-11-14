@@ -1,77 +1,77 @@
 import type { PitchSlide } from "@/lib/pitch-deck-content";
 
 /**
- * Pitch corto para organizadores de torneo.
- * Ángulo: credibilidad del torneo + menos fricción operativa. No es pitch de academia.
+ * Pitch corto para organizadores.
+ * Tono: conversación directa, sin eslóganes de startup.
  */
 export const ORGANIZER_PITCH_SLIDES: PitchSlide[] = [
   {
     id: "cover",
     variant: "cover",
-    kicker: "Para organizadores de torneo · Querétaro",
+    kicker: "Organizadores de torneo · Querétaro",
     title: "MiFicha",
     subtitle:
-      "Tu calendario y tu acta se convierten en fichas verificadas. Sin quitarte el control del torneo.",
-    highlight: "Registro gratis · mificha.mx/fut/organizadores",
+      "Ligas tu calendario y tus actas a fichas de jugadores. El torneo lo sigues llevando tú.",
+    highlight: "Sin costo de registro · mificha.mx/fut/organizadores",
     imageKey: "heroHome",
   },
   {
     id: "problema",
-    kicker: "Tu domingo",
-    title: "Compites por precio. Te piden stats. No queda nada.",
+    kicker: "Lo que ya te pasa",
+    title: "Después del partido te siguen escribiendo",
     bullets: [
-      "Padres y directores te escriben por goles, minutos y tarjetas.",
-      "Cada escuela manda un Excel distinto → tú arbitrás la pelea.",
-      "Al cerrar el torneo no tienes evidencia para vender la siguiente edición.",
+      "Padres preguntando goles, minutos o tarjetas.",
+      "Cada escuela manda sus números y a veces no coinciden.",
+      "Cuando termina la temporada, casi no queda nada concreto para armar la siguiente.",
     ],
   },
   {
     id: "porque",
-    kicker: "Por qué te conviene",
-    title: "Tres motivos, no más",
+    kicker: "Para qué sirve",
+    title: "Qué ganas al sumar MiFicha",
     bullets: [
-      "Diferenciación: tu torneo ofrece ficha oficial, no solo cancha e inscripción.",
-      "Menos operación: el acta que ya publicas llega solo a plantel y tutor.",
-      "Activo de temporada: historial ligado a tu marca cuando vendas la siguiente.",
+      "Tu torneo puede ofrecer ficha por jugador, no solo partido e inscripción.",
+      "El acta que ya armás llega a la academia y al tutor, sin que tú reenvíes todo.",
+      "Queda historial del torneo para cuando invites escuelas o busques patrocinio.",
     ],
-    highlight: "No sustituimos inscripción ni reglamento. Tú sigues siendo la fuente oficial.",
+    highlight: "No tocamos tu inscripción ni tu reglamento.",
   },
   {
     id: "como",
     variant: "split",
-    kicker: "Cómo encaja",
-    title: "Tú mandas. MiFicha reparte.",
+    kicker: "Reparto de trabajo",
+    title: "Cada quien su parte",
     bullets: [
-      "Tú: calendario, marcador y acta.",
-      "Academia: plantel y contacto del tutor (gratis para ellas).",
-      "MiFicha: sincroniza fichas y avisa al padre.",
+      "Tú publicas calendario, marcador y acta.",
+      "La academia carga plantel y el contacto del tutor (sin cuota para ellas).",
+      "MiFicha actualiza la ficha y avisa al padre.",
     ],
     stats: [
-      { value: "Gratis", label: "Registro del torneo" },
-      { value: "1 acta", label: "Fuente por partido" },
-      { value: "Auto", label: "Aviso al tutor" },
+      { value: "Gratis", label: "Registrar el torneo" },
+      { value: "Tu acta", label: "Sigue siendo la oficial" },
+      { value: "Aviso", label: "Al tutor después del partido" },
     ],
     imageKey: "featurePassport",
   },
   {
     id: "no-es",
-    kicker: "Claridad",
-    title: "Qué no es",
+    kicker: "Para que quede claro",
+    title: "Esto no es",
     bullets: [
-      "No es otra app de inscripción.",
-      "No es que las academias capturen el marcador oficial.",
-      "No es un costo escondido: el registro del torneo es gratis.",
+      "Una plataforma para cobrar inscripciones.",
+      "Que la academia mande el marcador oficial.",
+      "Un cobro sorpresa: registrar el torneo es gratis.",
     ],
   },
   {
     id: "cierre",
     variant: "cta",
-    kicker: "Siguiente paso",
-    title: "Cargamos tu primera jornada juntos",
+    kicker: "Si te late",
+    title: "Vemos tu calendario en 20 minutos",
     bullets: [
-      "20 min: vemos tu calendario",
-      "Activamos academias con un guión listo",
-      "Primera acta → fichas y avisos en automático",
+      "Revisamos cómo cargarlo",
+      "Te pasamos un texto listo para las academias",
+      "Con la primera acta ya salen fichas y avisos",
     ],
     highlight: "WhatsApp 442 155 6155 · hola@mificha.mx · mificha.mx/fut/organizadores",
     imageKey: "ctaBand",
