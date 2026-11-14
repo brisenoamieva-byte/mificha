@@ -65,6 +65,7 @@ export function UnifiedEnter() {
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [checking, setChecking] = useState(true);
   const [showChooser, setShowChooser] = useState(forcePick);
@@ -118,6 +119,7 @@ export function UnifiedEnter() {
   async function onSubmit(event: React.FormEvent) {
     event.preventDefault();
     setError(null);
+    setSuccess(null);
     setLoading(true);
     const normalizedEmail = email.trim().toLowerCase();
 
@@ -134,7 +136,8 @@ export function UnifiedEnter() {
           try {
             await signIn(normalizedEmail, password);
           } catch {
-            setError("Cuenta creada. Confirma tu correo y vuelve a entrar.");
+            setSuccess("Cuenta creada. Confirma tu correo y vuelve a entrar.");
+            setMode("login");
             setLoading(false);
             return;
           }
@@ -147,7 +150,8 @@ export function UnifiedEnter() {
         data: { session },
       } = await supabase.auth.getSession();
       if (!session) {
-        setError("Confirma tu correo antes de continuar.");
+        setSuccess("Confirma tu correo antes de continuar.");
+        setMode("login");
         setLoading(false);
         return;
       }
@@ -238,7 +242,11 @@ export function UnifiedEnter() {
           <button
             key={tab.id}
             type="button"
-            onClick={() => setMode(tab.id)}
+            onClick={() => {
+              setMode(tab.id);
+              setError(null);
+              setSuccess(null);
+            }}
             className={
               mode === tab.id
                 ? "flex-1 rounded-md bg-white px-3 py-2 text-sm font-semibold text-mf-gph-ink shadow-sm"
@@ -298,6 +306,12 @@ export function UnifiedEnter() {
 
       {error ? (
         <p className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>
+      ) : null}
+
+      {success ? (
+        <p className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
+          {success}
+        </p>
       ) : null}
 
       <button type="submit" disabled={loading} className="mf-btn-primary w-full disabled:opacity-60">
