@@ -37,6 +37,8 @@ export const VISORIA_EVENT = {
   categories: {
     femenil: { label: "Femenil", years: "2012 a 2008", minYear: 2008, maxYear: 2012 },
     varonil: { label: "Varonil", years: "2017 a 2010", minYear: 2010, maxYear: 2017 },
+    /** Fuera de bandas pedidas por visores; se captura el año real de nacimiento. */
+    otro: { label: "Otro", years: "fuera de rango · año real", minYear: 2000, maxYear: 2022 },
   },
   days: [
     {
@@ -140,11 +142,16 @@ export function birthYearFromDate(iso: string): number | null {
   const month = Number(match[2]);
   const day = Number(match[3]);
   if (month < 1 || month > 12 || day < 1 || day > 31) return null;
-  if (year < 1995 || year > 2020) return null;
+  // Rango amplio: categorías oficiales filtran con categoryFitsBirthYear; "otro" usa año real.
+  if (year < 2000 || year > 2022) return null;
   return year;
 }
 
 export function categoryFitsBirthYear(category: VisoriaCategory, year: number) {
+  if (category === "otro") {
+    const band = VISORIA_EVENT.categories.otro;
+    return year >= band.minYear && year <= band.maxYear;
+  }
   const band = VISORIA_EVENT.categories[category];
   return year >= band.minYear && year <= band.maxYear;
 }

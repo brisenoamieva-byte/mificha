@@ -68,7 +68,7 @@ export function VisoriaAdminList() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
-  const [category, setCategory] = useState<"all" | "femenil" | "varonil">("all");
+  const [category, setCategory] = useState<"all" | "femenil" | "varonil" | "otro">("all");
   const [day, setDay] = useState<"all" | "jueves" | "viernes">("all");
   const [source, setSource] = useState("all");
   const [sortKey, setSortKey] = useState<SortKey>("player_full_name");
@@ -209,6 +209,7 @@ export function VisoriaAdminList() {
           <option value="all">Todas las categorías</option>
           <option value="varonil">Varonil</option>
           <option value="femenil">Femenil</option>
+          <option value="otro">Otro</option>
         </select>
         <select
           value={day}

@@ -117,7 +117,10 @@ export function VisoriaLanding() {
               Femenil y varonil, los dos días
             </p>
             <p className="mt-1 max-w-2xl text-sm leading-6 text-mf-text-secondary">
-              El jueves 26 es abierto. El viernes 27 es solo para seleccionados.
+              El jueves 26 es abierto. El viernes 27 es solo para seleccionados. Si el
+              año está fuera de esas bandas, regístrate en{" "}
+              <span className="font-medium text-mf-gph-ink">Otro</span> con la fecha
+              real de nacimiento.
             </p>
             <div className="mt-4 flex flex-col gap-3 border-t border-mf-border pt-4 sm:flex-row sm:gap-12">
               <p>
@@ -134,6 +137,14 @@ export function VisoriaLanding() {
                 </span>
                 <span className="mt-1 block text-base font-semibold text-mf-gph-ink">
                   Nacidos de {VISORIA_EVENT.categories.varonil.years}
+                </span>
+              </p>
+              <p>
+                <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
+                  Otro
+                </span>
+                <span className="mt-1 block text-base font-semibold text-mf-gph-ink">
+                  Fuera de rango · año real
                 </span>
               </p>
             </div>

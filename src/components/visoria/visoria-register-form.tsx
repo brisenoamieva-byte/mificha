@@ -184,7 +184,16 @@ export function VisoriaRegisterForm() {
             <option value="varonil">
               Varonil · {VISORIA_EVENT.categories.varonil.years}
             </option>
+            <option value="otro">
+              Otro · fuera de rango (año real de nacimiento)
+            </option>
           </select>
+          {category === "otro" ? (
+            <p className="mt-1.5 text-xs leading-5 text-mf-text-muted">
+              Pon la fecha de nacimiento real. Los visores pueden observar fuera de las
+              edades pedidas si ven algo distinto.
+            </p>
+          ) : null}
         </div>
         <div>
           <label htmlFor="position" className="text-sm font-medium text-mf-text">

@@ -74,6 +74,7 @@ function categoryOf(value) {
   const text = clean(value).toLowerCase();
   if (text.startsWith("fem")) return "femenil";
   if (text.startsWith("var") || text.startsWith("masc")) return "varonil";
+  if (text.startsWith("otr") || text === "otro") return "otro";
   return "";
 }
 

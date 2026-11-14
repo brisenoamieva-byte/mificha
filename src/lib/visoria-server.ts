@@ -62,15 +62,17 @@ export function parseVisoriaRegistration(
   if (player.length < 5) return { error: "Escribe el nombre completo del jugador." };
   if (guardian.length < 5) return { error: "Escribe el nombre del padre, madre o tutor." };
   if (!year) return { error: "Revisa la fecha de nacimiento." };
-  if (category !== "femenil" && category !== "varonil") {
-    return { error: "Elige categoría femenil o varonil." };
+  if (category !== "femenil" && category !== "varonil" && category !== "otro") {
+    return { error: "Elige categoría femenil, varonil u otro." };
   }
   if (!categoryFitsBirthYear(category, year)) {
     return {
       error:
         category === "femenil"
-          ? "Femenil es para nacidas de 2008 a 2012."
-          : "Varonil es para nacidos de 2010 a 2017.",
+          ? "Femenil es para nacidas de 2008 a 2012. Si está fuera de ese rango, elige Otro."
+          : category === "varonil"
+            ? "Varonil es para nacidos de 2010 a 2017. Si está fuera de ese rango, elige Otro."
+            : "Revisa la fecha de nacimiento (años 2000 a 2022).",
     };
   }
   if (!isValidMxWhatsApp(phone)) {

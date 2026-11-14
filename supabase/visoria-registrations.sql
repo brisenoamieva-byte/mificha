@@ -9,7 +9,7 @@ create table if not exists public.visoria_registrations (
     check (source in ('platform', 'google_forms', 'whatsapp', 'import')),
   player_full_name text not null,
   birth_date date not null,
-  category text not null check (category in ('femenil', 'varonil')),
+  category text not null check (category in ('femenil', 'varonil', 'otro')),
   position text,
   current_club text,
   city text,
