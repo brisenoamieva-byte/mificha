@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { Rocket } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
-/** Enlace interno de playbook (misma autorización que el resto de /interno). */
+/** Solo el fundador ve el playbook de lanzamiento. */
 export function PitchDeckNavLink({ onClose }: { onClose?: () => void }) {
   const [allowed, setAllowed] = useState(false);
 
@@ -19,7 +19,7 @@ export function PitchDeckNavLink({ onClose }: { onClose?: () => void }) {
 
       if (!session) return;
 
-      const response = await fetch("/fut/api/interno/pitch-access", {
+      const response = await fetch("/fut/api/interno/founder-access", {
         headers: {
           Authorization: `Bearer ${session.access_token}`,
         },

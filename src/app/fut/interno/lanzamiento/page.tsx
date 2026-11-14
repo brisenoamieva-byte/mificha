@@ -6,6 +6,7 @@ export default function FounderLaunchPage() {
     <InternoAccessGate
       nextPath="/fut/interno/lanzamiento"
       loadingLabel="Cargando playbook…"
+      access="founder"
     >
       <FounderLaunchPlaybook />
     </InternoAccessGate>

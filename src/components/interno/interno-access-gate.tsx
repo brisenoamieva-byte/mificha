@@ -8,12 +8,18 @@ interface InternoAccessGateProps {
   nextPath: string;
   loadingLabel: string;
   children: ReactNode;
+  /**
+   * `founder` = solo Ricardo (playbook de lanzamiento).
+   * `interno` = lista PITCH_ALLOWED_* (herramientas internas).
+   */
+  access?: "interno" | "founder";
 }
 
 export function InternoAccessGate({
   nextPath,
   loadingLabel,
   children,
+  access = "interno",
 }: InternoAccessGateProps) {
   const router = useRouter();
   const [ready, setReady] = useState(false);
@@ -32,7 +38,12 @@ export function InternoAccessGate({
           return;
         }
 
-        const response = await fetch("/fut/api/interno/pitch-access", {
+        const accessPath =
+          access === "founder"
+            ? "/fut/api/interno/founder-access"
+            : "/fut/api/interno/pitch-access";
+
+        const response = await fetch(accessPath, {
           headers: {
             Authorization: `Bearer ${session.access_token}`,
           },
@@ -60,7 +71,7 @@ export function InternoAccessGate({
     return () => {
       cancelled = true;
     };
-  }, [nextPath, router]);
+  }, [access, nextPath, router]);
 
   if (!ready) {
     return (
