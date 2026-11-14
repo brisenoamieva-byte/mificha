@@ -26,21 +26,18 @@ import { cn } from "@/lib/utils";
 const STEPS = [
   {
     icon: MessageCircle,
-    title: "Paga o agenda",
-    description:
-      "Paga en línea o escribe por WhatsApp. Luego eliges horario (calendario GPH o coordinación directa). Sesión presencial en Querétaro.",
+    title: "Paga y elige horario",
+    description: "Pago en línea y calendario GPH. Sesión presencial en Querétaro.",
   },
   {
     icon: ClipboardList,
-    title: "Sesión con metodología GPH",
-    description:
-      "Técnica, táctica, físico, mental y hábitos. Escala 1–5 y etapa de desarrollo.",
+    title: "Sesión de evaluación",
+    description: "Técnica, táctica, físico, mental y hábitos · escala 1–5.",
   },
   {
     icon: LineChart,
-    title: "Ficha y seguimiento",
-    description:
-      "El informe queda en mificha.mx. La familia consulta etapa, objetivos y avance cuando haga falta.",
+    title: "Informe en tu ficha",
+    description: "Etapa, objetivos y seguimiento en mificha.mx por 12 meses.",
   },
 ] as const;
 
@@ -53,12 +50,11 @@ export function EvaluacionesPageContent() {
     <>
       <MarketingPageHero
         eyebrow={`${GPH_ALLIANCE.shortLabel} · ${CURRENT_SEASON_LABEL}`}
-        title="Diagnóstico GPH: mide, orienta y da seguimiento."
+        title="Diagnóstico GPH para tu jugador."
         description={
           <WithBrandName>
-            Sesión presencial en Querétaro con metodología GPH. Sales con etapa de
-            desarrollo, fortalezas, objetivos claros y el informe en MiFicha — para
-            entrenar con rumbo, no a ciegas.
+            Sesión presencial en Querétaro. Sales con etapa, objetivos claros y el
+            informe en MiFicha — para entrenar con rumbo.
           </WithBrandName>
         }
         actions={
@@ -75,10 +71,18 @@ export function EvaluacionesPageContent() {
             <Link href="/fut/pagar?sku=diagnosis" className="mf-btn-gph-ghost">
               Pagar diagnóstico
             </Link>
-            <Link href="/fut/d/demo" className="mf-btn-gph-ghost">
-              Ver ejemplo
-            </Link>
           </>
+        }
+        belowActions={
+          <p className="text-sm text-mf-text-secondary">
+            <Link href="/fut/d/demo" className="font-semibold text-mf-gph hover:underline">
+              Ver ejemplo de informe
+            </Link>
+            {" · "}
+            <Link href="/fut/tutor" className="font-semibold text-mf-gph hover:underline">
+              Crear ficha de tutor
+            </Link>
+          </p>
         }
         aside={
           <div className="mf-card overflow-hidden p-0 sm:p-0">
@@ -90,35 +94,28 @@ export function EvaluacionesPageContent() {
             <div className="p-6 sm:p-8">
               <AllianceLockup size="lg" showCaption />
               <DiagnosisPromoPrice className="mt-5" size="lg" />
-              <ul className="mt-5 space-y-2 text-sm text-mf-text-secondary">
-                {[
-                  "Sesión presencial en Querétaro",
-                  "Ficha visual + lectura de entrenador",
-                  "3 a 5 objetivos de desarrollo",
-                  "Informe en mificha.mx",
-                ].map((item) => (
-                  <li key={item} className="flex gap-2">
-                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-mf-gph" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
+              <p className="mt-4 text-sm leading-6 text-mf-text-secondary">
+                Incluye informe en la ficha y 12 meses de MiFicha.
+              </p>
             </div>
           </div>
         }
       />
 
       <section className="border-b border-mf-border bg-white">
-        <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
+        <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-12">
           <div className="grid gap-10 lg:grid-cols-2 lg:gap-14">
             <div>
-              <p className="mf-marketing-eyebrow">Qué incluye</p>
-              <h2 className="mt-3 text-2xl font-semibold tracking-[-0.02em] text-mf-text">
-                Lo que recibes con el diagnóstico
+              <p className="mf-marketing-eyebrow">Incluye</p>
+              <h2 className="mt-2 text-xl font-semibold tracking-[-0.02em] text-mf-text sm:text-2xl">
+                Qué recibes
               </h2>
-              <ul className="mt-6 space-y-3">
+              <ul className="mt-5 space-y-2.5">
                 {DIAGNOSIS_PRODUCT.whatYouGet.map((item) => (
-                  <li key={item} className="flex gap-3 text-sm leading-6 text-mf-text-secondary">
+                  <li
+                    key={item}
+                    className="flex gap-3 text-sm leading-6 text-mf-text-secondary"
+                  >
                     <Check className="mt-0.5 h-4 w-4 shrink-0 text-mf-gph" />
                     {item}
                   </li>
@@ -126,97 +123,37 @@ export function EvaluacionesPageContent() {
               </ul>
             </div>
             <div>
-              <p className="mf-marketing-eyebrow">Alcance</p>
-              <h2 className="mt-3 text-2xl font-semibold tracking-[-0.02em] text-mf-text">
-                Para qué sirve
+              <p className="mf-marketing-eyebrow">Para quién</p>
+              <h2 className="mt-2 text-xl font-semibold tracking-[-0.02em] text-mf-text sm:text-2xl">
+                Cuándo conviene
               </h2>
-              <ul className="mt-6 space-y-3">
+              <ul className="mt-5 space-y-2.5">
                 {DIAGNOSIS_PRODUCT.scope.map((item) => (
-                  <li key={item} className="flex gap-3 text-sm leading-6 text-mf-text-secondary">
+                  <li
+                    key={item}
+                    className="flex gap-3 text-sm leading-6 text-mf-text-secondary"
+                  >
                     <Target className="mt-0.5 h-4 w-4 shrink-0 text-mf-gph" />
                     {item}
                   </li>
                 ))}
               </ul>
-              <p className="mt-6 text-sm leading-7 text-mf-text-secondary">
-                Conviene tener la{" "}
-                <Link href="/fut/tutor" className="font-semibold text-mf-gph hover:underline">
-                  ficha del jugador
-                </Link>{" "}
-                lista (la arma el tutor): el informe queda ligado a esa ficha.
-              </p>
             </div>
           </div>
         </div>
       </section>
 
-      <section
-        id="agendar"
-        className="scroll-mt-24 border-b border-mf-border bg-mf-gph-soft"
-      >
-        <div className="mx-auto flex max-w-6xl flex-col gap-5 px-4 py-10 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-12">
-          <div className="max-w-xl">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
-              Agendar diagnóstico
-            </p>
-            <h2 className="mt-2 text-2xl font-semibold tracking-[-0.02em] text-mf-gph-ink">
-              {bookingIsCalendar
-                ? "Elige horario en el calendario GPH"
-                : "Coordina fecha por WhatsApp"}
-            </h2>
-            <p className="mt-2 text-sm leading-7 text-mf-text-secondary">
-              {bookingIsCalendar
-                ? "Sesión presencial en Querétaro. El calendario muestra espacios libres del equipo GPH; si necesitas un grupo o dudas, escribe por WhatsApp."
-                : "Sesión presencial en Querétaro. Escribe para fecha, sede y si es un jugador o un grupo. Número: "}
-              {!bookingIsCalendar ? (
-                <span className="font-semibold tabular-nums text-mf-gph-ink">
-                  {GPH_WHATSAPP_DISPLAY}
-                </span>
-              ) : null}
-              {!bookingIsCalendar ? "." : null}
-            </p>
-          </div>
-          <div className="flex shrink-0 flex-wrap gap-3 self-start sm:self-center">
-            <a
-              href={bookingHref}
-              className="mf-btn-gph"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {bookingIsCalendar ? null : <MessageCircle className="h-4 w-4" />}
-              {diagnosisBookingCtaLabel(`WhatsApp ${GPH_WHATSAPP_DISPLAY}`)}
-            </a>
-            {bookingIsCalendar ? (
-              <a
-                href={whatsapp}
-                className="mf-btn-gph-ghost"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <MessageCircle className="h-4 w-4" />
-                WhatsApp
-              </a>
-            ) : null}
-          </div>
-        </div>
-      </section>
-
       <section className="border-b border-mf-border bg-mf-canvas">
-        <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
-          <div className="max-w-2xl">
-            <p className="mf-marketing-eyebrow">Cómo funciona</p>
-            <h2 className="mt-3 text-2xl font-semibold tracking-[-0.02em] text-mf-text">
-              Diagnóstico + seguimiento en MiFicha
+        <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-12">
+          <div className="max-w-xl">
+            <p className="mf-marketing-eyebrow">Proceso</p>
+            <h2 className="mt-2 text-xl font-semibold tracking-[-0.02em] text-mf-text sm:text-2xl">
+              Tres pasos
             </h2>
-            <p className="mt-2 text-sm leading-7 text-mf-text-secondary">
-              {bookingIsCalendar
-                ? "Paga o agenda en el calendario. El informe queda en tu cuenta; conviene tener la ficha del tutor lista para el seguimiento."
-                : "Agenda por WhatsApp. El informe queda en tu cuenta; conviene tener la ficha del tutor lista para el seguimiento."}
-            </p>
           </div>
-          <ol className="mt-8 grid gap-3 sm:grid-cols-3 sm:gap-4">
+          <ol className="mt-7 grid gap-3 sm:grid-cols-3 sm:gap-4">
             {STEPS.map((item, index) => (
-              <li key={item.title} className="mf-card p-5">
+              <li key={item.title} className="rounded-xl border border-mf-border bg-white p-5">
                 <div className="flex items-center gap-3">
                   <span className="flex h-7 w-7 items-center justify-center rounded-full bg-mf-gph text-xs font-semibold text-white">
                     {index + 1}
@@ -235,18 +172,18 @@ export function EvaluacionesPageContent() {
         </div>
       </section>
 
-      <section id="precios" className="border-b border-mf-border bg-mf-surface">
-        <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:py-16">
-          <div className="max-w-2xl">
+      <section id="precios" className="scroll-mt-24 border-b border-mf-border bg-mf-surface">
+        <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-12">
+          <div className="max-w-xl">
             <p className="mf-marketing-eyebrow">Cobro</p>
-            <h2 className="mt-3 text-2xl font-semibold tracking-[-0.02em] text-mf-text">
+            <h2 className="mt-2 text-xl font-semibold tracking-[-0.02em] text-mf-text sm:text-2xl">
               {DIAGNOSIS_PRODUCT.title}
             </h2>
-            <p className="mt-3 text-sm leading-7 text-mf-text-secondary sm:text-base">
+            <p className="mt-2 text-sm leading-7 text-mf-text-secondary">
               {DIAGNOSIS_PRODUCT.subtitle}
             </p>
           </div>
-          <div className="mt-8 grid gap-4 sm:grid-cols-2">
+          <div className="mt-7 grid gap-4 sm:grid-cols-2">
             {DIAGNOSIS_PRODUCT.plans.map((plan) => (
               <article
                 key={plan.id}
@@ -266,14 +203,36 @@ export function EvaluacionesPageContent() {
                   </p>
                 )}
                 <p className="mt-2 text-xs font-medium text-mf-text-muted">{plan.period}</p>
-                <p className="mt-4 text-sm leading-7 text-mf-text-secondary">
+                <p className="mt-3 text-sm leading-6 text-mf-text-secondary">
                   {plan.description}
                 </p>
               </article>
             ))}
           </div>
           <p className="mt-4 text-xs text-mf-text-muted">{DIAGNOSIS_PRODUCT.footnote}</p>
-          <div className="mt-8">
+
+          <div
+            id="agendar"
+            className="mt-8 flex flex-col gap-4 rounded-xl border border-mf-gph/20 bg-mf-gph-soft px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6"
+          >
+            <div className="max-w-md">
+              <p className="text-sm font-semibold text-mf-gph-ink">
+                {bookingIsCalendar
+                  ? "Elige horario o paga ahora"
+                  : "Agenda por WhatsApp o paga ahora"}
+              </p>
+              <p className="mt-1 text-xs leading-5 text-mf-text-secondary">
+                Grupo o dudas:{" "}
+                <a
+                  href={whatsapp}
+                  className="font-semibold text-mf-gph hover:underline"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  WhatsApp {GPH_WHATSAPP_DISPLAY}
+                </a>
+              </p>
+            </div>
             <div className="flex flex-wrap gap-3">
               <a
                 href={bookingHref}
@@ -282,27 +241,12 @@ export function EvaluacionesPageContent() {
                 rel="noopener noreferrer"
               >
                 {!bookingIsCalendar ? <MessageCircle className="h-4 w-4" /> : null}
-                {diagnosisBookingCtaLabel("Agendar por WhatsApp")}
+                {diagnosisBookingCtaLabel(`WhatsApp ${GPH_WHATSAPP_DISPLAY}`)}
               </a>
               <Link href="/fut/pagar?sku=diagnosis" className="mf-btn-gph-ghost">
                 Pagar diagnóstico
               </Link>
-              <Link href="/fut/tutor" className="mf-btn-gph-ghost">
-                Crear cuenta de tutor
-              </Link>
             </div>
-            <p className="mt-3 text-sm text-mf-text-secondary">
-              Para cotizar un grupo o dudas: WhatsApp{" "}
-              <a
-                href={whatsapp}
-                className="font-semibold text-mf-gph hover:underline"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {GPH_WHATSAPP_DISPLAY}
-              </a>
-              .
-            </p>
           </div>
         </div>
       </section>
@@ -328,8 +272,7 @@ export function HomeGphAllianceBand() {
             ¿Listo para el diagnóstico GPH?
           </h2>
           <p className="mt-2 text-sm leading-7 text-white/75">
-            Sesión presencial en Querétaro, informe en la ficha y 12 meses de plataforma. El
-            detalle de precio está arriba en el hero.
+            Sesión en Querétaro, informe en la ficha y 12 meses de plataforma.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-3">

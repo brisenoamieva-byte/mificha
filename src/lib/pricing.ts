@@ -66,10 +66,9 @@ export const ORGANIZER_PRICING = {
 
 /** Evaluaciones GPH — promo −30% sobre $2,900. Incluye 12 meses de MiFicha. */
 export const DIAGNOSIS_PRODUCT = {
-  title: "Evaluaciones",
-  subtitle:
-    "Sesión presencial con metodología GPH. El informe, la etapa y el plan quedan en mificha.mx para que la familia dé seguimiento.",
-  footnote: "Sesión GPH + 12 meses de MiFicha · Mercado Pago o WhatsApp.",
+  title: "Precio",
+  subtitle: "Un jugador o un grupo. El informe queda en la ficha de MiFicha.",
+  footnote: "Incluye 12 meses de MiFicha · Mercado Pago o WhatsApp.",
   memberPriceLabel: "$1,200",
   listPriceLabel: FAMILY_PRODUCTS.diagnosis.listPriceLabel,
   publicPriceLabel: FAMILY_PRODUCTS.diagnosis.priceLabel,
@@ -78,17 +77,15 @@ export const DIAGNOSIS_PRODUCT = {
   promoHeadline: DIAGNOSIS_PROMO.headline,
   checkoutHref: "/fut/pagar?sku=diagnosis",
   whatYouGet: [
-    "Sesión presencial con pruebas de técnica, táctica, físico, mental y hábitos",
-    "Calificación 1–5 y etapa de desarrollo",
-    "Ficha visual + lectura de entrenador con 3 a 5 objetivos concretos",
-    "Informe digital ligado a la ficha del jugador en mificha.mx",
-    "12 meses de acceso a MiFicha para seguimiento y material del tutor",
+    "Pruebas: técnica, táctica, físico, mental y hábitos",
+    "Escala 1–5, etapa de desarrollo y 3–5 objetivos",
+    "Informe en la ficha del jugador (mificha.mx)",
+    "12 meses de plataforma para seguimiento",
   ],
   scope: [
-    "Sirve para orientar el entrenamiento en casa y con la academia",
-    "Útil antes de visorías, cambios de categoría o decisiones de temporada",
-    "No promete beca, selección ni contrato: mide y prioriza el desarrollo",
-    "No requiere que la academia esté inscrita en MiFicha para contratarlo",
+    "Orientar entrenamiento en casa y con la academia",
+    "Antes de visorías, cambio de categoría o decisiones de temporada",
+    "No promete beca ni selección: mide y prioriza el desarrollo",
   ],
   plans: [
     {
@@ -97,17 +94,15 @@ export const DIAGNOSIS_PRODUCT = {
       listPriceLabel: FAMILY_PRODUCTS.diagnosis.listPriceLabel,
       priceLabel: FAMILY_PRODUCTS.diagnosis.priceLabel,
       promo: true,
-      period: "MXN · evaluación + 12 meses MiFicha",
-      description:
-        "Diagnóstico GPH completo: sesión, ficha, lectura de entrenador y un año de plataforma para dar seguimiento.",
+      period: "MXN · sesión + 12 meses MiFicha",
+      description: "Diagnóstico completo e informe ligado a la ficha.",
     },
     {
       id: "grupo",
       label: "Grupo o plantel",
       priceLabel: "A cotizar",
       period: "por jornada",
-      description:
-        "Varios jugadores en una misma sesión. Cada uno queda con su ficha y plan en la plataforma.",
+      description: "Varios jugadores; cada uno con su ficha y plan.",
     },
   ],
 } as const;

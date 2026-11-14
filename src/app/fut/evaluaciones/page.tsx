@@ -3,9 +3,9 @@ import { EvaluacionesPageContent } from "@/components/marketing/evaluaciones-pag
 import { SiteFooter, SiteHeader } from "@/components/marketing/site-header";
 
 export const metadata: Metadata = {
-  title: "Evaluaciones GPH | MiFicha",
+  title: "Diagnóstico GPH | MiFicha",
   description:
-    "Diagnósticos de jugadores con metodología GPH. La ficha y el seguimiento viven en mificha.mx.",
+    "Sesión presencial en Querétaro: etapa, objetivos e informe en la ficha MiFicha.",
 };
 
 export default function EvaluacionesPage() {
