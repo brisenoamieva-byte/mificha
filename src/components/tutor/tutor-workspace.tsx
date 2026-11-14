@@ -884,7 +884,7 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
                 setForm((current) => ({ ...current, player_name: event.target.value }))
               }
               className={inputClass}
-              placeholder="Ej. Diego Briseño"
+              placeholder="Ej. Santiago Hernández"
             />
           </label>
           <div className="grid gap-4 sm:grid-cols-2">
