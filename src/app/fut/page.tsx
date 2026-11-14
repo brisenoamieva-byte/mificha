@@ -6,7 +6,10 @@ import { HomeHowItWorks } from "@/components/marketing/home-how-it-works";
 import { HomeGphAllianceBand } from "@/components/marketing/evaluaciones-page-content";
 import { SponsorSlot } from "@/components/marketing/sponsor-slot";
 import { countExploreDirectoryPlayers } from "@/lib/explore-demo-data";
-import { fetchPublicDirectory } from "@/lib/public-directory";
+import {
+  fetchPublicDirectory,
+  sanitizeDirectoryForLockedView,
+} from "@/lib/public-directory";
 import { resolveExploreAccess } from "@/lib/scout-access";
 import { createSupabaseAdminClient } from "@/lib/supabase-admin";
 import { fetchTutorDirectoryPlayers } from "@/lib/tutor-directory";
@@ -28,15 +31,18 @@ export default async function Home() {
   ]);
 
   const academySlugs = new Set(directoryBase.players.map((player) => player.slug));
-  const directory = {
+  const fullDirectory = {
     ...directoryBase,
     players: [
       ...directoryBase.players,
       ...tutorPlayers.filter((player) => !academySlugs.has(player.slug)),
     ],
   };
+  const directory = access.unlocked
+    ? fullDirectory
+    : sanitizeDirectoryForLockedView(fullDirectory);
 
-  const playerCount = countExploreDirectoryPlayers(directory);
+  const playerCount = countExploreDirectoryPlayers(fullDirectory);
   const initialCategoryFilter = "all";
 
   return (

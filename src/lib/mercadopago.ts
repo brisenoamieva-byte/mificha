@@ -1,8 +1,71 @@
+import { createHmac, timingSafeEqual } from "crypto";
 import { getAppBaseUrl } from "@/lib/app-url";
 
 export function isMercadoPagoConfigured() {
   const token = process.env.MERCADOPAGO_ACCESS_TOKEN?.trim() ?? "";
   return Boolean(token) && !token.includes("...");
+}
+
+/** Secret de Webhooks en el panel de Mercado Pago (opcional pero recomendado). */
+export function getMercadoPagoWebhookSecret() {
+  const secret =
+    process.env.MERCADOPAGO_WEBHOOK_SECRET?.trim() ||
+    process.env.MP_WEBHOOK_SECRET?.trim() ||
+    "";
+  if (!secret || secret.includes("...")) return null;
+  return secret;
+}
+
+/**
+ * Valida x-signature de notificaciones Webhooks de Mercado Pago.
+ * Manifest: id:{data.id};request-id:{x-request-id};ts:{ts};
+ */
+export function verifyMercadoPagoWebhookSignature(input: {
+  xSignature: string | null;
+  xRequestId: string | null;
+  dataId: string | null;
+  secret: string;
+  toleranceSeconds?: number;
+}) {
+  const signature = String(input.xSignature ?? "").trim();
+  const requestId = String(input.xRequestId ?? "").trim();
+  const dataId = String(input.dataId ?? "").trim();
+  if (!signature || !requestId || !dataId) return false;
+
+  const parts: Record<string, string> = {};
+  for (const chunk of signature.split(",")) {
+    const [rawKey, ...rest] = chunk.split("=");
+    const key = rawKey?.trim();
+    const value = rest.join("=").trim();
+    if (key && value) parts[key] = value;
+  }
+  const ts = parts.ts;
+  const v1 = parts.v1;
+  if (!ts || !v1) return false;
+
+  const tsNum = Number(ts);
+  if (!Number.isFinite(tsNum)) return false;
+  const tolerance = input.toleranceSeconds ?? 60 * 60 * 5;
+  const nowSec = Math.floor(Date.now() / 1000);
+  if (Math.abs(nowSec - tsNum) > tolerance) return false;
+
+  const manifest = `id:${dataId};request-id:${requestId};ts:${ts};`;
+  const expected = createHmac("sha256", input.secret).update(manifest).digest("hex");
+  try {
+    const a = Buffer.from(expected, "utf8");
+    const b = Buffer.from(v1, "utf8");
+    if (a.length !== b.length) return false;
+    return timingSafeEqual(a, b);
+  } catch {
+    return false;
+  }
+}
+
+/** Tolerancia de 1 MXN por redondeos. */
+export function mercadoPagoAmountMatches(expectedMxn: number, paidMxn: number | undefined) {
+  if (!Number.isFinite(expectedMxn) || expectedMxn < 0) return false;
+  if (paidMxn == null || !Number.isFinite(paidMxn)) return false;
+  return Math.abs(paidMxn - expectedMxn) <= 1;
 }
 
 function accessToken() {

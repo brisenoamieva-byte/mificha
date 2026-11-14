@@ -19,7 +19,7 @@ export function PitchDeckGate() {
         } = await supabase.auth.getSession();
 
         if (!session) {
-          router.replace("/fut/login?next=/fut/interno/pitch");
+          router.replace("/fut/entrar?next=/fut/interno/pitch");
           return;
         }
 
@@ -41,7 +41,7 @@ export function PitchDeckGate() {
         setReady(true);
       } catch {
         if (!cancelled) {
-          router.replace("/fut/login?next=/fut/interno/pitch");
+          router.replace("/fut/entrar?next=/fut/interno/pitch");
         }
       }
     }

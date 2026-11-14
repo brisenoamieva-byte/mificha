@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 export default function OrganizadoresInternoPage() {
   return (
     <InternoAccessGate
-      nextPath="/fut/interno/fut/organizadores"
+      nextPath="/fut/interno/organizadores"
       loadingLabel="Cargando one-pager organizador…"
     >
       <Suspense fallback={<div className="min-h-screen bg-white" />}>

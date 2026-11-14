@@ -169,8 +169,12 @@ export function AgentPresentationDeck({
           </p>
           <h2 className="mt-3 text-3xl font-bold uppercase tracking-tight">Hablemos</h2>
           <ul className="mx-auto mt-8 max-w-md space-y-2 text-base text-white/85">
-            {child.guardian_phone ? <li>{child.guardian_phone}</li> : null}
-            {profile.contact_email ? <li>{profile.contact_email}</li> : null}
+            {profile.show_contact_whatsapp && profile.contact_whatsapp ? (
+              <li>{profile.contact_whatsapp}</li>
+            ) : null}
+            {profile.show_contact_email && profile.contact_email ? (
+              <li>{profile.contact_email}</li>
+            ) : null}
             {profile.instagram ? <li>@{profile.instagram}</li> : null}
             {profile.city ? <li>{profile.city}</li> : null}
           </ul>

@@ -15,6 +15,7 @@ import {
   buildTutorShareAbsoluteUrl,
 } from "@/lib/og-tutor-share";
 import { formatPlayerCategory } from "@/lib/player-category";
+import { formatPublicLockedName } from "@/lib/privacy";
 import { resolvePublicCode } from "@/lib/public-code-resolve";
 import { resolveExploreAccess } from "@/lib/scout-access";
 import { fetchTutorLinkedPerformance } from "@/lib/tutor-linked-performance";
@@ -50,11 +51,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         child.profile.club,
         child.profile.city,
       ].filter(Boolean);
-      const title = `${child.player_name} · Ficha | MiFicha`;
+      const publicName = formatPublicLockedName(child.player_name);
+      const title = `${publicName} · Ficha | MiFicha`;
       const description =
         bits.length > 0
-          ? `Ficha de ${child.player_name}: ${bits.join(" · ")}. Material del tutor, rendimiento y seguimiento en MiFicha.`
-          : `Ficha de presentación de ${child.player_name}. Material del tutor en MiFicha.`;
+          ? `Ficha de ${publicName}: ${bits.join(" · ")}. Material del tutor, rendimiento y seguimiento en MiFicha.`
+          : `Ficha de presentación de ${publicName}. Material del tutor en MiFicha.`;
       const access = child.public_code || child.share_token;
       const pageUrl = buildTutorShareAbsoluteUrl(access);
       const ogPayload = buildOgTutorSharePayload(child);
@@ -156,7 +158,7 @@ export default async function TutorShareFichaPage({ params }: PageProps) {
     const place = [child.profile.club || child.profile.school, child.profile.city]
       .filter(Boolean)
       .join(" · ");
-    const loginHref = `/fut/login?next=${encodeURIComponent(sharePath)}`;
+    const loginHref = `/fut/entrar?next=${encodeURIComponent(sharePath)}`;
     return (
       <div className="flex min-h-dvh flex-col bg-mf-canvas">
         <TutorFichaViewTracker token={access || token} />

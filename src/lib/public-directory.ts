@@ -76,6 +76,39 @@ export interface PublicDirectoryData {
   players: DirectoryPlayer[];
 }
 
+/**
+ * Vista locked: el payload al cliente no lleva nombre completo ni media firmada.
+ * Conserva birth_date para filtros de categoría en el cliente.
+ */
+export function sanitizeDirectoryForLockedView(
+  data: PublicDirectoryData,
+): PublicDirectoryData {
+  return {
+    ...data,
+    players: data.players.map((player) => {
+      const first =
+        String(player.first_name ?? "")
+          .trim()
+          .split(/\s+/)
+          .filter(Boolean)[0] ?? "";
+      const surname =
+        String(player.last_name ?? "")
+          .trim()
+          .split(/\s+/)
+          .filter(Boolean)[0] ?? "";
+      const initial = surname.charAt(0).toLocaleUpperCase("es-MX");
+      return {
+        ...player,
+        first_name: first || "Jugador",
+        last_name: initial ? `${initial}.` : "",
+        photo_url: null,
+        video_url: null,
+        season_stats: undefined,
+      };
+    }),
+  };
+}
+
 /** Jugadores de demo local (`/fut/api/seed`) — no mezclar con perfiles de ejemplo en /explorar. */
 export function isDevSeedPlayer(player: Pick<DirectoryPlayer, "slug">) {
   return player.slug.endsWith("-seed");

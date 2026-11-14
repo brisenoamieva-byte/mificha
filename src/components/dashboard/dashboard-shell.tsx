@@ -33,7 +33,7 @@ export function DashboardShell({ children }: DashboardShellProps) {
 
       if (sessionError) throw sessionError;
       if (!session?.user) {
-        router.replace("/fut/login");
+        router.replace("/fut/entrar?next=/fut/dashboard");
         return;
       }
 
@@ -69,7 +69,7 @@ export function DashboardShell({ children }: DashboardShellProps) {
       const {
         data: { session },
       } = await supabase.auth.getSession();
-      if (!session) router.replace("/fut/login");
+      if (!session) router.replace("/fut/entrar?next=/fut/dashboard");
     } finally {
       setLoading(false);
     }

@@ -48,7 +48,10 @@ export function AgentOnePager({
       : null;
   const highlights = resolveHighlightsUrl(profile.youtube_url, materials);
   const transfermarkt = profile.transfermarkt_url?.trim() || null;
-  const contactPhone = child.guardian_phone?.trim() || null;
+  const contactPhone =
+    profile.show_contact_whatsapp && profile.contact_whatsapp?.trim()
+      ? profile.contact_whatsapp.trim()
+      : null;
   const contactHref = waHref(contactPhone);
   const role =
     profile.role_title?.trim() ||

@@ -28,7 +28,7 @@ export function InternoAccessGate({
         } = await supabase.auth.getSession();
 
         if (!session) {
-          router.replace(`/fut/login?next=${encodeURIComponent(nextPath)}`);
+          router.replace(`/fut/entrar?next=${encodeURIComponent(nextPath)}`);
           return;
         }
 
@@ -50,7 +50,7 @@ export function InternoAccessGate({
         setReady(true);
       } catch {
         if (!cancelled) {
-          router.replace(`/fut/login?next=${encodeURIComponent(nextPath)}`);
+          router.replace(`/fut/entrar?next=${encodeURIComponent(nextPath)}`);
         }
       }
     }

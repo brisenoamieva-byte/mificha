@@ -67,7 +67,7 @@ export async function fetchPublicPlayerBySlug(
   const { url, key } = getSupabaseHeaders();
 
   const playerResponse = await fetch(
-    `${url}/rest/v1/players?slug=eq.${encodeURIComponent(slug)}&is_public=eq.true&public_consent_at=not.is.null&select=*,academies(name,city,logo_url,primary_color)`,
+    `${url}/rest/v1/players?slug=eq.${encodeURIComponent(slug)}&is_public=eq.true&public_consent_at=not.is.null&select=id,academy_id,slug,first_name,last_name,birth_date,position,passport_score,photo_url,video_url,bio,height_cm,weight_kg,dominant_foot,nationality,is_public,is_discoverable,public_consent_at,created_at,updated_at,academies(name,city,logo_url,primary_color)`,
     {
       headers: {
         apikey: key,

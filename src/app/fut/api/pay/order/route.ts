@@ -15,7 +15,6 @@ export async function GET(request: Request) {
       status: order.status,
       amount_mxn: order.amount_mxn,
       membership_until: order.membership_until,
-      player_name: order.player_name,
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "No se pudo consultar.";

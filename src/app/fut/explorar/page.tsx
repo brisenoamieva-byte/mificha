@@ -4,7 +4,10 @@ import { ExploreDirectory } from "@/components/marketing/explore-directory";
 import { ExplorePaywallBanner } from "@/components/marketing/explore-paywall";
 import { SiteFooter, SiteHeader } from "@/components/marketing/site-header";
 import { countExploreDirectoryAcademies, countExploreDirectoryPlayers } from "@/lib/explore-demo-data";
-import { fetchPublicDirectory } from "@/lib/public-directory";
+import {
+  fetchPublicDirectory,
+  sanitizeDirectoryForLockedView,
+} from "@/lib/public-directory";
 import { resolveExploreAccess } from "@/lib/scout-access";
 import { createSupabaseAdminClient } from "@/lib/supabase-admin";
 import { fetchTutorDirectoryPlayers } from "@/lib/tutor-directory";
@@ -52,10 +55,13 @@ export default async function ExplorarPage({
     ...data.players,
     ...tutorPlayers.filter((player) => !academySlugs.has(player.slug)),
   ];
-  const directory = { ...data, players: mergedPlayers };
+  const fullDirectory = { ...data, players: mergedPlayers };
+  const directory = access.unlocked
+    ? fullDirectory
+    : sanitizeDirectoryForLockedView(fullDirectory);
 
-  const playerCount = countExploreDirectoryPlayers(directory);
-  const academyCount = countExploreDirectoryAcademies(directory);
+  const playerCount = countExploreDirectoryPlayers(fullDirectory);
+  const academyCount = countExploreDirectoryAcademies(fullDirectory);
   // Por defecto: todos con consentimiento. El filtro Sub-X es opcional.
   const initialCategoryFilter = initialCategory || "all";
 

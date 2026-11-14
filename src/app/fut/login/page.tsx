@@ -1,33 +1,27 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { Suspense } from "react";
-import { AuthShell } from "@/components/auth/auth-shell";
-import { LoginForm } from "@/components/auth/login-form";
+import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "Iniciar sesión | MiFicha",
 };
 
-export default function LoginPage() {
-  return (
-    <AuthShell
-      title="Inicia sesión"
-      subtitle="Mismo acceso para tutor, representante o academia: te llevamos a tu espacio."
-      footer={
-        <>
-          <Link href="/fut/entrar" className="font-semibold text-mf-brand hover:underline">
-            Acceso unificado
-          </Link>
-          <span className="mx-2 text-mf-text-muted">·</span>
-          <Link href="/fut" className="text-mf-brand hover:underline">
-            Volver al inicio
-          </Link>
-        </>
-      }
-    >
-      <Suspense fallback={<p className="text-sm text-gray-500">Cargando…</p>}>
-        <LoginForm />
-      </Suspense>
-    </AuthShell>
-  );
+type SearchParams = Promise<Record<string, string | string[] | undefined>>;
+
+function firstParam(value: string | string[] | undefined) {
+  if (Array.isArray(value)) return value[0] ?? "";
+  return value ?? "";
+}
+
+/** Legacy: un solo login en /fut/entrar. */
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: SearchParams;
+}) {
+  const params = await searchParams;
+  const next = firstParam(params.next);
+  if (next.startsWith("/")) {
+    redirect(`/fut/entrar?next=${encodeURIComponent(next)}`);
+  }
+  redirect("/fut/entrar");
 }

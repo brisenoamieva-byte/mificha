@@ -129,7 +129,7 @@ export function FichaLockedTeaser({
   const copy = personaMembershipPublicCopy();
   const afterActivate = returnPath || "/fut/tutor";
   const enterHref =
-    loginHref || `/fut/login?next=${encodeURIComponent(afterActivate)}`;
+    loginHref || `/fut/entrar?next=${encodeURIComponent(afterActivate)}`;
   const publicName = formatPublicLockedName(name);
 
   return (

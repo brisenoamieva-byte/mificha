@@ -11,6 +11,7 @@ import {
   digitalFichaPath,
 } from "@/lib/agent-materials";
 import { formatPlayerCategory } from "@/lib/player-category";
+import { formatPublicLockedName } from "@/lib/privacy";
 import { resolveExploreAccess } from "@/lib/scout-access";
 import {
   getTutorChildByShareToken,
@@ -32,8 +33,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     const child = await peekTutorChildByShareToken(admin, token);
     if (!child) return { title: "Ficha PDF | MiFicha", robots: { index: false } };
     return {
-      title: `${child.player_name} · Ficha PDF | MiFicha`,
-      description: `Ficha imprimible de ${child.player_name}.`,
+      title: `${formatPublicLockedName(child.player_name)} · Ficha PDF | MiFicha`,
+      description: `Ficha imprimible de ${formatPublicLockedName(child.player_name)}.`,
       robots: { index: false, follow: false },
     };
   } catch {

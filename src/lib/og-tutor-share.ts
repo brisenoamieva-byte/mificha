@@ -1,3 +1,4 @@
+import { formatPublicLockedName } from "@/lib/privacy";
 import type { TutorChild } from "@/lib/tutor-family";
 import { tutorSharePath } from "@/lib/tutor-family";
 
@@ -33,7 +34,7 @@ export function buildOgTutorSharePayload(child: TutorChild): OgTutorSharePayload
       : (parts[0]?.slice(0, 2) || "MF").toUpperCase();
 
   return {
-    title: child.player_name.trim() || "Jugador",
+    title: formatPublicLockedName(child.player_name) || "Jugador",
     subtitle: bits.length > 0 ? bits.join(" · ") : "Ficha de presentación",
     publicCode: child.public_code || null,
     initials,
