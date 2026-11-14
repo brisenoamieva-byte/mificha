@@ -94,8 +94,8 @@ export default function TerminosPage() {
         </LegalParagraph>
         <LegalParagraph>
           Los <strong className="text-mf-text">organizadores de torneo</strong> pueden
-          contratar una temporada MiFicha (calendario, acta y fichas para las academias
-          inscritas). Los precios vigentes se muestran en{" "}
+          registrar su torneo en MiFicha sin costo de plataforma (calendario, acta y
+          sincronización de fichas). El detalle vigente está en{" "}
           <Link href="/fut/organizadores" className="text-mf-brand hover:underline">
             mificha.mx/fut/organizadores
           </Link>
