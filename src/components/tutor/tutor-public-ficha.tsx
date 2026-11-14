@@ -2,10 +2,12 @@ import { GphLogo } from "@/components/ui/gph-logo";
 import { PlayerCategoryBadge } from "@/components/ui/player-category-badge";
 import { TutorCareerSummaryCard } from "@/components/tutor/tutor-career-summary";
 import { TutorLastMatchCard } from "@/components/tutor/tutor-last-match";
+import { TutorPublicContactCard } from "@/components/tutor/tutor-public-contact";
 import { formatPlayerCategory } from "@/lib/player-category";
 import { PLAYER_CODE_SHORT } from "@/lib/player-public-code-copy";
 import type { TutorLinkedPerformance } from "@/lib/tutor-linked-performance";
 import type { TutorChild, TutorMaterial, TutorSeasonStat } from "@/lib/tutor-family";
+import type { TutorPublicContactLinks } from "@/lib/tutor-public-contact";
 
 type MaterialWithUrl = TutorMaterial & { url: string | null };
 
@@ -48,6 +50,7 @@ export function TutorPublicFicha({
   seasons = [],
   shareHref = null,
   absoluteShareUrl = null,
+  contact = null,
 }: {
   child: TutorChild;
   materials: MaterialWithUrl[];
@@ -56,6 +59,7 @@ export function TutorPublicFicha({
   seasons?: TutorSeasonStat[];
   shareHref?: string | null;
   absoluteShareUrl?: string | null;
+  contact?: TutorPublicContactLinks | null;
 }) {
   const profile = child.profile;
   const age = ageFromBirth(profile.birth_date);
@@ -284,6 +288,11 @@ export function TutorPublicFicha({
           están arriba.
         </p>
       ) : null}
+
+      {!compact && contact ? (
+        <TutorPublicContactCard contact={contact} playerName={child.player_name} />
+      ) : null}
+
       <p className="tutor-ficha-print-url hidden text-center text-xs text-mf-text-muted print:block">
         mificha.mx · ficha de {child.player_name}
         {child.public_code ? ` · ${child.public_code}` : ""}

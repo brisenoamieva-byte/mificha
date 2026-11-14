@@ -74,6 +74,10 @@ interface TutorChildCard {
     role_title: string | null;
     tagline: string | null;
     contact_email: string | null;
+    contact_whatsapp: string | null;
+    show_contact_email: boolean;
+    show_contact_whatsapp: boolean;
+    show_contact_academy: boolean;
     instagram: string | null;
     highlight_chips: string[];
     achievements: Array<{ title: string; detail: string }>;
@@ -114,6 +118,10 @@ const emptyForm = {
   role_title: "",
   tagline: "",
   contact_email: "",
+  contact_whatsapp: "",
+  show_contact_email: false,
+  show_contact_whatsapp: false,
+  show_contact_academy: false,
   instagram: "",
   highlight_chips_text: "",
   achievements_text: "",
@@ -264,6 +272,10 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
       role_title: child.profile.role_title ?? "",
       tagline: child.profile.tagline ?? "",
       contact_email: child.profile.contact_email ?? "",
+      contact_whatsapp: child.profile.contact_whatsapp ?? "",
+      show_contact_email: Boolean(child.profile.show_contact_email),
+      show_contact_whatsapp: Boolean(child.profile.show_contact_whatsapp),
+      show_contact_academy: Boolean(child.profile.show_contact_academy),
       instagram: child.profile.instagram ?? "",
       highlight_chips_text: (child.profile.highlight_chips ?? []).join("\n"),
       achievements_text: (child.profile.achievements ?? [])
@@ -513,6 +525,10 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
           role_title: form.role_title || null,
           tagline: form.tagline || null,
           contact_email: form.contact_email || null,
+          contact_whatsapp: form.contact_whatsapp || null,
+          show_contact_email: Boolean(form.show_contact_email),
+          show_contact_whatsapp: Boolean(form.show_contact_whatsapp),
+          show_contact_academy: Boolean(form.show_contact_academy),
           instagram: form.instagram || null,
           highlight_chips_text: form.highlight_chips_text || null,
           achievements_text: form.achievements_text || null,

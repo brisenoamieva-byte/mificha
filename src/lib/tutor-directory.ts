@@ -152,6 +152,7 @@ export async function fetchTutorDirectoryPlayers(
       photo_url,
       video_url,
       has_gph_evaluation: false,
+      gph_global_score: null,
       source: "tutor",
       public_code: code,
       season_stats,

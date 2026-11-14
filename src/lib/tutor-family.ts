@@ -50,7 +50,15 @@ export interface TutorChildProfile {
   /** Frase corta bajo el nombre / “en una frase”. */
   tagline: string | null;
   contact_email: string | null;
+  /** WhatsApp público (solo si show_contact_whatsapp). */
+  contact_whatsapp: string | null;
   instagram: string | null;
+  /** Publicar correo en la ficha (opt-in). */
+  show_contact_email: boolean;
+  /** Publicar WhatsApp en la ficha (opt-in). */
+  show_contact_whatsapp: boolean;
+  /** Mostrar CTA hacia la academia ligada (opt-in). */
+  show_contact_academy: boolean;
   /** Chips de hitos (máx. 4), ej. "Campeona Europa 2024". */
   highlight_chips: string[];
   /** Logros: club/torneo + detalle. */
@@ -144,7 +152,11 @@ export type TutorChildInput = {
   role_title?: string | null;
   tagline?: string | null;
   contact_email?: string | null;
+  contact_whatsapp?: string | null;
   instagram?: string | null;
+  show_contact_email?: boolean;
+  show_contact_whatsapp?: boolean;
+  show_contact_academy?: boolean;
   highlight_chips?: string[];
   achievements?: Array<{ title: string; detail: string }>;
   callups?: Array<{ level: string; detail: string }>;
@@ -182,7 +194,11 @@ function emptyProfile(): TutorChildProfile {
     role_title: null,
     tagline: null,
     contact_email: null,
+    contact_whatsapp: null,
     instagram: null,
+    show_contact_email: false,
+    show_contact_whatsapp: false,
+    show_contact_academy: false,
     highlight_chips: [],
     achievements: [],
     callups: [],
@@ -257,6 +273,10 @@ function normalizeChild(raw: TutorChild): TutorChild {
     public_code: normalizePublicCode(raw.public_code) ?? "",
     profile: {
       ...merged,
+      contact_whatsapp: phoneKey(merged.contact_whatsapp) || null,
+      show_contact_email: Boolean(merged.show_contact_email),
+      show_contact_whatsapp: Boolean(merged.show_contact_whatsapp),
+      show_contact_academy: Boolean(merged.show_contact_academy),
       highlight_chips: normalizeStringList(merged.highlight_chips, 4),
       achievements: normalizeNamedPairs(merged.achievements, "title", 12) as Array<{
         title: string;
@@ -295,7 +315,11 @@ function profileFromInput(input: TutorChildInput): TutorChildProfile {
     role_title: input.role_title?.trim() || null,
     tagline: input.tagline?.trim() || null,
     contact_email: input.contact_email?.trim() || null,
+    contact_whatsapp: phoneKey(input.contact_whatsapp) || null,
     instagram: input.instagram?.trim().replace(/^@/, "") || null,
+    show_contact_email: Boolean(input.show_contact_email),
+    show_contact_whatsapp: Boolean(input.show_contact_whatsapp),
+    show_contact_academy: Boolean(input.show_contact_academy),
     highlight_chips: normalizeStringList(input.highlight_chips, 4),
     achievements: normalizeNamedPairs(input.achievements, "title", 12) as Array<{
       title: string;

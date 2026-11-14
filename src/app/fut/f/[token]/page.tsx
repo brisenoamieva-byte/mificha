@@ -29,6 +29,10 @@ import {
   peekTutorChildByShareToken,
   tutorSharePath,
 } from "@/lib/tutor-family";
+import {
+  fetchTutorLinkedAcademyContact,
+  resolveTutorPublicContact,
+} from "@/lib/tutor-public-contact";
 import { createSupabaseAdminClient } from "@/lib/supabase-admin";
 
 interface PageProps {
@@ -183,6 +187,10 @@ export default async function TutorShareFichaPage({ params }: PageProps) {
   const materials = await listTutorMaterials(admin, child);
   const seasons = await listTutorSeasons(admin, child);
   const performance = await fetchTutorLinkedPerformance(admin, child);
+  const academyContact = child.profile.show_contact_academy
+    ? await fetchTutorLinkedAcademyContact(admin, child.linked_academy_id)
+    : null;
+  const contact = resolveTutorPublicContact(child, academyContact);
 
   return (
     <div className="flex min-h-dvh flex-col bg-mf-canvas">
@@ -196,6 +204,7 @@ export default async function TutorShareFichaPage({ params }: PageProps) {
           seasons={seasons}
           shareHref={sharePath}
           absoluteShareUrl={absoluteUrl}
+          contact={contact}
         />
 
         <div className="mt-5">

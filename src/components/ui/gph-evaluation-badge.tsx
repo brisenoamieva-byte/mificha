@@ -8,6 +8,8 @@ type GphEvaluationBadgeProps = {
   className?: string;
   /** Evita anidar un <a> dentro de otra tarjeta-enlace. */
   asSpan?: boolean;
+  /** Calificación global 1–5, si se quiere mostrar en el sello. */
+  score?: number | null;
 };
 
 export function GphEvaluationBadge({
@@ -15,6 +17,7 @@ export function GphEvaluationBadge({
   variant = "soft",
   className,
   asSpan = false,
+  score = null,
 }: GphEvaluationBadgeProps) {
   const classes = cn(
     "inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide",
@@ -24,25 +27,40 @@ export function GphEvaluationBadge({
     className,
   );
 
+  const scoreLabel =
+    score != null && Number.isFinite(score)
+      ? ` · ${Number(score).toFixed(1)}`
+      : "";
+
   const label = (
     <>
       <span aria-hidden className="font-black">
         GPH
       </span>{" "}
-      Evaluación
+      {scoreLabel ? (
+        <span className="normal-case tracking-normal tabular-nums">
+          {Number(score).toFixed(1)}
+        </span>
+      ) : (
+        "Evaluación"
+      )}
     </>
   );
 
   if (href && !asSpan) {
     return (
-      <Link href={href} className={classes} title="Ver evaluación GPH">
+      <Link
+        href={href}
+        className={classes}
+        title={`Evaluación GPH${scoreLabel}`}
+      >
         {label}
       </Link>
     );
   }
 
   return (
-    <span className={classes} title="Tiene evaluación GPH">
+    <span className={classes} title={`Evaluación GPH${scoreLabel || ""}`}>
       {label}
     </span>
   );

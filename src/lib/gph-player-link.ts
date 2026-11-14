@@ -102,19 +102,44 @@ export async function fetchLatestGphSummary(
 export async function fetchGphPlayerIdSet(
   playerIds: string[],
 ): Promise<Set<string>> {
+  const scores = await fetchLatestGphScoresByPlayerId(playerIds);
+  return new Set(scores.keys());
+}
+
+/**
+ * Última calificación global GPH (1–5) por `players.id`.
+ * Si hay evaluación pero aún sin score, el valor es `null` y la clave igual existe.
+ */
+export async function fetchLatestGphScoresByPlayerId(
+  playerIds: string[],
+): Promise<Map<string, number | null>> {
   const unique = [...new Set(playerIds.filter(Boolean))];
-  if (unique.length === 0) return new Set();
+  const out = new Map<string, number | null>();
+  if (unique.length === 0) return out;
 
   const admin = tryAdmin();
-  if (!admin) return new Set();
+  if (!admin) return out;
 
   const { data, error } = await admin
     .from("player_diagnoses")
-    .select("player_id")
-    .in("player_id", unique);
+    .select("player_id, global_score, evaluated_at, created_at")
+    .in("player_id", unique)
+    .order("evaluated_at", { ascending: false })
+    .order("created_at", { ascending: false });
 
-  if (error || !data) return new Set();
-  return new Set(
-    data.map((row) => String((row as { player_id: string }).player_id)),
-  );
+  if (error || !data) return out;
+
+  for (const row of data as Array<{
+    player_id: string;
+    global_score: number | null;
+  }>) {
+    const id = String(row.player_id);
+    if (out.has(id)) continue;
+    const score =
+      row.global_score == null || !Number.isFinite(Number(row.global_score))
+        ? null
+        : Number(row.global_score);
+    out.set(id, score);
+  }
+  return out;
 }

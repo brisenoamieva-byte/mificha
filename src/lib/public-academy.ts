@@ -2,7 +2,7 @@ import {
   defaultAcademyCoverFallback,
   getAcademyCoverUrl,
 } from "@/lib/academy-cover-store";
-import { fetchGphPlayerIdSet } from "@/lib/gph-player-link";
+import { fetchLatestGphScoresByPlayerId } from "@/lib/gph-player-link";
 import { GPH_LOGO } from "@/lib/gph-alliance";
 import { createSupabaseAdminClient } from "@/lib/supabase-admin";
 import { signPlayerPhotoUrl } from "@/lib/supabase-admin";
@@ -35,6 +35,7 @@ export interface FeaturedPlayer {
   passport_score: number;
   photo_url: string | null;
   has_gph_evaluation?: boolean;
+  gph_global_score?: number | null;
 }
 
 export interface PublicAcademyData {
@@ -204,14 +205,18 @@ export async function fetchPublicAcademyBySlug(
       return (right.passport_score ?? 0) - (left.passport_score ?? 0);
     });
     const top = sorted.slice(0, 12);
-    const gphIds = await fetchGphPlayerIdSet(
+    const gphScores = await fetchLatestGphScoresByPlayerId(
       top.map((player) => player.id).filter((id): id is string => Boolean(id)),
     );
     featuredPlayers = await Promise.all(
       top.map(async (player) => ({
         ...player,
         photo_url: await signPlayerPhotoUrl(player.photo_url),
-        has_gph_evaluation: Boolean(player.id && gphIds.has(player.id)),
+        has_gph_evaluation: Boolean(player.id && gphScores.has(player.id)),
+        gph_global_score:
+          player.id && gphScores.has(player.id)
+            ? (gphScores.get(player.id) ?? null)
+            : null,
       })),
     );
   }

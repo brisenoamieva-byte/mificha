@@ -56,7 +56,12 @@ function parseInput(body: Record<string, unknown>): TutorChildInput {
     role_title: body.role_title == null ? null : String(body.role_title),
     tagline: body.tagline == null ? null : String(body.tagline),
     contact_email: body.contact_email == null ? null : String(body.contact_email),
+    contact_whatsapp:
+      body.contact_whatsapp == null ? null : String(body.contact_whatsapp),
     instagram: body.instagram == null ? null : String(body.instagram),
+    show_contact_email: Boolean(body.show_contact_email),
+    show_contact_whatsapp: Boolean(body.show_contact_whatsapp),
+    show_contact_academy: Boolean(body.show_contact_academy),
     highlight_chips: Array.isArray(body.highlight_chips)
       ? body.highlight_chips.map((item) => String(item))
       : parseLinesToList(

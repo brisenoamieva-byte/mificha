@@ -11,6 +11,11 @@ import {
   ExplorePerformanceFilters,
 } from "@/components/marketing/explore-performance-filters";
 import {
+  GphScoreFilterSelect,
+  gphScoreFilterValueFromPerformance,
+  performancePatchFromGphScoreFilter,
+} from "@/components/marketing/gph-score-filter-select";
+import {
   isMarketingPlaceholderAcademy,
   normalizeExplorePlayerName,
 } from "@/lib/explore-demo-data";
@@ -142,7 +147,7 @@ export function ExploreDirectory({
             : " en el buscador"}
         </p>
 
-        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
           <label className="block sm:col-span-2 lg:col-span-2">
             <span className="sr-only">Buscar</span>
             <div className="relative">
@@ -188,6 +193,18 @@ export function ExploreDirectory({
               ))}
             </select>
           </label>
+
+          <GphScoreFilterSelect
+            hideLabel
+            className="sm:col-span-2 lg:col-span-2"
+            value={gphScoreFilterValueFromPerformance(performance)}
+            onChange={(next) =>
+              setPerformance((current) => ({
+                ...current,
+                ...performancePatchFromGphScoreFilter(next),
+              }))
+            }
+          />
         </div>
 
         <div className="mt-3 grid gap-3 lg:grid-cols-2">

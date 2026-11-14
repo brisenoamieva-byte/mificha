@@ -9,6 +9,11 @@ import {
   ExplorePerformanceFilters,
 } from "@/components/marketing/explore-performance-filters";
 import { ExplorePaywallBanner } from "@/components/marketing/explore-paywall";
+import {
+  GphScoreFilterSelect,
+  gphScoreFilterValueFromPerformance,
+  performancePatchFromGphScoreFilter,
+} from "@/components/marketing/gph-score-filter-select";
 import { BrandWordmark } from "@/components/ui/brand-wordmark";
 import { CategoryFilterSelect } from "@/components/ui/category-filter-select";
 import { MexicoLocationSelect } from "@/components/ui/mexico-location-select";
@@ -130,8 +135,8 @@ export function HomeTalentSearch({
             Encuentra jugadores de futbol
           </p>
           <p className="mt-2 max-w-xl text-sm leading-7 text-white/70 sm:text-base">
-            Nombre, posición, categoría y rendimiento. Vista básica gratis; ficha completa con
-            membresía persona (gratis por tiempo limitado).
+            Nombre, posición, categoría, calificación GPH y rendimiento. Vista básica gratis;
+            ficha completa con membresía persona (gratis por tiempo limitado).
             {playerCount > 0 ? (
               <>
                 {" "}
@@ -186,6 +191,17 @@ export function HomeTalentSearch({
                 birthDates={birthDates}
                 hideLabel
                 className="block"
+              />
+
+              <GphScoreFilterSelect
+                hideLabel
+                value={gphScoreFilterValueFromPerformance(performance)}
+                onChange={(next) =>
+                  setPerformance((current) => ({
+                    ...current,
+                    ...performancePatchFromGphScoreFilter(next),
+                  }))
+                }
               />
 
               <MexicoLocationSelect

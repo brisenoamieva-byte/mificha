@@ -1,6 +1,6 @@
 import type { PlayerPosition } from "@/types/database";
 import { locationMatches } from "@/lib/mexico-locations";
-import { fetchGphPlayerIdSet } from "@/lib/gph-player-link";
+import { fetchLatestGphScoresByPlayerId } from "@/lib/gph-player-link";
 import { signPlayerPhotoUrl } from "@/lib/supabase-admin";
 import {
   matchesCategoryFilter,
@@ -30,7 +30,10 @@ export type DirectoryPerformanceFilter = {
   minGoals?: number;
   minAssists?: number;
   minMatches?: number;
+  /** Solo jugadores con evaluación GPH (con o sin score numérico). */
   requireGph?: boolean;
+  /** Mínimo de calificación global GPH (1–5). 0 = sin mínimo. */
+  minGphScore?: number;
   requireVideo?: boolean;
 };
 
@@ -52,6 +55,8 @@ export interface DirectoryPlayer {
   photo_url: string | null;
   video_url?: string | null;
   has_gph_evaluation?: boolean;
+  /** Última calificación global GPH (1–5), si existe. */
+  gph_global_score?: number | null;
   /** academy = plantel certificado; tutor = ficha armada por el tutor */
   source?: "academy" | "tutor";
   public_code?: string | null;
@@ -180,6 +185,7 @@ export function hasActivePerformanceFilter(
       (performance.minAssists && performance.minAssists > 0) ||
       (performance.minMatches && performance.minMatches > 0) ||
       performance.requireGph ||
+      (performance.minGphScore && performance.minGphScore > 0) ||
       performance.requireVideo,
   );
 }
@@ -239,8 +245,8 @@ export async function fetchPublicDirectory(): Promise<PublicDirectoryData> {
     const playerIds = consented
       .map((player) => player.id)
       .filter((id): id is string => Boolean(id));
-    const [gphIds, seasonStatsById] = await Promise.all([
-      fetchGphPlayerIdSet(playerIds),
+    const [gphScores, seasonStatsById] = await Promise.all([
+      fetchLatestGphScoresByPlayerId(playerIds),
       fetchActiveSeasonStatsByPlayerId(playerIds, url, key),
     ]);
     const players = await Promise.all(
@@ -249,7 +255,11 @@ export async function fetchPublicDirectory(): Promise<PublicDirectoryData> {
         source: "academy" as const,
         academies: asAcademyEmbed(player.academies),
         photo_url: await signPlayerPhotoUrl(player.photo_url),
-        has_gph_evaluation: Boolean(player.id && gphIds.has(player.id)),
+        has_gph_evaluation: Boolean(player.id && gphScores.has(player.id)),
+        gph_global_score:
+          player.id && gphScores.has(player.id)
+            ? (gphScores.get(player.id) ?? null)
+            : null,
         season_stats: player.id
           ? (seasonStatsById.get(player.id) ?? { ...EMPTY_SEASON_STATS })
           : { ...EMPTY_SEASON_STATS },
@@ -307,6 +317,7 @@ export function filterDirectory(
   const minAssists = performance?.minAssists ?? 0;
   const minMatches = performance?.minMatches ?? 0;
   const requireGph = Boolean(performance?.requireGph);
+  const minGphScore = performance?.minGphScore ?? 0;
   const requireVideo = Boolean(performance?.requireVideo);
 
   const academies = (Array.isArray(data.academies) ? data.academies : []).filter((academy) => {
@@ -339,7 +350,15 @@ export function filterDirectory(
     if (stats.goals < minGoals) return false;
     if (stats.assists < minAssists) return false;
     if (stats.matches < minMatches) return false;
-    if (requireGph && !player.has_gph_evaluation) return false;
+    if ((requireGph || minGphScore > 0) && !player.has_gph_evaluation) {
+      return false;
+    }
+    if (minGphScore > 0) {
+      const score = player.gph_global_score;
+      if (score == null || !Number.isFinite(score) || score < minGphScore) {
+        return false;
+      }
+    }
     if (requireVideo && !player.video_url) return false;
 
     if (!normalizedQuery) return true;

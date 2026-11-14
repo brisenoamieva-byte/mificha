@@ -1,5 +1,10 @@
 "use client";
 
+import {
+  GphScoreFilterSelect,
+  gphScoreFilterValueFromPerformance,
+  performancePatchFromGphScoreFilter,
+} from "@/components/marketing/gph-score-filter-select";
 import type { DirectoryPerformanceFilter } from "@/lib/public-directory";
 import { CURRENT_SEASON_LABEL } from "@/lib/marketing-season";
 import { cn } from "@/lib/utils";
@@ -10,6 +15,7 @@ export const DEFAULT_PERFORMANCE_FILTER: DirectoryPerformanceFilter = {
   minAssists: 0,
   minMatches: 0,
   requireGph: false,
+  minGphScore: 0,
   requireVideo: false,
 };
 
@@ -109,34 +115,32 @@ export function ExplorePerformanceFilters({
           placeholder="Ej. 5"
         />
       </div>
-      <div className="flex flex-wrap gap-x-4 gap-y-2">
-        <label
-          className={cn(
-            "inline-flex items-center gap-2 text-sm",
-            dark ? "text-white/85" : "text-mf-text-secondary",
-          )}
-        >
-          <input
-            type="checkbox"
-            checked={Boolean(value.requireGph)}
-            onChange={(event) => patch({ requireGph: event.target.checked })}
-            className="h-4 w-4 rounded border-mf-border text-mf-gph focus:ring-mf-gph"
-          />
-          Con evaluación GPH
-        </label>
-        <label
-          className={cn(
-            "inline-flex items-center gap-2 text-sm",
-            dark ? "text-white/85" : "text-mf-text-secondary",
-          )}
-        >
-          <input
-            type="checkbox"
-            checked={Boolean(value.requireVideo)}
-            onChange={(event) => patch({ requireVideo: event.target.checked })}
-            className="h-4 w-4 rounded border-mf-border text-mf-gph focus:ring-mf-gph"
-          />
-          Con video
+      <div className="grid gap-2 sm:grid-cols-2">
+        <GphScoreFilterSelect
+          value={gphScoreFilterValueFromPerformance(value)}
+          onChange={(next) => patch(performancePatchFromGphScoreFilter(next))}
+          selectClassName={inputClass}
+        />
+        <label className="block">
+          <span className="mb-1 block text-xs font-medium text-mf-text-secondary">
+            Video
+          </span>
+          <label
+            className={cn(
+              "inline-flex h-[42px] w-full items-center gap-2 rounded-lg border px-3 text-sm",
+              dark
+                ? "border-white/20 bg-white/95 text-mf-text"
+                : "border-mf-border bg-white text-mf-text-secondary",
+            )}
+          >
+            <input
+              type="checkbox"
+              checked={Boolean(value.requireVideo)}
+              onChange={(event) => patch({ requireVideo: event.target.checked })}
+              className="h-4 w-4 rounded border-mf-border text-mf-gph focus:ring-mf-gph"
+            />
+            Solo con video
+          </label>
         </label>
       </div>
     </div>

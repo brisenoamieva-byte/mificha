@@ -112,6 +112,10 @@ interface TutorBuilderPanelProps {
     role_title: string;
     tagline: string;
     contact_email: string;
+    contact_whatsapp: string;
+    show_contact_email: boolean;
+    show_contact_whatsapp: boolean;
+    show_contact_academy: boolean;
     instagram: string;
     highlight_chips_text: string;
     achievements_text: string;
@@ -197,6 +201,10 @@ export function TutorBuilderPanel({
       role_title: form.role_title || null,
       tagline: form.tagline || null,
       contact_email: form.contact_email || null,
+      contact_whatsapp: form.contact_whatsapp || null,
+      show_contact_email: Boolean(form.show_contact_email),
+      show_contact_whatsapp: Boolean(form.show_contact_whatsapp),
+      show_contact_academy: Boolean(form.show_contact_academy),
       instagram: form.instagram || null,
       highlight_chips: parseLinesToList(form.highlight_chips_text, 4),
       achievements: parseTitleDetailLines(form.achievements_text, 12),
@@ -323,7 +331,7 @@ export function TutorBuilderPanel({
               className="mf-btn-gph mt-4 w-full sm:w-auto"
             >
               <ImagePlus className="h-4 w-4" />
-              Subir foto de portada
+              Subir foto
             </button>
           ) : null}
           {!child.explore_opt_in ? (
@@ -705,9 +713,25 @@ export function TutorBuilderPanel({
                         }))
                       }
                       className={inputClass}
+                      placeholder="tutor@correo.com"
                     />
                   </label>
                   <label className="block text-sm font-medium text-mf-text">
+                    WhatsApp de contacto
+                    <input
+                      type="tel"
+                      value={form.contact_whatsapp}
+                      onChange={(event) =>
+                        setForm((current) => ({
+                          ...current,
+                          contact_whatsapp: event.target.value,
+                        }))
+                      }
+                      className={inputClass}
+                      placeholder="442 123 4567"
+                    />
+                  </label>
+                  <label className="block text-sm font-medium text-mf-text sm:col-span-2">
                     Instagram
                     <input
                       value={form.instagram}
@@ -722,6 +746,9 @@ export function TutorBuilderPanel({
                     />
                   </label>
                 </div>
+                <p className="text-xs leading-5 text-mf-text-muted">
+                  Correo y WhatsApp no se publican solos: actívalos en Compartir.
+                </p>
                 <label className="block text-sm font-medium text-mf-text">
                   Hitos (uno por línea, máx. 4)
                   <textarea
@@ -823,10 +850,10 @@ export function TutorBuilderPanel({
                   <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-mf-gph/40 bg-mf-gph-soft px-4 py-8 text-center transition hover:border-mf-gph hover:bg-mf-gph-soft/80">
                     <ImagePlus className="h-8 w-8 text-mf-gph" />
                     <span className="text-sm font-semibold text-mf-gph-ink">
-                      Subir foto de portada
+                      Subir foto
                     </span>
                     <span className="text-xs text-mf-text-secondary">
-                      JPG o PNG · de frente, clara
+                      Puedes subir varias · JPG o PNG
                     </span>
                     <input
                       type="file"
@@ -891,7 +918,8 @@ export function TutorBuilderPanel({
             <ul className="space-y-3">
               {child.materials.length === 0 ? (
                 <li className="text-sm text-mf-text-muted">
-                  Aún no hay material. Empieza con una foto clara de frente.
+                  Aún no hay material. Sube fotos (la primera queda de portada; luego puedes
+                  cambiarla) y videos.
                 </li>
               ) : (
                 child.materials.map((item) => (
@@ -1265,6 +1293,111 @@ export function TutorBuilderPanel({
                 </Link>
               </div>
             ) : null}
+
+            <div className="space-y-3 rounded-xl border border-mf-border bg-mf-canvas px-4 py-4">
+              <div>
+                <p className="text-sm font-semibold text-mf-gph-ink">
+                  Contacto en la ficha pública
+                </p>
+                <p className="mt-1 text-sm leading-6 text-mf-text-secondary">
+                  Apagado por defecto. Activa solo lo que quieras que vea un representante o
+                  academia.
+                </p>
+              </div>
+              <label className="flex cursor-pointer items-start gap-2.5 text-sm text-mf-text">
+                <input
+                  type="checkbox"
+                  checked={form.show_contact_email}
+                  onChange={(event) =>
+                    setForm((current) => ({
+                      ...current,
+                      show_contact_email: event.target.checked,
+                    }))
+                  }
+                  className="mt-0.5 h-4 w-4 rounded border-mf-border"
+                />
+                <span>
+                  Mostrar correo
+                  {form.contact_email ? (
+                    <span className="block text-xs text-mf-text-muted">{form.contact_email}</span>
+                  ) : (
+                    <span className="block text-xs text-mf-danger">
+                      Primero escribe el correo en Datos del jugador.
+                    </span>
+                  )}
+                </span>
+              </label>
+              <label className="flex cursor-pointer items-start gap-2.5 text-sm text-mf-text">
+                <input
+                  type="checkbox"
+                  checked={form.show_contact_whatsapp}
+                  onChange={(event) =>
+                    setForm((current) => ({
+                      ...current,
+                      show_contact_whatsapp: event.target.checked,
+                    }))
+                  }
+                  className="mt-0.5 h-4 w-4 rounded border-mf-border"
+                />
+                <span>
+                  Mostrar WhatsApp del tutor
+                  {form.contact_whatsapp ? (
+                    <span className="block text-xs text-mf-text-muted">
+                      {form.contact_whatsapp}
+                    </span>
+                  ) : (
+                    <span className="block text-xs text-mf-danger">
+                      Primero escribe el WhatsApp en Datos del jugador.
+                    </span>
+                  )}
+                </span>
+              </label>
+              <label
+                className={`flex items-start gap-2.5 text-sm ${
+                  child.linked_academy_id
+                    ? "cursor-pointer text-mf-text"
+                    : "cursor-not-allowed text-mf-text-muted"
+                }`}
+              >
+                <input
+                  type="checkbox"
+                  disabled={!child.linked_academy_id}
+                  checked={Boolean(form.show_contact_academy && child.linked_academy_id)}
+                  onChange={(event) =>
+                    setForm((current) => ({
+                      ...current,
+                      show_contact_academy: event.target.checked,
+                    }))
+                  }
+                  className="mt-0.5 h-4 w-4 rounded border-mf-border"
+                />
+                <span>
+                  Mostrar contacto de academia
+                  {child.linked_academy_name ? (
+                    <span className="block text-xs text-mf-text-muted">
+                      {child.linked_academy_name}
+                    </span>
+                  ) : (
+                    <span className="block text-xs text-mf-text-muted">
+                      Disponible cuando haya academia ligada.
+                    </span>
+                  )}
+                </span>
+              </label>
+              <button
+                type="button"
+                disabled={busy}
+                className="mf-btn-gph"
+                onClick={() => {
+                  const event = {
+                    preventDefault() {},
+                  } as React.FormEvent;
+                  onSaveProfile(event);
+                }}
+              >
+                Guardar contacto público
+              </button>
+            </div>
 
             <TutorConsentPanel
               exploreOptIn={Boolean(child.explore_opt_in)}

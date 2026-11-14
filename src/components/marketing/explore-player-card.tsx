@@ -135,7 +135,9 @@ export function ExplorePlayerCard({
               Verificada
             </span>
           )}
-          {unlocked && player.has_gph_evaluation ? <GphEvaluationBadge asSpan /> : null}
+          {unlocked && player.has_gph_evaluation ? (
+            <GphEvaluationBadge asSpan score={player.gph_global_score} />
+          ) : null}
           {unlocked && player.video_url ? (
             <span className="inline-flex items-center gap-1 font-medium text-violet-700">
               <Film className="h-3 w-3 shrink-0" aria-hidden />
