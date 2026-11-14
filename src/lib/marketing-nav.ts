@@ -8,7 +8,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { CRACKS_TRYOUTS_PATH } from "@/lib/cracks-tryouts";
-import { trainingWhatsAppHref } from "@/lib/gph-alliance";
+import { trainingBookingHref } from "@/lib/gph-alliance";
 import { GPH_PACHUCA_PATH } from "@/lib/gph-pachuca-segunda-fase";
 import { academyMembershipPublicCopy } from "@/lib/academy-membership";
 import { personaMembershipPublicCopy } from "@/lib/persona-membership";
@@ -65,9 +65,9 @@ export const MARKETING_NAV: NavSection[] = [
         description: "Diagnóstico GPH + 12 meses de MiFicha",
       },
       {
-        href: trainingWhatsAppHref(),
-        label: "Entrenamientos",
-        description: "Especialización GPH · WhatsApp",
+        href: trainingBookingHref(),
+        label: "Clase muestra GPH",
+        description: "Gratis · ver horarios en Calendly",
       },
     ],
   },

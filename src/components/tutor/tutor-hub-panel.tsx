@@ -132,12 +132,12 @@ export function TutorHubPanel() {
           GPH · especialización
         </p>
         <h2 className="mt-2 text-xl font-semibold tracking-tight text-mf-gph-ink sm:text-2xl">
-          Solicita tu entrenamiento gratuito con GPH
+          Clase muestra gratuita con GPH
         </h2>
         <p className="mt-2 max-w-2xl text-sm leading-7 text-mf-text-secondary">
           {isCalendly
-            ? "Elige un espacio disponible en el calendario. Confirmamos cupo y sede contigo."
-            : "Revisa disponibilidad con GPH por WhatsApp. Cuando tengamos Calendly público, el mismo botón abrirá el calendario."}
+            ? "Elige un horario disponible en el calendario GPH. Sesión de especialización sin costo."
+            : "Revisa disponibilidad con GPH por WhatsApp."}
         </p>
         <div className="mt-5 flex flex-wrap gap-3">
           <a
@@ -146,7 +146,7 @@ export function TutorHubPanel() {
             rel="noopener noreferrer"
             className="mf-btn-gph"
           >
-            {isCalendly ? "Ver espacios en Calendly" : "Solicitar por WhatsApp"}
+            {isCalendly ? "Ver horarios" : "Solicitar por WhatsApp"}
           </a>
           <Link href="/fut/evaluaciones" className="mf-btn-gph-ghost">
             Ver diagnóstico GPH

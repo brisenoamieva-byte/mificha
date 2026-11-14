@@ -84,3 +84,26 @@ export function trainingWhatsAppHref() {
     "Hola, quiero información sobre entrenamientos y especialización GPH en MiFicha.";
   return `https://wa.me/${GPH_WHATSAPP_E164}?text=${encodeURIComponent(text)}`;
 }
+
+/** Calendly clase muestra / entrenamiento. Env → default → WhatsApp. */
+export function getTrainingBookingConfig() {
+  const dedicated = process.env.NEXT_PUBLIC_GPH_CALENDLY_URL?.trim() || "";
+  const url = dedicated || GPH_TRAINING_CALENDLY_DEFAULT;
+  return {
+    ready: Boolean(url),
+    url: url || null,
+  };
+}
+
+export function trainingBookingHref() {
+  const { url } = getTrainingBookingConfig();
+  return url || trainingWhatsAppHref();
+}
+
+export function trainingBookingIsCalendar() {
+  return getTrainingBookingConfig().ready;
+}
+
+export function trainingBookingCtaLabel(fallback = "Pedir por WhatsApp") {
+  return trainingBookingIsCalendar() ? "Ver horarios de clase muestra" : fallback;
+}

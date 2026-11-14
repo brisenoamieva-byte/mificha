@@ -18,6 +18,8 @@ import {
   diagnosisBookingHref,
   diagnosisBookingIsCalendar,
   diagnosisWhatsAppHref,
+  trainingBookingCtaLabel,
+  trainingBookingHref,
 } from "@/lib/gph-alliance";
 import { DiagnosisPromoPrice } from "@/components/marketing/diagnosis-promo-price";
 import { DIAGNOSIS_PRODUCT } from "@/lib/pricing";
@@ -45,6 +47,7 @@ export function EvaluacionesPageContent() {
   const bookingHref = diagnosisBookingHref();
   const bookingIsCalendar = diagnosisBookingIsCalendar();
   const whatsapp = diagnosisWhatsAppHref();
+  const trainingHref = trainingBookingHref();
 
   return (
     <>
@@ -54,7 +57,8 @@ export function EvaluacionesPageContent() {
         description={
           <WithBrandName>
             Sesión presencial en Querétaro. Sales con etapa, objetivos claros y el
-            informe en MiFicha — para entrenar con rumbo.
+            informe en MiFicha — para entrenar con rumbo. GPH también ofrece clase
+            muestra gratuita.
           </WithBrandName>
         }
         actions={
@@ -79,9 +83,14 @@ export function EvaluacionesPageContent() {
               Ver ejemplo de informe
             </Link>
             {" · "}
-            <Link href="/fut/tutor" className="font-semibold text-mf-gph hover:underline">
-              Crear ficha de tutor
-            </Link>
+            <a
+              href={trainingHref}
+              className="font-semibold text-mf-gph hover:underline"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Clase muestra gratis · horarios
+            </a>
           </p>
         }
         aside={
@@ -169,6 +178,35 @@ export function EvaluacionesPageContent() {
               </li>
             ))}
           </ol>
+        </div>
+      </section>
+
+      <section
+        id="clase-muestra"
+        className="scroll-mt-24 border-b border-mf-border bg-white"
+      >
+        <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-8 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-10">
+          <div className="max-w-xl">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
+              También con GPH
+            </p>
+            <h2 className="mt-2 text-xl font-semibold tracking-[-0.02em] text-mf-gph-ink">
+              Clase muestra gratuita
+            </h2>
+            <p className="mt-1.5 text-sm leading-6 text-mf-text-secondary">
+              Sesión de especialización sin costo. Elige un espacio libre en el
+              calendario GPH.
+            </p>
+          </div>
+          <a
+            href={trainingHref}
+            className="mf-btn-gph shrink-0 self-start sm:self-center"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {trainingBookingCtaLabel()}
+            <ArrowRight className="h-4 w-4" />
+          </a>
         </div>
       </section>
 

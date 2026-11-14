@@ -1,25 +1,16 @@
 import {
-  GPH_TRAINING_CALENDLY_DEFAULT,
-  GPH_WHATSAPP_E164,
+  trainingBookingHref,
+  trainingBookingIsCalendar,
 } from "@/lib/gph-alliance";
 import { MEMBERSHIP_OFFER } from "@/lib/membership-offer";
 
-/** Calendly clase muestra / entrenamiento. Env → default GPH → WhatsApp. */
+/** @deprecated usar trainingBookingHref — se mantiene para el hub tutor. */
 export function gphFreeTrainingBookingHref() {
-  const calendly =
-    process.env.NEXT_PUBLIC_GPH_CALENDLY_URL?.trim() ||
-    GPH_TRAINING_CALENDLY_DEFAULT;
-  if (calendly) return calendly;
-  const text =
-    "Hola, quiero solicitar mi entrenamiento gratuito de especialización con GPH desde MiFicha. ¿Qué espacios hay disponibles?";
-  return `https://wa.me/${GPH_WHATSAPP_E164}?text=${encodeURIComponent(text)}`;
+  return trainingBookingHref();
 }
 
 export function gphFreeTrainingBookingIsCalendly() {
-  return Boolean(
-    process.env.NEXT_PUBLIC_GPH_CALENDLY_URL?.trim() ||
-      GPH_TRAINING_CALENDLY_DEFAULT,
-  );
+  return trainingBookingIsCalendar();
 }
 
 export type TutorServiceStatus = "vivo" | "piloto" | "proximamente";

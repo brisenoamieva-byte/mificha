@@ -1,5 +1,5 @@
 import { CRACKS_TRYOUTS, CRACKS_TRYOUTS_PATH } from "@/lib/cracks-tryouts";
-import { trainingWhatsAppHref } from "@/lib/gph-alliance";
+import { trainingBookingHref } from "@/lib/gph-alliance";
 import {
   GPH_PACHUCA_PATH,
   GPH_PACHUCA_SEGUNDA_FASE,
@@ -62,11 +62,11 @@ export const PRODUCTOS_HUB = {
     },
     {
       id: "entrenamientos",
-      title: "Entrenamientos",
-      detail: "Especialización y sesiones GPH. Cupos y fechas por WhatsApp.",
-      meta: "Con membresía o cotización",
-      href: trainingWhatsAppHref(),
-      cta: "Pedir información",
+      title: "Clase muestra GPH",
+      detail: "Sesión gratuita de especialización. Elige horario en el calendario GPH.",
+      meta: "Gratis · Calendly",
+      href: trainingBookingHref(),
+      cta: "Ver horarios",
     },
   ] satisfies HubItem[],
 } as const;
