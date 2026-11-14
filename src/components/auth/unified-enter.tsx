@@ -312,8 +312,8 @@ export function UnifiedEnter() {
       </button>
 
       <p className="text-center text-xs leading-5 text-mf-text-muted">
-        Tutor, representante y academia usan el mismo correo. La membresía persona (gratis
-        por tiempo limitado; después $50 USD/año) publica fichas y desbloquea detalle en
+        Tutor, representante y academia usan el mismo correo. Explorar Pro (gratis por
+        tiempo limitado; después $50 USD/año) publica fichas y desbloquea el detalle en
         Explorar.
       </p>
     </form>

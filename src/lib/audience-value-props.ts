@@ -96,7 +96,7 @@ export const AUDIENCE_VALUE_PROPS: AudienceValueProp[] = [
     id: "scout",
     icon: Search,
     title: "Visorías y scouts",
-    headline: "Busca gratis; detalle con membresía persona.",
+    headline: "Busca gratis; detalle con Explorar Pro.",
     reasons: [
       "Filtros por categoría, posición y ciudad — gratis.",
       "Solo jugadores con consentimiento del tutor o representante.",

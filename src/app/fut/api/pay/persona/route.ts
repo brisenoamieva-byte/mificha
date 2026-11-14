@@ -26,7 +26,7 @@ export async function POST(request: Request) {
   if (!user) {
     return NextResponse.json(
       {
-        error: "Inicia sesión para activar la membresía persona.",
+        error: "Inicia sesión para activar Explorar Pro.",
         loginRequired: true,
       },
       { status: 401 },

@@ -120,7 +120,7 @@ export function ExplorePlayerCard({
           </p>
         ) : (
           <p className="mt-2 text-xs text-mf-text-muted">
-            {unlocked ? CURRENT_SEASON_LABEL : "Detalle con membresía persona"}
+            {unlocked ? CURRENT_SEASON_LABEL : "Detalle con Explorar Pro"}
           </p>
         )}
 

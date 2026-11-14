@@ -931,7 +931,7 @@ export function TutorBuilderPanel({
               </p>
             ) : (
               <Link href="/fut/explorar#pro" className="mf-btn-gph">
-                Membresía persona
+                Explorar Pro
               </Link>
             )}
 

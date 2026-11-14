@@ -17,7 +17,7 @@ export function ExplorePaywallBanner({ access }: { access: ExploreAccess }) {
   if (access.unlocked) {
     const label =
       access.reason === "scout_sub"
-        ? "Acceso completo · membresía persona"
+        ? "Acceso completo · Explorar Pro"
         : access.reason === "admin"
           ? "Acceso completo · superadmin / staff"
           : access.reason === "owner"
@@ -42,7 +42,7 @@ export function ExplorePaywallBanner({ access }: { access: ExploreAccess }) {
         <div className="px-5 py-6 sm:px-6">
           <p className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
             <Search className="h-3.5 w-3.5" aria-hidden />
-            Membresía persona
+            Explorar Pro
           </p>
           <h2 className="mt-2 text-xl font-semibold text-mf-gph-ink">
             {SCOUT_PRODUCT.headline}
@@ -60,8 +60,8 @@ export function ExplorePaywallBanner({ access }: { access: ExploreAccess }) {
             <Link href="/fut/tutor" className="font-semibold text-mf-gph hover:underline">
               Mis fichas
             </Link>
-            : ahí creas y descargas el PDF de tus jugadores. Esta membresía desbloquea el
-            detalle de terceros en Explorar.
+            : ahí creas y descargas el PDF de tus jugadores. Explorar Pro desbloquea el
+            detalle de otros jugadores.
           </p>
         </div>
         <div className="border-t border-mf-border bg-mf-canvas px-5 py-6 sm:px-6 lg:border-l lg:border-t-0">
@@ -164,8 +164,8 @@ export function FichaLockedTeaser({
         <p className="text-sm leading-7 text-mf-text-secondary">
           {loggedIn ? (
             <>
-              Para ver la ficha completa o el kit de <strong>otro</strong> jugador, activa la
-              membresía persona
+              Para ver la ficha completa o el kit de <strong>otro</strong> jugador, activa
+              Explorar Pro
               {PERSONA_MEMBERSHIP_FREE_PROMO
                 ? ` (${copy.short})`
                 : ` (${SCOUT_PRODUCT.priceLabel} ${SCOUT_PRODUCT.currency}/año)`}
@@ -174,7 +174,7 @@ export function FichaLockedTeaser({
           ) : (
             <>
               Si quieres ver la ficha completa de <strong>otro</strong> jugador (fotos,
-              contacto, kit), entra con tu cuenta o activa la membresía persona
+              contacto, kit), entra con tu cuenta o activa Explorar Pro
               {PERSONA_MEMBERSHIP_FREE_PROMO
                 ? ` (${copy.short})`
                 : ` (${SCOUT_PRODUCT.priceLabel} ${SCOUT_PRODUCT.currency}/año)`}

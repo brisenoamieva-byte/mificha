@@ -91,13 +91,13 @@ export const DIAGNOSIS_PRODUCT = {
 } as const;
 
 export const SCOUT_PRICING = {
-  headline: "Explorar · membresía persona",
+  headline: "Explorar Pro",
   basicLabel: "Búsqueda básica",
   basicPrice: "Gratis",
-  proLabel: "Membresía persona · Explorar Pro",
+  proLabel: "Explorar Pro",
   proStatus: "Gratis por tiempo limitado · después $50 USD/año",
   description:
-    "Filtra por categoría, posición y ciudad. Solo fichas con consentimiento. El detalle completo se desbloquea con la membresía persona (gratis por tiempo limitado; después $50 USD/año).",
+    "Filtra por categoría, posición y ciudad. Solo fichas con consentimiento. El detalle completo se desbloquea con Explorar Pro (gratis por tiempo limitado; después $50 USD/año).",
   unlockNote:
     "Incluye publicar fichas (tutor o representante) y ver fotos, videos, bio, contacto y ficha completa de terceros con opt-in.",
 } as const;

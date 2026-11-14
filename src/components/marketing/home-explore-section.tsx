@@ -37,7 +37,7 @@ export function HomeExploreSection({
             </h2>
             <p className="mt-1 max-w-xl text-sm leading-6 text-mf-text-secondary">
               Fichas que publican tutores o representantes. Datos básicos visibles; el
-              detalle se abre con la membresía persona.
+              detalle se abre con Explorar Pro.
             </p>
           </div>
           <Link href="/fut/explorar" className="mf-btn-gph-ghost shrink-0">

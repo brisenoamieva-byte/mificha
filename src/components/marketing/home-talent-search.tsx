@@ -136,7 +136,7 @@ export function HomeTalentSearch({
           </p>
           <p className="mt-2 max-w-xl text-sm leading-7 text-white/70 sm:text-base">
             Nombre, posición, categoría, calificación GPH y rendimiento. Vista básica gratis;
-            ficha completa con membresía persona (gratis por tiempo limitado).
+            ficha completa con Explorar Pro (gratis por tiempo limitado).
             {playerCount > 0 ? (
               <>
                 {" "}

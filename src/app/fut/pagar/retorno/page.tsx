@@ -80,7 +80,7 @@ export default async function PagoRetornoPage({
   const pending = status === "pending" || status === "in_process";
 
   const paidTitle = isPersona
-    ? "Listo. Membresía persona activa."
+    ? "Listo. Explorar Pro activo."
     : isAcademy
       ? "Listo. Acceso academia activo."
       : "Listo. Ya quedó tu año en MiFicha.";
