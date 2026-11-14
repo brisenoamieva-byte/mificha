@@ -55,10 +55,10 @@ function SponsorLogoTile({
 }) {
   const box =
     size === "lg"
-      ? "h-14 w-[148px] px-3"
+      ? "h-16 w-[160px] px-3"
       : size === "sm"
-        ? "h-10 w-[112px] px-2.5"
-        : "h-12 w-[132px] px-3";
+        ? "h-12 w-[120px] px-2.5"
+        : "h-14 w-[148px] px-3";
 
   return (
     <SlotLink
@@ -72,8 +72,8 @@ function SponsorLogoTile({
       <Image
         src={brand.logoPath}
         alt={brand.name}
-        width={140}
-        height={56}
+        width={160}
+        height={64}
         className="h-full w-full object-contain"
       />
     </SlotLink>
