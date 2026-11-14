@@ -6,9 +6,8 @@ import { Check, Circle, Copy, ExternalLink, FileText, ImagePlus, Video } from "l
 import { PlayerPublicCodeCard } from "@/components/public/player-public-code-card";
 import { TutorCareerSummaryCard } from "@/components/tutor/tutor-career-summary";
 import { TutorConsentPanel } from "@/components/tutor/tutor-consent-panel";
-import { PlayerModeCard } from "@/components/tutor/player-mode-card";
+import { TutorPublicFicha } from "@/components/tutor/tutor-public-ficha";
 import { agentMaterialsPath } from "@/lib/agent-materials";
-import { playerModeSharePath } from "@/lib/player-mode";
 import {
   defaultTutorSeasonLabel,
   TUTOR_CITY_OPTIONS,
@@ -271,10 +270,10 @@ export function TutorBuilderPanel({
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
-                Vista previa · carta
+                Vista previa
               </p>
               <h2 className="mt-1 text-lg font-semibold text-mf-gph-ink">
-                Así la ve el jugador
+                Así se ve la ficha
               </h2>
               <p className="mt-1 text-sm text-mf-text-secondary">
                 {progress.statusLabel} · {progress.percent}% completa
@@ -293,16 +292,9 @@ export function TutorBuilderPanel({
               ) : null}
               {shareHref ? (
                 <>
-                  <Link
-                    href={`${shareHref}${shareHref.includes("?") ? "&" : "?"}vista=jugador`}
-                    target="_blank"
-                    className="mf-btn-gph"
-                  >
-                    Ver como jugador
-                  </Link>
-                  <Link href={shareHref} target="_blank" className="mf-btn-gph-ghost">
+                  <Link href={shareHref} target="_blank" className="mf-btn-gph">
                     <ExternalLink className="h-4 w-4" />
-                    Abrir
+                    Abrir ficha
                   </Link>
                   <button type="button" className="mf-btn-gph-ghost" onClick={onCopyShare}>
                     <Copy className="h-4 w-4" />
@@ -349,7 +341,7 @@ export function TutorBuilderPanel({
           ) : null}
         </div>
 
-        <PlayerModeCard
+        <TutorPublicFicha
           child={previewChild}
           materials={child.materials.map((item) => ({
             id: item.id,
@@ -366,7 +358,8 @@ export function TutorBuilderPanel({
           }))}
           performance={child.linked_performance ?? null}
           seasons={seasons}
-          shareHref={shareHref ? playerModeSharePath(shareHref) : null}
+          shareHref={shareHref}
+          compact
         />
       </div>
 

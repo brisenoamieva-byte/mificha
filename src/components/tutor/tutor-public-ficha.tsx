@@ -1,6 +1,7 @@
 import { GphLogo } from "@/components/ui/gph-logo";
 import { PlayerCategoryBadge } from "@/components/ui/player-category-badge";
 import { TutorCareerSummaryCard } from "@/components/tutor/tutor-career-summary";
+import { TutorLastMatchCard } from "@/components/tutor/tutor-last-match";
 import { formatPlayerCategory } from "@/lib/player-category";
 import { PLAYER_CODE_SHORT } from "@/lib/player-public-code-copy";
 import type { TutorLinkedPerformance } from "@/lib/tutor-linked-performance";
@@ -45,12 +46,16 @@ export function TutorPublicFicha({
   compact = false,
   performance = null,
   seasons = [],
+  shareHref = null,
+  absoluteShareUrl = null,
 }: {
   child: TutorChild;
   materials: MaterialWithUrl[];
   compact?: boolean;
   performance?: TutorLinkedPerformance | null;
   seasons?: TutorSeasonStat[];
+  shareHref?: string | null;
+  absoluteShareUrl?: string | null;
 }) {
   const profile = child.profile;
   const age = ageFromBirth(profile.birth_date);
@@ -89,8 +94,22 @@ export function TutorPublicFicha({
     },
   ] as const;
 
+  const showLastMatch =
+    Boolean(performance?.lastMatch) || Boolean(child.linked_player_id);
+
   return (
     <div className="tutor-ficha-print space-y-4">
+      {showLastMatch ? (
+        <TutorLastMatchCard
+          playerName={child.player_name}
+          publicCode={child.public_code}
+          lastMatch={performance?.lastMatch ?? null}
+          shareHref={shareHref}
+          absoluteShareUrl={absoluteShareUrl}
+          linked={Boolean(child.linked_player_id || performance?.playerId)}
+        />
+      ) : null}
+
       <article className="overflow-hidden rounded-2xl border border-mf-border bg-white shadow-[0_24px_60px_-28px_rgba(15,45,82,0.45)]">
         <div className="relative overflow-hidden bg-gradient-to-br from-[#0a1f3d] via-[#123d68] to-[#0f2d52] px-5 py-6 text-white sm:px-7 sm:py-7">
           <div

@@ -7,7 +7,6 @@ import { PlayerCodeConnections } from "@/components/tutor/player-code-connection
 import { PublicCodeStub } from "@/components/tutor/public-code-stub";
 import { TutorFichaViewTracker } from "@/components/tutor/tutor-ficha-view-tracker";
 import { TutorPublicFicha } from "@/components/tutor/tutor-public-ficha";
-import { PlayerModeCard } from "@/components/tutor/player-mode-card";
 import { FichaLockedTeaser } from "@/components/marketing/explore-paywall";
 import { TutorShareActions } from "@/components/tutor/tutor-share-actions";
 import {
@@ -16,7 +15,6 @@ import {
   buildTutorShareAbsoluteUrl,
 } from "@/lib/og-tutor-share";
 import { formatPlayerCategory } from "@/lib/player-category";
-import { playerModeSharePath } from "@/lib/player-mode";
 import { resolvePublicCode } from "@/lib/public-code-resolve";
 import { resolveExploreAccess } from "@/lib/scout-access";
 import { fetchTutorLinkedPerformance } from "@/lib/tutor-linked-performance";
@@ -35,12 +33,6 @@ import { createSupabaseAdminClient } from "@/lib/supabase-admin";
 
 interface PageProps {
   params: Promise<{ token: string }>;
-  searchParams: Promise<{ vista?: string | string[] }>;
-}
-
-function firstParam(value: string | string[] | undefined) {
-  if (Array.isArray(value)) return value[0] ?? "";
-  return value ?? "";
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -108,13 +100,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 }
 
-export default async function TutorShareFichaPage({
-  params,
-  searchParams,
-}: PageProps) {
+export default async function TutorShareFichaPage({ params }: PageProps) {
   const { token } = await params;
-  const vista = firstParam((await searchParams).vista).toLowerCase();
-  const playerVista = vista === "jugador" || vista === "carta";
   let admin;
   try {
     admin = createSupabaseAdminClient();
@@ -196,106 +183,46 @@ export default async function TutorShareFichaPage({
   const materials = await listTutorMaterials(admin, child);
   const seasons = await listTutorSeasons(admin, child);
   const performance = await fetchTutorLinkedPerformance(admin, child);
-  const playerSharePath = playerModeSharePath(sharePath);
-  const playerModeAbsoluteUrl = (() => {
-    try {
-      const url = new URL(absoluteUrl);
-      url.searchParams.set("vista", "jugador");
-      return url.toString();
-    } catch {
-      return `${absoluteUrl}${absoluteUrl.includes("?") ? "&" : "?"}vista=jugador`;
-    }
-  })();
 
   return (
     <div className="flex min-h-dvh flex-col bg-mf-canvas">
       <TutorFichaViewTracker token={access || token} />
       <SiteHeader actionHref="/fut/tutor" actionLabel="Soy tutor" />
       <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-8 sm:px-6 sm:py-12">
-        {!playerVista ? (
-          <div className="mb-4 flex flex-wrap items-center justify-between gap-2 print:hidden">
-            <p className="text-sm text-mf-text-secondary">
-              Empieza por la carta — así la ve un jugador.
-            </p>
-            <Link
-              href={playerSharePath}
-              className="text-sm font-semibold text-mf-gph hover:underline"
-            >
-              Solo modo jugador
-            </Link>
-          </div>
-        ) : (
-          <div className="mb-4 flex flex-wrap items-center justify-between gap-2 print:hidden">
-            <p className="text-sm font-semibold text-mf-gph-ink">Modo jugador</p>
-            <Link
-              href={sharePath}
-              className="text-sm font-semibold text-mf-gph hover:underline"
-            >
-              Ver ficha completa
-            </Link>
-          </div>
-        )}
-
-        <PlayerModeCard
+        <TutorPublicFicha
           child={child}
           materials={materials}
-          seasons={seasons}
           performance={performance}
-          shareHref={playerSharePath}
-          absoluteShareUrl={playerModeAbsoluteUrl}
+          seasons={seasons}
+          shareHref={sharePath}
+          absoluteShareUrl={absoluteUrl}
         />
 
         <div className="mt-5">
           <TutorShareActions
             playerName={playerName}
-            sharePath={playerSharePath}
-            absoluteUrl={playerModeAbsoluteUrl}
+            sharePath={sharePath}
+            absoluteUrl={absoluteUrl}
             publicCode={child.public_code}
-            materialsKitHref={
-              playerVista
-                ? null
-                : agentMaterialsPath(agentMaterialsAccess(child))
-            }
+            materialsKitHref={agentMaterialsPath(agentMaterialsAccess(child))}
           />
         </div>
 
-        {!playerVista ? (
-          <>
-            <div className="mt-8 border-t border-mf-border-subtle pt-8">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-text-muted">
-                Detalle completo
-              </p>
-              <h2 className="mt-1 text-lg font-semibold text-mf-gph-ink">
-                Para tutores y visores
-              </h2>
-              <div className="mt-4">
-                <TutorPublicFicha
-                  child={child}
-                  materials={materials}
-                  performance={performance}
-                  seasons={seasons}
-                />
-              </div>
-            </div>
-            <PlayerCodeConnections resolution={resolution} className="mt-5" />
-            {!performance?.gph ? (
-              <DiagnosisHireCard playerName={playerName} className="mt-5" compact />
-            ) : null}
-          </>
+        <PlayerCodeConnections resolution={resolution} className="mt-5" />
+        {!performance?.gph ? (
+          <DiagnosisHireCard playerName={playerName} className="mt-5" compact />
         ) : null}
 
         <p className="mt-6 text-center text-xs leading-6 text-mf-text-muted print:hidden">
-          {playerVista
-            ? "Tu carta en MiFicha · pídele a tu tutor completar las misiones"
-            : "Ficha armada por el tutor"}
-          {!playerVista && performance
+          Ficha armada por el tutor
+          {performance
             ? " · incluye rendimiento de academia ligada"
-            : !playerVista && seasons.length
+            : seasons.length
               ? " · con rendimiento capturado por el tutor"
               : ""}
           {" · "}
           <Link href="/fut/tutor" className="font-semibold text-mf-gph hover:underline">
-            {playerVista ? "Entrar con tu tutor" : "Crear la tuya"}
+            Crear la tuya
           </Link>
         </p>
       </main>

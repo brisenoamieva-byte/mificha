@@ -6,11 +6,38 @@ import {
   formatMatchDate,
   getMatchResultLabel,
 } from "@/lib/match-utils";
-import { buildLastMatchShareText } from "@/lib/player-mode";
 import type { TutorLastMatchHighlight } from "@/lib/tutor-linked-performance";
 import { cn } from "@/lib/utils";
 
-export function PlayerModeLastMatch({
+function buildLastMatchShareText(input: {
+  playerName: string;
+  publicCode?: string | null;
+  lastMatch: TutorLastMatchHighlight;
+  url: string;
+}) {
+  const { lastMatch, playerName, publicCode, url } = input;
+  const bits: string[] = [];
+  if (lastMatch.minutes > 0) bits.push(`${lastMatch.minutes} min`);
+  if (lastMatch.goals > 0) {
+    bits.push(`${lastMatch.goals} gol${lastMatch.goals === 1 ? "" : "es"}`);
+  }
+  if (lastMatch.assists > 0) {
+    bits.push(
+      `${lastMatch.assists} asistencia${lastMatch.assists === 1 ? "" : "s"}`,
+    );
+  }
+  if (bits.length === 0) bits.push("convocado");
+
+  const score =
+    lastMatch.goalsFor != null && lastMatch.goalsAgainst != null
+      ? ` (${lastMatch.goalsFor}-${lastMatch.goalsAgainst})`
+      : "";
+  const code = publicCode ? ` (${publicCode})` : "";
+  return `Último partido vs ${lastMatch.opponent}${score}: ${bits.join(" · ")}. Ficha de ${playerName}${code}: ${url}`;
+}
+
+/** Bloque “este partido” en la ficha pública (cuando hay academia ligada). */
+export function TutorLastMatchCard({
   playerName,
   publicCode,
   lastMatch,
@@ -24,7 +51,6 @@ export function PlayerModeLastMatch({
   lastMatch: TutorLastMatchHighlight | null;
   shareHref?: string | null;
   absoluteShareUrl?: string | null;
-  /** Si ya hay vínculo con academia pero aún no hay partido. */
   linked?: boolean;
   className?: string;
 }) {
@@ -51,6 +77,7 @@ export function PlayerModeLastMatch({
   }, [lastMatch, playerName, publicCode, resolvedUrl]);
 
   if (!lastMatch) {
+    if (!linked) return null;
     return (
       <section
         className={cn(
@@ -62,14 +89,11 @@ export function PlayerModeLastMatch({
           Este partido
         </p>
         <p className="mt-2 text-sm font-semibold text-mf-gph-ink">
-          {linked
-            ? "Aún no hay jornada con tus minutos"
-            : "Cuando tu academia registre un partido, aquí aparece tu carta"}
+          Aún no hay jornada con minutos
         </p>
         <p className="mt-1 text-xs leading-5 text-mf-text-muted">
-          {linked
-            ? "Pide al entrenador que capture el acta: minutos, goles y asistencias se encienden solos."
-            : "Con el código MF tu plantel y tu carta son la misma persona."}
+          Cuando la academia capture el acta, aquí aparecen minutos, goles y
+          asistencias.
         </p>
       </section>
     );
