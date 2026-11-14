@@ -12,6 +12,7 @@ import {
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDashboard } from "@/components/dashboard/dashboard-context";
 import { AcademyLinkRequests } from "@/components/dashboard/academy-link-requests";
+import { AcademySeasonClaims } from "@/components/dashboard/academy-season-claims";
 import { NoAcademyState } from "@/components/dashboard/no-academy-state";
 import { Skeleton } from "@/components/dashboard/skeletons";
 import { PlayerAvatar } from "@/components/ui/player-avatar";
@@ -149,6 +150,7 @@ export function PlantelGuardiansContent() {
   return (
     <div className="mx-auto max-w-6xl space-y-6">
       <AcademyLinkRequests academyId={academy.id} />
+      <AcademySeasonClaims academyId={academy.id} />
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div>
           <Link

@@ -20,6 +20,7 @@ import {
   type TutorSeasonStat,
 } from "@/lib/tutor-family";
 import type { TutorLinkedPerformance } from "@/lib/tutor-linked-performance";
+import type { TutorSeasonClaim } from "@/lib/tutor-season-claims";
 
 const PHONE_STORAGE_KEY = "mificha.tutor.phone";
 
@@ -52,6 +53,7 @@ interface TutorChildCard {
   linked_at?: string | null;
   linked_performance?: TutorLinkedPerformance | null;
   seasons?: TutorSeasonStat[];
+  season_claims?: Record<string, TutorSeasonClaim>;
   view_stats?: {
     total_views: number;
     unique_visitors: number;
@@ -151,6 +153,7 @@ async function authed(path: string, init?: RequestInit) {
     child?: TutorChildCard;
     suggestions?: LinkSuggestion[];
     mode?: "active" | "pending";
+    proposed_to_academy?: boolean;
   };
   if (!response.ok) throw new Error(payload.error || "No se pudo completar.");
   return payload;
@@ -630,8 +633,9 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
     if (!child) return;
     setBusy(true);
     setError(null);
+    setNotice(null);
     try {
-      await authed("/fut/api/tutor/seasons", {
+      const payload = await authed("/fut/api/tutor/seasons", {
         method: "POST",
         body: JSON.stringify({
           action: "save",
@@ -641,6 +645,11 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
         }),
       });
       await load(phone);
+      if (payload.proposed_to_academy) {
+        setNotice(
+          "Torneo guardado y enviado a la academia ligada para revisión. No sustituye el acta oficial de partidos.",
+        );
+      }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "No se guardó el torneo.");
     } finally {

@@ -6,6 +6,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDashboard } from "@/components/dashboard/dashboard-context";
 import { AcademyActivityDisputes } from "@/components/dashboard/academy-activity-disputes";
 import { AcademyLinkRequests } from "@/components/dashboard/academy-link-requests";
+import { AcademySeasonClaims } from "@/components/dashboard/academy-season-claims";
 import { LeagueOfficialBanner } from "@/components/dashboard/league-official-banner";
 import { MatchScheduleCard } from "@/components/marketing/match-schedule-card";
 import { NoAcademyState } from "@/components/dashboard/no-academy-state";
@@ -123,6 +124,7 @@ export function PartidosContent() {
       <LeagueOfficialBanner academy={academy} />
 
       <AcademyLinkRequests academyId={academy.id} />
+      <AcademySeasonClaims academyId={academy.id} />
       <AcademyActivityDisputes academyId={academy.id} />
 
       {!season && !loading ? (

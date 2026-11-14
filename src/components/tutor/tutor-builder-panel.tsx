@@ -26,6 +26,10 @@ import {
 } from "@/lib/tutor-ficha-progress";
 import { MEMBERSHIP_CHECKOUT_DISABLED } from "@/lib/gph-commerce";
 import type { TutorLinkedPerformance } from "@/lib/tutor-linked-performance";
+import {
+  claimStatusLabel,
+  type TutorSeasonClaim,
+} from "@/lib/tutor-season-claims";
 import { parseLinesToList, parseTitleDetailLines } from "@/lib/tutor-family";
 import { cn } from "@/lib/utils";
 
@@ -61,6 +65,7 @@ export interface TutorBuilderChild {
   linked_at?: string | null;
   linked_performance?: TutorLinkedPerformance | null;
   seasons?: TutorSeasonStat[];
+  season_claims?: Record<string, TutorSeasonClaim>;
   view_stats?: {
     total_views: number;
     unique_visitors: number;
@@ -217,6 +222,7 @@ export function TutorBuilderPanel({
   );
 
   const seasons = child.seasons ?? [];
+  const seasonClaims = child.season_claims ?? {};
 
   const progress = useMemo(
     () =>
@@ -1185,7 +1191,9 @@ export function TutorBuilderPanel({
                   Aún no hay torneos capturados. Agrega al menos uno con partidos o minutos.
                 </li>
               ) : (
-                seasons.map((row) => (
+                seasons.map((row) => {
+                  const claim = seasonClaims[row.id];
+                  return (
                   <li
                     key={row.id}
                     className="rounded-xl border border-mf-border px-4 py-3"
@@ -1194,6 +1202,24 @@ export function TutorBuilderPanel({
                       <div>
                         <p className="text-sm font-semibold text-mf-gph-ink">
                           {row.tournament_name}
+                          {claim ? (
+                            <span
+                              className={cn(
+                                "ml-2 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em]",
+                                claim.status === "accepted"
+                                  ? "bg-emerald-50 text-emerald-800"
+                                  : claim.status === "rejected"
+                                    ? "bg-mf-danger-soft text-mf-danger"
+                                    : "bg-amber-50 text-amber-800",
+                              )}
+                            >
+                              {claimStatusLabel(claim.status)}
+                            </span>
+                          ) : child.linked_player_id ? (
+                            <span className="ml-2 rounded-full bg-mf-canvas px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-mf-text-muted">
+                              Solo en tu ficha
+                            </span>
+                          ) : null}
                         </p>
                         <p className="mt-0.5 text-xs text-mf-text-muted">
                           {[row.season_label, row.team_name].filter(Boolean).join(" · ")}
@@ -1235,7 +1261,8 @@ export function TutorBuilderPanel({
                       </div>
                     </div>
                   </li>
-                ))
+                  );
+                })
               )}
             </ul>
           </section>

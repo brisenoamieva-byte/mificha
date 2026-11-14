@@ -5,6 +5,10 @@ import {
   listTutorSeasons,
   upsertTutorSeason,
 } from "@/lib/tutor-family";
+import {
+  getSeasonClaimMapForChild,
+  syncSeasonClaimForLinkedChild,
+} from "@/lib/tutor-season-claims";
 import { createSupabaseAdminClient } from "@/lib/supabase-admin";
 import { getAuthedSupabaseClient } from "@/lib/supabase-server";
 
@@ -28,7 +32,8 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: "No encontramos a ese jugador." }, { status: 404 });
     }
     const seasons = await listTutorSeasons(admin, child);
-    return NextResponse.json({ seasons });
+    const claims = await getSeasonClaimMapForChild(admin, child.id);
+    return NextResponse.json({ seasons, claims });
   } catch (error) {
     const message = error instanceof Error ? error.message : "No se pudo cargar.";
     return NextResponse.json({ error: message }, { status: 500 });
@@ -85,7 +90,18 @@ export async function POST(request: Request) {
         },
         body.season_id ? String(body.season_id) : null,
       );
-      return NextResponse.json({ ok: true, season: row });
+      let claim = null;
+      try {
+        claim = await syncSeasonClaimForLinkedChild(admin, child, row);
+      } catch {
+        // El torneo ya quedó guardado; la propuesta a academia es best-effort.
+      }
+      return NextResponse.json({
+        ok: true,
+        season: row,
+        claim,
+        proposed_to_academy: Boolean(claim),
+      });
     }
 
     return NextResponse.json({ error: "Acción inválida." }, { status: 400 });
