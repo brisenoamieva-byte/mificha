@@ -1,10 +1,8 @@
 import Link from "next/link";
-import { ArrowRight, Calendar } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { ORGANIZER_ONE_PAGER } from "@/lib/organizer-one-pager";
 
 export function OrganizerDemoSection() {
-  const { demoMatch } = ORGANIZER_ONE_PAGER;
-
   return (
     <section id="como-funciona" className="scroll-mt-24 border-b border-mf-border bg-mf-canvas">
       <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:py-16">
@@ -16,45 +14,23 @@ export function OrganizerDemoSection() {
           <p className="mt-3 text-sm leading-7 text-mf-text-secondary sm:text-base">
             {ORGANIZER_ONE_PAGER.demoSubtitle}
           </p>
-        </div>
 
-        <div className="mt-8 grid gap-6 lg:grid-cols-2 lg:items-start">
-          <article className="rounded-xl border border-mf-border bg-white p-5 sm:p-6">
-            <p className="text-xs font-semibold uppercase tracking-wide text-mf-brand">
-              {demoMatch.league}
-            </p>
-            <h3 className="mt-2 text-lg font-semibold text-mf-text">
-              vs {demoMatch.opponent}
-            </h3>
-            <p className="mt-1 text-sm text-mf-text-secondary">
-              {demoMatch.category} · {demoMatch.jornada}
-            </p>
-            <dl className="mt-4 space-y-2 text-sm text-mf-text-secondary">
-              <div className="flex items-start gap-2">
-                <Calendar className="mt-0.5 h-4 w-4 shrink-0 text-mf-brand" aria-hidden />
-                <dd>{demoMatch.date}</dd>
-              </div>
-              <dd className="pl-6">{demoMatch.venue}</dd>
-            </dl>
-          </article>
+          <ol className="mt-8 space-y-3">
+            {ORGANIZER_ONE_PAGER.demoSteps.map((step, index) => (
+              <li key={step} className="flex gap-3 text-sm leading-7 text-mf-text-secondary">
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-mf-brand-soft text-xs font-semibold text-mf-brand">
+                  {index + 1}
+                </span>
+                {step}
+              </li>
+            ))}
+          </ol>
 
-          <div className="flex flex-col gap-5">
-            <ol className="space-y-3">
-              {ORGANIZER_ONE_PAGER.demoSteps.map((step, index) => (
-                <li key={step} className="flex gap-3 text-sm leading-7 text-mf-text-secondary">
-                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-mf-brand-soft text-xs font-semibold text-mf-brand">
-                    {index + 1}
-                  </span>
-                  {step}
-                </li>
-              ))}
-            </ol>
-            <div>
-              <Link href={ORGANIZER_ONE_PAGER.demoExploreHref} className="mf-btn-primary">
-                Ver red en Explorar
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </div>
+          <div className="mt-8">
+            <Link href={ORGANIZER_ONE_PAGER.demoExploreHref} className="mf-btn-primary">
+              Ver red en Explorar
+              <ArrowRight className="h-4 w-4" />
+            </Link>
           </div>
         </div>
       </div>

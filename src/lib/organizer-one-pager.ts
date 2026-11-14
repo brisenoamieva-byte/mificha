@@ -15,15 +15,7 @@ export const ORGANIZER_ONE_PAGER = {
   solution:
     "MiFicha publica jornadas, marcador y acta como fuente oficial. Cruza esos datos con cada plantel y avisa al padre. No sustituye tu inscripción ni tu reglamento.",
   demoTitle: "Así funciona",
-  demoSubtitle: "Ejemplo en Querétaro: jornada, acta y ficha del jugador.",
-  demoMatch: {
-    league: "Liga Interescolar Querétaro",
-    category: "Sub-15",
-    opponent: "Instituto Cervantes",
-    jornada: "Jornada 11",
-    date: "14 mar 2026 · 10:00",
-    venue: "Unidad Deportiva Jurica",
-  },
+  demoSubtitle: "Calendario, acta y ficha del jugador en tres pasos.",
   demoSteps: [
     "Publicas calendario, marcador y acta.",
     "MiFicha sincroniza stats con cada plantel.",
