@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { BrandWordmark } from "@/components/ui/brand-wordmark";
 
 export default function PublicPlayerNotFound() {
   return (
@@ -10,10 +9,10 @@ export default function PublicPlayerNotFound() {
           Este jugador no existe o su perfil no es público.
         </p>
         <Link
-          href="/"
+          href="/fut"
           className="mt-6 inline-block rounded-xl bg-[#1B4F8C] px-5 py-3 text-sm font-semibold text-white"
         >
-          Ir a <BrandWordmark />
+          Ir a MiFicha
         </Link>
       </div>
     </div>

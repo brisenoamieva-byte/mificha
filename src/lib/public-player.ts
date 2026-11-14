@@ -60,6 +60,10 @@ function getSupabaseHeaders() {
   return { url, key };
 }
 
+/** Columnas que existen en `players` (sin bio/nationality/updated_at — no están en schema). */
+const PUBLIC_PLAYER_SELECT =
+  "id,academy_id,slug,first_name,last_name,birth_date,position,passport_score,photo_url,video_url,height_cm,weight_kg,dominant_foot,is_public,is_discoverable,public_consent_at,created_at,academies(name,city,logo_url,primary_color)";
+
 export async function fetchPublicPlayerBySlug(
   slug: string,
   options?: { skipMediaSigning?: boolean },
@@ -67,7 +71,7 @@ export async function fetchPublicPlayerBySlug(
   const { url, key } = getSupabaseHeaders();
 
   const playerResponse = await fetch(
-    `${url}/rest/v1/players?slug=eq.${encodeURIComponent(slug)}&is_public=eq.true&public_consent_at=not.is.null&select=id,academy_id,slug,first_name,last_name,birth_date,position,passport_score,photo_url,video_url,bio,height_cm,weight_kg,dominant_foot,nationality,is_public,is_discoverable,public_consent_at,created_at,updated_at,academies(name,city,logo_url,primary_color)`,
+    `${url}/rest/v1/players?slug=eq.${encodeURIComponent(slug)}&is_public=eq.true&public_consent_at=not.is.null&select=${PUBLIC_PLAYER_SELECT}`,
     {
       headers: {
         apikey: key,
@@ -77,7 +81,14 @@ export async function fetchPublicPlayerBySlug(
     },
   );
 
-  if (!playerResponse.ok) return null;
+  if (!playerResponse.ok) {
+    console.error(
+      "fetchPublicPlayerBySlug failed:",
+      playerResponse.status,
+      await playerResponse.text().catch(() => ""),
+    );
+    return null;
+  }
 
   const players = (await playerResponse.json()) as Array<
     Player & { academies: PublicPlayerAcademy | null }

@@ -255,6 +255,8 @@ export function buildIdealXI(
   const categoryLabel = category.kind === "all" ? null : category;
   if (categoryLabel?.kind === "age") {
     scopeLabel = `${scopeLabel} · Sub-${categoryLabel.age}`;
+  } else if (categoryLabel?.kind === "adult") {
+    scopeLabel = `${scopeLabel} · Mayor`;
   } else if (categoryLabel?.kind === "generation") {
     scopeLabel = `${scopeLabel} · Gen. ${categoryLabel.year}`;
   }

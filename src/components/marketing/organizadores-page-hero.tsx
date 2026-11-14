@@ -21,7 +21,7 @@ export function OrganizadoresPageHero({ mailtoHref }: OrganizadoresPageHeroProps
             Organizadores · {CURRENT_SEASON_LABEL}
           </p>
           <h1 className="mt-4 text-[2rem] font-semibold leading-[1.08] tracking-[-0.035em] text-mf-text sm:text-[2.5rem]">
-            Stats oficiales para tu torneo
+            Registra tu torneo y conecta calendario y datos
           </h1>
           <p className="mt-5 text-base leading-8 text-mf-text-secondary sm:text-[1.0625rem]">
             <WithBrandName>
@@ -32,7 +32,7 @@ export function OrganizadoresPageHero({ mailtoHref }: OrganizadoresPageHeroProps
 
           <div className="mt-8 flex flex-wrap gap-3">
             <a href={mailtoHref} className="mf-btn-primary">
-              Agendar conversación
+              Registrar mi torneo
               <ArrowRight className="h-4 w-4" />
             </a>
             <Link href="#precios" className="mf-btn-accent">

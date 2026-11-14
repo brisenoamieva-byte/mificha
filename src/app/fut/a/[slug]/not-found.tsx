@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { BrandWordmark } from "@/components/ui/brand-wordmark";
 
 export default function AcademyPublicNotFound() {
   return (
@@ -12,10 +11,10 @@ export default function AcademyPublicNotFound() {
           Esta academia no existe o su landing pública está desactivada.
         </p>
         <Link
-          href="/"
+          href="/fut"
           className="mt-6 inline-block rounded-full bg-[#1B4F8C] px-6 py-3 text-sm font-bold text-white"
         >
-          Ir a <BrandWordmark />
+          Ir a MiFicha
         </Link>
       </div>
     </div>

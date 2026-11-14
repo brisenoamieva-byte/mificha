@@ -107,6 +107,10 @@ export function getRankingScopeLabel(
     return `${label} · Sub-${category.age}`;
   }
 
+  if (category.kind === "adult") {
+    return `${label} · Mayor`;
+  }
+
   if (category.kind === "generation") {
     return `${label} · Gen. ${category.year}`;
   }

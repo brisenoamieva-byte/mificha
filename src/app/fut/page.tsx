@@ -4,6 +4,7 @@ import { HomeCtaBand } from "@/components/marketing/home-cta-band";
 import { HomeTalentSearch } from "@/components/marketing/home-talent-search";
 import { HomeHowItWorks } from "@/components/marketing/home-how-it-works";
 import { HomeGphAllianceBand } from "@/components/marketing/evaluaciones-page-content";
+import { HomeOrganizersInvite } from "@/components/marketing/home-organizers-invite";
 import { SponsorSlot } from "@/components/marketing/sponsor-slot";
 import { countExploreDirectoryPlayers } from "@/lib/explore-demo-data";
 import {
@@ -84,6 +85,7 @@ export default async function Home() {
           </div>
         </section>
 
+        <HomeOrganizersInvite />
         <HomeGphAllianceBand />
         <HomeHowItWorks />
         <HomeCtaBand />

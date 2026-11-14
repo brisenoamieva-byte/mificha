@@ -52,6 +52,11 @@ export const MARKETING_NAV: NavSection[] = [
         label: "Academia",
         description: `Panel academia · plantel, partidos y MF · ${academyCopy.short}`,
       },
+      {
+        href: "/fut/organizadores",
+        label: "Organizadores de torneo",
+        description: "Calendario, acta y datos conectados a fichas",
+      },
     ],
   },
   {
