@@ -262,7 +262,7 @@ export function HomeTalentSearch({
                   ·
                 </span>
                 <Link href="#pro" className="hover:text-white">
-                  Membresía gratis
+                  Explorar Pro gratis
                 </Link>
               </>
             ) : null}
