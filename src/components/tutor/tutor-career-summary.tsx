@@ -124,7 +124,7 @@ export function TutorCareerSummaryCard({
                 : ""}
             </p>
           </div>
-          {onAddTournament ? (
+          {onAddTournament && hasNumbers ? (
             <button
               type="button"
               onClick={onAddTournament}
