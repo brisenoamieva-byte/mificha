@@ -48,6 +48,21 @@ async function fetchHomePath(accessToken: string) {
   return payload.path || "/fut/entrar?elige=1";
 }
 
+function withTimeout<T>(promise: Promise<T>, ms: number, fallback: T): Promise<T> {
+  return new Promise((resolve) => {
+    const timer = window.setTimeout(() => resolve(fallback), ms);
+    void promise
+      .then((value) => {
+        window.clearTimeout(timer);
+        resolve(value);
+      })
+      .catch(() => {
+        window.clearTimeout(timer);
+        resolve(fallback);
+      });
+  });
+}
+
 export function UnifiedEnter() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -66,47 +81,81 @@ export function UnifiedEnter() {
 
   useEffect(() => {
     let cancelled = false;
+
+    const showLogin = () => {
+      if (cancelled) return;
+      setShowChooser(forcePick);
+      setChecking(false);
+    };
+
+    // Nunca dejar la pantalla colgada en "Revisando tu sesión…".
+    const watchdog = window.setTimeout(showLogin, 7000);
+
     void (async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+      const sessionResult = await withTimeout(
+        supabase.auth.getSession(),
+        5000,
+        { data: { session: null }, error: null },
+      );
+      if (cancelled) return;
+
+      const session = sessionResult.data.session;
       if (!session) {
-        if (!cancelled) {
-          setChecking(false);
-          setShowChooser(forcePick);
-        }
+        showLogin();
         return;
       }
+
       if (forcePick) {
-        if (!cancelled) {
-          setShowChooser(true);
-          setChecking(false);
-        }
+        setShowChooser(true);
+        setChecking(false);
         return;
       }
-      if (nextOverride?.startsWith("/")) {
-        window.location.assign(nextOverride);
-        return;
-      }
+
+      // Evita bucle entrar ↔ destino (sesión inválida / cookies a medias).
+      const bounceKey = `mf_enter_bounce:${nextOverride || "home"}`;
       try {
-        const path = await fetchHomePath(session.access_token);
-        if (path.includes("elige=1")) {
-          if (!cancelled) {
-            setShowChooser(true);
-            setChecking(false);
-          }
+        const last = Number(window.sessionStorage.getItem(bounceKey) || "0");
+        if (last && Date.now() - last < 10000) {
+          await supabase.auth.signOut().catch(() => undefined);
+          setError("Tu sesión anterior se trabó. Entra de nuevo con correo y contraseña.");
+          showLogin();
           return;
         }
-        window.location.assign(path);
+        window.sessionStorage.setItem(bounceKey, String(Date.now()));
       } catch {
-        if (!cancelled) {
+        /* sessionStorage puede fallar en modo estricto */
+      }
+
+      if (nextOverride?.startsWith("/")) {
+        window.location.replace(nextOverride);
+        window.setTimeout(showLogin, 4000);
+        return;
+      }
+
+      try {
+        const path = await withTimeout(
+          fetchHomePath(session.access_token),
+          6000,
+          "/fut/entrar?elige=1",
+        );
+        if (cancelled) return;
+        if (path.includes("elige=1")) {
           setShowChooser(true);
           setChecking(false);
+          return;
         }
+        window.location.replace(path);
+        window.setTimeout(showLogin, 4000);
+      } catch {
+        showLogin();
       }
-    })();
+    })().finally(() => {
+      window.clearTimeout(watchdog);
+    });
+
     return () => {
       cancelled = true;
+      window.clearTimeout(watchdog);
     };
   }, [forcePick, nextOverride]);
 
@@ -150,8 +199,15 @@ export function UnifiedEnter() {
         return;
       }
 
+      try {
+        const bounceKey = `mf_enter_bounce:${nextOverride || "home"}`;
+        window.sessionStorage.removeItem(bounceKey);
+      } catch {
+        /* ignore */
+      }
+
       if (nextOverride?.startsWith("/")) {
-        window.location.assign(nextOverride);
+        window.location.replace(nextOverride);
         return;
       }
 
@@ -161,7 +217,7 @@ export function UnifiedEnter() {
         setLoading(false);
         return;
       }
-      window.location.assign(path);
+      window.location.replace(path);
     } catch (submitError) {
       setError(getErrorMessage(submitError));
       setLoading(false);
