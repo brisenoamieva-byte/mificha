@@ -113,6 +113,7 @@ interface TutorBuilderPanelProps {
     height_cm: string;
     weight_kg: string;
     nationality: string;
+    nui: string;
     dominant_foot: "" | "left" | "right" | "both";
     bio: string;
     goals: string;
@@ -202,6 +203,7 @@ export function TutorBuilderPanel({
       height_cm: form.height_cm ? Number(form.height_cm) : null,
       weight_kg: form.weight_kg ? Number(form.weight_kg) : null,
       nationality: form.nationality || null,
+      nui: form.nui || null,
       dominant_foot: form.dominant_foot || null,
       bio: form.bio || null,
       goals: form.goals || null,
@@ -525,6 +527,25 @@ export function TutorBuilderPanel({
                       }
                       className={inputClass}
                     />
+                  </label>
+                  <label className="block text-sm font-medium text-mf-text">
+                    NUI (federado)
+                    <input
+                      value={form.nui}
+                      onChange={(event) =>
+                        setForm((current) => ({
+                          ...current,
+                          nui: event.target.value.replace(/\D+/g, "").slice(0, 12),
+                        }))
+                      }
+                      className={inputClass}
+                      inputMode="numeric"
+                      placeholder="1265657"
+                      autoComplete="off"
+                    />
+                    <span className="mt-1 block text-xs text-mf-text-muted">
+                      Número único de registro (GASER). Se liga a tu código MF-.
+                    </span>
                   </label>
                   <label className="block text-sm font-medium text-mf-text">
                     Ciudad

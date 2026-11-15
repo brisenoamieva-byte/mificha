@@ -242,6 +242,19 @@ async function attachPublicCode(
     ...row,
     public_code: publicCode,
   };
+  if (row.nui && publicCode) {
+    try {
+      const { claimNui } = await import("@/lib/player-nui");
+      await claimNui(admin, {
+        nui: row.nui,
+        publicCode,
+        kind: "visoria",
+        id: row.id,
+      });
+    } catch {
+      /* no bloquear inscripción si el NUI ya está en otro perfil */
+    }
+  }
   try {
     const { seedTutorFromVisoriaRegistration } = await import("@/lib/tutor-family");
     await seedTutorFromVisoriaRegistration(admin, withCode);
@@ -261,10 +274,30 @@ async function withPublicCodes(
     admin,
     rows.map((row) => row.id),
   );
-  return rows.map((row) => ({
+  const withCodes = rows.map((row) => ({
     ...row,
     public_code: codes[row.id] ?? row.public_code ?? null,
   }));
+
+  try {
+    const { claimNui } = await import("@/lib/player-nui");
+    await Promise.all(
+      withCodes
+        .filter((row) => row.nui && row.public_code)
+        .map((row) =>
+          claimNui(admin, {
+            nui: row.nui,
+            publicCode: row.public_code,
+            kind: "visoria",
+            id: row.id,
+          }).catch(() => null),
+        ),
+    );
+  } catch {
+    /* listado no debe fallar por registry NUI */
+  }
+
+  return withCodes;
 }
 
 export async function listVisoriaRegistrations(

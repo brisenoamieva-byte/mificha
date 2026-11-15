@@ -2,6 +2,11 @@ import { randomBytes, randomUUID } from "crypto";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { listFamilyOrders, type FamilyOrderRow } from "@/lib/family-orders";
 import {
+  claimNui,
+  normalizeNui,
+  releaseNui,
+} from "@/lib/player-nui";
+import {
   collectUsedPublicCodes,
   ensureTutorPublicCodes,
   mintPublicCode,
@@ -46,6 +51,8 @@ export interface TutorChildProfile {
   height_cm: number | null;
   weight_kg: number | null;
   nationality: string | null;
+  /** NUI federado (GASER), ligado al MF- del jugador. */
+  nui: string | null;
   dominant_foot: "left" | "right" | "both" | null;
   bio: string | null;
   goals: string | null;
@@ -157,6 +164,7 @@ export type TutorChildInput = {
   height_cm?: number | null;
   weight_kg?: number | null;
   nationality?: string | null;
+  nui?: string | null;
   dominant_foot?: "left" | "right" | "both" | null;
   bio?: string | null;
   goals?: string | null;
@@ -199,6 +207,7 @@ function emptyProfile(): TutorChildProfile {
     height_cm: null,
     weight_kg: null,
     nationality: null,
+    nui: null,
     dominant_foot: null,
     bio: null,
     goals: null,
@@ -286,6 +295,7 @@ function normalizeChild(raw: TutorChild): TutorChild {
     public_code: normalizePublicCode(raw.public_code) ?? "",
     profile: {
       ...merged,
+      nui: normalizeNui(merged.nui) ?? null,
       contact_whatsapp: phoneKey(merged.contact_whatsapp) || null,
       show_contact_email: Boolean(merged.show_contact_email),
       show_contact_whatsapp: Boolean(merged.show_contact_whatsapp),
@@ -316,6 +326,7 @@ function profileFromInput(input: TutorChildInput): TutorChildProfile {
     height_cm: input.height_cm ?? null,
     weight_kg: input.weight_kg ?? null,
     nationality: input.nationality?.trim() || null,
+    nui: normalizeNui(input.nui) ?? null,
     dominant_foot: input.dominant_foot ?? null,
     bio: input.bio?.trim() || null,
     goals: input.goals?.trim() || null,
@@ -775,9 +786,41 @@ export async function createTutorChild(
     explore_opt_in: false,
     explore_opt_in_at: null,
   };
+  const claimedNui = await claimNui(admin, {
+    nui: input.nui,
+    publicCode: child.public_code,
+    kind: "tutor",
+    id: child.id,
+  });
+  child.profile.nui = claimedNui;
+  await syncLinkedPlayerNui(admin, child);
+
   roster.unshift(child);
   await writeJson(admin, ROSTER, roster);
   return child;
+}
+
+async function syncLinkedPlayerNui(
+  admin: SupabaseClient,
+  child: Pick<TutorChild, "linked_player_id" | "profile" | "memberships">,
+) {
+  const playerIds = new Set<string>();
+  if (child.linked_player_id) playerIds.add(child.linked_player_id);
+  for (const membership of child.memberships ?? []) {
+    if (membership.player_id) playerIds.add(membership.player_id);
+  }
+  if (playerIds.size === 0) return;
+
+  const nui = normalizeNui(child.profile.nui);
+  for (const playerId of playerIds) {
+    const { error } = await admin
+      .from("players")
+      .update({ nui })
+      .eq("id", playerId);
+    if (error && !/nui|column/i.test(error.message)) {
+      throw new Error(error.message);
+    }
+  }
 }
 
 export async function updateTutorChild(
@@ -795,12 +838,24 @@ export async function updateTutorChild(
 
   const current = roster[index];
   const playerName = input.player_name.trim() || current.player_name;
-  roster[index] = {
+  const nextProfile = profileFromInput(input);
+  const claimedNui = await claimNui(admin, {
+    nui: input.nui,
+    previousNui: current.profile?.nui,
+    publicCode: current.public_code,
+    kind: "tutor",
+    id: current.id,
+  });
+  nextProfile.nui = claimedNui;
+
+  const updated: TutorChild = {
     ...current,
     player_name: playerName,
     guardian_phone: phoneKey(input.guardian_phone) || current.guardian_phone,
-    profile: profileFromInput(input),
+    profile: nextProfile,
   };
+  await syncLinkedPlayerNui(admin, updated);
+  roster[index] = updated;
   await writeJson(admin, ROSTER, roster);
   return roster[index];
 }
@@ -847,6 +902,11 @@ export async function deleteTutorChild(
   }
 
   await releaseTutorPublicCode(admin, childId, removed.public_code);
+  await releaseNui(admin, {
+    nui: removed.profile?.nui,
+    kind: "tutor",
+    id: childId,
+  });
   return { ok: true as const, id: childId, player_name: removed.player_name };
 }
 
@@ -1602,6 +1662,7 @@ export async function seedTutorFromVisoriaRegistration(
     guardian_phone: string;
     guardian_email: string | null;
     public_code?: string | null;
+    nui?: string | null;
   },
 ) {
   const code = normalizePublicCode(reg.public_code);
@@ -1656,6 +1717,7 @@ export async function seedTutorFromVisoriaRegistration(
       position: positionLabel || null,
       club: reg.current_club || null,
       city: reg.city || null,
+      nui: normalizeNui(reg.nui) ?? null,
     },
     created_at: new Date().toISOString(),
     memberships: [],

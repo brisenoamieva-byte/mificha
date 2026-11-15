@@ -177,6 +177,7 @@ export function buildPublicFichaDocument(data: PublicPlayerData): FichaDocumentM
   const metaParts: Array<string | null | false> = [
     player.academies?.city ?? null,
     player.jersey_number != null ? `Dorsal ${player.jersey_number}` : null,
+    player.nui ? `NUI ${player.nui}` : null,
     player.dominant_foot ? getDominantFootLabel(player.dominant_foot) : null,
     player.height_cm ? `${player.height_cm} cm` : null,
   ];

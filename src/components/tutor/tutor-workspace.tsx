@@ -78,6 +78,7 @@ interface TutorChildCard {
     height_cm: number | null;
     weight_kg: number | null;
     nationality: string | null;
+    nui: string | null;
     dominant_foot: "left" | "right" | "both" | null;
     bio: string | null;
     goals: string | null;
@@ -122,6 +123,7 @@ const emptyForm = {
   height_cm: "",
   weight_kg: "",
   nationality: "",
+  nui: "",
   dominant_foot: "" as "" | "left" | "right" | "both",
   bio: "",
   goals: "",
@@ -276,6 +278,7 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
       height_cm: child.profile.height_cm != null ? String(child.profile.height_cm) : "",
       weight_kg: child.profile.weight_kg != null ? String(child.profile.weight_kg) : "",
       nationality: child.profile.nationality ?? "",
+      nui: child.profile.nui ?? "",
       dominant_foot: child.profile.dominant_foot ?? "",
       bio: child.profile.bio ?? "",
       goals: child.profile.goals ?? "",
@@ -454,6 +457,7 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
           height_cm: form.height_cm ? Number(form.height_cm) : null,
           weight_kg: form.weight_kg ? Number(form.weight_kg) : null,
           nationality: form.nationality || null,
+          nui: form.nui || null,
           dominant_foot: form.dominant_foot || null,
           bio: form.bio || null,
           goals: form.goals || null,

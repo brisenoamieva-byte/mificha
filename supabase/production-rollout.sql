@@ -933,3 +933,11 @@ for all
 to authenticated
 using (public.get_user_role() = 'admin')
 with check (public.get_user_role() = 'admin');
+
+-- ===== player-nui.sql =====
+alter table public.players
+  add column if not exists nui text;
+
+create unique index if not exists players_nui_unique
+  on public.players (nui)
+  where nui is not null;

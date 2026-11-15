@@ -140,6 +140,7 @@ export type Database = {
           height_cm: number | null;
           weight_kg: number | null;
           jersey_number: number | null;
+          nui: string | null;
           photo_url: string | null;
           video_url: string | null;
           secondary_position: Database["public"]["Enums"]["player_position"] | null;
@@ -171,6 +172,7 @@ export type Database = {
           height_cm?: number | null;
           weight_kg?: number | null;
           jersey_number?: number | null;
+          nui?: string | null;
           photo_url?: string | null;
           video_url?: string | null;
           secondary_position?: Database["public"]["Enums"]["player_position"] | null;
@@ -202,6 +204,7 @@ export type Database = {
           height_cm?: number | null;
           weight_kg?: number | null;
           jersey_number?: number | null;
+          nui?: string | null;
           photo_url?: string | null;
           video_url?: string | null;
           secondary_position?: Database["public"]["Enums"]["player_position"] | null;

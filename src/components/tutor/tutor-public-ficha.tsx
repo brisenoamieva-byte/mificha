@@ -96,6 +96,10 @@ export function TutorPublicFicha({
       label: "Código",
       value: child.public_code || "—",
     },
+    {
+      label: "NUI",
+      value: profile.nui || "—",
+    },
   ] as const;
 
   const showLastMatch =
@@ -162,7 +166,7 @@ export function TutorPublicFicha({
             </div>
           </div>
 
-          <div className="relative mt-5 grid grid-cols-2 gap-2 sm:grid-cols-4">
+          <div className="relative mt-5 grid grid-cols-2 gap-2 sm:grid-cols-3">
             {heroStats.map((stat) => (
               <Stat key={stat.label} label={stat.label} value={stat.value} />
             ))}

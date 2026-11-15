@@ -90,6 +90,7 @@ export function PlayerModal({
   const [position, setPosition] = useState<PlayerPosition>("midfielder");
   const [dominantFoot, setDominantFoot] = useState<DominantFoot>("right");
   const [jerseyNumber, setJerseyNumber] = useState("");
+  const [nui, setNui] = useState("");
   const [heightCm, setHeightCm] = useState("");
   const [weightKg, setWeightKg] = useState("");
   const [isPublic, setIsPublic] = useState(false);
@@ -130,6 +131,7 @@ export function PlayerModal({
       setPosition(player.position);
       setDominantFoot(player.dominant_foot);
       setJerseyNumber(player.jersey_number?.toString() ?? "");
+      setNui(player.nui ?? "");
       setHeightCm(player.height_cm?.toString() ?? "");
       setWeightKg(player.weight_kg?.toString() ?? "");
       setIsPublic(player.is_public);
@@ -156,6 +158,7 @@ export function PlayerModal({
     setPosition("midfielder");
     setDominantFoot("right");
     setJerseyNumber("");
+    setNui("");
     setHeightCm("");
     setWeightKg("");
     setIsPublic(false);
@@ -297,6 +300,14 @@ export function PlayerModal({
         playerId = String(inserted.id);
       }
 
+      await authedFetch("/fut/api/players/nui", {
+        method: "POST",
+        body: JSON.stringify({
+          player_id: playerId,
+          nui: nui.trim() || null,
+        }),
+      });
+
       if (selectedChildId) {
         const linkResult = (await authedFetch("/fut/api/players/link-tutor", {
           method: "POST",
@@ -405,6 +416,26 @@ export function PlayerModal({
                   onChange={(event) => setJerseyNumber(event.target.value)}
                   className={inputClassName}
                 />
+              </div>
+              <div className="sm:col-span-2">
+                <label className="block text-sm font-medium text-slate-700">
+                  NUI federado
+                  <span className="font-normal text-slate-400"> (GASER, opcional)</span>
+                </label>
+                <input
+                  value={nui}
+                  onChange={(event) =>
+                    setNui(event.target.value.replace(/\D+/g, "").slice(0, 12))
+                  }
+                  className={inputClassName}
+                  inputMode="numeric"
+                  placeholder="1265657"
+                  autoComplete="off"
+                />
+                <p className="mt-1 text-xs text-slate-500">
+                  Se asocia al código MF- del jugador. Un NUI solo puede usarse en un
+                  perfil.
+                </p>
               </div>
             </div>
 

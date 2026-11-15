@@ -48,6 +48,7 @@ function parseInput(body: Record<string, unknown>): TutorChildInput {
     height_cm: Number.isFinite(height) ? height : null,
     weight_kg: Number.isFinite(weight) ? weight : null,
     nationality: body.nationality == null ? null : String(body.nationality),
+    nui: body.nui == null ? null : String(body.nui),
     dominant_foot: dominant,
     bio: body.bio == null ? null : String(body.bio),
     goals: body.goals == null ? null : String(body.goals),

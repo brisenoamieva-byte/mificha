@@ -53,6 +53,13 @@ select
     select 1
     from information_schema.columns
     where table_schema = 'public'
+      and table_name = 'players'
+      and column_name = 'nui'
+  ) as players_nui_sql,
+  exists (
+    select 1
+    from information_schema.columns
+    where table_schema = 'public'
       and table_name = 'matches'
       and column_name = 'tournament_id'
   ) as matches_tournament_link_sql,
