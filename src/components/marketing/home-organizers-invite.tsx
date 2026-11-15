@@ -57,7 +57,7 @@ export function HomeOrganizersInvite() {
         <div className="mt-8">
           <Link
             href="/fut/organizadores#registro"
-            className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-mf-brand transition hover:bg-white/90"
+            className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-white px-5 text-sm font-semibold text-mf-brand transition hover:bg-white/90 sm:h-auto sm:w-auto sm:py-2.5"
           >
             Ver registro gratis
             <ArrowRight className="h-4 w-4" />

@@ -44,11 +44,14 @@ export function HomeHowItWorks() {
           ))}
         </ol>
 
-        <div className="mt-8 flex flex-wrap gap-2">
-          <Link href="/fut/entrar" className="mf-btn-gph">
+        <div className="mt-8 flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap">
+          <Link href="/fut/entrar" className="mf-btn-gph w-full justify-center sm:w-auto">
             Entrar / publicar ficha
           </Link>
-          <Link href="/fut/explorar#pro" className="mf-btn-gph-ghost">
+          <Link
+            href="/fut/explorar#pro"
+            className="mf-btn-gph-ghost w-full justify-center sm:w-auto"
+          >
             Ver membresía
           </Link>
         </div>

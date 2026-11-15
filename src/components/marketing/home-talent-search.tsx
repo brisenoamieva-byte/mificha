@@ -124,11 +124,11 @@ export function HomeTalentSearch({
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_70%_at_15%_0%,rgba(52,211,153,0.18),transparent_55%),radial-gradient(ellipse_70%_60%_at_90%_20%,rgba(27,79,140,0.55),transparent_50%),linear-gradient(180deg,rgba(10,31,61,0.2),rgba(10,31,61,0.95))]"
           aria-hidden
         />
-        <div className="relative mx-auto max-w-4xl px-4 py-12 sm:px-6 sm:py-16 lg:py-20">
+        <div className="relative mx-auto max-w-4xl px-4 py-10 sm:px-6 sm:py-16 lg:py-20">
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/55">
             Buscador · {CURRENT_SEASON_LABEL}
           </p>
-          <h1 className="mt-3 text-[2.15rem] font-semibold leading-[1.05] tracking-[-0.04em] text-white sm:text-[2.75rem]">
+          <h1 className="mt-3 text-[2rem] font-semibold leading-[1.05] tracking-[-0.04em] text-white sm:text-[2.75rem]">
             <BrandWordmark className="text-white" />
           </h1>
           <p className="mt-4 max-w-2xl text-lg font-medium leading-8 text-white/90 sm:text-xl">
@@ -218,11 +218,11 @@ export function HomeTalentSearch({
               />
             </div>
 
-            <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+            <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
               <button
                 type="button"
                 onClick={() => setShowPerformance((open) => !open)}
-                className="inline-flex items-center gap-1.5 text-sm font-semibold text-mf-gph-ink hover:text-mf-gph"
+                className="inline-flex items-center gap-1.5 self-start text-sm font-semibold text-mf-gph-ink hover:text-mf-gph"
                 aria-expanded={showPerformance}
               >
                 Filtros de rendimiento
@@ -236,7 +236,10 @@ export function HomeTalentSearch({
                   </span>
                 ) : null}
               </button>
-              <button type="submit" className="mf-btn-gph h-[42px] justify-center px-6">
+              <button
+                type="submit"
+                className="mf-btn-gph h-11 w-full justify-center px-6 sm:h-[42px] sm:w-auto"
+              >
                 Ver resultados · {players.length}
               </button>
             </div>

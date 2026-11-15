@@ -56,10 +56,10 @@ export function SiteHeader({
 
 export function SiteFooter() {
   return (
-    <footer className="border-t border-mf-border bg-mf-surface">
+    <footer className="mf-safe-bottom border-t border-mf-border bg-mf-surface">
       <SponsorSlot placement="footer_rail" />
       <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
-        <div className="flex flex-wrap gap-x-5 gap-y-2 text-sm text-mf-text-secondary">
+        <div className="flex flex-wrap justify-center gap-x-5 gap-y-2 text-center text-sm text-mf-text-secondary sm:justify-start sm:text-left">
           <Link href="/fut/planes" className="transition hover:text-mf-text">
             Planes
           </Link>
@@ -92,15 +92,15 @@ export function SiteFooter() {
           </Link>
         </div>
       </div>
-      <div className="mx-auto flex max-w-6xl flex-col gap-3 border-t border-mf-border px-4 py-8 text-sm text-mf-text-muted sm:flex-row sm:items-center sm:justify-between sm:px-6">
+      <div className="mx-auto flex max-w-6xl flex-col items-center gap-3 border-t border-mf-border px-4 py-8 text-center text-sm text-mf-text-muted sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:text-left">
         <BrandLogoLink href="/fut" size="sm" />
-        <div className="flex flex-col gap-2 sm:items-end">
+        <div className="flex flex-col items-center gap-2 sm:items-end">
           <p className="text-mf-text-secondary">
             <a href="mailto:hola@mificha.mx" className="font-medium text-mf-brand hover:underline">
               hola@mificha.mx
             </a>
           </p>
-          <div className="flex flex-wrap items-center gap-4">
+          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 sm:justify-end">
             <Link href={LEGAL_ROUTES.privacy} className="hover:text-mf-text">
               Aviso de privacidad
             </Link>

@@ -55,10 +55,10 @@ function SponsorLogoTile({
 }) {
   const box =
     size === "lg"
-      ? "h-16 w-[160px] px-3"
+      ? "h-16 w-[min(42vw,160px)] sm:w-[160px] px-3"
       : size === "sm"
-        ? "h-12 w-[120px] px-2.5"
-        : "h-14 w-[148px] px-3";
+        ? "h-12 w-[min(40vw,128px)] sm:w-[128px] px-2.5"
+        : "h-14 w-[min(42vw,148px)] sm:w-[148px] px-3";
 
   return (
     <SlotLink
@@ -83,15 +83,22 @@ function SponsorLogoTile({
 function SponsorLogoRow({
   brands,
   size = "md",
+  className,
 }: {
   brands: SponsorBrand[];
   size?: "sm" | "md" | "lg";
+  className?: string;
 }) {
   if (brands.length === 0) return null;
   return (
-    <ul className="flex flex-wrap items-center gap-2.5 sm:gap-3">
+    <ul
+      className={cn(
+        "flex w-full max-w-xl flex-wrap items-center justify-center gap-2.5 sm:max-w-none sm:justify-start sm:gap-3",
+        className,
+      )}
+    >
       {brands.map((brand) => (
-        <li key={brand.id}>
+        <li key={brand.id} className="shrink-0">
           <SponsorLogoTile brand={brand} size={size} />
         </li>
       ))}
@@ -110,8 +117,8 @@ export function SponsorSlot({ placement }: { placement: SponsorPlacement }) {
         aria-label="Patrocinadores"
         className="border-b border-mf-border bg-[color-mix(in_srgb,var(--mf-brand)_6%,white)]"
       >
-        <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-3.5">
-          <div className="flex min-w-0 flex-wrap items-center gap-x-4 gap-y-2">
+        <div className="mx-auto flex max-w-6xl flex-col items-center gap-3 px-4 py-3.5 text-center sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-3.5 sm:text-left">
+          <div className="flex w-full min-w-0 flex-col items-center gap-2.5 sm:w-auto sm:flex-row sm:items-center sm:gap-x-4 sm:gap-y-2">
             <span className="shrink-0 text-[10px] font-semibold uppercase tracking-[0.14em] text-mf-text-muted">
               {slot.eyebrow}
             </span>
@@ -144,7 +151,7 @@ export function SponsorSlot({ placement }: { placement: SponsorPlacement }) {
         </p>
         {featured ? (
           <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex min-w-0 items-center gap-4">
+            <div className="flex min-w-0 flex-col items-center gap-4 text-center sm:flex-row sm:items-center sm:text-left">
               <SponsorLogoTile brand={featured} size="lg" />
               <div className="min-w-0">
                 <p className="text-sm font-semibold text-mf-gph-ink">{featured.name}</p>
@@ -153,7 +160,10 @@ export function SponsorSlot({ placement }: { placement: SponsorPlacement }) {
                 </p>
               </div>
             </div>
-            <SlotLink href={featured.href} className="mf-btn-gph-ghost shrink-0 self-start">
+            <SlotLink
+              href={featured.href}
+              className="mf-btn-gph-ghost w-full shrink-0 self-stretch sm:w-auto sm:self-start"
+            >
               Conocer más
             </SlotLink>
           </div>
@@ -180,8 +190,8 @@ export function SponsorSlot({ placement }: { placement: SponsorPlacement }) {
   // footer_rail
   return (
     <aside aria-label="Aliados y patrocinio" className="border-b border-mf-border bg-mf-canvas">
-      <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-        <div className="flex min-w-0 flex-wrap items-center gap-x-4 gap-y-3">
+      <div className="mx-auto flex max-w-6xl flex-col items-center gap-3 px-4 py-5 text-center sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:text-left">
+        <div className="flex w-full min-w-0 flex-col items-center gap-3 sm:w-auto sm:flex-row sm:items-center sm:gap-x-4">
           <p className="shrink-0 text-[10px] font-semibold uppercase tracking-[0.14em] text-mf-text-muted">
             {slot.eyebrow}
           </p>
@@ -189,7 +199,7 @@ export function SponsorSlot({ placement }: { placement: SponsorPlacement }) {
         </div>
         <SlotLink
           href={sponsorInquiryHref(placement)}
-          className="inline-flex h-12 shrink-0 items-center rounded-lg border border-dashed border-mf-border bg-white px-3 text-xs font-semibold text-mf-text-secondary transition hover:border-mf-brand/40 hover:text-mf-brand"
+          className="inline-flex h-12 w-full max-w-xs shrink-0 items-center justify-center rounded-lg border border-dashed border-mf-border bg-white px-3 text-xs font-semibold text-mf-text-secondary transition hover:border-mf-brand/40 hover:text-mf-brand sm:w-auto sm:max-w-none"
         >
           + {slot.availableLabel}
         </SlotLink>

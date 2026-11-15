@@ -25,17 +25,17 @@ export function HomeCtaBand() {
             Llena la ficha de tu hijo en MiFicha. En Explorar te buscan agentes de futbol.
           </p>
         </div>
-        <div className="flex flex-wrap gap-3">
+        <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:flex-wrap">
           <Link
             href="/fut/pagar?sku=diagnosis"
-            className="inline-flex items-center gap-2 rounded-full bg-mf-gph px-6 py-3 text-sm font-semibold text-white transition hover:bg-mf-gph-hot"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-mf-gph px-6 py-3 text-sm font-semibold text-white transition hover:bg-mf-gph-hot sm:w-auto"
           >
             Contratar diagnóstico
             <ArrowRight className="h-4 w-4" />
           </Link>
           <Link
             href="/fut/tutor"
-            className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-mf-brand transition hover:bg-white/95"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-mf-brand transition hover:bg-white/95 sm:w-auto"
           >
             Entrar como tutor
           </Link>

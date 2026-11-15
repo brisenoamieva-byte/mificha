@@ -62,7 +62,7 @@ export default async function Home() {
 
         <section className="border-b border-mf-border bg-white">
           <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-10 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-            <div>
+            <div className="min-w-0">
               <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
                 Planes y productos
               </p>
@@ -73,12 +73,15 @@ export default async function Home() {
                 Cuentas de plataforma y servicios GPH.
               </p>
             </div>
-            <div className="flex flex-wrap gap-2">
-              <Link href="/fut/planes" className="mf-btn-gph">
+            <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap">
+              <Link href="/fut/planes" className="mf-btn-gph w-full justify-center sm:w-auto">
                 Ver planes
                 <ArrowRight className="h-4 w-4" />
               </Link>
-              <Link href="/fut/productos" className="mf-btn-gph-ghost">
+              <Link
+                href="/fut/productos"
+                className="mf-btn-gph-ghost w-full justify-center sm:w-auto"
+              >
                 Ver productos
               </Link>
             </div>
