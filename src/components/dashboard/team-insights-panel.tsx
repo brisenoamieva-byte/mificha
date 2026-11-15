@@ -51,20 +51,20 @@ export function TeamInsightsPanel({
   if (players.length === 0) return null;
 
   return (
-    <section className="space-y-6">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-        <div>
+    <section className="min-w-0 space-y-6">
+      <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+        <div className="min-w-0">
           <p className="mf-section-kicker">Rendimiento del plantel</p>
           <h2 className="mf-section-title mt-1 text-lg sm:text-xl">
             Panorama de temporada
           </h2>
           {seasonName ? (
-            <p className="mt-1 text-sm text-mf-text-muted">{seasonName}</p>
+            <p className="mt-1 truncate text-sm text-mf-text-muted">{seasonName}</p>
           ) : null}
         </div>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-4">
         <MiniStatCard
           label="Progreso del plantel"
           value={getPassportTier(progressAverage).label}
@@ -94,11 +94,11 @@ export function TeamInsightsPanel({
         />
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[320px_minmax(0,1fr)]">
-        <div className="mf-card p-6">
-          <div className="flex items-center gap-2">
-            <Crown className="h-5 w-5 text-mf-warning" />
-            <h3 className="mf-section-title">Progreso del plantel</h3>
+      <div className="grid min-w-0 gap-4 lg:grid-cols-[minmax(0,320px)_minmax(0,1fr)] lg:gap-6">
+        <div className="mf-card min-w-0 overflow-hidden p-4 sm:p-6">
+          <div className="flex min-w-0 items-center gap-2">
+            <Crown className="h-5 w-5 shrink-0 text-mf-warning" />
+            <h3 className="mf-section-title min-w-0 truncate">Progreso del plantel</h3>
           </div>
 
           <div className="mt-5 space-y-3">
@@ -107,12 +107,12 @@ export function TeamInsightsPanel({
                 key={player.id}
                 href={`/fut/j/${player.slug}`}
                 target="_blank"
-                className="group block rounded-md border border-transparent p-3 transition hover:border-mf-border hover:bg-mf-canvas"
+                className="group block min-w-0 rounded-md border border-transparent p-2.5 transition hover:border-mf-border hover:bg-mf-canvas sm:p-3"
               >
-                <div className="flex items-center gap-3">
+                <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
                   <span
                     className={cn(
-                      "flex h-8 w-8 items-center justify-center rounded-md text-xs font-semibold",
+                      "flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-xs font-semibold",
                       index === 0
                         ? "bg-mf-warning-soft text-mf-warning"
                         : "bg-mf-canvas text-mf-text-secondary",
@@ -124,13 +124,16 @@ export function TeamInsightsPanel({
                     <p className="truncate font-medium text-mf-text group-hover:text-mf-brand">
                       {player.first_name} {player.last_name}
                     </p>
-                    <p className="text-xs text-mf-text-muted">
+                    <p className="truncate text-xs text-mf-text-muted">
                       {getPositionLabel(player.position)}
                     </p>
                   </div>
-                  <ProgressTierBadge score={player.passport_score} />
+                  <ProgressTierBadge
+                    score={player.passport_score}
+                    className="max-w-[5.75rem] shrink-0 truncate sm:max-w-none"
+                  />
                 </div>
-                <div className="mt-3">
+                <div className="mt-3 min-w-0">
                   <PassportBar score={player.passport_score} />
                 </div>
               </Link>
@@ -138,13 +141,13 @@ export function TeamInsightsPanel({
           </div>
         </div>
 
-        <div className="mf-card p-6">
-          <div className="flex items-center gap-2">
-            <Medal className="h-5 w-5 text-mf-brand" />
-            <h3 className="mf-section-title">Destacados de temporada</h3>
+        <div className="mf-card min-w-0 overflow-hidden p-4 sm:p-6">
+          <div className="flex min-w-0 items-center gap-2">
+            <Medal className="h-5 w-5 shrink-0 text-mf-brand" />
+            <h3 className="mf-section-title min-w-0 truncate">Destacados de temporada</h3>
           </div>
 
-          <div className="mt-6 grid gap-4 sm:grid-cols-2">
+          <div className="mt-5 grid min-w-0 grid-cols-1 gap-3 sm:mt-6 sm:grid-cols-2 sm:gap-4">
             {["total_goals", "total_assists", "total_matches", "total_minutes"].map(
               (metric) => {
                 const typedMetric = metric as keyof PlayerSeasonStat;
@@ -166,14 +169,14 @@ export function TeamInsightsPanel({
                 return (
                   <div
                     key={metric}
-                    className="rounded-md border border-mf-border-subtle bg-mf-canvas p-4"
+                    className="min-w-0 rounded-md border border-mf-border-subtle bg-mf-canvas p-3 sm:p-4"
                   >
                     <p className="text-xs font-medium text-mf-text-secondary">
                       {labels[metric]}
                     </p>
                     {leaderPlayer ? (
                       <>
-                        <p className="mt-2 text-sm font-medium text-mf-text">
+                        <p className="mt-2 truncate text-sm font-medium text-mf-text">
                           {leaderPlayer.first_name} {leaderPlayer.last_name}
                         </p>
                         <p className="mt-1 text-2xl font-semibold tabular-nums text-mf-brand">
@@ -189,8 +192,8 @@ export function TeamInsightsPanel({
             )}
           </div>
 
-          <div className="mt-6 flex items-center justify-center">
-            <PassportRing score={progressAverage} size="lg" />
+          <div className="mt-6 flex w-full justify-center">
+            <PassportRing score={progressAverage} size="md" />
           </div>
         </div>
       </div>

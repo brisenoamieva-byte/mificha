@@ -73,17 +73,21 @@
 }
 
 html {
+  width: 100%;
   overflow-x: clip;
   -webkit-text-size-adjust: 100%;
 }
 
 body {
+  width: 100%;
+  max-width: 100%;
   background: var(--mf-canvas);
   color: var(--mf-text);
   font-feature-settings: "cv11", "ss01";
   -webkit-font-smoothing: antialiased;
   overflow-x: clip;
 }
+
 
 @layer components {
   .mf-safe-top {

@@ -88,9 +88,9 @@ interface PassportRingProps {
 }
 
 const ringSizes = {
-  sm: "max-w-[88px]",
-  md: "max-w-[120px]",
-  lg: "max-w-[160px]",
+  sm: "w-[88px] max-w-[88px]",
+  md: "w-[120px] max-w-[120px]",
+  lg: "w-[160px] max-w-[160px]",
 };
 
 export function PassportRing({
@@ -103,7 +103,7 @@ export function PassportRing({
       variant="hero"
       showLabel={false}
       showScore={false}
-      className={ringSizes[size]}
+      className={cn("mx-auto shrink-0", ringSizes[size])}
     />
   );
 }
@@ -129,12 +129,19 @@ export function MiniStatCard({
   tone = "blue",
 }: MiniStatCardProps) {
   return (
-    <div className="mf-card p-4">
+    <div className="mf-card min-w-0 overflow-hidden p-4">
       <p className="text-xs font-medium text-mf-text-secondary">{label}</p>
-      <p className={cn("mt-2 text-[1.75rem] font-semibold tabular-nums tracking-[-0.02em]", toneClasses[tone])}>
+      <p
+        className={cn(
+          "mt-2 break-words text-[1.5rem] font-semibold tabular-nums tracking-[-0.02em] sm:text-[1.75rem]",
+          toneClasses[tone],
+        )}
+      >
         {value}
       </p>
-      {hint ? <p className="mt-1 text-xs text-mf-text-muted">{hint}</p> : null}
+      {hint ? (
+        <p className="mt-1 line-clamp-2 text-xs text-mf-text-muted">{hint}</p>
+      ) : null}
     </div>
   );
 }

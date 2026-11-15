@@ -21,14 +21,14 @@ export default async function TutorPage() {
   }
 
   return (
-    <div className="flex min-h-dvh flex-col bg-mf-canvas">
+    <div className="flex min-h-dvh w-full max-w-[100vw] flex-col overflow-x-hidden bg-mf-canvas">
       <SiteHeader
         actionHref="/fut/tutor"
         actionLabel="Mis fichas"
         showAcademyLink={false}
       />
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-6 sm:py-10">
-        <div className="mb-6 max-w-2xl">
+      <main className="mx-auto min-w-0 w-full max-w-6xl flex-1 px-4 py-8 sm:px-6 sm:py-10">
+        <div className="mb-6 min-w-0 max-w-2xl">
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
             Cuenta persona
           </p>

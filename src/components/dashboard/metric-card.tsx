@@ -13,10 +13,12 @@ interface MetricCardProps {
 
 export function MetricCard({ title, value, icon: Icon, badge }: MetricCardProps) {
   return (
-    <div className="mf-card p-5">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <p className="text-[0.8125rem] font-medium text-mf-text-secondary">{title}</p>
+    <div className="mf-card min-w-0 p-4 sm:p-5">
+      <div className="flex min-w-0 items-start justify-between gap-3 sm:gap-4">
+        <div className="min-w-0">
+          <p className="text-[0.8125rem] font-medium leading-snug text-mf-text-secondary">
+            {title}
+          </p>
           {badge ? (
             <span
               className={cn(
@@ -34,7 +36,7 @@ export function MetricCard({ title, value, icon: Icon, badge }: MetricCardProps)
             </p>
           )}
         </div>
-        <div className="flex h-9 w-9 items-center justify-center rounded-md bg-mf-brand-soft text-mf-brand">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-mf-brand-soft text-mf-brand">
           <Icon className="h-[18px] w-[18px]" />
         </div>
       </div>

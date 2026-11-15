@@ -115,8 +115,8 @@ export function DashboardShell({ children }: DashboardShellProps) {
         refresh: loadDashboard,
       }}
     >
-      <div className="min-h-dvh bg-mf-canvas">
-        <div className="flex min-h-dvh">
+      <div className="min-h-dvh w-full max-w-[100vw] overflow-x-hidden bg-mf-canvas">
+        <div className="flex min-h-dvh min-w-0">
           <DashboardSidebar
             open={sidebarOpen}
             onClose={() => setSidebarOpen(false)}
@@ -124,7 +124,9 @@ export function DashboardShell({ children }: DashboardShellProps) {
 
           <div className="flex min-w-0 flex-1 flex-col">
             <DashboardHeader onMenuClick={() => setSidebarOpen(true)} />
-            <main className="mf-page-bottom flex-1 px-4 py-6 sm:px-6 sm:py-8">{children}</main>
+            <main className="mf-page-bottom min-w-0 max-w-full flex-1 overflow-x-hidden px-4 py-6 sm:px-6 sm:py-8">
+              {children}
+            </main>
           </div>
         </div>
       </div>

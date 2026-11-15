@@ -215,7 +215,7 @@ export function DashboardHome() {
   }
 
   return (
-    <div className="mx-auto max-w-7xl space-y-8">
+    <div className="mx-auto min-w-0 max-w-7xl space-y-8">
       <div>
         <h1 className="mf-page-title">Dashboard</h1>
         <p className="mt-1 text-sm text-mf-text-secondary">
@@ -244,7 +244,7 @@ export function DashboardHome() {
         <span className="text-sm font-semibold text-mf-brand">Abrir →</span>
       </Link>
 
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <div className="grid min-w-0 grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4 [&>*]:min-w-0">
         {stats ? (
           <>
             <MetricCard
@@ -300,8 +300,8 @@ export function DashboardHome() {
 
       <AcademyWeeklyCompetition academyId={academy.id} />
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        <section className="mf-card p-6 lg:col-span-2">
+      <div className="grid min-w-0 gap-4 lg:grid-cols-3 lg:gap-6">
+        <section className="mf-card min-w-0 overflow-hidden p-4 sm:p-6 lg:col-span-2">
           <h2 className="mf-section-title">
             Jugadores recientes
           </h2>

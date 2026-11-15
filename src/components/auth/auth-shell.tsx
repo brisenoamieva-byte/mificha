@@ -10,13 +10,13 @@ interface AuthShellProps {
 
 export function AuthShell({ title, subtitle, children, footer }: AuthShellProps) {
   return (
-    <div className="flex min-h-dvh flex-col bg-mf-canvas">
+    <div className="flex min-h-dvh w-full max-w-[100vw] flex-col overflow-x-hidden bg-mf-canvas">
       <header className="border-b border-mf-border bg-mf-surface px-4 py-3 sm:px-6">
         <BrandLogoLink />
       </header>
 
-      <main className="flex flex-1 items-center justify-center px-4 py-12 mf-page-bottom sm:px-6">
-        <div className="w-full max-w-[420px]">
+      <main className="mf-page-bottom flex min-w-0 flex-1 items-center justify-center px-4 py-12 sm:px-6">
+        <div className="w-full min-w-0 max-w-[420px]">
           <div className="mb-8">
             <h1 className="text-[1.75rem] font-semibold tracking-[-0.02em] text-mf-text">
               {title}
@@ -24,7 +24,7 @@ export function AuthShell({ title, subtitle, children, footer }: AuthShellProps)
             <p className="mt-2 text-sm leading-6 text-mf-text-secondary">{subtitle}</p>
           </div>
 
-          <div className="mf-card p-6 sm:p-8">{children}</div>
+          <div className="mf-card min-w-0 overflow-hidden p-5 sm:p-8">{children}</div>
 
           {footer ? (
             <div className="mt-6 text-center text-sm text-mf-text-secondary">{footer}</div>

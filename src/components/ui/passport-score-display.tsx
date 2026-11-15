@@ -229,7 +229,7 @@ export function PassportScoreDisplay({
   return (
     <div
       className={cn(
-        "mx-auto w-full max-w-[200px] rounded-2xl border px-5 py-6 text-center",
+        "mx-auto w-full max-w-[200px] rounded-2xl border px-4 py-5 text-center sm:px-5 sm:py-6",
         surface === "dark"
           ? "border-white/10 bg-white/5"
           : "border-slate-200/80 bg-white shadow-sm",

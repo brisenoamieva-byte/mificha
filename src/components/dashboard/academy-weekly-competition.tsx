@@ -75,18 +75,21 @@ export function AcademyWeeklyCompetition({ academyId }: AcademyWeeklyCompetition
         </p>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_280px]">
-        <div className="mf-card overflow-hidden">
-          <div className="border-b border-mf-border-subtle px-5 py-4">
+      <div className="grid min-w-0 gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,280px)] lg:gap-6">
+        <div className="mf-card min-w-0 overflow-hidden">
+          <div className="border-b border-mf-border-subtle px-4 py-4 sm:px-5">
             <div className="inline-flex items-center gap-2 text-sm font-semibold text-mf-brand">
-              <Trophy className="h-4 w-4" />
+              <Trophy className="h-4 w-4 shrink-0" />
               Top plantel
             </div>
           </div>
           <div className="divide-y divide-mf-border-subtle">
             {rows.slice(0, 8).map((player) => (
-              <div key={player.player_id} className="flex items-center gap-4 px-5 py-4">
-                <span className="w-6 text-sm font-semibold tabular-nums text-mf-text-secondary">
+              <div
+                key={player.player_id}
+                className="flex min-w-0 items-center gap-3 px-4 py-4 sm:gap-4 sm:px-5"
+              >
+                <span className="w-6 shrink-0 text-sm font-semibold tabular-nums text-mf-text-secondary">
                   {player.rank}
                 </span>
                 {player.photo_url ? (
@@ -94,10 +97,10 @@ export function AcademyWeeklyCompetition({ academyId }: AcademyWeeklyCompetition
                   <img
                     src={player.photo_url}
                     alt=""
-                    className="h-10 w-10 rounded-full object-cover ring-1 ring-mf-border"
+                    className="h-10 w-10 shrink-0 rounded-full object-cover ring-1 ring-mf-border"
                   />
                 ) : (
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-mf-brand-soft text-xs font-semibold text-mf-brand">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-mf-brand-soft text-xs font-semibold text-mf-brand">
                     {getPlayerInitials(player.first_name, player.last_name)}
                   </div>
                 )}
@@ -105,15 +108,15 @@ export function AcademyWeeklyCompetition({ academyId }: AcademyWeeklyCompetition
                   <Link
                     href={`/fut/j/${player.slug}`}
                     target="_blank"
-                    className="truncate font-semibold text-mf-text hover:text-mf-brand"
+                    className="block truncate font-semibold text-mf-text hover:text-mf-brand"
                   >
                     {player.first_name} {player.last_name}
                   </Link>
-                  <p className="text-xs text-mf-text-muted">
+                  <p className="truncate text-xs text-mf-text-muted">
                     {getPositionLabel(player.position)} · {player.goals}G · {player.assists}A
                   </p>
                 </div>
-                <div className="text-right">
+                <div className="shrink-0 text-right">
                   <p className="text-base font-semibold tabular-nums text-mf-brand">
                     {Math.round(player.weekly_score)}
                   </p>
@@ -124,7 +127,7 @@ export function AcademyWeeklyCompetition({ academyId }: AcademyWeeklyCompetition
           </div>
         </div>
 
-        <div className="mf-card p-5">
+        <div className="mf-card min-w-0 overflow-hidden p-4 sm:p-5">
           <div className="inline-flex items-center gap-2 text-sm font-semibold text-mf-warning">
             <Flame className="h-4 w-4" />
             En racha

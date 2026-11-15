@@ -36,12 +36,12 @@ export function DashboardHeader({ onMenuClick }: DashboardHeaderProps) {
 
   return (
     <header className="mf-safe-top sticky top-0 z-40 border-b border-mf-border bg-mf-surface">
-      <div className="flex items-center justify-between gap-4 px-4 py-3 sm:px-6">
-        <div className="flex min-w-0 items-center gap-3">
+      <div className="flex min-w-0 items-center justify-between gap-2 px-3 py-3 sm:gap-4 sm:px-6">
+        <div className="flex min-w-0 items-center gap-2 sm:gap-3">
           <button
             type="button"
             onClick={onMenuClick}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-md text-mf-text-secondary hover:bg-black/[0.04] lg:hidden"
+            className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-md text-mf-text-secondary hover:bg-black/[0.04] lg:hidden"
             aria-label="Abrir menú"
           >
             <Menu className="h-5 w-5" />
@@ -57,7 +57,7 @@ export function DashboardHeader({ onMenuClick }: DashboardHeaderProps) {
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
           <Link
             href="/fut/tutor"
             className="hidden text-sm font-medium text-mf-text-secondary transition hover:text-mf-text sm:inline-flex"

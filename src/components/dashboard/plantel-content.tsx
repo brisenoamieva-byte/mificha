@@ -277,7 +277,7 @@ export function PlantelContent() {
         ) : null}
 
         {players.length > 0 ? (
-          <div className="grid gap-4 sm:grid-cols-3">
+          <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4 [&>*]:min-w-0">
             <MiniStatCard
               label="Progreso del plantel"
               value={getPassportTier(progressAverage).label}
