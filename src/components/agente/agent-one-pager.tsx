@@ -175,10 +175,18 @@ export function AgentOnePager({
             </li>
             <li>
               <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-mf-text-muted">
-                Instagram
+                Redes
               </span>
               <div className="mt-0.5 font-semibold">
-                {profile.instagram ? `@${profile.instagram}` : "—"}
+                {[
+                  profile.instagram ? `IG @${profile.instagram}` : null,
+                  profile.tiktok
+                    ? `TT @${String(profile.tiktok).replace(/^@/, "")}`
+                    : null,
+                  profile.facebook ? `FB ${profile.facebook}` : null,
+                ]
+                  .filter(Boolean)
+                  .join(" · ") || "—"}
               </div>
             </li>
             <li>

@@ -8,6 +8,7 @@ import { PLAYER_CODE_SHORT } from "@/lib/player-public-code-copy";
 import type { TutorLinkedPerformance } from "@/lib/tutor-linked-performance";
 import type { TutorChild, TutorMaterial, TutorSeasonStat } from "@/lib/tutor-family";
 import type { TutorPublicContactLinks } from "@/lib/tutor-public-contact";
+import { buildTutorSocialLinks } from "@/lib/tutor-social-links";
 
 type MaterialWithUrl = TutorMaterial & { url: string | null };
 
@@ -104,6 +105,7 @@ export function TutorPublicFicha({
 
   const showLastMatch =
     Boolean(performance?.lastMatch) || Boolean(child.linked_player_id);
+  const socialLinks = buildTutorSocialLinks(profile);
 
   return (
     <div className="tutor-ficha-print space-y-4">
@@ -175,6 +177,21 @@ export function TutorPublicFicha({
             <p className="relative mt-3 text-xs leading-5 text-white/60 print:hidden">
               {PLAYER_CODE_SHORT}
             </p>
+          ) : null}
+          {socialLinks.length ? (
+            <div className="relative mt-4 flex flex-wrap gap-2 print:hidden">
+              {socialLinks.map((link) => (
+                <a
+                  key={link.id}
+                  href={link.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="rounded-lg border border-white/25 bg-white/10 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-white/20"
+                >
+                  {link.label}
+                </a>
+              ))}
+            </div>
           ) : null}
         </div>
 

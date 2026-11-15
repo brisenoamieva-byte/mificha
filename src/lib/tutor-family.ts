@@ -68,6 +68,8 @@ export interface TutorChildProfile {
   /** WhatsApp público (solo si show_contact_whatsapp). */
   contact_whatsapp: string | null;
   instagram: string | null;
+  facebook: string | null;
+  tiktok: string | null;
   /** Publicar correo en la ficha (opt-in). */
   show_contact_email: boolean;
   /** Publicar WhatsApp en la ficha (opt-in). */
@@ -175,6 +177,8 @@ export type TutorChildInput = {
   contact_email?: string | null;
   contact_whatsapp?: string | null;
   instagram?: string | null;
+  facebook?: string | null;
+  tiktok?: string | null;
   show_contact_email?: boolean;
   show_contact_whatsapp?: boolean;
   show_contact_academy?: boolean;
@@ -218,6 +222,8 @@ function emptyProfile(): TutorChildProfile {
     contact_email: null,
     contact_whatsapp: null,
     instagram: null,
+    facebook: null,
+    tiktok: null,
     show_contact_email: false,
     show_contact_whatsapp: false,
     show_contact_academy: false,
@@ -232,6 +238,14 @@ function cleanUrl(value: string | null | undefined) {
   if (!trimmed) return null;
   if (/^https?:\/\//i.test(trimmed)) return trimmed;
   return `https://${trimmed}`;
+}
+
+/** Handle o URL de red social → valor limpio para guardar. */
+function cleanSocialHandle(value: string | null | undefined) {
+  const trimmed = value?.trim() || "";
+  if (!trimmed) return null;
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  return trimmed.replace(/^@/, "") || null;
 }
 
 function normalizeStringList(value: unknown, limit = 8): string[] {
@@ -336,7 +350,9 @@ function profileFromInput(input: TutorChildInput): TutorChildProfile {
     tagline: input.tagline?.trim() || null,
     contact_email: input.contact_email?.trim() || null,
     contact_whatsapp: phoneKey(input.contact_whatsapp) || null,
-    instagram: input.instagram?.trim().replace(/^@/, "") || null,
+    instagram: cleanSocialHandle(input.instagram),
+    facebook: cleanSocialHandle(input.facebook),
+    tiktok: cleanSocialHandle(input.tiktok),
     show_contact_email: Boolean(input.show_contact_email),
     show_contact_whatsapp: Boolean(input.show_contact_whatsapp),
     show_contact_academy: Boolean(input.show_contact_academy),
@@ -1512,6 +1528,8 @@ export interface TutorSeasonStat {
   assists: number;
   minutes: number;
   notes: string | null;
+  /** Menor = más arriba en la ficha. */
+  sort_order: number;
   created_at: string;
   updated_at: string;
 }
@@ -1534,6 +1552,8 @@ function nonNegInt(value: unknown, fallback = 0) {
 }
 
 function normalizeSeason(raw: TutorSeasonStat): TutorSeasonStat {
+  const created = String(raw.created_at ?? "");
+  const sortRaw = Number((raw as { sort_order?: number }).sort_order);
   return {
     ...raw,
     tournament_name: String(raw.tournament_name ?? "").trim(),
@@ -1544,7 +1564,18 @@ function normalizeSeason(raw: TutorSeasonStat): TutorSeasonStat {
     assists: nonNegInt(raw.assists),
     minutes: nonNegInt(raw.minutes),
     notes: raw.notes?.trim() || null,
+    // Legacy sin sort_order: ordenar por created_at (más reciente arriba).
+    sort_order: Number.isFinite(sortRaw)
+      ? sortRaw
+      : created
+        ? -Date.parse(created) || 0
+        : 0,
   };
+}
+
+function compareSeasons(a: TutorSeasonStat, b: TutorSeasonStat) {
+  if (a.sort_order !== b.sort_order) return a.sort_order - b.sort_order;
+  return b.created_at.localeCompare(a.created_at);
 }
 
 export async function listTutorSeasons(admin: SupabaseClient, child: TutorChild) {
@@ -1555,7 +1586,7 @@ export async function listTutorSeasons(admin: SupabaseClient, child: TutorChild)
         row.child_id === child.id && row.guardian_user_id === child.guardian_user_id,
     )
     .map(normalizeSeason)
-    .sort((a, b) => b.updated_at.localeCompare(a.updated_at));
+    .sort(compareSeasons);
 }
 
 export async function upsertTutorSeason(
@@ -1595,16 +1626,61 @@ export async function upsertTutorSeason(
     return rows[index];
   }
 
+  const mine = rows
+    .filter(
+      (row) =>
+        row.child_id === child.id && row.guardian_user_id === child.guardian_user_id,
+    )
+    .map(normalizeSeason);
+  const minOrder = mine.reduce(
+    (min, row) => Math.min(min, row.sort_order),
+    0,
+  );
+
   const row = normalizeSeason({
     id: randomUUID(),
     child_id: child.id,
     guardian_user_id: child.guardian_user_id,
     created_at: now,
+    sort_order: minOrder - 1,
     ...payload,
   });
   rows.unshift(row);
   await writeJson(admin, SEASONS, rows);
   return row;
+}
+
+export async function reorderTutorSeasons(
+  admin: SupabaseClient,
+  child: TutorChild,
+  orderedIds: string[],
+) {
+  const ids = orderedIds.map((id) => String(id ?? "").trim()).filter(Boolean);
+  if (!ids.length) throw new Error("Indica el orden de los torneos.");
+
+  const rows = await readJson<TutorSeasonStat>(admin, SEASONS);
+  const mine = rows.filter(
+    (row) =>
+      row.child_id === child.id && row.guardian_user_id === child.guardian_user_id,
+  );
+  const byId = new Map(mine.map((row) => [row.id, row]));
+  if (ids.some((id) => !byId.has(id)) || ids.length !== mine.length) {
+    throw new Error("El orden no coincide con los torneos de esta ficha.");
+  }
+
+  const now = new Date().toISOString();
+  const orderMap = new Map(ids.map((id, index) => [id, index]));
+  for (let i = 0; i < rows.length; i += 1) {
+    const row = rows[i];
+    if (row.child_id !== child.id || row.guardian_user_id !== child.guardian_user_id) {
+      continue;
+    }
+    const sort_order = orderMap.get(row.id);
+    if (sort_order == null) continue;
+    rows[i] = normalizeSeason({ ...row, sort_order, updated_at: now });
+  }
+  await writeJson(admin, SEASONS, rows);
+  return listTutorSeasons(admin, child);
 }
 
 export async function deleteTutorSeason(

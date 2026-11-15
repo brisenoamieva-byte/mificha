@@ -2,7 +2,17 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Check, Circle, Copy, ExternalLink, FileText, ImagePlus, Video } from "lucide-react";
+import {
+  ArrowDown,
+  ArrowUp,
+  Check,
+  Circle,
+  Copy,
+  ExternalLink,
+  FileText,
+  ImagePlus,
+  Video,
+} from "lucide-react";
 import { PlayerPublicCodeCard } from "@/components/public/player-public-code-card";
 import { TutorCareerSummaryCard } from "@/components/tutor/tutor-career-summary";
 import { TutorConsentPanel } from "@/components/tutor/tutor-consent-panel";
@@ -127,6 +137,8 @@ interface TutorBuilderPanelProps {
     show_contact_whatsapp: boolean;
     show_contact_academy: boolean;
     instagram: string;
+    facebook: string;
+    tiktok: string;
     highlight_chips_text: string;
     achievements_text: string;
     callups_text: string;
@@ -150,6 +162,7 @@ interface TutorBuilderPanelProps {
   onSetFeaturedVideo: (materialId: string) => void;
   onSaveSeason: (input: TutorSeasonInput, seasonId?: string | null) => void;
   onDeleteSeason: (seasonId: string) => void;
+  onReorderSeasons: (orderedIds: string[]) => void;
   onCopyShare: () => void;
   onCopyPublicCode: () => void;
   onLinkPlayer: (playerId: string, match?: TutorLinkSuggestion["match"]) => void;
@@ -179,6 +192,7 @@ export function TutorBuilderPanel({
   onSetFeaturedVideo,
   onSaveSeason,
   onDeleteSeason,
+  onReorderSeasons,
   onCopyShare,
   onCopyPublicCode,
   onToggleExploreOptIn,
@@ -191,6 +205,7 @@ export function TutorBuilderPanel({
     buildEmptySeasonForm(child.profile.club || form.club),
   );
   const [editingSeasonId, setEditingSeasonId] = useState<string | null>(null);
+  const editorPanelRef = useRef<HTMLDivElement | null>(null);
   const isGoalkeeper = /portero/i.test(form.position || child.profile.position || "");
 
   const draftProfile = useMemo(
@@ -217,6 +232,8 @@ export function TutorBuilderPanel({
       show_contact_whatsapp: Boolean(form.show_contact_whatsapp),
       show_contact_academy: Boolean(form.show_contact_academy),
       instagram: form.instagram || null,
+      facebook: form.facebook || null,
+      tiktok: form.tiktok || null,
       highlight_chips: parseLinesToList(form.highlight_chips_text, 4),
       achievements: parseTitleDetailLines(form.achievements_text, 12),
       callups: parseTitleDetailLines(form.callups_text, 12).map((row) => ({
@@ -262,6 +279,13 @@ export function TutorBuilderPanel({
   const shareHref = shareAccess ? tutorSharePath(shareAccess) : null;
   const materialsHref = shareAccess ? agentMaterialsPath(shareAccess) : null;
   const showAcademy = hasLinkedAcademy || linkSuggestions.length > 0;
+
+  function goToStep(next: TutorBuilderStepId) {
+    setStep(next);
+    window.setTimeout(() => {
+      editorPanelRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 60);
+  }
 
   useEffect(() => {
     const key = `${child.id}:${child.materials.length}:${child.player_name}:${child.profile.bio ?? ""}:${child.profile.position ?? ""}`;
@@ -348,7 +372,7 @@ export function TutorBuilderPanel({
           {progress.photos === 0 ? (
             <button
               type="button"
-              onClick={() => setStep("material")}
+              onClick={() => goToStep("material")}
               className="mf-btn-gph mt-4 w-full sm:w-auto"
             >
               <ImagePlus className="h-4 w-4" />
@@ -361,7 +385,7 @@ export function TutorBuilderPanel({
               <button
                 type="button"
                 className="font-semibold underline"
-                onClick={() => setStep("compartir")}
+                onClick={() => goToStep("compartir")}
               >
                 Compartir
               </button>
@@ -399,7 +423,7 @@ export function TutorBuilderPanel({
           performances={linkedPerformances}
           title="Dashboard del alumno"
           exploreOptIn={Boolean(child.explore_opt_in)}
-          onAddTournament={() => setStep("rendimiento")}
+          onAddTournament={() => goToStep("rendimiento")}
         />
 
         <section className="rounded-2xl border border-mf-border bg-white p-5">
@@ -410,11 +434,12 @@ export function TutorBuilderPanel({
             Completa paso a paso
           </h2>
           <p className="mt-2 text-sm leading-6 text-mf-text-secondary">
-            Toca cada paso para editarlo. Las fotos y videos se suben en{" "}
+            Toca cada paso: el editor se abre justo debajo. Las fotos y videos se
+            suben en{" "}
             <button
               type="button"
               className="font-semibold text-mf-gph underline-offset-2 hover:underline"
-              onClick={() => setStep("material")}
+              onClick={() => goToStep("material")}
             >
               Subir foto y video
             </button>
@@ -424,7 +449,7 @@ export function TutorBuilderPanel({
           {progress.photos === 0 ? (
             <button
               type="button"
-              onClick={() => setStep("material")}
+              onClick={() => goToStep("material")}
               className="mt-4 flex w-full cursor-pointer items-center gap-3 rounded-xl border border-mf-gph/35 bg-mf-gph-soft px-4 py-4 text-left transition hover:border-mf-gph hover:bg-white hover:shadow-sm"
             >
               <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-mf-gph text-white">
@@ -446,7 +471,7 @@ export function TutorBuilderPanel({
               <li key={item.id}>
                 <button
                   type="button"
-                  onClick={() => setStep(item.id)}
+                  onClick={() => goToStep(item.id)}
                   className={cn(
                     "flex w-full cursor-pointer items-start gap-3 rounded-xl border px-3 py-3 text-left transition duration-150",
                     step === item.id
@@ -488,6 +513,7 @@ export function TutorBuilderPanel({
           </ol>
         </section>
 
+        <div ref={editorPanelRef} className="scroll-mt-24 space-y-4">
         {(step === "identidad" || step === "cancha" || step === "historia") && (
           <form
             onSubmit={onSaveProfile}
@@ -772,7 +798,7 @@ export function TutorBuilderPanel({
                       placeholder="442 123 4567"
                     />
                   </label>
-                  <label className="block text-sm font-medium text-mf-text sm:col-span-2">
+                  <label className="block text-sm font-medium text-mf-text">
                     Instagram
                     <input
                       value={form.instagram}
@@ -786,9 +812,38 @@ export function TutorBuilderPanel({
                       placeholder="@jugador"
                     />
                   </label>
+                  <label className="block text-sm font-medium text-mf-text">
+                    TikTok
+                    <input
+                      value={form.tiktok}
+                      onChange={(event) =>
+                        setForm((current) => ({
+                          ...current,
+                          tiktok: event.target.value,
+                        }))
+                      }
+                      className={inputClass}
+                      placeholder="@jugador"
+                    />
+                  </label>
+                  <label className="block text-sm font-medium text-mf-text sm:col-span-2">
+                    Facebook
+                    <input
+                      value={form.facebook}
+                      onChange={(event) =>
+                        setForm((current) => ({
+                          ...current,
+                          facebook: event.target.value,
+                        }))
+                      }
+                      className={inputClass}
+                      placeholder="usuario o https://facebook.com/…"
+                    />
+                  </label>
                 </div>
                 <p className="text-xs leading-5 text-mf-text-muted">
-                  Correo y WhatsApp no se publican solos: actívalos en Compartir.
+                  Redes se muestran en la ficha pública. Correo y WhatsApp no se
+                  publican solos: actívalos en Compartir.
                 </p>
                 <label className="block text-sm font-medium text-mf-text">
                   Hitos (uno por línea, máx. 4)
@@ -870,7 +925,7 @@ export function TutorBuilderPanel({
               <button
                 type="button"
                 className="mf-btn-gph-ghost"
-                onClick={() => setStep("material")}
+                onClick={() => goToStep("material")}
               >
                 <ImagePlus className="h-4 w-4" />
                 Ir a subir foto y video
@@ -1220,13 +1275,18 @@ export function TutorBuilderPanel({
               </div>
             </form>
 
+            {seasons.length > 1 ? (
+              <p className="text-xs leading-5 text-mf-text-muted">
+                Los torneos nuevos quedan arriba. Usa ↑ ↓ para cambiar el orden en la ficha.
+              </p>
+            ) : null}
             <ul className="space-y-3">
               {seasons.length === 0 ? (
                 <li className="text-sm text-mf-text-muted">
                   Aún no hay torneos capturados. Agrega al menos uno con partidos o minutos.
                 </li>
               ) : (
-                seasons.map((row) => {
+                seasons.map((row, index) => {
                   const claim = seasonClaims[row.id];
                   return (
                   <li
@@ -1265,6 +1325,36 @@ export function TutorBuilderPanel({
                         </p>
                       </div>
                       <div className="flex flex-wrap gap-2">
+                        <button
+                          type="button"
+                          disabled={busy || index === 0}
+                          className="rounded-lg border border-mf-border px-2 py-1.5 text-mf-gph hover:bg-mf-gph-soft disabled:opacity-40"
+                          title="Subir"
+                          aria-label="Subir torneo"
+                          onClick={() => {
+                            if (index <= 0) return;
+                            const next = seasons.map((item) => item.id);
+                            [next[index - 1], next[index]] = [next[index], next[index - 1]];
+                            onReorderSeasons(next);
+                          }}
+                        >
+                          <ArrowUp className="h-3.5 w-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          disabled={busy || index === seasons.length - 1}
+                          className="rounded-lg border border-mf-border px-2 py-1.5 text-mf-gph hover:bg-mf-gph-soft disabled:opacity-40"
+                          title="Bajar"
+                          aria-label="Bajar torneo"
+                          onClick={() => {
+                            if (index >= seasons.length - 1) return;
+                            const next = seasons.map((item) => item.id);
+                            [next[index], next[index + 1]] = [next[index + 1], next[index]];
+                            onReorderSeasons(next);
+                          }}
+                        >
+                          <ArrowDown className="h-3.5 w-3.5" />
+                        </button>
                         <button
                           type="button"
                           disabled={busy}
@@ -1328,7 +1418,7 @@ export function TutorBuilderPanel({
                 <button
                   type="button"
                   className="mf-btn-gph mt-3"
-                  onClick={() => setStep("rendimiento")}
+                  onClick={() => goToStep("rendimiento")}
                 >
                   Capturar torneo
                 </button>
@@ -1516,6 +1606,7 @@ export function TutorBuilderPanel({
             </div>
           </section>
         ) : null}
+        </div>
 
         {showAcademy ? (
           <section className="rounded-2xl border border-mf-border bg-white p-5">

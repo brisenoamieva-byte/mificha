@@ -92,6 +92,8 @@ interface TutorChildCard {
     show_contact_whatsapp: boolean;
     show_contact_academy: boolean;
     instagram: string | null;
+    facebook: string | null;
+    tiktok: string | null;
     highlight_chips: string[];
     achievements: Array<{ title: string; detail: string }>;
     callups: Array<{ level: string; detail: string }>;
@@ -137,6 +139,8 @@ const emptyForm = {
   show_contact_whatsapp: false,
   show_contact_academy: false,
   instagram: "",
+  facebook: "",
+  tiktok: "",
   highlight_chips_text: "",
   achievements_text: "",
   callups_text: "",
@@ -292,6 +296,8 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
       show_contact_whatsapp: Boolean(child.profile.show_contact_whatsapp),
       show_contact_academy: Boolean(child.profile.show_contact_academy),
       instagram: child.profile.instagram ?? "",
+      facebook: child.profile.facebook ?? "",
+      tiktok: child.profile.tiktok ?? "",
       highlight_chips_text: (child.profile.highlight_chips ?? []).join("\n"),
       achievements_text: (child.profile.achievements ?? [])
         .map((row) =>
@@ -471,6 +477,8 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
           show_contact_whatsapp: Boolean(form.show_contact_whatsapp),
           show_contact_academy: Boolean(form.show_contact_academy),
           instagram: form.instagram || null,
+          facebook: form.facebook || null,
+          tiktok: form.tiktok || null,
           highlight_chips_text: form.highlight_chips_text || null,
           achievements_text: form.achievements_text || null,
           callups_text: form.callups_text || null,
@@ -710,6 +718,42 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
     }
   }
 
+  async function reorderSeasons(orderedIds: string[]) {
+    if (!child) return;
+    const childId = child.id;
+    setBusy(true);
+    setError(null);
+    setChildren((prev) =>
+      prev.map((row) => {
+        if (row.id !== childId) return row;
+        const byId = new Map((row.seasons ?? []).map((season) => [season.id, season]));
+        const seasons = orderedIds
+          .map((id, index) => {
+            const season = byId.get(id);
+            return season ? { ...season, sort_order: index } : null;
+          })
+          .filter((season): season is NonNullable<typeof season> => Boolean(season));
+        return { ...row, seasons };
+      }),
+    );
+    try {
+      await authed("/fut/api/tutor/seasons", {
+        method: "POST",
+        body: JSON.stringify({
+          action: "reorder",
+          child_id: childId,
+          ordered_ids: orderedIds,
+        }),
+      });
+      await load(phone, childId);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "No se pudo reordenar.");
+      await load(phone, childId);
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function deleteSeason(seasonId: string) {
     if (!child) return;
     const ok = window.confirm("¿Eliminar este torneo de la ficha?");
@@ -935,6 +979,12 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
                   setNotice(null);
                   setOnboardNotice(null);
                   setError(null);
+                  window.setTimeout(() => {
+                    childPanelRef.current?.scrollIntoView({
+                      behavior: "smooth",
+                      block: "start",
+                    });
+                  }, 80);
                 }}
                 className={
                   item.id === child?.id
@@ -1087,6 +1137,7 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
             onSetFeaturedVideo={(id) => void manageMaterial("set_featured", id)}
             onSaveSeason={(input, seasonId) => void saveSeason(input, seasonId)}
             onDeleteSeason={(id) => void deleteSeason(id)}
+            onReorderSeasons={(ids) => void reorderSeasons(ids)}
             onCopyShare={() => void copyShare()}
             onCopyPublicCode={() => void copyPublicCode()}
             onToggleExploreOptIn={(enabled) => void toggleExploreOptIn(enabled)}

@@ -17,7 +17,15 @@ export function AuthRecoveryRedirect() {
       }
     });
 
-    void consumeAuthRedirect().catch(() => undefined);
+    // /fut/confirmar y /fut/recuperar/nueva consumen el enlace ellos mismos.
+    // Si lo gastamos aquí primero, la pantalla de confirmar dice "caducó".
+    const ownsCallback =
+      pathname === "/fut/confirmar" ||
+      pathname === "/fut/recuperar/nueva" ||
+      pathname.startsWith("/fut/recuperar/");
+    if (!ownsCallback) {
+      void consumeAuthRedirect().catch(() => undefined);
+    }
 
     return () => data.subscription.unsubscribe();
   }, [pathname, router]);

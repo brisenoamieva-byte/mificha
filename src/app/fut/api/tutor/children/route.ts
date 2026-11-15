@@ -61,6 +61,8 @@ function parseInput(body: Record<string, unknown>): TutorChildInput {
     contact_whatsapp:
       body.contact_whatsapp == null ? null : String(body.contact_whatsapp),
     instagram: body.instagram == null ? null : String(body.instagram),
+    facebook: body.facebook == null ? null : String(body.facebook),
+    tiktok: body.tiktok == null ? null : String(body.tiktok),
     show_contact_email: Boolean(body.show_contact_email),
     show_contact_whatsapp: Boolean(body.show_contact_whatsapp),
     show_contact_academy: Boolean(body.show_contact_academy),

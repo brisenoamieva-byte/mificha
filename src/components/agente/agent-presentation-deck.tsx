@@ -175,7 +175,11 @@ export function AgentPresentationDeck({
             {profile.show_contact_email && profile.contact_email ? (
               <li>{profile.contact_email}</li>
             ) : null}
-            {profile.instagram ? <li>@{profile.instagram}</li> : null}
+            {profile.instagram ? <li>IG @{profile.instagram}</li> : null}
+            {profile.tiktok ? (
+              <li>TT @{String(profile.tiktok).replace(/^@/, "")}</li>
+            ) : null}
+            {profile.facebook ? <li>FB {profile.facebook}</li> : null}
             {profile.city ? <li>{profile.city}</li> : null}
           </ul>
         </div>

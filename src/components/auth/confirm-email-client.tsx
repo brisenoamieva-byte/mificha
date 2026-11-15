@@ -32,6 +32,9 @@ export function ConfirmEmailClient() {
   const searchParams = useSearchParams();
   const [status, setStatus] = useState<"working" | "ok" | "error">("working");
   const [message, setMessage] = useState("Confirmando tu correo…");
+  const [resendEmail, setResendEmail] = useState("");
+  const [resending, setResending] = useState(false);
+  const [resendNotice, setResendNotice] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -39,12 +42,22 @@ export function ConfirmEmailClient() {
       const type = normalizeEmailOtpType(searchParams.get("type"));
       const next = searchParams.get("next");
       const ok = await consumeAuthRedirect();
+
+      // Si el enlace ya se usó (doble clic / preview de Gmail), la sesión puede existir.
+      let hasSession = ok;
+      if (!hasSession) {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+        hasSession = Boolean(session);
+      }
+
       if (cancelled) return;
 
-      if (!ok) {
+      if (!hasSession) {
         setStatus("error");
         setMessage(
-          "No se pudo confirmar el enlace. Puede haber expirado o ya se usó. Entra y pide uno nuevo si hace falta.",
+          "Este enlace ya no es válido (caducó o se usó). Si ya confirmaste, entra con tu correo. Si no, pide uno nuevo abajo.",
         );
         return;
       }
@@ -71,6 +84,35 @@ export function ConfirmEmailClient() {
     };
   }, [router, searchParams]);
 
+  async function resendConfirmation() {
+    const email = resendEmail.trim().toLowerCase();
+    if (!email) {
+      setResendNotice("Escribe el correo con el que te registraste.");
+      return;
+    }
+    setResending(true);
+    setResendNotice(null);
+    try {
+      const { error } = await supabase.auth.resend({
+        type: "signup",
+        email,
+        options: {
+          emailRedirectTo: `${window.location.origin}/fut/confirmar`,
+        },
+      });
+      if (error) throw error;
+      setResendNotice("Te enviamos un correo nuevo. Abre el enlace más reciente.");
+    } catch (error) {
+      setResendNotice(
+        error instanceof Error
+          ? error.message
+          : "No se pudo reenviar. Intenta desde Entrar.",
+      );
+    } finally {
+      setResending(false);
+    }
+  }
+
   return (
     <AuthShell
       title="Confirmar correo"
@@ -94,8 +136,32 @@ export function ConfirmEmailClient() {
           <>
             <p className="rounded-lg bg-red-50 px-4 py-3 text-red-700">{message}</p>
             <Link href="/fut/entrar" className="mf-btn-primary inline-flex w-full justify-center">
-              Volver a Entrar
+              Entrar con correo y contraseña
             </Link>
+            <div className="space-y-2 rounded-xl border border-mf-border bg-mf-canvas p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-mf-text-muted">
+                Reenviar confirmación
+              </p>
+              <input
+                type="email"
+                value={resendEmail}
+                onChange={(event) => setResendEmail(event.target.value)}
+                className="mf-input"
+                placeholder="tu@correo.com"
+                autoComplete="email"
+              />
+              <button
+                type="button"
+                disabled={resending}
+                onClick={() => void resendConfirmation()}
+                className="mf-btn-gph-ghost w-full disabled:opacity-60"
+              >
+                {resending ? "Enviando…" : "Enviar enlace nuevo"}
+              </button>
+              {resendNotice ? (
+                <p className="text-xs leading-5 text-mf-text-secondary">{resendNotice}</p>
+              ) : null}
+            </div>
           </>
         ) : null}
       </div>

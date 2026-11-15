@@ -3,6 +3,7 @@ import {
   deleteTutorSeason,
   getTutorChild,
   listTutorSeasons,
+  reorderTutorSeasons,
   upsertTutorSeason,
 } from "@/lib/tutor-family";
 import {
@@ -48,6 +49,7 @@ export async function POST(request: Request) {
     action?: string;
     child_id?: string;
     season_id?: string;
+    ordered_ids?: string[];
     tournament_name?: string;
     season_label?: string;
     team_name?: string | null;
@@ -72,6 +74,15 @@ export async function POST(request: Request) {
         String(body.season_id ?? ""),
       );
       return NextResponse.json(result);
+    }
+
+    if (body.action === "reorder") {
+      const seasons = await reorderTutorSeasons(
+        admin,
+        child,
+        Array.isArray(body.ordered_ids) ? body.ordered_ids.map(String) : [],
+      );
+      return NextResponse.json({ ok: true, seasons });
     }
 
     if (body.action === "save") {
