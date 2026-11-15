@@ -570,7 +570,7 @@ export function TutorBuilderPanel({
                       autoComplete="off"
                     />
                     <span className="mt-1 block text-xs text-mf-text-muted">
-                      Número único de registro (GASER). Se liga a tu código MF-.
+                      Número único de registro federado. Se liga a tu código MF-.
                     </span>
                   </label>
                   <label className="block text-sm font-medium text-mf-text">

@@ -97,7 +97,7 @@ export async function claimNui(
   const rawTrimmed = String(opts.nui ?? "").trim();
   const nui = normalizeNui(opts.nui);
   if (rawTrimmed && !nui) {
-    throw new Error("NUI inválido. Usa solo números (5 a 12 dígitos), como en GASER.");
+    throw new Error("NUI inválido. Usa solo números (5 a 12 dígitos).");
   }
 
   const previous = normalizeNui(opts.previousNui);

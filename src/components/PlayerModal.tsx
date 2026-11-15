@@ -420,7 +420,7 @@ export function PlayerModal({
               <div className="sm:col-span-2">
                 <label className="block text-sm font-medium text-slate-700">
                   NUI federado
-                  <span className="font-normal text-slate-400"> (GASER, opcional)</span>
+                  <span className="font-normal text-slate-400"> (opcional)</span>
                 </label>
                 <input
                   value={nui}
