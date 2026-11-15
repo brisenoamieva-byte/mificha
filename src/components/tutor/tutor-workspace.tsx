@@ -820,15 +820,20 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
           <button
             type="button"
             className="text-sm font-semibold text-mf-text-muted hover:text-mf-text"
-            onClick={() =>
-              void supabase.auth.signOut().then(() => {
-                setSessionEmail(null);
-                setShowPasswordPanel(false);
-                setShowDeleteAccountPanel(false);
-                setNewPassword("");
-                setNewPasswordConfirm("");
-              })
-            }
+            onClick={() => {
+              void (async () => {
+                try {
+                  await supabase.auth.signOut({ scope: "global" });
+                } catch {
+                  try {
+                    await supabase.auth.signOut();
+                  } catch {
+                    /* igual redirigimos */
+                  }
+                }
+                window.location.assign("/fut/entrar");
+              })();
+            }}
           >
             Salir
           </button>
