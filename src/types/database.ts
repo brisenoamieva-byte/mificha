@@ -265,6 +265,56 @@ export type Database = {
         };
         Relationships: [];
       };
+      tournaments: {
+        Row: {
+          id: string;
+          name: string;
+          slug: string;
+          platform_season_id: string | null;
+          region: string | null;
+          organizer_name: string | null;
+          organizer_contact: string | null;
+          start_date: string | null;
+          end_date: string | null;
+          is_active: boolean;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          slug: string;
+          platform_season_id?: string | null;
+          region?: string | null;
+          organizer_name?: string | null;
+          organizer_contact?: string | null;
+          start_date?: string | null;
+          end_date?: string | null;
+          is_active?: boolean;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          slug?: string;
+          platform_season_id?: string | null;
+          region?: string | null;
+          organizer_name?: string | null;
+          organizer_contact?: string | null;
+          start_date?: string | null;
+          end_date?: string | null;
+          is_active?: boolean;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "tournaments_platform_season_id_fkey";
+            columns: ["platform_season_id"];
+            isOneToOne: false;
+            referencedRelation: "platform_seasons";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       seasons: {
         Row: {
           id: string;
@@ -330,6 +380,7 @@ export type Database = {
           is_official: boolean;
           result_locked_at: string | null;
           acta_published_at: string | null;
+          tournament_id: string | null;
           created_at: string;
         };
         Insert: {
@@ -351,6 +402,7 @@ export type Database = {
           is_official?: boolean;
           result_locked_at?: string | null;
           acta_published_at?: string | null;
+          tournament_id?: string | null;
           created_at?: string;
         };
         Update: {
@@ -372,6 +424,7 @@ export type Database = {
           is_official?: boolean;
           result_locked_at?: string | null;
           acta_published_at?: string | null;
+          tournament_id?: string | null;
           created_at?: string;
         };
         Relationships: [
@@ -387,6 +440,13 @@ export type Database = {
             columns: ["academy_id"];
             isOneToOne: false;
             referencedRelation: "academies";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "matches_tournament_id_fkey";
+            columns: ["tournament_id"];
+            isOneToOne: false;
+            referencedRelation: "tournaments";
             referencedColumns: ["id"];
           },
         ];
@@ -782,6 +842,7 @@ export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 export type Academy = Database["public"]["Tables"]["academies"]["Row"];
 export type Player = Database["public"]["Tables"]["players"]["Row"];
 export type Season = Database["public"]["Tables"]["seasons"]["Row"];
+export type Tournament = Database["public"]["Tables"]["tournaments"]["Row"];
 export type Match = Database["public"]["Tables"]["matches"]["Row"];
 export type MatchStat = Database["public"]["Tables"]["match_stats"]["Row"];
 export type PlayerSeasonStat =

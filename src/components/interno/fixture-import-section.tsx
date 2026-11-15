@@ -13,6 +13,8 @@ import { toast } from "@/components/ui/toast";
 interface FixtureImportSectionProps {
   academyId: string;
   seasonId: string | undefined;
+  tournamentId?: string;
+  tournaments?: Array<{ id: string; name: string }>;
   disabled?: boolean;
   onImported: () => void;
 }
@@ -49,6 +51,8 @@ async function authedFetch(input: string, init?: RequestInit) {
 export function FixtureImportSection({
   academyId,
   seasonId,
+  tournamentId: initialTournamentId = "",
+  tournaments = [],
   disabled,
   onImported,
 }: FixtureImportSectionProps) {
@@ -57,6 +61,7 @@ export function FixtureImportSection({
   const [importing, setImporting] = useState(false);
   const [isPublic, setIsPublic] = useState(true);
   const [isOfficial, setIsOfficial] = useState(true);
+  const [tournamentId, setTournamentId] = useState(initialTournamentId);
 
   async function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
@@ -93,6 +98,7 @@ export function FixtureImportSection({
         body: JSON.stringify({
           ...(isMultiAcademy ? {} : { academy_id: academyId }),
           season_id: seasonId,
+          tournament_id: tournamentId || null,
           is_public: isPublic,
           is_official: isOfficial,
           fixtures: preview.valid.map((row) => ({
@@ -181,6 +187,23 @@ export function FixtureImportSection({
           />
           Público
         </label>
+        {tournaments.length > 0 ? (
+          <label className="flex min-w-[12rem] flex-1 items-center gap-2 text-sm text-white/75">
+            <span className="shrink-0">Torneo</span>
+            <select
+              value={tournamentId}
+              onChange={(event) => setTournamentId(event.target.value)}
+              className="w-full rounded-lg border border-white/15 bg-[#0f2038] px-3 py-1.5 text-sm text-white outline-none"
+            >
+              <option value="">Sin torneo</option>
+              {tournaments.map((tournament) => (
+                <option key={tournament.id} value={tournament.id}>
+                  {tournament.name}
+                </option>
+              ))}
+            </select>
+          </label>
+        ) : null}
       </div>
 
       {preview ? (

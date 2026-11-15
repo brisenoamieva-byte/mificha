@@ -37,7 +37,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ academies: academies ?? [] });
   }
 
-  const [{ data: season }, { data: fixtures, error: fixturesError }] = await Promise.all([
+  const [{ data: season }, fixturesResult, tournamentsResult] = await Promise.all([
     auth.admin
       .from("seasons")
       .select("*")
@@ -46,12 +46,33 @@ export async function GET(request: Request) {
       .maybeSingle(),
     auth.admin
       .from("matches")
-      .select("*")
+      .select("*, tournaments(id,name,slug)")
       .eq("academy_id", academyId)
       .in("status", ["scheduled", "postponed", "completed"])
       .order("kickoff_at", { ascending: false, nullsFirst: false })
       .limit(40),
+    auth.admin
+      .from("tournaments")
+      .select("id,name,slug,is_active")
+      .eq("is_active", true)
+      .order("name", { ascending: true }),
   ]);
+
+  let fixtures = fixturesResult.data;
+  let fixturesError = fixturesResult.error;
+
+  // Si aún no corre tournaments-catalog.sql, cae al select sin join.
+  if (fixturesError) {
+    const fallback = await auth.admin
+      .from("matches")
+      .select("*")
+      .eq("academy_id", academyId)
+      .in("status", ["scheduled", "postponed", "completed"])
+      .order("kickoff_at", { ascending: false, nullsFirst: false })
+      .limit(40);
+    fixtures = fallback.data;
+    fixturesError = fallback.error;
+  }
 
   if (fixturesError) {
     return NextResponse.json({ error: fixturesError.message }, { status: 500 });
@@ -60,6 +81,7 @@ export async function GET(request: Request) {
   return NextResponse.json({
     season,
     fixtures: fixtures ?? [],
+    tournaments: tournamentsResult.error ? [] : (tournamentsResult.data ?? []),
   });
 }
 
@@ -75,6 +97,7 @@ interface FixtureBody {
   notes?: string;
   is_public?: boolean;
   is_official?: boolean;
+  tournament_id?: string | null;
   fixture_id?: string;
   status?: "scheduled" | "postponed" | "cancelled";
   result?: "win" | "draw" | "loss";
@@ -136,6 +159,7 @@ export async function POST(request: Request) {
       notes: body.notes?.trim() || null,
       is_public: body.is_public ?? true,
       is_official: body.is_official ?? true,
+      tournament_id: body.tournament_id?.trim() || null,
       status: "scheduled",
       result: null,
       goals_for: null,
@@ -178,6 +202,9 @@ export async function PATCH(request: Request) {
   }
   if (body.category !== undefined) updates.category = body.category.trim() || null;
   if (body.notes !== undefined) updates.notes = body.notes.trim() || null;
+  if (body.tournament_id !== undefined) {
+    updates.tournament_id = body.tournament_id?.trim() || null;
+  }
   if (typeof body.is_public === "boolean") updates.is_public = body.is_public;
   if (body.status) updates.status = body.status;
 

@@ -45,6 +45,19 @@ select
   ) as platform_seasons_shared_sql,
   exists (
     select 1
+    from information_schema.tables
+    where table_schema = 'public'
+      and table_name = 'tournaments'
+  ) as tournaments_catalog_sql,
+  exists (
+    select 1
+    from information_schema.columns
+    where table_schema = 'public'
+      and table_name = 'matches'
+      and column_name = 'tournament_id'
+  ) as matches_tournament_link_sql,
+  exists (
+    select 1
     from information_schema.columns
     where table_schema = 'public'
       and table_name = 'seasons'

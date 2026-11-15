@@ -29,6 +29,17 @@ interface AcademyOption {
   is_certified: boolean;
 }
 
+interface TournamentOption {
+  id: string;
+  name: string;
+  slug: string;
+  is_active: boolean;
+}
+
+type FixtureRow = Match & {
+  tournaments?: { id: string; name: string; slug: string } | null;
+};
+
 function todayIsoDate() {
   return new Date().toISOString().split("T")[0];
 }
@@ -62,7 +73,8 @@ export function FixturesAdminPanel() {
   const [academies, setAcademies] = useState<AcademyOption[]>([]);
   const [selectedAcademyId, setSelectedAcademyId] = useState("");
   const [activeSeason, setActiveSeason] = useState<Season | null>(null);
-  const [fixtures, setFixtures] = useState<Match[]>([]);
+  const [fixtures, setFixtures] = useState<FixtureRow[]>([]);
+  const [tournaments, setTournaments] = useState<TournamentOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -73,6 +85,7 @@ export function FixturesAdminPanel() {
   const [venueAddress, setVenueAddress] = useState("");
   const [category, setCategory] = useState("");
   const [notes, setNotes] = useState("");
+  const [tournamentId, setTournamentId] = useState("");
   const [isPublic, setIsPublic] = useState(true);
   const [isOfficial, setIsOfficial] = useState(true);
 
@@ -101,10 +114,15 @@ export function FixturesAdminPanel() {
     try {
       const payload = (await authedFetch(
         `/fut/api/interno/fixtures?academy_id=${encodeURIComponent(academyId)}`,
-      )) as { season: Season | null; fixtures: Match[] };
+      )) as {
+        season: Season | null;
+        fixtures: FixtureRow[];
+        tournaments?: TournamentOption[];
+      };
 
       setActiveSeason(payload.season);
       setFixtures(payload.fixtures);
+      setTournaments(payload.tournaments ?? []);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "No se cargaron jornadas.");
     }
@@ -146,6 +164,7 @@ export function FixturesAdminPanel() {
           venue_address: venueAddress,
           category,
           notes,
+          tournament_id: tournamentId || null,
           is_public: isPublic,
           is_official: isOfficial,
         }),
@@ -195,6 +214,12 @@ export function FixturesAdminPanel() {
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
+            <Link
+              href="/fut/interno/torneos"
+              className="rounded-full border border-emerald-400/30 bg-emerald-500/10 px-4 py-2 text-sm font-semibold text-emerald-100 hover:bg-emerald-500/15"
+            >
+              Torneos
+            </Link>
             <Link
               href="/fut/interno/gobernanza"
               className="rounded-full border border-white/15 px-4 py-2 text-sm font-semibold text-white/80 hover:bg-white/5"
@@ -258,6 +283,8 @@ export function FixturesAdminPanel() {
             <FixtureImportSection
               academyId={selectedAcademyId}
               seasonId={activeSeason?.id}
+              tournamentId={tournamentId}
+              tournaments={tournaments}
               disabled={!activeSeason}
               onImported={() => void loadFixtures(selectedAcademyId)}
             />
@@ -280,6 +307,9 @@ export function FixturesAdminPanel() {
                         <p className="mt-1 text-sm text-white/55">
                           {formatKickoffDateTime(fixture.kickoff_at, fixture.match_date)}
                           {fixture.category ? ` · ${fixture.category}` : ""}
+                          {fixture.tournaments?.name
+                            ? ` · ${fixture.tournaments.name}`
+                            : ""}
                         </p>
                         {fixture.venue_name ? (
                           <p className="mt-1 inline-flex items-center gap-1 text-xs text-white/45">
@@ -374,6 +404,32 @@ export function FixturesAdminPanel() {
                     className="w-full rounded-xl border border-white/15 bg-[#0f2038] px-4 py-3 text-sm text-white outline-none focus:border-emerald-400/50"
                     placeholder="Sub-15 Varonil"
                   />
+                </div>
+                <div>
+                  <label className="mb-2 block text-xs font-medium uppercase tracking-wide text-white/50">
+                    Torneo
+                  </label>
+                  <select
+                    value={tournamentId}
+                    onChange={(event) => setTournamentId(event.target.value)}
+                    className="w-full rounded-xl border border-white/15 bg-[#0f2038] px-4 py-3 text-sm text-white outline-none focus:border-emerald-400/50"
+                  >
+                    <option value="">Sin torneo del catálogo</option>
+                    {tournaments.map((tournament) => (
+                      <option key={tournament.id} value={tournament.id}>
+                        {tournament.name}
+                      </option>
+                    ))}
+                  </select>
+                  {tournaments.length === 0 ? (
+                    <p className="mt-2 text-xs text-white/45">
+                      Registra torneos en{" "}
+                      <Link href="/fut/interno/torneos" className="underline">
+                        Catálogo de torneos
+                      </Link>
+                      .
+                    </p>
+                  ) : null}
                 </div>
                 <div>
                   <label className="mb-2 block text-xs font-medium uppercase tracking-wide text-white/50">

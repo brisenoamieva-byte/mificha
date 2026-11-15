@@ -31,6 +31,7 @@ interface BulkFixtureInput {
 interface BulkBody {
   academy_id?: string;
   season_id?: string;
+  tournament_id?: string | null;
   is_public?: boolean;
   is_official?: boolean;
   fixtures?: BulkFixtureInput[];
@@ -124,6 +125,8 @@ export async function POST(request: Request) {
     return activeSeason.id;
   }
 
+  const tournamentId = body.tournament_id?.trim() || null;
+
   const rows: Array<{
     academy_id: string;
     season_id: string;
@@ -134,6 +137,7 @@ export async function POST(request: Request) {
     venue_address: string | null;
     category: string | null;
     notes: string | null;
+    tournament_id: string | null;
     is_public: boolean;
     is_official: boolean;
     status: "scheduled";
@@ -186,6 +190,7 @@ export async function POST(request: Request) {
       venue_address: fixture.venue_address?.trim() || null,
       category: fixture.category?.trim() || null,
       notes: fixture.notes?.trim() || null,
+      tournament_id: tournamentId,
       is_public: body.is_public ?? true,
       is_official: body.is_official ?? true,
       status: "scheduled",
