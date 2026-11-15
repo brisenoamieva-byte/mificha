@@ -1,4 +1,12 @@
+/**
+ * Marca maestra MiFicha: escudo MF (azul + punto verde).
+ * Variantes:
+ * - BRAND_ICON → UI (header, sidebar) — escudo solo
+ * - BRAND_APP_ICON → favicon / PWA / apple-touch — escudo en canvas
+ * Regenerar favicons: `node scripts/build-favicon.mjs`
+ */
 export const BRAND_ICON = "/brand/mificha-icon.png";
+export const BRAND_APP_ICON = "/brand/mificha-app-icon.png";
 export const BRAND_OG_IMAGE = "/marketing/og-default.png";
 export { GPH_LOGO } from "@/lib/gph-alliance";
 
