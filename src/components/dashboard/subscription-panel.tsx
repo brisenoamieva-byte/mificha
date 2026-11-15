@@ -43,7 +43,7 @@ function AcademyFreePanel() {
             href="/fut/organizadores"
             className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-[#1B4F8C] hover:underline"
           >
-            ¿Organizas torneo? Ver precios para temporadas
+            ¿Organizas torneo? Ver registro de temporadas
             <ExternalLink className="h-3.5 w-3.5" />
           </Link>
         </div>
@@ -128,8 +128,7 @@ export function SubscriptionPanel() {
             </h2>
           </div>
           <p className="mt-2 text-sm text-slate-600">
-            {ACADEMY_PRODUCT.priceLabel} {ACADEMY_PRODUCT.currency}{" "}
-            {ACADEMY_PRODUCT.period}. Plantel, partidos y avisos a tutores.
+            Plantel, partidos y avisos a tutores.
           </p>
           <span
             className={cn(
@@ -148,9 +147,7 @@ export function SubscriptionPanel() {
             disabled={loading}
             className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#1B4F8C] px-4 py-3 text-sm font-semibold text-white hover:bg-[#164278] disabled:opacity-60"
           >
-            {loading
-              ? "Redirigiendo…"
-              : `Contratar · ${ACADEMY_PRODUCT.priceLabel} USD/año`}
+            {loading ? "Redirigiendo…" : "Activar acceso academia"}
           </button>
         ) : null}
       </div>

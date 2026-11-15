@@ -104,7 +104,7 @@ export function PlatformOpsStatus() {
       <h2 className="text-base font-semibold">Estado operativo</h2>
       <p className="mt-1 text-sm leading-6 text-white/65">
         Cobro, correo y agenda GPH: lo que bloquea recibos, invitaciones y el
-        diagnóstico de $2,030.
+        diagnóstico GPH.
       </p>
       <ul className="mt-4 space-y-2">
         {loading ? (

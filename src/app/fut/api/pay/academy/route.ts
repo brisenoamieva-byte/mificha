@@ -10,7 +10,7 @@ import { createSupabaseAdminClient } from "@/lib/supabase-admin";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 
 /**
- * Acceso academia (referencia futura $150 USD/año).
+ * Acceso academia (checkout; montos no se publican en marketing).
  * - Promo / canal gratuito: registra 12 meses sin cobro.
  * - Cobro activo: Mercado Pago.
  */

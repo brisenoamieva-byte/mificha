@@ -128,27 +128,26 @@ export async function grantPersonaMembership(
 }
 
 export function personaMembershipPublicCopy() {
-  const listPrice = `${SCOUT_PRODUCT.priceLabel} ${SCOUT_PRODUCT.currency}/${SCOUT_PRODUCT.period.replace("al ", "")}`;
   const academyBit = ACADEMY_MEMBERSHIP_FREE_PROMO
     ? "academia (canal gratuito: plantel, partidos y MF)"
-    : "academia ($150 USD/año)";
+    : "academia (plantel, partidos y MF)";
   if (PERSONA_MEMBERSHIP_FREE_PROMO) {
     return {
       badge: "Gratis por tiempo limitado",
-      priceLine: `Gratis ahora · después ${listPrice}`,
+      priceLine: "Gratis por tiempo limitado",
       meta: "Gratis · tiempo limitado",
       cta: "Activar gratis",
       short: "Gratis por tiempo limitado",
-      planesSummary: `Dos cuentas: persona (gratis por tiempo limitado; después $50 USD/año) o ${academyBit}.`,
+      planesSummary: `Dos cuentas: persona (gratis por tiempo limitado) o ${academyBit}.`,
     };
   }
   return {
     badge: null as string | null,
-    priceLine: listPrice,
-    meta: listPrice,
-    cta: `Contratar · ${SCOUT_PRODUCT.priceLabel} USD/año`,
-    short: listPrice,
-    planesSummary: `Dos cuentas: persona ($50 USD/año) o ${academyBit}.`,
+    priceLine: "Explorar Pro",
+    meta: "Explorar Pro",
+    cta: "Activar Explorar Pro",
+    short: "Explorar Pro",
+    planesSummary: `Dos cuentas: persona (Explorar Pro) o ${academyBit}.`,
   };
 }
 

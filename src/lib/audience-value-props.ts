@@ -42,7 +42,7 @@ export const AUDIENCE_VALUE_PROPS: AudienceValueProp[] = [
       "Seguimiento en el expediente del jugador.",
       "En Explorar te ven agentes y scouts de futbol (con tu opt-in).",
       "Avisos de visorías, torneos y servicios GPH.",
-      "Opcional: diagnóstico GPH $2,030 (−30%, incluye 12 meses).",
+      "Opcional: diagnóstico GPH (incluye 12 meses de plataforma).",
     ],
     href: "/fut/tutor",
     cta: "Entrar como tutor",

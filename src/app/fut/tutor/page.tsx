@@ -37,7 +37,7 @@ export default async function TutorPage() {
           </h1>
           <p className="mt-2 text-sm leading-7 text-mf-text-secondary">
             Tutor o representante: misma cuenta. Publica fichas con consentimiento; la
-            membresía (gratis por tiempo limitado; después $50 USD/año) desbloquea detalle en
+            membresía (gratis por tiempo limitado) desbloquea detalle en
             Explorar.
           </p>
         </div>

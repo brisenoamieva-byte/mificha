@@ -76,5 +76,5 @@ export const ACADEMY_COMMERCIAL = {
   ],
   /** Precio de referencia futuro; no es el pitch principal. */
   futurePriceUsd: 150,
-  futurePriceHint: "Referencia futura · $150 USD/año (apagada mientras el piloto necesite academias activas)",
+  futurePriceHint: "Sin cuota mientras el piloto necesite academias activas",
 } as const;

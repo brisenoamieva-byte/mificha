@@ -161,7 +161,6 @@ export async function grantAcademyMembership(
 }
 
 export function academyMembershipPublicCopy() {
-  const listPrice = `${ACADEMY_PRODUCT.priceLabel} ${ACADEMY_PRODUCT.currency}/${ACADEMY_PRODUCT.period.replace("al ", "")}`;
   if (ACADEMY_MEMBERSHIP_FREE_PROMO) {
     return {
       badge: "Canal gratuito",
@@ -176,13 +175,13 @@ export function academyMembershipPublicCopy() {
   }
   return {
     badge: null as string | null,
-    priceLine: listPrice,
-    meta: listPrice,
-    cta: `Contratar · ${ACADEMY_PRODUCT.priceLabel} USD/año`,
-    short: listPrice,
+    priceLine: "Acceso academia",
+    meta: "Acceso academia",
+    cta: "Activar acceso academia",
+    short: "Acceso academia",
     headline: "Acceso academia",
     summary:
-      "Plantel, partidos, código MF y avisos · $150 USD/año. El organizador del torneo se cotiza aparte.",
+      "Plantel, partidos, código MF y avisos. El organizador del torneo se cotiza aparte.",
   };
 }
 
@@ -197,7 +196,7 @@ export function planesHubSummary(
       /academia \([^)]+\)/,
       ACADEMY_MEMBERSHIP_FREE_PROMO
         ? "academia (canal gratuito: plantel, partidos y MF)"
-        : "academia ($150 USD/año)",
+        : "academia (plantel, partidos y MF)",
     );
   }
   return `${personaPlanesSummary} Academia: ${academyCopy.short}.`;

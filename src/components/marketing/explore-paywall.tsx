@@ -72,17 +72,11 @@ export function ExplorePaywallBanner({ access }: { access: ExploreAccess }) {
               </p>
               <p className="mt-2 text-3xl font-semibold text-mf-gph-ink">Gratis</p>
               <p className="mt-1 text-sm text-mf-text-secondary">
-                Después {SCOUT_PRODUCT.priceLabel} {SCOUT_PRODUCT.currency}{" "}
-                {SCOUT_PRODUCT.period}.
+                Por tiempo limitado en el piloto.
               </p>
             </>
           ) : (
-            <p className="text-3xl font-semibold text-mf-gph-ink">
-              {SCOUT_PRODUCT.priceLabel}
-              <span className="ml-1 text-base font-medium text-mf-text-muted">
-                {SCOUT_PRODUCT.currency} {SCOUT_PRODUCT.period}
-              </span>
-            </p>
+            <p className="text-3xl font-semibold text-mf-gph-ink">Explorar Pro</p>
           )}
           <p className="mt-2 text-sm text-mf-text-secondary">
             Incluye publicar fichas y desbloquear detalle, fotos y contacto de terceros.
@@ -166,19 +160,13 @@ export function FichaLockedTeaser({
             <>
               Para ver la ficha completa o el kit de <strong>otro</strong> jugador, activa
               Explorar Pro
-              {PERSONA_MEMBERSHIP_FREE_PROMO
-                ? ` (${copy.short})`
-                : ` (${SCOUT_PRODUCT.priceLabel} ${SCOUT_PRODUCT.currency}/año)`}
-              .
+              {PERSONA_MEMBERSHIP_FREE_PROMO ? ` (${copy.short})` : ""}.
             </>
           ) : (
             <>
               Si quieres ver la ficha completa de <strong>otro</strong> jugador (fotos,
               contacto, kit), entra con tu cuenta o activa Explorar Pro
-              {PERSONA_MEMBERSHIP_FREE_PROMO
-                ? ` (${copy.short})`
-                : ` (${SCOUT_PRODUCT.priceLabel} ${SCOUT_PRODUCT.currency}/año)`}
-              .
+              {PERSONA_MEMBERSHIP_FREE_PROMO ? ` (${copy.short})` : ""}.
             </>
           )}
         </p>

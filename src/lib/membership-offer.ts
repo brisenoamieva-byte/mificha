@@ -6,8 +6,8 @@ export const MEMBERSHIP_OFFER = {
   headlineHook: "puertas a oportunidades reales",
   summary:
     "Ficha del hijo, seguimiento y visibilidad ante agentes en Explorar — más visorías, torneos y GPH en una sola cuenta.",
-  priceLabel: "$1,200",
-  pricePeriod: "MXN al año",
+  priceLabel: "Gratis por tiempo limitado",
+  pricePeriod: "piloto",
   specializationLimit:
     "1 ciclo de especialización al mes (o el cupo que publique GPH). Extra se cotiza aparte.",
   benefits: [

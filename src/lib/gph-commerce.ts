@@ -33,15 +33,14 @@ export const FAMILY_PRICING_COPY = {
     : "Familias · membresía anual",
   /** Explicación completa (sección membresía, página). */
   today:
-    "La plataforma está abierta para que el tutor arme la ficha del jugador. Lo único que se cobra ahora es el diagnóstico GPH: de $2,900 a $2,030 (−30%), evaluación presencial + 12 meses de MiFicha.",
+    "La plataforma está abierta para que el tutor arme la ficha del jugador. Lo que se cobra aparte es el diagnóstico GPH (evaluación presencial + 12 meses de MiFicha).",
   /** Una línea (nav, pies, cards). */
   todayShort:
-    "Ficha del jugador. Diagnóstico GPH $2,030 (−30% sobre $2,900, incluye 12 meses).",
-  diagnosis:
-    "$2,030 (−30%) · diagnóstico GPH + 12 meses de MiFicha",
+    "Ficha del jugador gratis por tiempo limitado. Diagnóstico GPH opcional (incluye 12 meses).",
+  diagnosis: "Diagnóstico GPH · evaluación presencial + 12 meses de MiFicha",
   /** Solo pie discreto; no va en el hero. */
   laterNote:
-    "Más adelante la membresía sola será $1,200 al año. Si pagaste el diagnóstico, ese año ya viene incluido.",
+    "La ficha del jugador está en piloto gratuito por tiempo limitado. El diagnóstico GPH se cotiza aparte.",
 } as const;
 
 export const GPH_PARTNERSHIP = {

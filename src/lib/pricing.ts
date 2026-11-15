@@ -13,7 +13,7 @@ export const ACADEMY_ACCESS = {
   summary: ACADEMY_COMMERCIAL.summary,
   features: [...ACADEMY_COMMERCIAL.features],
   priceUsd: ACADEMY_COMMERCIAL.futurePriceUsd,
-  priceLabel: `$${ACADEMY_COMMERCIAL.futurePriceUsd}`,
+  priceLabel: "Canal academia",
   promoFree: ACADEMY_BILLING_PROMO_FREE,
 } as const;
 
@@ -52,7 +52,7 @@ export const DIAGNOSIS_PRODUCT = {
   title: "Precio",
   subtitle: "Un jugador o un grupo. El informe queda en la ficha de MiFicha.",
   footnote: "Incluye 12 meses de MiFicha · Mercado Pago o WhatsApp.",
-  memberPriceLabel: "$1,200",
+  memberPriceLabel: "Membresía",
   listPriceLabel: FAMILY_PRODUCTS.diagnosis.listPriceLabel,
   publicPriceLabel: FAMILY_PRODUCTS.diagnosis.priceLabel,
   discountPercent: DIAGNOSIS_PROMO.discountPercent,
@@ -74,11 +74,11 @@ export const DIAGNOSIS_PRODUCT = {
     {
       id: "individual",
       label: "Jugador",
-      listPriceLabel: FAMILY_PRODUCTS.diagnosis.listPriceLabel,
-      priceLabel: FAMILY_PRODUCTS.diagnosis.priceLabel,
+      listPriceLabel: "Promo",
+      priceLabel: "Promo · tiempo limitado",
       promo: true,
-      period: "MXN · sesión + 12 meses MiFicha",
-      description: "Diagnóstico completo e informe ligado a la ficha.",
+      period: "Sesión + 12 meses MiFicha",
+      description: "Diagnóstico completo e informe ligado a la ficha. El monto se confirma al pagar.",
     },
     {
       id: "grupo",
@@ -95,18 +95,18 @@ export const SCOUT_PRICING = {
   basicLabel: "Búsqueda básica",
   basicPrice: "Gratis",
   proLabel: "Explorar Pro",
-  proStatus: "Gratis por tiempo limitado · después $50 USD/año",
+  proStatus: "Gratis por tiempo limitado",
   description:
-    "Filtra por categoría, posición y ciudad. Solo fichas con consentimiento. El detalle completo se desbloquea con Explorar Pro (gratis por tiempo limitado; después $50 USD/año).",
+    "Filtra por categoría, posición y ciudad. Solo fichas con consentimiento. El detalle completo se desbloquea con Explorar Pro (gratis por tiempo limitado).",
   unlockNote:
     "Incluye publicar fichas (tutor o representante) y ver fotos, videos, bio, contacto y ficha completa de terceros con opt-in.",
 } as const;
 
 /** Suscripción legacy para academias — desactivada en producto; conservada para Stripe futuro. */
 export const LEGACY_ACADEMY_PLANS = {
-  starter: { label: "Starter", priceLabel: "$699/mes", amount: 69_900 },
-  pro: { label: "Pro", priceLabel: "$1,199/mes", amount: 119_900 },
-  elite: { label: "Elite", priceLabel: "$1,999/mes", amount: 199_900 },
+  starter: { label: "Starter", priceLabel: "Plan Starter", amount: 69_900 },
+  pro: { label: "Pro", priceLabel: "Plan Pro", amount: 119_900 },
+  elite: { label: "Elite", priceLabel: "Plan Elite", amount: 199_900 },
 } as const;
 
 /** Cobro anual academia ($150). Env fuerza on/off; si no, sigue ACADEMY_ACCESS.promoFree. */

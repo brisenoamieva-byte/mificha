@@ -37,6 +37,6 @@ export type ExploreAccess = {
 };
 
 export function scoutWhatsAppCheckoutHref() {
-  const text = `Hola, quiero Explorar Pro en MiFicha (${SCOUT_PRODUCT.priceLabel} ${SCOUT_PRODUCT.currency} ${SCOUT_PRODUCT.period}): publicar fichas y ver detalle completo en Explorar.`;
+  const text = `Hola, quiero Explorar Pro en MiFicha: publicar fichas y ver detalle completo en Explorar.`;
   return `https://wa.me/${GPH_WHATSAPP_E164}?text=${encodeURIComponent(text)}`;
 }

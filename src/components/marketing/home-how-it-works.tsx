@@ -17,7 +17,7 @@ const STEPS = [
     n: "3",
     title: "Detalle y academia",
     detail:
-      "Fotos, contacto y ficha completa con Explorar Pro (gratis por tiempo limitado; después $50 USD/año). La academia opera plantel, partidos y código MF sin cuota; el ingreso es el diagnóstico GPH a familias.",
+      "Fotos, contacto y ficha completa con Explorar Pro (gratis por tiempo limitado). La academia opera plantel, partidos y código MF sin cuota; el ingreso es el diagnóstico GPH a familias.",
   },
 ] as const;
 

@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   title: "Membresía anual | MiFicha",
   description: MEMBERSHIP_CHECKOUT_DISABLED
     ? FAMILY_PRICING_COPY.today
-    : "MiFicha $1,200 al año: seguimiento del jugador, visorías de Primera, convocatorias, eventos con descuento y especialización acotada.",
+    : "MiFicha: seguimiento del jugador, visorías de Primera, convocatorias, eventos con descuento y especialización acotada.",
 };
 
 export default function MembresiaPage() {

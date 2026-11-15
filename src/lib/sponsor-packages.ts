@@ -36,8 +36,8 @@ export const SPONSOR_PACKAGES: SponsorPackage[] = [
     id: "aliado",
     name: "Aliado",
     audience: "Marca presente en toda la plataforma",
-    priceLabel: "$12,000",
-    priceNote: "MXN",
+    priceLabel: "Cotizar",
+    priceNote: "",
     period: "por trimestre",
     placements: ["footer_rail"],
     includes: [
@@ -50,8 +50,8 @@ export const SPONSOR_PACKAGES: SponsorPackage[] = [
     id: "familias",
     name: "Familias",
     audience: "Tutores activos en el hub",
-    priceLabel: "$28,000",
-    priceNote: "MXN",
+    priceLabel: "Cotizar",
+    priceNote: "",
     period: "por trimestre",
     placements: ["tutor_card"],
     includes: [
@@ -65,8 +65,8 @@ export const SPONSOR_PACKAGES: SponsorPackage[] = [
     id: "home",
     name: "Home",
     audience: "Máxima visibilidad de entrada",
-    priceLabel: "$45,000",
-    priceNote: "MXN",
+    priceLabel: "Cotizar",
+    priceNote: "",
     period: "por trimestre",
     placements: ["home_strip"],
     includes: [
@@ -79,8 +79,8 @@ export const SPONSOR_PACKAGES: SponsorPackage[] = [
     id: "temporada",
     name: "Temporada",
     audience: "Pack completo de inventario",
-    priceLabel: "$70,000",
-    priceNote: "MXN",
+    priceLabel: "Cotizar",
+    priceNote: "",
     period: "por 4 meses",
     placements: ["home_strip", "tutor_card", "footer_rail"],
     includes: [
