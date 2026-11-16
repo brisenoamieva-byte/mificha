@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import type { TutorLinkRequest } from "@/lib/tutor-link-requests";
+import { supabase } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
 
 export function TutorLinkRequestsInbox({
@@ -20,7 +21,16 @@ export function TutorLinkRequestsInbox({
   const load = useCallback(async () => {
     setError(null);
     try {
-      const response = await fetch("/fut/api/tutor/links?pending=1");
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session) {
+        setPending([]);
+        return;
+      }
+      const response = await fetch("/fut/api/tutor/links?pending=1", {
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
       const payload = (await response.json()) as {
         pending?: TutorLinkRequest[];
         error?: string;
@@ -45,9 +55,19 @@ export function TutorLinkRequestsInbox({
     setBusyId(requestId);
     setError(null);
     try {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session) {
+        setError("Inicia sesión.");
+        return;
+      }
       const response = await fetch("/fut/api/tutor/links", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`,
+        },
         body: JSON.stringify({ action, request_id: requestId }),
       });
       const payload = (await response.json()) as { error?: string };

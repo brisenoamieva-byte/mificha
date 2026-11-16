@@ -57,7 +57,8 @@ export function AcademyLinkRequests({ academyId }: { academyId: string }) {
         Solicitudes de vínculo tutor
       </p>
       <p className="mt-1 text-sm text-slate-600">
-        Une plantel y ficha tutor solo cuando ambos confirman (salvo mismo código MF).
+        Une plantel y ficha tutor cuando ambos confirman. Con el mismo código MF, o si
+        el tutor también opera esta academia, se liga al instante.
       </p>
 
       {error ? (

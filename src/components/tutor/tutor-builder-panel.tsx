@@ -42,6 +42,7 @@ import {
 } from "@/lib/tutor-season-claims";
 import type { TutorMembership } from "@/lib/tutor-memberships";
 import { childHasAnyMembership, childMemberships } from "@/lib/tutor-memberships";
+import type { TutorLinkRequest } from "@/lib/tutor-link-requests";
 import { parseLinesToList, parseTitleDetailLines } from "@/lib/tutor-family";
 import { cn } from "@/lib/utils";
 import {
@@ -154,6 +155,7 @@ interface TutorBuilderPanelProps {
   linkBusy: boolean;
   copied: boolean;
   linkSuggestions: TutorLinkSuggestion[];
+  pendingLinks?: TutorLinkRequest[];
   storyTitle: string;
   storyBody: string;
   setStoryTitle: (value: string) => void;
@@ -173,6 +175,7 @@ interface TutorBuilderPanelProps {
   onCopyPublicCode: () => void;
   onLinkPlayer: (playerId: string, match?: TutorLinkSuggestion["match"]) => void;
   onUnlinkPlayer: (playerId?: string) => void;
+  onCancelLinkRequest?: (requestId: string) => void;
   onToggleExploreOptIn: (enabled: boolean) => void;
   onSignLinkedAcademyConsent?: () => void;
   workspace?: GuardianKind;
@@ -186,6 +189,7 @@ export function TutorBuilderPanel({
   linkBusy,
   copied,
   linkSuggestions,
+  pendingLinks = [],
   storyTitle,
   storyBody,
   setStoryTitle,
@@ -207,6 +211,7 @@ export function TutorBuilderPanel({
   onSignLinkedAcademyConsent,
   onLinkPlayer,
   onUnlinkPlayer,
+  onCancelLinkRequest,
   workspace = "tutor",
 }: TutorBuilderPanelProps) {
   const [seasonForm, setSeasonForm] = useState(() =>
@@ -1726,6 +1731,41 @@ export function TutorBuilderPanel({
                     </button>
                   </li>
                 ))}
+              </ul>
+            ) : null}
+            {pendingLinks.length > 0 ? (
+              <ul className="mt-3 space-y-2">
+                {pendingLinks.map((row) => {
+                  const waitingTutor = row.status === "pending_tutor";
+                  return (
+                    <li
+                      key={row.id}
+                      className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-3"
+                    >
+                      <div>
+                        <p className="text-sm font-semibold text-mf-gph-ink">
+                          {row.academy_name}
+                        </p>
+                        <p className="text-xs text-mf-text-muted">
+                          {waitingTutor
+                            ? "La academia pidió vincular · confírmalo arriba"
+                            : "Solicitud enviada · esperando a la academia"}
+                          {row.player_name ? ` · ${row.player_name}` : ""}
+                        </p>
+                      </div>
+                      {!waitingTutor && onCancelLinkRequest ? (
+                        <button
+                          type="button"
+                          disabled={linkBusy}
+                          onClick={() => onCancelLinkRequest(row.id)}
+                          className="text-xs font-semibold text-mf-text-muted hover:text-mf-danger"
+                        >
+                          Cancelar
+                        </button>
+                      ) : null}
+                    </li>
+                  );
+                })}
               </ul>
             ) : null}
             {linkSuggestions.length > 0 ? (

@@ -39,6 +39,8 @@ export async function GET(request: Request) {
     }
     const suggestions = await suggestAcademyPlayersForChild(admin, child);
     const pending = await listPendingLinkRequestsForTutor(admin, user.id);
+    const childPending = pending.filter((row) => row.child_id === childId);
+    const pendingPlayerIds = new Set(childPending.map((row) => row.player_id));
     return NextResponse.json({
       child: {
         id: child.id,
@@ -49,8 +51,9 @@ export async function GET(request: Request) {
         linked_player_slug: child.linked_player_slug,
         linked_at: child.linked_at,
       },
-      suggestions,
-      pending: pending.filter((row) => row.child_id === childId),
+      // No volver a ofrecer un plantel que ya tiene solicitud abierta.
+      suggestions: suggestions.filter((row) => !pendingPlayerIds.has(row.player_id)),
+      pending: childPending,
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "No se pudo buscar.";

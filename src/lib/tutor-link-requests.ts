@@ -126,6 +126,25 @@ async function samePublicCode(
   return Boolean(playerCode && playerCode === childCode);
 }
 
+function isOpenStatus(status: LinkRequestStatus) {
+  return status === "pending_academy" || status === "pending_tutor";
+}
+
+/** Misma pareja child↔player ya pendiente. */
+function matchingOpenRequest(
+  rows: TutorLinkRequest[],
+  childId: string,
+  playerId: string,
+) {
+  return rows.find(
+    (row) =>
+      isOpenStatus(row.status) &&
+      row.child_id === childId &&
+      row.player_id === playerId,
+  );
+}
+
+/** Otra solicitud abierta que bloquea (mismo child o mismo player, distinta pareja). */
 function openConflict(
   rows: TutorLinkRequest[],
   childId: string,
@@ -133,8 +152,9 @@ function openConflict(
 ) {
   return rows.find(
     (row) =>
-      (row.status === "pending_academy" || row.status === "pending_tutor") &&
-      (row.child_id === childId || row.player_id === playerId),
+      isOpenStatus(row.status) &&
+      (row.child_id === childId || row.player_id === playerId) &&
+      !(row.child_id === childId && row.player_id === playerId),
   );
 }
 
@@ -145,6 +165,33 @@ async function activateLink(
   playerId: string,
 ) {
   return linkTutorChildToPlayer(admin, guardianUserId, childId, playerId);
+}
+
+async function activateAndMarkRequest(
+  admin: SupabaseClient,
+  rows: TutorLinkRequest[],
+  request: TutorLinkRequest,
+  resolvedBy: LinkRequestInitiator,
+) {
+  const linked = await activateLink(
+    admin,
+    request.guardian_user_id,
+    request.child_id,
+    request.player_id,
+  );
+  const now = new Date().toISOString();
+  const index = rows.findIndex((row) => row.id === request.id);
+  const active: TutorLinkRequest = {
+    ...request,
+    status: "active",
+    updated_at: now,
+    resolved_at: now,
+    resolved_by: resolvedBy,
+  };
+  if (index >= 0) rows[index] = active;
+  else rows.unshift(active);
+  await writeRequests(admin, rows);
+  return { mode: "active" as const, child: linked, request: active };
 }
 
 /**
@@ -165,12 +212,6 @@ export async function requestLinkFromTutor(
 
   const meta = await loadPlayerMeta(admin, playerId);
   const rows = await readRequests(admin);
-  const conflict = openConflict(rows, childId, playerId);
-  if (conflict) {
-    throw new Error("Ya hay una solicitud de vínculo pendiente para este jugador.");
-  }
-
-  // Misma identidad MF-, o el tutor también opera esa academia: activar al instante.
   const sameCode =
     matchKind === "code" || (await samePublicCode(admin, child, playerId));
   const selfAcademy = await tutorCanManageAcademy(
@@ -178,7 +219,23 @@ export async function requestLinkFromTutor(
     guardianUserId,
     meta.academyId,
   );
-  if (sameCode || selfAcademy) {
+  const shouldActivate = sameCode || selfAcademy;
+
+  const existing = matchingOpenRequest(rows, childId, playerId);
+  if (existing) {
+    if (shouldActivate) {
+      return activateAndMarkRequest(admin, rows, existing, "tutor");
+    }
+    return { mode: "pending" as const, child, request: existing };
+  }
+
+  const conflict = openConflict(rows, childId, playerId);
+  if (conflict) {
+    throw new Error("Ya hay una solicitud de vínculo pendiente para este jugador.");
+  }
+
+  // Misma identidad MF-, o el tutor también opera esa academia: activar al instante.
+  if (shouldActivate) {
     const linked = await activateLink(admin, guardianUserId, childId, playerId);
     const now = new Date().toISOString();
     const active: TutorLinkRequest = {
@@ -253,12 +310,30 @@ export async function requestLinkFromAcademy(
   }
 
   const rows = await readRequests(admin);
+  const sameCode =
+    matchKind === "code" || (await samePublicCode(admin, child, playerId));
+  // Si el tutor del hijo también opera esta academia (caso Gustavo), no pedir doble OK.
+  const selfAcademy = await tutorCanManageAcademy(
+    admin,
+    child.guardian_user_id,
+    academyId,
+  );
+  const shouldActivate = sameCode || selfAcademy;
+
+  const existing = matchingOpenRequest(rows, childId, playerId);
+  if (existing) {
+    if (shouldActivate) {
+      return activateAndMarkRequest(admin, rows, existing, "academy");
+    }
+    return { mode: "pending" as const, child, request: existing };
+  }
+
   const conflict = openConflict(rows, childId, playerId);
   if (conflict) {
     throw new Error("Ya hay una solicitud de vínculo pendiente para este jugador.");
   }
 
-  if (matchKind === "code" || (await samePublicCode(admin, child, playerId))) {
+  if (shouldActivate) {
     const linked = await activateLink(
       admin,
       child.guardian_user_id,
@@ -279,7 +354,7 @@ export async function requestLinkFromAcademy(
       player_slug: meta.playerSlug,
       academy_id: meta.academyId,
       academy_name: meta.academyName,
-      match_kind: "code",
+      match_kind: sameCode ? "code" : matchKind,
       created_at: now,
       updated_at: now,
       resolved_at: now,

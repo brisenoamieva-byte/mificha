@@ -19,6 +19,7 @@ import {
   type TutorSeasonInput,
   type TutorSeasonStat,
 } from "@/lib/tutor-family";
+import type { TutorLinkRequest } from "@/lib/tutor-link-requests";
 import type { TutorLinkedPerformance } from "@/lib/tutor-linked-performance";
 import type { TutorSeasonClaim } from "@/lib/tutor-season-claims";
 import {
@@ -212,6 +213,7 @@ async function authed(path: string, init?: RequestInit) {
     suggestions?: LinkSuggestion[];
     mode?: "active" | "pending";
     proposed_to_academy?: boolean;
+    pending?: TutorLinkRequest[];
   };
   if (!response.ok) throw new Error(payload.error || "No se pudo completar.");
   return payload;
@@ -238,6 +240,7 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
   const [linkSuggestions, setLinkSuggestions] = useState<LinkSuggestion[]>([]);
   const [linkBusy, setLinkBusy] = useState(false);
   const [linkInboxKey, setLinkInboxKey] = useState(0);
+  const [pendingLinks, setPendingLinks] = useState<TutorLinkRequest[]>([]);
   const [onboardNotice, setOnboardNotice] = useState<string | null>(null);
   const [showPasswordPanel, setShowPasswordPanel] = useState(false);
   const [showDeleteAccountPanel, setShowDeleteAccountPanel] = useState(false);
@@ -360,20 +363,44 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
     });
   }, [child]);
 
+  const refreshChildLinks = useCallback(async (childId: string) => {
+    try {
+      const payload = await authed(
+        `/fut/api/tutor/links?child_id=${encodeURIComponent(childId)}`,
+      );
+      setLinkSuggestions((payload.suggestions as LinkSuggestion[]) ?? []);
+      setPendingLinks(
+        Array.isArray(payload.pending) ? (payload.pending as TutorLinkRequest[]) : [],
+      );
+    } catch {
+      setLinkSuggestions([]);
+      setPendingLinks([]);
+    }
+  }, []);
+
   useEffect(() => {
     if (!child) {
       setLinkSuggestions([]);
+      setPendingLinks([]);
       return;
     }
     let cancelled = false;
-    void authed(`/fut/api/tutor/links?child_id=${encodeURIComponent(child.id)}`)
-      .then((payload) => {
+    void (async () => {
+      try {
+        const payload = await authed(
+          `/fut/api/tutor/links?child_id=${encodeURIComponent(child.id)}`,
+        );
         if (cancelled) return;
         setLinkSuggestions((payload.suggestions as LinkSuggestion[]) ?? []);
-      })
-      .catch(() => {
-        if (!cancelled) setLinkSuggestions([]);
-      });
+        setPendingLinks(
+          Array.isArray(payload.pending) ? (payload.pending as TutorLinkRequest[]) : [],
+        );
+      } catch {
+        if (cancelled) return;
+        setLinkSuggestions([]);
+        setPendingLinks([]);
+      }
+    })();
     return () => {
       cancelled = true;
     };
@@ -394,6 +421,7 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
         }),
       });
       await load(phone, child.id);
+      await refreshChildLinks(child.id);
       setLinkInboxKey((value) => value + 1);
       if (payload.mode === "pending") {
         setNotice(
@@ -401,10 +429,27 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
         );
       } else {
         setNotice("Jugador ligado con su academia. Es la misma persona en ambos lados.");
-        setLinkSuggestions([]);
       }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "No se pudo ligar.");
+    } finally {
+      setLinkBusy(false);
+    }
+  }
+
+  async function cancelLinkRequest(requestId: string) {
+    setLinkBusy(true);
+    setError(null);
+    try {
+      await authed("/fut/api/tutor/links", {
+        method: "POST",
+        body: JSON.stringify({ action: "reject", request_id: requestId }),
+      });
+      if (child) await refreshChildLinks(child.id);
+      setLinkInboxKey((value) => value + 1);
+      setNotice("Solicitud de vínculo cancelada.");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "No se pudo cancelar.");
     } finally {
       setLinkBusy(false);
     }
@@ -1234,6 +1279,7 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
             linkBusy={linkBusy}
             copied={copied}
             linkSuggestions={linkSuggestions}
+            pendingLinks={pendingLinks}
             storyTitle={storyTitle}
             storyBody={storyBody}
             setStoryTitle={setStoryTitle}
@@ -1255,6 +1301,7 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
             onSignLinkedAcademyConsent={() => void signLinkedAcademyConsent()}
             onLinkPlayer={(playerId, match) => void linkPlayer(playerId, match)}
             onUnlinkPlayer={(playerId) => void unlinkPlayer(playerId)}
+            onCancelLinkRequest={(requestId) => void cancelLinkRequest(requestId)}
           />
         </div>
       ) : null}
