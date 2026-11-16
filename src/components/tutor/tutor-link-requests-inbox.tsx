@@ -7,9 +7,11 @@ import { cn } from "@/lib/utils";
 export function TutorLinkRequestsInbox({
   className,
   onChanged,
+  refreshKey = 0,
 }: {
   className?: string;
   onChanged?: () => void;
+  refreshKey?: number;
 }) {
   const [pending, setPending] = useState<TutorLinkRequest[]>([]);
   const [busyId, setBusyId] = useState<string | null>(null);
@@ -25,17 +27,19 @@ export function TutorLinkRequestsInbox({
       };
       if (!response.ok) {
         setError(payload.error ?? "No se pudieron cargar vínculos.");
+        setPending([]);
         return;
       }
       setPending(payload.pending ?? []);
     } catch {
       setError("Error de red al cargar vínculos.");
+      setPending([]);
     }
   }, []);
 
   useEffect(() => {
     void load();
-  }, [load]);
+  }, [load, refreshKey]);
 
   async function act(action: "accept" | "reject", requestId: string) {
     setBusyId(requestId);
@@ -60,7 +64,7 @@ export function TutorLinkRequestsInbox({
     }
   }
 
-  if (pending.length === 0) return null;
+  if (pending.length === 0 && !error) return null;
 
   return (
     <section

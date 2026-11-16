@@ -14,9 +14,23 @@ import {
   unlinkTutorChild,
 } from "@/lib/tutor-player-link";
 import { childHasPlayerMembership } from "@/lib/tutor-memberships";
+import { requireAcademyAccess } from "@/lib/academy-members-server";
 
 const OPS_BUCKET = "mificha-ops";
 const REQUESTS_PATH = "families/link-requests.json";
+
+async function tutorCanManageAcademy(
+  admin: SupabaseClient,
+  guardianUserId: string,
+  academyId: string,
+) {
+  try {
+    await requireAcademyAccess(admin, guardianUserId, academyId);
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 export type LinkRequestStatus =
   | "pending_academy"
@@ -156,8 +170,15 @@ export async function requestLinkFromTutor(
     throw new Error("Ya hay una solicitud de vínculo pendiente para este jugador.");
   }
 
-  // Misma identidad MF-: activar sin segunda confirmación.
-  if (matchKind === "code" || (await samePublicCode(admin, child, playerId))) {
+  // Misma identidad MF-, o el tutor también opera esa academia: activar al instante.
+  const sameCode =
+    matchKind === "code" || (await samePublicCode(admin, child, playerId));
+  const selfAcademy = await tutorCanManageAcademy(
+    admin,
+    guardianUserId,
+    meta.academyId,
+  );
+  if (sameCode || selfAcademy) {
     const linked = await activateLink(admin, guardianUserId, childId, playerId);
     const now = new Date().toISOString();
     const active: TutorLinkRequest = {
@@ -173,7 +194,7 @@ export async function requestLinkFromTutor(
       player_slug: meta.playerSlug,
       academy_id: meta.academyId,
       academy_name: meta.academyName,
-      match_kind: "code",
+      match_kind: sameCode ? "code" : matchKind,
       created_at: now,
       updated_at: now,
       resolved_at: now,

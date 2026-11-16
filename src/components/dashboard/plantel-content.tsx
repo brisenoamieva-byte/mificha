@@ -14,6 +14,7 @@ import {
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { PlayerModal } from "@/components/PlayerModal";
+import { AcademyLinkRequests } from "@/components/dashboard/academy-link-requests";
 import { PlayerImportModal } from "@/components/dashboard/player-import-modal";
 import { useDashboard } from "@/components/dashboard/dashboard-context";
 import { NoAcademyState } from "@/components/dashboard/no-academy-state";
@@ -261,6 +262,8 @@ export function PlantelContent() {
             </button>
           </div>
         </div>
+
+        <AcademyLinkRequests academyId={academy.id} />
 
         {players.length === 0 && !loading ? (
           <div className="rounded-xl border border-[#1B4F8C]/20 bg-[#1B4F8C]/5 p-5">

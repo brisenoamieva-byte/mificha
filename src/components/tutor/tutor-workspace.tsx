@@ -237,6 +237,7 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
   const [notice, setNotice] = useState<string | null>(null);
   const [linkSuggestions, setLinkSuggestions] = useState<LinkSuggestion[]>([]);
   const [linkBusy, setLinkBusy] = useState(false);
+  const [linkInboxKey, setLinkInboxKey] = useState(0);
   const [onboardNotice, setOnboardNotice] = useState<string | null>(null);
   const [showPasswordPanel, setShowPasswordPanel] = useState(false);
   const [showDeleteAccountPanel, setShowDeleteAccountPanel] = useState(false);
@@ -393,6 +394,7 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
         }),
       });
       await load(phone, child.id);
+      setLinkInboxKey((value) => value + 1);
       if (payload.mode === "pending") {
         setNotice(
           "Solicitud enviada a la academia. Cuando la confirmen, verás stats oficiales aquí.",
@@ -1065,7 +1067,10 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
         </p>
       ) : null}
 
-      <TutorLinkRequestsInbox onChanged={() => void load(phone, selectedId)} />
+      <TutorLinkRequestsInbox
+        refreshKey={linkInboxKey}
+        onChanged={() => void load(phone, selectedId)}
+      />
       <TutorActivityInbox />
 
       {children.length > 0 ? (
