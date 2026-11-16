@@ -24,7 +24,6 @@ import type { TutorSeasonClaim } from "@/lib/tutor-season-claims";
 import {
   assertTutorMediaSize,
   friendlyTutorUploadError,
-  tutorMediaMaxLabel,
   type TutorUploadState,
 } from "@/lib/tutor-media-limits";
 
@@ -208,6 +207,7 @@ async function authed(path: string, init?: RequestInit) {
     children?: TutorChildCard[];
     token?: string;
     path?: string;
+    signedUrl?: string;
     child?: TutorChildCard;
     suggestions?: LinkSuggestion[];
     mode?: "active" | "pending";
