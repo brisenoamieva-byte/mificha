@@ -44,6 +44,10 @@ import type { TutorMembership } from "@/lib/tutor-memberships";
 import { childHasAnyMembership, childMemberships } from "@/lib/tutor-memberships";
 import { parseLinesToList, parseTitleDetailLines } from "@/lib/tutor-family";
 import { cn } from "@/lib/utils";
+import {
+  tutorMediaMaxLabel,
+  type TutorUploadState,
+} from "@/lib/tutor-media-limits";
 
 function buildEmptySeasonForm(club?: string | null) {
   return {
@@ -163,6 +167,8 @@ interface TutorBuilderPanelProps {
   onSaveSeason: (input: TutorSeasonInput, seasonId?: string | null) => void;
   onDeleteSeason: (seasonId: string) => void;
   onReorderSeasons: (orderedIds: string[]) => void;
+  uploadState?: TutorUploadState | null;
+  uploadError?: string | null;
   onCopyShare: () => void;
   onCopyPublicCode: () => void;
   onLinkPlayer: (playerId: string, match?: TutorLinkSuggestion["match"]) => void;
@@ -193,6 +199,8 @@ export function TutorBuilderPanel({
   onSaveSeason,
   onDeleteSeason,
   onReorderSeasons,
+  uploadState = null,
+  uploadError = null,
   onCopyShare,
   onCopyPublicCode,
   onToggleExploreOptIn,
@@ -935,7 +943,10 @@ export function TutorBuilderPanel({
         )}
 
         {step === "material" ? (
-          <section className="space-y-4 rounded-2xl border border-mf-border bg-white p-5">
+          <section
+            id="tutor-material-upload"
+            className="scroll-mt-24 space-y-4 rounded-2xl border border-mf-border bg-white p-5"
+          >
             <StepHeading
               title="Aquí subes el contenido"
               detail="Sube fotos y videos, elige portada y video destacado, o elimina lo que no quieras mostrar."
@@ -943,37 +954,100 @@ export function TutorBuilderPanel({
             {child.active ? (
               <>
                 <div className="grid gap-3 sm:grid-cols-2">
-                  <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-mf-gph/40 bg-mf-gph-soft px-4 py-8 text-center transition hover:border-mf-gph hover:bg-mf-gph-soft/80">
+                  <label
+                    className={cn(
+                      "flex flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed px-4 py-8 text-center transition",
+                      busy
+                        ? "cursor-not-allowed border-mf-border bg-mf-canvas opacity-60"
+                        : "cursor-pointer border-mf-gph/40 bg-mf-gph-soft hover:border-mf-gph hover:bg-mf-gph-soft/80",
+                    )}
+                  >
                     <ImagePlus className="h-8 w-8 text-mf-gph" />
                     <span className="text-sm font-semibold text-mf-gph-ink">
                       Subir foto
                     </span>
                     <span className="text-xs text-mf-text-secondary">
-                      Puedes subir varias · JPG o PNG
+                      Varias fotos · JPG/PNG · máx. {tutorMediaMaxLabel("photo")}
                     </span>
                     <input
                       type="file"
                       accept="image/*"
+                      disabled={busy}
                       className="sr-only"
-                      onChange={(event) => void onFile("photo", event.target.files?.[0])}
+                      onChange={(event) => {
+                        const input = event.currentTarget;
+                        const file = input.files?.[0];
+                        input.value = "";
+                        void onFile("photo", file);
+                      }}
                     />
                   </label>
-                  <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-mf-border bg-mf-canvas px-4 py-8 text-center transition hover:border-mf-gph/50">
+                  <label
+                    className={cn(
+                      "flex flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed px-4 py-8 text-center transition",
+                      busy
+                        ? "cursor-not-allowed border-mf-border bg-mf-canvas opacity-60"
+                        : "cursor-pointer border-mf-border bg-mf-canvas hover:border-mf-gph/50",
+                    )}
+                  >
                     <Video className="h-8 w-8 text-mf-gph" />
                     <span className="text-sm font-semibold text-mf-gph-ink">
                       Subir video
                     </span>
                     <span className="text-xs text-mf-text-secondary">
-                      MP4 u otro formato corto
+                      Puedes subir varios · MP4/MOV · máx. {tutorMediaMaxLabel("video")}
                     </span>
                     <input
                       type="file"
                       accept="video/*"
+                      disabled={busy}
                       className="sr-only"
-                      onChange={(event) => void onFile("video", event.target.files?.[0])}
+                      onChange={(event) => {
+                        const input = event.currentTarget;
+                        const file = input.files?.[0];
+                        input.value = "";
+                        void onFile("video", file);
+                      }}
                     />
                   </label>
                 </div>
+                {uploadState ? (
+                  <div className="rounded-xl border border-mf-gph/30 bg-mf-gph-soft px-4 py-3">
+                    <p className="text-sm font-semibold text-mf-gph-ink">
+                      {uploadState.phase === "prepare"
+                        ? "Preparando carga…"
+                        : uploadState.phase === "upload"
+                          ? `Subiendo ${uploadState.kind === "video" ? "video" : "foto"}…`
+                          : "Guardando en la ficha…"}
+                    </p>
+                    <p className="mt-1 truncate text-xs text-mf-text-secondary">
+                      {uploadState.fileName}
+                    </p>
+                    <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/80">
+                      <div
+                        className={cn(
+                          "h-full rounded-full bg-mf-gph transition-[width] duration-200",
+                          uploadState.percent == null ? "w-1/3 animate-pulse" : "",
+                        )}
+                        style={
+                          uploadState.percent == null
+                            ? undefined
+                            : { width: `${uploadState.percent}%` }
+                        }
+                      />
+                    </div>
+                    <p className="mt-2 text-xs text-mf-text-muted">
+                      {uploadState.percent != null
+                        ? `${uploadState.percent}% · no cierres esta pantalla`
+                        : "No cierres esta pantalla"}
+                    </p>
+                  </div>
+                ) : null}
+                {uploadError ? (
+                  <p className="rounded-lg bg-mf-danger-soft px-4 py-3 text-sm text-mf-danger">
+                    {uploadError}
+                  </p>
+                ) : null}
                 <form onSubmit={onSaveStory} className="space-y-3 rounded-xl bg-mf-canvas p-4">
                   <p className="text-sm font-semibold text-mf-gph-ink">Nota para la ficha</p>
                   <input

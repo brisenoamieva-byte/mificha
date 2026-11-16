@@ -1362,6 +1362,7 @@ export async function prepareTutorUpload(
   return {
     path: storagePath,
     token: signed.data.token,
+    signedUrl: signed.data.signedUrl,
   };
 }
 

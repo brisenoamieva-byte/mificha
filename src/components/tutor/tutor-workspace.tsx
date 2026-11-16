@@ -21,6 +21,50 @@ import {
 } from "@/lib/tutor-family";
 import type { TutorLinkedPerformance } from "@/lib/tutor-linked-performance";
 import type { TutorSeasonClaim } from "@/lib/tutor-season-claims";
+import {
+  assertTutorMediaSize,
+  friendlyTutorUploadError,
+  tutorMediaMaxLabel,
+  type TutorUploadState,
+} from "@/lib/tutor-media-limits";
+
+function uploadFileWithProgress(
+  signedUrl: string,
+  file: File,
+  onProgress: (percent: number) => void,
+) {
+  return new Promise<void>((resolve, reject) => {
+    const body = new FormData();
+    body.append("cacheControl", "3600");
+    body.append("", file);
+    const xhr = new XMLHttpRequest();
+    xhr.open("PUT", signedUrl);
+    xhr.upload.onprogress = (event) => {
+      if (!event.lengthComputable || event.total <= 0) return;
+      onProgress(Math.min(99, Math.round((event.loaded / event.total) * 100)));
+    };
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        onProgress(100);
+        resolve();
+        return;
+      }
+      let detail = "";
+      try {
+        const parsed = JSON.parse(xhr.responseText) as { message?: string; error?: string };
+        detail = parsed.message || parsed.error || "";
+      } catch {
+        detail = xhr.responseText?.trim() || "";
+      }
+      reject(
+        new Error(detail || `No se pudo subir el archivo (error ${xhr.status}).`),
+      );
+    };
+    xhr.onerror = () => reject(new Error("Falló la conexión al subir el archivo."));
+    xhr.onabort = () => reject(new Error("Se canceló la carga."));
+    xhr.send(body);
+  });
+}
 
 const PHONE_STORAGE_KEY = "mificha.tutor.phone";
 
@@ -185,6 +229,9 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
   const [storyTitle, setStoryTitle] = useState("");
   const [storyBody, setStoryBody] = useState("");
   const [busy, setBusy] = useState(false);
+  const [uploadState, setUploadState] = useState<TutorUploadState | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const uploadLock = useRef(false);
   const [form, setForm] = useState(emptyForm);
   const [copied, setCopied] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
@@ -592,9 +639,23 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
 
   async function onFile(kind: "photo" | "video", file: File | undefined) {
     if (!child || !file) return;
+    if (uploadLock.current || busy) {
+      setUploadError("Espera a que termine la carga actual.");
+      return;
+    }
+    uploadLock.current = true;
     setBusy(true);
     setError(null);
+    setUploadError(null);
+    setNotice(null);
+    setUploadState({
+      kind,
+      fileName: file.name,
+      phase: "prepare",
+      percent: null,
+    });
     try {
+      assertTutorMediaSize(kind, file);
       const prepared = await authed("/fut/api/tutor/materials", {
         method: "POST",
         body: JSON.stringify({
@@ -604,11 +665,39 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
           file_name: file.name,
         }),
       });
-      if (!prepared.token || !prepared.path) throw new Error("No se abrió la carga.");
-      const uploaded = await supabase.storage
-        .from("mificha-ops")
-        .uploadToSignedUrl(prepared.path, prepared.token, file);
-      if (uploaded.error) throw new Error(uploaded.error.message);
+      if (!prepared.path) throw new Error("No se abrió la carga.");
+
+      setUploadState({
+        kind,
+        fileName: file.name,
+        phase: "upload",
+        percent: 0,
+      });
+
+      if (prepared.signedUrl) {
+        await uploadFileWithProgress(String(prepared.signedUrl), file, (percent) => {
+          setUploadState({
+            kind,
+            fileName: file.name,
+            phase: "upload",
+            percent,
+          });
+        });
+      } else if (prepared.token) {
+        const uploaded = await supabase.storage
+          .from("mificha-ops")
+          .uploadToSignedUrl(prepared.path, prepared.token, file);
+        if (uploaded.error) throw new Error(uploaded.error.message);
+      } else {
+        throw new Error("No se abrió la carga.");
+      }
+
+      setUploadState({
+        kind,
+        fileName: file.name,
+        phase: "save",
+        percent: 100,
+      });
       await authed("/fut/api/tutor/materials", {
         method: "POST",
         body: JSON.stringify({
@@ -620,10 +709,25 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
         }),
       });
       await load(phone);
+      setNotice(
+        kind === "video"
+          ? "Video subido. Puedes agregar más o marcar uno como destacado."
+          : "Foto subida.",
+      );
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "No se subió el archivo.");
+      const raw = err instanceof Error ? err.message : "No se subió el archivo.";
+      const message = friendlyTutorUploadError(raw, kind);
+      setUploadError(message);
+      setError(message);
+      window.setTimeout(() => {
+        document
+          .getElementById("tutor-material-upload")
+          ?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 50);
     } finally {
+      uploadLock.current = false;
       setBusy(false);
+      setUploadState(null);
     }
   }
 
@@ -1138,6 +1242,8 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
             onSaveSeason={(input, seasonId) => void saveSeason(input, seasonId)}
             onDeleteSeason={(id) => void deleteSeason(id)}
             onReorderSeasons={(ids) => void reorderSeasons(ids)}
+            uploadState={uploadState}
+            uploadError={uploadError}
             onCopyShare={() => void copyShare()}
             onCopyPublicCode={() => void copyPublicCode()}
             onToggleExploreOptIn={(enabled) => void toggleExploreOptIn(enabled)}
