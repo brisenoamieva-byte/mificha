@@ -163,7 +163,7 @@ interface TutorBuilderPanelProps {
   setStoryBody: (value: string) => void;
   onSaveProfile: (event: React.FormEvent) => void;
   onSaveStory: (event: React.FormEvent) => void;
-  onFile: (kind: "photo" | "video", file: File | undefined) => void;
+  onFile: (kind: "photo" | "video", files: FileList | File[] | File | undefined) => void;
   onDeleteMaterial: (materialId: string) => void;
   onSetCover: (materialId: string) => void;
   onSetFeaturedVideo: (materialId: string) => void;
@@ -289,7 +289,9 @@ export function TutorBuilderPanel({
     ],
   );
   const [step, setStep] = useState<TutorBuilderStepId>(progress.next.id);
-  const lastSavedKey = useRef(`${child.id}:${child.materials.length}:${child.player_name}`);
+  /** Si está activo, guardar/subir no salta al siguiente paso del resumen. */
+  const [keepCapturing, setKeepCapturing] = useState(true);
+  const lastChildId = useRef(child.id);
   const shareAccess = child.public_code || child.share_token;
   const shareHref = shareAccess ? tutorSharePath(shareAccess) : null;
   const materialsHref = shareAccess ? agentMaterialsPath(shareAccess) : null;
@@ -303,11 +305,16 @@ export function TutorBuilderPanel({
   }
 
   useEffect(() => {
-    const key = `${child.id}:${child.materials.length}:${child.player_name}:${child.profile.bio ?? ""}:${child.profile.position ?? ""}`;
-    if (lastSavedKey.current === key) return;
-    lastSavedKey.current = key;
+    if (lastChildId.current === child.id) return;
+    lastChildId.current = child.id;
     setStep(progress.next.id);
-  }, [child, progress.next.id]);
+    setKeepCapturing(true);
+  }, [child.id, progress.next.id]);
+
+  useEffect(() => {
+    if (keepCapturing) return;
+    setStep(progress.next.id);
+  }, [child.materials.length, child.player_name, child.profile.bio, child.profile.position, keepCapturing, progress.next.id]);
 
   const previewChild: TutorChild = {
     id: child.id,
@@ -923,9 +930,25 @@ export function TutorBuilderPanel({
               </>
             ) : null}
 
+            <label className="flex items-start gap-2 text-sm text-mf-text-secondary">
+              <input
+                type="checkbox"
+                className="mt-1"
+                checked={keepCapturing}
+                onChange={(event) => setKeepCapturing(event.target.checked)}
+              />
+              <span>
+                Voy a seguir capturando — al guardar me quedo en esta sección (útil para
+                subir muchas fotos, videos o torneos).
+              </span>
+            </label>
             <div className="flex flex-wrap gap-3">
               <button type="submit" disabled={busy} className="mf-btn-gph">
-                {busy ? "Guardando…" : "Guardar y actualizar ficha"}
+                {busy
+                  ? "Guardando…"
+                  : keepCapturing
+                    ? "Guardar y seguir aquí"
+                    : "Guardar y actualizar ficha"}
               </button>
               <button
                 type="button"
@@ -946,10 +969,22 @@ export function TutorBuilderPanel({
           >
             <StepHeading
               title="Aquí subes el contenido"
-              detail="Sube fotos y videos, elige portada y video destacado, o elimina lo que no quieras mostrar."
+              detail="Puedes elegir varias fotos o videos a la vez. Se ordenan por fecha de subida (lo más nuevo arriba)."
             />
             {child.active ? (
               <>
+                <label className="flex items-start gap-2 text-sm text-mf-text-secondary">
+                  <input
+                    type="checkbox"
+                    className="mt-1"
+                    checked={keepCapturing}
+                    onChange={(event) => setKeepCapturing(event.target.checked)}
+                  />
+                  <span>
+                    Voy a seguir capturando — después de cada carga me quedo en esta
+                    sección.
+                  </span>
+                </label>
                 <div className="grid gap-3 sm:grid-cols-2">
                   <label
                     className={cn(
@@ -961,21 +996,22 @@ export function TutorBuilderPanel({
                   >
                     <ImagePlus className="h-8 w-8 text-mf-gph" />
                     <span className="text-sm font-semibold text-mf-gph-ink">
-                      Subir foto
+                      Subir fotos
                     </span>
                     <span className="text-xs text-mf-text-secondary">
-                      Varias fotos · JPG/PNG · máx. {tutorMediaMaxLabel("photo")}
+                      Varias a la vez · JPG/PNG · máx. {tutorMediaMaxLabel("photo")} c/u
                     </span>
                     <input
                       type="file"
                       accept="image/*"
+                      multiple
                       disabled={busy}
                       className="sr-only"
                       onChange={(event) => {
                         const input = event.currentTarget;
-                        const file = input.files?.[0];
+                        const files = input.files;
                         input.value = "";
-                        void onFile("photo", file);
+                        void onFile("photo", files ?? undefined);
                       }}
                     />
                   </label>
@@ -989,21 +1025,22 @@ export function TutorBuilderPanel({
                   >
                     <Video className="h-8 w-8 text-mf-gph" />
                     <span className="text-sm font-semibold text-mf-gph-ink">
-                      Subir video
+                      Subir videos
                     </span>
                     <span className="text-xs text-mf-text-secondary">
-                      Puedes subir varios · MP4/MOV · máx. {tutorMediaMaxLabel("video")}
+                      Varios a la vez · MP4/MOV · máx. {tutorMediaMaxLabel("video")} c/u
                     </span>
                     <input
                       type="file"
                       accept="video/*"
+                      multiple
                       disabled={busy}
                       className="sr-only"
                       onChange={(event) => {
                         const input = event.currentTarget;
-                        const file = input.files?.[0];
+                        const files = input.files;
                         input.value = "";
-                        void onFile("video", file);
+                        void onFile("video", files ?? undefined);
                       }}
                     />
                   </label>
@@ -1011,6 +1048,9 @@ export function TutorBuilderPanel({
                 {uploadState ? (
                   <div className="rounded-xl border border-mf-gph/30 bg-mf-gph-soft px-4 py-3">
                     <p className="text-sm font-semibold text-mf-gph-ink">
+                      {uploadState.total && uploadState.total > 1
+                        ? `Archivo ${uploadState.index ?? 1} de ${uploadState.total} · `
+                        : ""}
                       {uploadState.phase === "prepare"
                         ? "Preparando carga…"
                         : uploadState.phase === "upload"
@@ -1107,6 +1147,14 @@ export function TutorBuilderPanel({
                         <p className="mt-1 text-sm font-semibold text-mf-gph-ink">
                           {item.title}
                         </p>
+                        {item.created_at ? (
+                          <p className="mt-0.5 text-xs text-mf-text-muted">
+                            {new Date(item.created_at).toLocaleString("es-MX", {
+                              dateStyle: "medium",
+                              timeStyle: "short",
+                            })}
+                          </p>
+                        ) : null}
                       </div>
                       <div className="flex flex-wrap gap-2">
                         {item.kind === "photo" && !item.is_cover ? (
@@ -1171,6 +1219,17 @@ export function TutorBuilderPanel({
                   : "Sin academia aún: captura torneos, minutos, goles y asistencias para que un visor vea números en tu link."
               }
             />
+            <label className="flex items-start gap-2 text-sm text-mf-text-secondary">
+              <input
+                type="checkbox"
+                className="mt-1"
+                checked={keepCapturing}
+                onChange={(event) => setKeepCapturing(event.target.checked)}
+              />
+              <span>
+                Voy a seguir capturando — al agregar un torneo me quedo en esta sección.
+              </span>
+            </label>
 
             {child.linked_performance ? (
               <p className="rounded-xl bg-mf-gph-soft px-4 py-3 text-sm leading-6 text-mf-gph-ink">

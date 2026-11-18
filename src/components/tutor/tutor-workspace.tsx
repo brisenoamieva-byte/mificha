@@ -695,8 +695,16 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
     }
   }
 
-  async function onFile(kind: "photo" | "video", file: File | undefined) {
-    if (!child || !file) return;
+  async function onFile(
+    kind: "photo" | "video",
+    files: FileList | File[] | File | undefined,
+  ) {
+    if (!child || !files) return;
+    const list =
+      files instanceof File
+        ? [files]
+        : Array.from(files as FileList | File[]).filter(Boolean);
+    if (list.length === 0) return;
     if (uploadLock.current || busy) {
       setUploadError("Espera a que termine la carga actual.");
       return;
@@ -706,72 +714,116 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
     setError(null);
     setUploadError(null);
     setNotice(null);
-    setUploadState({
-      kind,
-      fileName: file.name,
-      phase: "prepare",
-      percent: null,
-    });
+
+    let uploaded = 0;
+    let lastError: string | null = null;
+
     try {
-      assertTutorMediaSize(kind, file);
-      const prepared = await authed("/fut/api/tutor/materials", {
-        method: "POST",
-        body: JSON.stringify({
-          action: "prepare",
-          child_id: child.id,
-          kind,
-          file_name: file.name,
-        }),
-      });
-      if (!prepared.path) throw new Error("No se abrió la carga.");
+      for (let i = 0; i < list.length; i++) {
+        const file = list[i];
+        const index = i + 1;
+        const total = list.length;
+        try {
+          assertTutorMediaSize(kind, file);
+          setUploadState({
+            kind,
+            fileName: file.name,
+            phase: "prepare",
+            percent: null,
+            index,
+            total,
+          });
+          const prepared = await authed("/fut/api/tutor/materials", {
+            method: "POST",
+            body: JSON.stringify({
+              action: "prepare",
+              child_id: child.id,
+              kind,
+              file_name: file.name,
+            }),
+          });
+          if (!prepared.path) throw new Error("No se abrió la carga.");
 
-      setUploadState({
-        kind,
-        fileName: file.name,
-        phase: "upload",
-        percent: 0,
-      });
-
-      if (prepared.signedUrl) {
-        await uploadFileWithProgress(String(prepared.signedUrl), file, (percent) => {
           setUploadState({
             kind,
             fileName: file.name,
             phase: "upload",
-            percent,
+            percent: 0,
+            index,
+            total,
           });
-        });
-      } else if (prepared.token) {
-        const uploaded = await supabase.storage
-          .from("mificha-ops")
-          .uploadToSignedUrl(prepared.path, prepared.token, file);
-        if (uploaded.error) throw new Error(uploaded.error.message);
-      } else {
-        throw new Error("No se abrió la carga.");
+
+          if (prepared.signedUrl) {
+            await uploadFileWithProgress(String(prepared.signedUrl), file, (percent) => {
+              setUploadState({
+                kind,
+                fileName: file.name,
+                phase: "upload",
+                percent,
+                index,
+                total,
+              });
+            });
+          } else if (prepared.token) {
+            const signedUpload = await supabase.storage
+              .from("mificha-ops")
+              .uploadToSignedUrl(prepared.path, prepared.token, file);
+            if (signedUpload.error) throw new Error(signedUpload.error.message);
+          } else {
+            throw new Error("No se abrió la carga.");
+          }
+
+          setUploadState({
+            kind,
+            fileName: file.name,
+            phase: "save",
+            percent: 100,
+            index,
+            total,
+          });
+          await authed("/fut/api/tutor/materials", {
+            method: "POST",
+            body: JSON.stringify({
+              action: "commit",
+              child_id: child.id,
+              kind,
+              title: file.name,
+              path: prepared.path,
+            }),
+          });
+          uploaded += 1;
+        } catch (err: unknown) {
+          const raw = err instanceof Error ? err.message : "No se subió el archivo.";
+          lastError = friendlyTutorUploadError(raw, kind);
+          // Sigue con el resto si hay varios archivos.
+          if (list.length === 1) throw err;
+        }
       }
 
-      setUploadState({
-        kind,
-        fileName: file.name,
-        phase: "save",
-        percent: 100,
-      });
-      await authed("/fut/api/tutor/materials", {
-        method: "POST",
-        body: JSON.stringify({
-          action: "commit",
-          child_id: child.id,
-          kind,
-          title: file.name,
-          path: prepared.path,
-        }),
-      });
       await load(phone);
-      setNotice(
-        kind === "video"
-          ? "Video subido. Puedes agregar más o marcar uno como destacado."
-          : "Foto subida.",
-      );
+      if (uploaded > 0) {
+        const noun =
+          kind === "video"
+            ? uploaded === 1
+              ? "Video subido"
+              : `${uploaded} videos subidos`
+            : uploaded === 1
+              ? "Foto subida"
+              : `${uploaded} fotos subidas`;
+        setNotice(
+          lastError
+            ? `${noun}. Algunos fallaron: ${lastError}`
+            : kind === "video"
+              ? `${noun}. Puedes agregar más o marcar uno como destacado.`
+              : `${noun}.`,
+        );
+      }
+      if (lastError && uploaded === 0) {
+        setUploadError(lastError);
+        setError(lastError);
+      } else if (lastError) {
+        setUploadError(lastError);
+      }
     } catch (err: unknown) {
       const raw = err instanceof Error ? err.message : "No se subió el archivo.";
       const message = friendlyTutorUploadError(raw, kind);

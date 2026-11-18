@@ -1014,12 +1014,7 @@ function compareTutorMaterials(a: TutorMaterial, b: TutorMaterial) {
   const bFeatured = b.kind === "video" && Boolean(b.is_featured);
   if (aFeatured !== bFeatured) return aFeatured ? -1 : 1;
 
-  // Fotos antes que videos/notas para que la portada lidera la lista visual.
-  const kindRank = (kind: TutorMaterialKind) =>
-    kind === "photo" ? 0 : kind === "video" ? 1 : 2;
-  const byKind = kindRank(a.kind) - kindRank(b.kind);
-  if (byKind !== 0) return byKind;
-
+  // Mezcla fotos/videos/notas por fecha de subida (más reciente arriba).
   return b.created_at.localeCompare(a.created_at);
 }
 

@@ -1,9 +1,9 @@
-/** Límites de material del tutor (ficha). Alineados con player-videos / diagnóstico. */
+/** Límites de material del tutor (ficha). Video 100 MB para clips más largos sin editar tanto. */
 export const TUTOR_PHOTO_MAX_BYTES = 12 * 1024 * 1024;
-export const TUTOR_VIDEO_MAX_BYTES = 50 * 1024 * 1024;
+export const TUTOR_VIDEO_MAX_BYTES = 100 * 1024 * 1024;
 
 export const TUTOR_PHOTO_MAX_LABEL = "12 MB";
-export const TUTOR_VIDEO_MAX_LABEL = "50 MB";
+export const TUTOR_VIDEO_MAX_LABEL = "100 MB";
 
 export function tutorMediaMaxBytes(kind: "photo" | "video") {
   return kind === "video" ? TUTOR_VIDEO_MAX_BYTES : TUTOR_PHOTO_MAX_BYTES;
@@ -48,4 +48,7 @@ export type TutorUploadState = {
   phase: TutorUploadPhase;
   /** 0–100 mientras sube el archivo; null en prepare/save. */
   percent: number | null;
+  /** Carga múltiple: archivo actual (1-based) y total. */
+  index?: number;
+  total?: number;
 };
