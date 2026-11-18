@@ -30,6 +30,12 @@ export type DirectoryPerformanceFilter = {
   minGoals?: number;
   minAssists?: number;
   minMatches?: number;
+  /** Mínimo de goles + asistencias. */
+  minContributions?: number;
+  /** Mínimo de goles por 90 minutos (requiere piso de muestra). */
+  minGoalsPer90?: number;
+  /** Mínimo de asistencias por 90 minutos (requiere piso de muestra). */
+  minAssistsPer90?: number;
   /** Solo jugadores con evaluación GPH (con o sin score numérico). */
   requireGph?: boolean;
   /** Mínimo de calificación global GPH (1–5). 0 = sin mínimo. */
@@ -43,6 +49,42 @@ export const EMPTY_SEASON_STATS: DirectorySeasonStats = {
   assists: 0,
   minutes: 0,
 };
+
+/** Sin al menos 90' la tasa por 90 cuenta como 0 al filtrar (evita muestras ridículas). */
+export const RATE_SAMPLE_MIN_MINUTES = 90;
+
+export type DirectorySeasonRates = {
+  contributions: number;
+  goalsPer90: number;
+  assistsPer90: number;
+  hasRateSample: boolean;
+};
+
+function roundRate(value: number) {
+  return Math.round(value * 100) / 100;
+}
+
+export function computeDirectoryRates(
+  stats: DirectorySeasonStats,
+): DirectorySeasonRates {
+  const contributions = stats.goals + stats.assists;
+  const hasRateSample = stats.minutes >= RATE_SAMPLE_MIN_MINUTES;
+  if (!hasRateSample || stats.minutes <= 0) {
+    return {
+      contributions,
+      goalsPer90: 0,
+      assistsPer90: 0,
+      hasRateSample,
+    };
+  }
+  const nineties = stats.minutes / 90;
+  return {
+    contributions,
+    goalsPer90: roundRate(stats.goals / nineties),
+    assistsPer90: roundRate(stats.assists / nineties),
+    hasRateSample,
+  };
+}
 
 export interface DirectoryPlayer {
   id?: string;
@@ -217,6 +259,9 @@ export function hasActivePerformanceFilter(
       (performance.minGoals && performance.minGoals > 0) ||
       (performance.minAssists && performance.minAssists > 0) ||
       (performance.minMatches && performance.minMatches > 0) ||
+      (performance.minContributions && performance.minContributions > 0) ||
+      (performance.minGoalsPer90 && performance.minGoalsPer90 > 0) ||
+      (performance.minAssistsPer90 && performance.minAssistsPer90 > 0) ||
       performance.requireGph ||
       (performance.minGphScore && performance.minGphScore > 0) ||
       performance.requireVideo,
@@ -359,6 +404,9 @@ export function filterDirectory(
   const minGoals = performance?.minGoals ?? 0;
   const minAssists = performance?.minAssists ?? 0;
   const minMatches = performance?.minMatches ?? 0;
+  const minContributions = performance?.minContributions ?? 0;
+  const minGoalsPer90 = performance?.minGoalsPer90 ?? 0;
+  const minAssistsPer90 = performance?.minAssistsPer90 ?? 0;
   const requireGph = Boolean(performance?.requireGph);
   const minGphScore = performance?.minGphScore ?? 0;
   const requireVideo = Boolean(performance?.requireVideo);
@@ -389,10 +437,14 @@ export function filterDirectory(
     if (player.passport_score < minPassport) return false;
 
     const stats = playerSeasonStats(player);
+    const rates = computeDirectoryRates(stats);
     if (stats.minutes < minMinutes) return false;
     if (stats.goals < minGoals) return false;
     if (stats.assists < minAssists) return false;
     if (stats.matches < minMatches) return false;
+    if (rates.contributions < minContributions) return false;
+    if (rates.goalsPer90 < minGoalsPer90) return false;
+    if (rates.assistsPer90 < minAssistsPer90) return false;
     if ((requireGph || minGphScore > 0) && !player.has_gph_evaluation) {
       return false;
     }

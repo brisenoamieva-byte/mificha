@@ -76,8 +76,9 @@ export function TutorPublicFicha({
   const extraVideos = videos.filter((item) => item.id !== featuredVideo?.id);
   const position = profile.position || "Posición por definir";
   const birthYear = profile.birth_date?.slice(0, 4) || null;
+  const locationLabel = [profile.city, profile.state].filter(Boolean).join(", ");
   const placeLine =
-    [profile.club || profile.school, profile.city].filter(Boolean).join(" · ") ||
+    [profile.club || profile.school, locationLabel].filter(Boolean).join(" · ") ||
     "Club y ciudad por definir";
   const categoryLabel = formatPlayerCategory(profile.birth_date);
   const heroStats = [

@@ -45,6 +45,7 @@ function parseInput(body: Record<string, unknown>): TutorChildInput {
     club: body.club == null ? null : String(body.club),
     school: body.school == null ? null : String(body.school),
     city: body.city == null ? null : String(body.city),
+    state: body.state == null ? null : String(body.state),
     height_cm: Number.isFinite(height) ? height : null,
     weight_kg: Number.isFinite(weight) ? weight : null,
     nationality: body.nationality == null ? null : String(body.nationality),
@@ -145,6 +146,7 @@ export async function POST(request: Request) {
           ["Teléfono", child.guardian_phone],
           ["Código", child.public_code],
           ["Ciudad", child.profile.city],
+          ["Estado", child.profile.state],
         ],
       });
     }

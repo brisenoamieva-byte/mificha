@@ -18,9 +18,9 @@ import { TutorCareerSummaryCard } from "@/components/tutor/tutor-career-summary"
 import { TutorConsentPanel } from "@/components/tutor/tutor-consent-panel";
 import { TutorPublicFicha } from "@/components/tutor/tutor-public-ficha";
 import { agentMaterialsPath } from "@/lib/agent-materials";
+import { MexicoLocationSelect } from "@/components/ui/mexico-location-select";
 import {
   defaultTutorSeasonLabel,
-  TUTOR_CITY_OPTIONS,
   TUTOR_POSITION_OPTIONS,
   TUTOR_TOURNAMENT_PRESETS,
   tutorSharePath,
@@ -125,6 +125,7 @@ interface TutorBuilderPanelProps {
     club: string;
     school: string;
     city: string;
+    state: string;
     height_cm: string;
     weight_kg: string;
     nationality: string;
@@ -228,6 +229,7 @@ export function TutorBuilderPanel({
       club: form.club || null,
       school: form.school || null,
       city: form.city || null,
+      state: form.state || null,
       height_cm: form.height_cm ? Number(form.height_cm) : null,
       weight_kg: form.weight_kg ? Number(form.weight_kg) : null,
       nationality: form.nationality || null,
@@ -586,28 +588,18 @@ export function TutorBuilderPanel({
                       Número único de registro federado. Se liga a tu código MF-.
                     </span>
                   </label>
-                  <label className="block text-sm font-medium text-mf-text">
-                    Ciudad
-                    <select
-                      value={form.city}
-                      onChange={(event) =>
-                        setForm((current) => ({ ...current, city: event.target.value }))
-                      }
-                      className={inputClass}
-                    >
-                      <option value="">Selecciona…</option>
-                      {TUTOR_CITY_OPTIONS.map((city) => (
-                        <option key={city} value={city}>
-                          {city}
-                        </option>
-                      ))}
-                      {form.city &&
-                      !(TUTOR_CITY_OPTIONS as readonly string[]).includes(form.city) ? (
-                        <option value={form.city}>{form.city}</option>
-                      ) : null}
-                    </select>
-                  </label>
                 </div>
+                <MexicoLocationSelect
+                  state={form.state}
+                  city={form.city}
+                  onStateChange={(state) =>
+                    setForm((current) => ({ ...current, state }))
+                  }
+                  onCityChange={(city) =>
+                    setForm((current) => ({ ...current, city }))
+                  }
+                  selectClassName="focus:!border-mf-gph focus:!shadow-[0_0_0_3px_color-mix(in_srgb,var(--mf-gph)_16%,transparent)]"
+                />
               </>
             ) : null}
 

@@ -48,6 +48,8 @@ export interface TutorChildProfile {
   club: string | null;
   school: string | null;
   city: string | null;
+  /** Estado de la República (INEGI / catálogo México). */
+  state: string | null;
   height_cm: number | null;
   weight_kg: number | null;
   nationality: string | null;
@@ -163,6 +165,7 @@ export type TutorChildInput = {
   club?: string | null;
   school?: string | null;
   city?: string | null;
+  state?: string | null;
   height_cm?: number | null;
   weight_kg?: number | null;
   nationality?: string | null;
@@ -208,6 +211,7 @@ function emptyProfile(): TutorChildProfile {
     club: null,
     school: null,
     city: null,
+    state: null,
     height_cm: null,
     weight_kg: null,
     nationality: null,
@@ -337,6 +341,7 @@ function profileFromInput(input: TutorChildInput): TutorChildProfile {
     club: input.club?.trim() || null,
     school: input.school?.trim() || null,
     city: input.city?.trim() || null,
+    state: input.state?.trim() || null,
     height_cm: input.height_cm ?? null,
     weight_kg: input.weight_kg ?? null,
     nationality: input.nationality?.trim() || null,
@@ -451,7 +456,7 @@ export const TUTOR_POSITION_OPTIONS = [
   "Delantero",
 ] as const;
 
-/** Ciudades frecuentes para el piloto GPH / Bajío (+ principales). */
+/** @deprecated Preferir MexicoLocationSelect (estado → municipio). */
 export const TUTOR_CITY_OPTIONS = [
   "Querétaro",
   "Corregidora",

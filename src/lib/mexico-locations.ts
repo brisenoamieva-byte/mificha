@@ -50,3 +50,36 @@ export function resolveMunicipalityName(
     ) ?? ""
   );
 }
+
+/**
+ * Si el municipio aparece en un solo estado, lo infiere.
+ * Si hay varias coincidencias (o ninguna), devuelve "".
+ */
+export function inferStateFromMunicipality(
+  city: string | null | undefined,
+): string {
+  if (!city?.trim()) return "";
+
+  const normalized = normalizeLocation(city);
+  const matches: string[] = [];
+  for (const state of MEXICO_STATES) {
+    const hit = getMunicipalitiesForState(state).find(
+      (municipality) => normalizeLocation(municipality) === normalized,
+    );
+    if (hit) matches.push(state);
+  }
+  return matches.length === 1 ? matches[0] : "";
+}
+
+/** Resuelve estado guardado o, si falta, lo infiere del municipio. */
+export function resolveTutorLocation(
+  state: string | null | undefined,
+  city: string | null | undefined,
+): { state: string; city: string } {
+  const resolvedState =
+    resolveStateName(state) || inferStateFromMunicipality(city);
+  const resolvedCity = resolvedState
+    ? resolveMunicipalityName(resolvedState, city) || (city?.trim() ?? "")
+    : city?.trim() ?? "";
+  return { state: resolvedState, city: resolvedCity };
+}

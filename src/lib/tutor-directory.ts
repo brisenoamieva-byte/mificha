@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { resolveTutorLocation } from "@/lib/mexico-locations";
 import { normalizePublicCode } from "@/lib/public-player-code";
 import {
   EMPTY_SEASON_STATS,
@@ -143,7 +144,10 @@ export async function fetchTutorDirectoryPlayers(
     const { first_name, last_name } = splitPlayerName(child.player_name);
     const clubOrSchool =
       child.profile.club || child.profile.school || "Ficha del jugador";
-    const city = child.profile.city;
+    const location = resolveTutorLocation(
+      child.profile.state,
+      child.profile.city,
+    );
 
     out.push({
       id: child.id,
@@ -162,8 +166,8 @@ export async function fetchTutorDirectoryPlayers(
       season_stats,
       academies: {
         name: clubOrSchool,
-        city,
-        state: city === "Querétaro" ? "Querétaro" : null,
+        city: location.city || child.profile.city,
+        state: location.state || null,
         slug: "ficha-tutor",
         is_certified: false,
       },

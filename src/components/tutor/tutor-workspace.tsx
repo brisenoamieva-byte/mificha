@@ -10,8 +10,9 @@ import { TutorLinkRequestsInbox } from "@/components/tutor/tutor-link-requests-i
 import { updatePassword } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { guardianWorkspaceCopy } from "@/lib/guardian-workspace-copy";
+import { MexicoLocationSelect } from "@/components/ui/mexico-location-select";
+import { resolveTutorLocation } from "@/lib/mexico-locations";
 import {
-  TUTOR_CITY_OPTIONS,
   TUTOR_PILOT_FREE,
   TUTOR_PILOT_LABEL,
   tutorSharePath,
@@ -120,6 +121,7 @@ interface TutorChildCard {
     club: string | null;
     school: string | null;
     city: string | null;
+    state: string | null;
     height_cm: number | null;
     weight_kg: number | null;
     nationality: string | null;
@@ -167,6 +169,7 @@ const emptyForm = {
   club: "",
   school: "",
   city: "",
+  state: "",
   height_cm: "",
   weight_kg: "",
   nationality: "",
@@ -330,7 +333,13 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
       position: child.profile.position ?? "",
       club: child.profile.club ?? "",
       school: child.profile.school ?? "",
-      city: child.profile.city ?? "",
+      ...(() => {
+        const loc = resolveTutorLocation(
+          child.profile.state,
+          child.profile.city,
+        );
+        return { state: loc.state, city: loc.city };
+      })(),
       height_cm: child.profile.height_cm != null ? String(child.profile.height_cm) : "",
       weight_kg: child.profile.weight_kg != null ? String(child.profile.weight_kg) : "",
       nationality: child.profile.nationality ?? "",
@@ -555,6 +564,7 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
           club: form.club || null,
           school: form.school || null,
           city: form.city || null,
+          state: form.state || null,
           height_cm: form.height_cm ? Number(form.height_cm) : null,
           weight_kg: form.weight_kg ? Number(form.weight_kg) : null,
           nationality: form.nationality || null,
@@ -1211,36 +1221,28 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
               placeholder="Ej. Santiago Hernández"
             />
           </label>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <label className="block text-sm font-medium text-mf-text">
-              Fecha de nacimiento
-              <input
-                type="date"
-                value={form.birth_date}
-                onChange={(event) =>
-                  setForm((current) => ({ ...current, birth_date: event.target.value }))
-                }
-                className={inputClass}
-              />
-            </label>
-            <label className="block text-sm font-medium text-mf-text">
-              Ciudad
-              <select
-                value={form.city}
-                onChange={(event) =>
-                  setForm((current) => ({ ...current, city: event.target.value }))
-                }
-                className={inputClass}
-              >
-                <option value="">Selecciona…</option>
-                {TUTOR_CITY_OPTIONS.map((city) => (
-                  <option key={city} value={city}>
-                    {city}
-                  </option>
-                ))}
-              </select>
-            </label>
-          </div>
+          <label className="block text-sm font-medium text-mf-text">
+            Fecha de nacimiento
+            <input
+              type="date"
+              value={form.birth_date}
+              onChange={(event) =>
+                setForm((current) => ({ ...current, birth_date: event.target.value }))
+              }
+              className={inputClass}
+            />
+          </label>
+          <MexicoLocationSelect
+            state={form.state}
+            city={form.city}
+            onStateChange={(state) =>
+              setForm((current) => ({ ...current, state }))
+            }
+            onCityChange={(city) =>
+              setForm((current) => ({ ...current, city }))
+            }
+            selectClassName="focus:!border-mf-gph focus:!shadow-[0_0_0_3px_color-mix(in_srgb,var(--mf-gph)_16%,transparent)]"
+          />
           <label className="block text-sm font-medium text-mf-text">
             Código MF- de academia (opcional)
             <input
