@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Users, Zap } from "lucide-react";
 import {
   MinuteQuickInput,
@@ -31,7 +32,8 @@ interface MatchCaptureStepProps {
   onToggleConvocado: (playerId: string) => void;
   onSelectAllConvocados: () => void;
   onClearConvocados: () => void;
-  onEditConvocados: () => void;
+  /** @deprecated Prefer internal edit flow; kept for callers that still pass it. */
+  onEditConvocados?: () => void;
   onBulkMinutes: (minutes: number) => void;
   onUpdateCapture: (playerId: string, patch: Partial<PlayerCapture>) => void;
 }
@@ -52,17 +54,21 @@ export function MatchCaptureStep({
   onToggleConvocado,
   onSelectAllConvocados,
   onClearConvocados,
-  onEditConvocados,
   onBulkMinutes,
   onUpdateCapture,
 }: MatchCaptureStepProps) {
+  const [editingConvocados, setEditingConvocados] = useState(false);
+
   const captureTargets =
     listMode === "convocados"
       ? visiblePlayers.filter((player) => convocadoIds.includes(player.id))
       : visiblePlayers;
 
+  // Editar lista reabre el picker sin vaciar la selección actual.
   const showConvocadoPicker =
-    listMode === "convocados" && convocadoIds.length === 0 && visiblePlayers.length > 0;
+    listMode === "convocados" &&
+    visiblePlayers.length > 0 &&
+    (convocadoIds.length === 0 || editingConvocados);
 
   const rosterMinutesOnly = academyCaptureScope === "roster_minutes";
 
@@ -179,9 +185,11 @@ export function MatchCaptureStep({
         </div>
       ) : showConvocadoPicker ? (
         <div className="rounded-2xl border border-dashed border-mf-accent/40 bg-mf-accent-soft/30 p-5 shadow-sm">
-          <p className="font-semibold text-slate-900">¿Quién jugó hoy?</p>
+          <p className="font-semibold text-slate-900">
+            {editingConvocados ? "Ajusta la lista de convocados" : "¿Quién jugó hoy?"}
+          </p>
           <p className="mt-1 text-sm text-slate-600">
-            Toca a los convocados. Solo ellos aparecerán en la captura.
+            Toca para marcar o quitar. La selección actual se conserva.
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
             <button
@@ -191,9 +199,22 @@ export function MatchCaptureStep({
             >
               Marcar todos visibles
             </button>
+            {convocadoIds.length > 0 ? (
+              <button
+                type="button"
+                onClick={() => setEditingConvocados(false)}
+                className="rounded-lg bg-mf-accent px-3 py-1.5 text-xs font-semibold text-white hover:bg-mf-accent-dark"
+              >
+                Listo · {convocadoIds.length} convocado
+                {convocadoIds.length === 1 ? "" : "s"}
+              </button>
+            ) : null}
             <button
               type="button"
-              onClick={() => onListModeChange("all")}
+              onClick={() => {
+                setEditingConvocados(false);
+                onListModeChange("all");
+              }}
               className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-white"
             >
               Ver plantel completo
@@ -231,7 +252,7 @@ export function MatchCaptureStep({
               </span>
               <button
                 type="button"
-                onClick={onEditConvocados}
+                onClick={() => setEditingConvocados(true)}
                 className="font-semibold text-[#1B4F8C] hover:underline"
               >
                 Editar lista

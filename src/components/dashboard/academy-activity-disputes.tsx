@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import type { TutorActivityEvent } from "@/lib/tutor-activity";
 import { diagnosisAuthedFetch } from "@/lib/player-diagnosis-client";
@@ -65,7 +66,7 @@ export function AcademyActivityDisputes({ academyId }: { academyId: string }) {
         Revisiones de tutores
       </p>
       <p className="mt-1 text-sm text-amber-950/80">
-        Un tutor pidió corregir stats. Si ya ajustaste el acta o el partido, marca
+        Un tutor pidió corregir stats. Abre el partido, corrige y luego marca
         “Ya corregí”. Si los números están bien, confirma.
       </p>
 
@@ -96,6 +97,14 @@ export function AcademyActivityDisputes({ academyId }: { academyId: string }) {
               </p>
             ) : null}
             <div className="mt-2 flex flex-wrap gap-2">
+              {event.match_id ? (
+                <Link
+                  href={`/fut/dashboard/partidos/nuevo?matchId=${event.match_id}`}
+                  className="rounded-xl bg-[#1B4F8C] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#164278]"
+                >
+                  Corregir partido
+                </Link>
+              ) : null}
               <button
                 type="button"
                 disabled={busyId === event.id}

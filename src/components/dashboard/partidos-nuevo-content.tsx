@@ -121,6 +121,7 @@ export function PartidosNuevoContent() {
   const [listMode, setListMode] = useState<RosterListMode>("convocados");
   const [convocadoIds, setConvocadoIds] = useState<string[]>([]);
   const [pendingFixtures, setPendingFixtures] = useState<Match[]>([]);
+  const [isEditing, setIsEditing] = useState(false);
 
   const playedCount = useMemo(
     () => captures.filter((item) => item.played).length,
@@ -189,7 +190,17 @@ export function PartidosNuevoContent() {
         .eq("academy_id", academy.id)
         .maybeSingle();
 
-      if (scheduledMatch && scheduledMatch.status === "scheduled") {
+      const canCapturePending =
+        scheduledMatch &&
+        (scheduledMatch.status === "scheduled" || scheduledMatch.status === "postponed");
+      const canEditCompleted =
+        scheduledMatch &&
+        scheduledMatch.status === "completed" &&
+        !scheduledMatch.is_official;
+
+      if (canCapturePending || canEditCompleted) {
+        const editing = Boolean(canEditCompleted);
+        setIsEditing(editing);
         setScheduledMatchId(scheduledMatch.id);
         setSelectedFixture(scheduledMatch);
         setScheduledMatchCategory(scheduledMatch.category);
@@ -201,27 +212,63 @@ export function PartidosNuevoContent() {
           setGoalsAgainst(scheduledMatch.goals_against ?? 0);
         }
 
-        const [{ data: scheduledSeason }, { data: playerList }] = await Promise.all([
-          supabase
-            .from("seasons")
-            .select("*")
-            .eq("id", scheduledMatch.season_id)
-            .maybeSingle(),
-          supabase
-            .from("players")
-            .select("*")
-            .eq("academy_id", academy.id)
-            .order("last_name", { ascending: true }),
-        ]);
+        const [{ data: scheduledSeason }, { data: playerList }, existingStatsResult] =
+          await Promise.all([
+            supabase
+              .from("seasons")
+              .select("*")
+              .eq("id", scheduledMatch.season_id)
+              .maybeSingle(),
+            supabase
+              .from("players")
+              .select("*")
+              .eq("academy_id", academy.id)
+              .order("last_name", { ascending: true }),
+            editing
+              ? supabase.from("match_stats").select("*").eq("match_id", scheduledMatch.id)
+              : Promise.resolve({ data: null as Array<{
+                  player_id: string;
+                  goals: number;
+                  assists: number;
+                  minutes_played: number;
+                  yellow_cards: number;
+                  red_cards: number;
+                }> | null }),
+          ]);
+
+        const playerListSafe = playerList ?? [];
+        let nextCaptures = createCapturesForPlayers(
+          playerListSafe.map((player) => player.id),
+        );
+        const playedIds: string[] = [];
+
+        if (editing) {
+          for (const stat of existingStatsResult.data ?? []) {
+            playedIds.push(String(stat.player_id));
+            nextCaptures = updateCapturesList(nextCaptures, String(stat.player_id), {
+              played: true,
+              goals: Number(stat.goals ?? 0),
+              assists: Number(stat.assists ?? 0),
+              minutes: Number(stat.minutes_played ?? 0),
+              yellow: Number(stat.yellow_cards ?? 0) > 0,
+              red: Number(stat.red_cards ?? 0) > 0,
+            });
+          }
+          setConvocadoIds(playedIds);
+          setListMode(playedIds.length > 0 ? "convocados" : "all");
+          setCaptureStyle("detailed");
+          setStep(playedIds.length > 0 ? 2 : 1);
+        }
 
         setSeason(scheduledSeason);
-        setPlayers(playerList ?? []);
-        setCaptures(createCapturesForPlayers((playerList ?? []).map((player) => player.id)));
+        setPlayers(playerListSafe);
+        setCaptures(nextCaptures);
         setLoading(false);
         return;
       }
     }
 
+    setIsEditing(false);
     setScheduledMatchId(null);
     setSelectedFixture(null);
     setScheduledMatchCategory(null);
@@ -364,6 +411,15 @@ export function PartidosNuevoContent() {
         .single();
 
       if (matchError || !match) throw matchError ?? new Error("No se creó el partido.");
+
+      // Corrección: reemplazar stats del partido (el trigger refresca season totals).
+      if (isEditing) {
+        const { error: deleteError } = await supabase
+          .from("match_stats")
+          .delete()
+          .eq("match_id", match.id);
+        if (deleteError) throw deleteError;
+      }
 
       if (playedStats.length > 0) {
         const { error: statsError } = await supabase.from("match_stats").insert(
@@ -590,9 +646,13 @@ export function PartidosNuevoContent() {
         0,
       );
       toast.success(
-        unlockedCount > 0
-          ? `Partido guardado · ${unlockedCount} insignia${unlockedCount === 1 ? "" : "s"} desbloqueada${unlockedCount === 1 ? "" : "s"}.`
-          : "Partido guardado. Stats actualizadas en la ficha.",
+        isEditing
+          ? unlockedCount > 0
+            ? `Partido corregido · ${unlockedCount} insignia${unlockedCount === 1 ? "" : "s"} actualizada${unlockedCount === 1 ? "" : "s"}.`
+            : "Partido corregido. Stats actualizadas en la ficha."
+          : unlockedCount > 0
+            ? `Partido guardado · ${unlockedCount} insignia${unlockedCount === 1 ? "" : "s"} desbloqueada${unlockedCount === 1 ? "" : "s"}.`
+            : "Partido guardado. Stats actualizadas en la ficha.",
       );
       if (academy?.id) {
         void requestAcademyCertificationSync(academy.id);
@@ -737,10 +797,12 @@ export function PartidosNuevoContent() {
             ) : (
               <>
                 <h1 className="text-2xl font-bold text-slate-900">
-                  Capturar stats del plantel
+                  {isEditing ? "Corregir resultado" : "Registrar resultado"}
                 </h1>
                 <p className="mt-1 text-slate-600">
-                  Paso 1 de 2 · Jornada publicada por MiFicha
+                  {isEditing
+                    ? "Paso 1 de 2 · Ajusta marcador y stats ya capturados"
+                    : "Paso 1 de 2 · Jornada publicada por MiFicha"}
                 </p>
                 <p className="mt-3 text-sm text-slate-500">
                   Marcador y stats del plantel. En el paso 2 eliges convocados y captura
@@ -820,17 +882,26 @@ export function PartidosNuevoContent() {
                     </>
                   ) : null}
 
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setScheduledMatchId(null);
-                      setSelectedFixture(null);
-                      setScheduledMatchCategory(null);
-                    }}
-                    className="text-sm font-medium text-slate-500 hover:text-slate-700"
-                  >
-                    ← Elegir otra jornada
-                  </button>
+                  {!isEditing ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setScheduledMatchId(null);
+                        setSelectedFixture(null);
+                        setScheduledMatchCategory(null);
+                      }}
+                      className="text-sm font-medium text-slate-500 hover:text-slate-700"
+                    >
+                      ← Elegir otra jornada
+                    </button>
+                  ) : (
+                    <Link
+                      href={`/fut/dashboard/partidos/${scheduledMatchId}`}
+                      className="text-sm font-medium text-slate-500 hover:text-slate-700"
+                    >
+                      ← Volver al detalle
+                    </Link>
+                  )}
 
                   {error ? (
                     <p className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
@@ -866,7 +937,6 @@ export function PartidosNuevoContent() {
             onToggleConvocado={toggleConvocado}
             onSelectAllConvocados={selectAllConvocados}
             onClearConvocados={clearConvocados}
-            onEditConvocados={() => setConvocadoIds([])}
             onBulkMinutes={bulkMinutes}
             onUpdateCapture={updateCapture}
           />
@@ -905,7 +975,11 @@ export function PartidosNuevoContent() {
                   onClick={handleSave}
                   className="mf-btn-accent-solid flex-1 rounded-2xl px-5 py-4 text-base disabled:opacity-60"
                 >
-                  {saving ? "Guardando..." : "Guardar · avisar padres"}
+                  {saving
+                    ? "Guardando..."
+                    : isEditing
+                      ? "Guardar corrección · avisar padres"
+                      : "Guardar · avisar padres"}
                 </button>
               </div>
             </div>

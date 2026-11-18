@@ -38,35 +38,37 @@ export function NoSeasonState({
           )}
         </h1>
         <p className="mt-3 text-sm leading-7 text-mf-text-secondary">
-          Para capturar partidos tu academia necesita la{" "}
+          Para registrar resultados tu academia necesita la{" "}
           <strong className="font-semibold text-mf-text">
             temporada escolar <BrandWordmark />
           </strong>{" "}
-          activa. Esto no tiene que ver con el email de avisos a padres — es el calendario
-          oficial de la red.
+          activa. Esto no tiene que ver con el email de avisos a padres — es el
+          calendario oficial de la red.
         </p>
         <p className="mt-3 text-sm leading-7 text-mf-text-secondary">
           <WithBrandName>
-            Si acabas de registrarte, la temporada se asigna en cuanto MiFicha publica el ciclo
-            escolar (por ejemplo
+            Si acabas de registrarte, la temporada se asigna cuando MiFicha publica el
+            ciclo escolar (por ejemplo
           </WithBrandName>{" "}
           <strong className="font-semibold text-mf-text">Escolar 2025–2026</strong>). Luego
-          publicamos jornadas en Partidos.
+          aparecen las jornadas en Partidos.
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
-          <Link
-            href="/fut/interno/temporadas"
-            className="inline-flex items-center gap-2 rounded-full bg-mf-brand px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-mf-brand-dark"
-          >
-            Activar temporada (interno)
-          </Link>
           <a
             href="mailto:hola@mificha.mx?subject=Temporada%20MiFicha"
-            className="inline-flex items-center gap-2 rounded-full border border-mf-brand/20 bg-mf-brand-soft px-4 py-2.5 text-sm font-semibold text-mf-brand transition hover:bg-mf-brand/10"
+            className="inline-flex items-center gap-2 rounded-full bg-mf-brand px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-mf-brand-dark"
           >
             <Mail className="h-4 w-4" />
             Contactar soporte
           </a>
+          {backHref ? (
+            <Link
+              href={backHref}
+              className="inline-flex items-center gap-2 rounded-full border border-mf-brand/20 bg-mf-brand-soft px-4 py-2.5 text-sm font-semibold text-mf-brand transition hover:bg-mf-brand/10"
+            >
+              {backLabel}
+            </Link>
+          ) : null}
         </div>
       </div>
     </div>

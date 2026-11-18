@@ -137,6 +137,20 @@ export function PartidosDetail({ matchId }: PartidosDetailProps) {
             {formatKickoffDateTime(match.kickoff_at, match.match_date)} ·{" "}
             {match.goals_for ?? 0}-{match.goals_against ?? 0}
           </p>
+          {!match.is_official ? (
+            <div className="mt-4">
+              <Link
+                href={`/fut/dashboard/partidos/nuevo?matchId=${match.id}`}
+                className="inline-flex items-center justify-center rounded-xl bg-[#1B4F8C] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#164278]"
+              >
+                {stats.length === 0 ? "Completar captura" : "Corregir resultado"}
+              </Link>
+              <p className="mt-2 text-xs text-slate-500">
+                Cambia marcador o stats del plantel. Se actualiza la ficha y se puede
+                avisar al tutor.
+              </p>
+            </div>
+          ) : null}
         </div>
       ) : (
         <div className="space-y-3">
@@ -164,15 +178,25 @@ export function PartidosDetail({ matchId }: PartidosDetailProps) {
 
       <div className="rounded-2xl bg-white shadow-sm">
         {stats.length === 0 ? (
-          <p className="p-6 text-sm text-slate-500">
-            {completed
-              ? match.is_official
-                ? "MiFicha sincronizará stats cuando el organizador publique el acta oficial."
-                : "No hay stats registradas para este partido."
-              : match.is_official
-                ? "MiFicha actualizará fichas al publicarse el acta oficial."
-                : "Registra el resultado y stats cuando termine el partido."}
-          </p>
+          <div className="space-y-3 p-6">
+            <p className="text-sm text-slate-500">
+              {completed
+                ? match.is_official
+                  ? "MiFicha sincronizará stats cuando el organizador publique el acta oficial."
+                  : "No hay stats registradas para este partido."
+                : match.is_official
+                  ? "MiFicha actualizará fichas al publicarse el acta oficial."
+                  : "Registra el resultado y stats cuando termine el partido."}
+            </p>
+            {!match.is_official && match.status === "scheduled" ? (
+              <Link
+                href={`/fut/dashboard/partidos/nuevo?matchId=${match.id}`}
+                className="inline-flex text-sm font-semibold text-[#1B4F8C] hover:underline"
+              >
+                Registrar resultado →
+              </Link>
+            ) : null}
+          </div>
         ) : (
           <div className="divide-y divide-slate-100">
             {stats.map((stat) => (

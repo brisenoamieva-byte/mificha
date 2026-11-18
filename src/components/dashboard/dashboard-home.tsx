@@ -399,7 +399,7 @@ export function DashboardHome() {
                     href={`/fut/dashboard/partidos/nuevo?matchId=${nextMatch.id}`}
                     className="text-sm font-semibold text-mf-text-secondary hover:underline"
                   >
-                    Registrar amistoso
+                    Registrar resultado
                   </Link>
                 ) : null}
               </div>
