@@ -46,6 +46,8 @@ import type { TutorLinkRequest } from "@/lib/tutor-link-requests";
 import { parseLinesToList, parseTitleDetailLines } from "@/lib/tutor-family";
 import { cn } from "@/lib/utils";
 import {
+  formatQuotaMb,
+  TUTOR_VIDEO_QUOTA_BYTES,
   tutorMediaMaxLabel,
   type TutorUploadState,
 } from "@/lib/tutor-media-limits";
@@ -172,6 +174,8 @@ interface TutorBuilderPanelProps {
   onReorderSeasons: (orderedIds: string[]) => void;
   uploadState?: TutorUploadState | null;
   uploadError?: string | null;
+  videoUsedBytes?: number;
+  videoQuotaBytes?: number;
   onCopyShare: () => void;
   onCopyPublicCode: () => void;
   onLinkPlayer: (playerId: string, match?: TutorLinkSuggestion["match"]) => void;
@@ -206,6 +210,8 @@ export function TutorBuilderPanel({
   onReorderSeasons,
   uploadState = null,
   uploadError = null,
+  videoUsedBytes = 0,
+  videoQuotaBytes = TUTOR_VIDEO_QUOTA_BYTES,
   onCopyShare,
   onCopyPublicCode,
   onToggleExploreOptIn,
@@ -215,6 +221,8 @@ export function TutorBuilderPanel({
   onCancelLinkRequest,
   workspace = "tutor",
 }: TutorBuilderPanelProps) {
+  const videoQuota = formatQuotaMb(videoUsedBytes, videoQuotaBytes);
+  const videoFull = videoQuota.remainingBytes <= 0;
   const [seasonForm, setSeasonForm] = useState(() =>
     buildEmptySeasonForm(child.profile.club || form.club),
   );
@@ -973,6 +981,28 @@ export function TutorBuilderPanel({
             />
             {child.active ? (
               <>
+                <div className="rounded-xl border border-mf-border bg-mf-canvas px-4 py-3">
+                  <div className="flex items-baseline justify-between gap-3">
+                    <p className="text-sm font-semibold text-mf-gph-ink">
+                      Video usado: {videoQuota.usedLabel} / {videoQuota.quotaLabel}
+                    </p>
+                    <p className="text-xs text-mf-text-muted">{videoQuota.percent}%</p>
+                  </div>
+                  <div className="mt-2 h-2 overflow-hidden rounded-full bg-white">
+                    <div
+                      className={cn(
+                        "h-full rounded-full transition-[width] duration-200",
+                        videoFull ? "bg-mf-danger" : "bg-mf-gph",
+                      )}
+                      style={{ width: `${videoQuota.percent}%` }}
+                    />
+                  </div>
+                  <p className="mt-2 text-xs text-mf-text-secondary">
+                    {videoFull
+                      ? "Llegaste al límite de video de tu cuenta. Borra uno para subir otro."
+                      : "Tope por cuenta (todas tus fichas). Videos grandes se comprimen antes de subir."}
+                  </p>
+                </div>
                 <label className="flex items-start gap-2 text-sm text-mf-text-secondary">
                   <input
                     type="checkbox"
@@ -1018,7 +1048,7 @@ export function TutorBuilderPanel({
                   <label
                     className={cn(
                       "flex flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed px-4 py-8 text-center transition",
-                      busy
+                      busy || videoFull
                         ? "cursor-not-allowed border-mf-border bg-mf-canvas opacity-60"
                         : "cursor-pointer border-mf-border bg-mf-canvas hover:border-mf-gph/50",
                     )}
@@ -1028,13 +1058,15 @@ export function TutorBuilderPanel({
                       Subir videos
                     </span>
                     <span className="text-xs text-mf-text-secondary">
-                      Varios a la vez · MP4/MOV · máx. {tutorMediaMaxLabel("video")} c/u
+                      {videoFull
+                        ? "Límite de 500 MB alcanzado"
+                        : `Varios a la vez · MP4/MOV · máx. ${tutorMediaMaxLabel("video")} c/u`}
                     </span>
                     <input
                       type="file"
                       accept="video/*"
                       multiple
-                      disabled={busy}
+                      disabled={busy || videoFull}
                       className="sr-only"
                       onChange={(event) => {
                         const input = event.currentTarget;
@@ -1051,11 +1083,13 @@ export function TutorBuilderPanel({
                       {uploadState.total && uploadState.total > 1
                         ? `Archivo ${uploadState.index ?? 1} de ${uploadState.total} · `
                         : ""}
-                      {uploadState.phase === "prepare"
-                        ? "Preparando carga…"
-                        : uploadState.phase === "upload"
-                          ? `Subiendo ${uploadState.kind === "video" ? "video" : "foto"}…`
-                          : "Guardando en la ficha…"}
+                      {uploadState.phase === "compress"
+                        ? "Comprimiendo video…"
+                        : uploadState.phase === "prepare"
+                          ? "Preparando carga…"
+                          : uploadState.phase === "upload"
+                            ? `Subiendo ${uploadState.kind === "video" ? "video" : "foto"}…`
+                            : "Guardando en la ficha…"}
                     </p>
                     <p className="mt-1 truncate text-xs text-mf-text-secondary">
                       {uploadState.fileName}

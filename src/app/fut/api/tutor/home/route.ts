@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import {
+  getTutorVideoUsageBytes,
   listGuardianChildren,
   listTutorMaterials,
   listTutorSeasons,
@@ -12,6 +13,7 @@ import {
   fetchTutorLinkedPerformances,
 } from "@/lib/tutor-linked-performance";
 import { getSeasonClaimMapForChild } from "@/lib/tutor-season-claims";
+import { TUTOR_VIDEO_QUOTA_BYTES } from "@/lib/tutor-media-limits";
 import { createSupabaseAdminClient } from "@/lib/supabase-admin";
 import { getAuthedSupabaseClient } from "@/lib/supabase-server";
 
@@ -32,6 +34,7 @@ export async function GET(request: Request) {
   try {
     const admin = createSupabaseAdminClient();
     const children = await listGuardianChildren(admin, user, phone, kind);
+    const videoUsedBytes = await getTutorVideoUsageBytes(admin, user.id);
     const detailed = await Promise.all(
       children.map(async (child) => ({
         ...child,
@@ -45,7 +48,11 @@ export async function GET(request: Request) {
         view_stats: await getTutorFichaViewStats(admin, child.id),
       })),
     );
-    return NextResponse.json({ children: detailed });
+    return NextResponse.json({
+      children: detailed,
+      video_used_bytes: videoUsedBytes,
+      video_quota_bytes: TUTOR_VIDEO_QUOTA_BYTES,
+    });
   } catch (error) {
     const message = error instanceof Error ? error.message : "No se pudo cargar tu ficha.";
     return NextResponse.json({ error: message }, { status: 500 });

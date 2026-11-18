@@ -26,9 +26,12 @@ import type { TutorLinkedPerformance } from "@/lib/tutor-linked-performance";
 import type { TutorSeasonClaim } from "@/lib/tutor-season-claims";
 import {
   assertTutorMediaSize,
+  assertTutorVideoQuota,
   friendlyTutorUploadError,
+  TUTOR_VIDEO_QUOTA_BYTES,
   type TutorUploadState,
 } from "@/lib/tutor-media-limits";
+import { maybeCompressTutorVideo } from "@/lib/tutor-video-compress";
 
 function uploadFileWithProgress(
   signedUrl: string,
@@ -237,6 +240,8 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
   const [busy, setBusy] = useState(false);
   const [uploadState, setUploadState] = useState<TutorUploadState | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [videoUsedBytes, setVideoUsedBytes] = useState(0);
+  const [videoQuotaBytes, setVideoQuotaBytes] = useState(TUTOR_VIDEO_QUOTA_BYTES);
   const uploadLock = useRef(false);
   const [form, setForm] = useState(emptyForm);
   const [copied, setCopied] = useState(false);
@@ -261,6 +266,12 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
     if (whatsapp) params.set("phone", whatsapp);
     const payload = await authed(`/fut/api/tutor/home?${params.toString()}`);
     const rows = payload.children ?? [];
+    setVideoUsedBytes(Number(payload.video_used_bytes) || 0);
+    setVideoQuotaBytes(
+      Number(payload.video_quota_bytes) > 0
+        ? Number(payload.video_quota_bytes)
+        : TUTOR_VIDEO_QUOTA_BYTES,
+    );
     setChildren(rows);
     setSelectedId((current) => {
       if (preferId && rows.some((row) => row.id === preferId)) return preferId;
@@ -717,6 +728,7 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
 
     let uploaded = 0;
     let lastError: string | null = null;
+    let runningVideoUsed = videoUsedBytes;
 
     try {
       for (let i = 0; i < list.length; i++) {
@@ -725,9 +737,34 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
         const total = list.length;
         try {
           assertTutorMediaSize(kind, file);
+          let uploadFile = file;
+          if (kind === "video") {
+            setUploadState({
+              kind,
+              fileName: file.name,
+              phase: "compress",
+              percent: 0,
+              index,
+              total,
+            });
+            const result = await maybeCompressTutorVideo(file, (percent) => {
+              setUploadState({
+                kind,
+                fileName: file.name,
+                phase: "compress",
+                percent,
+                index,
+                total,
+              });
+            });
+            uploadFile = result.file;
+            assertTutorMediaSize(kind, uploadFile);
+            assertTutorVideoQuota(runningVideoUsed, uploadFile.size);
+          }
+
           setUploadState({
             kind,
-            fileName: file.name,
+            fileName: uploadFile.name,
             phase: "prepare",
             percent: null,
             index,
@@ -739,14 +776,19 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
               action: "prepare",
               child_id: child.id,
               kind,
-              file_name: file.name,
+              file_name: uploadFile.name,
+              file_size: uploadFile.size,
             }),
           });
           if (!prepared.path) throw new Error("No se abrió la carga.");
+          if (prepared.video_used_bytes != null) {
+            runningVideoUsed = Number(prepared.video_used_bytes) || runningVideoUsed;
+            setVideoUsedBytes(runningVideoUsed);
+          }
 
           setUploadState({
             kind,
-            fileName: file.name,
+            fileName: uploadFile.name,
             phase: "upload",
             percent: 0,
             index,
@@ -754,20 +796,24 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
           });
 
           if (prepared.signedUrl) {
-            await uploadFileWithProgress(String(prepared.signedUrl), file, (percent) => {
-              setUploadState({
-                kind,
-                fileName: file.name,
-                phase: "upload",
-                percent,
-                index,
-                total,
-              });
-            });
+            await uploadFileWithProgress(
+              String(prepared.signedUrl),
+              uploadFile,
+              (percent) => {
+                setUploadState({
+                  kind,
+                  fileName: uploadFile.name,
+                  phase: "upload",
+                  percent,
+                  index,
+                  total,
+                });
+              },
+            );
           } else if (prepared.token) {
             const signedUpload = await supabase.storage
               .from("mificha-ops")
-              .uploadToSignedUrl(prepared.path, prepared.token, file);
+              .uploadToSignedUrl(prepared.path, prepared.token, uploadFile);
             if (signedUpload.error) throw new Error(signedUpload.error.message);
           } else {
             throw new Error("No se abrió la carga.");
@@ -775,13 +821,13 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
 
           setUploadState({
             kind,
-            fileName: file.name,
+            fileName: uploadFile.name,
             phase: "save",
             percent: 100,
             index,
             total,
           });
-          await authed("/fut/api/tutor/materials", {
+          const committed = await authed("/fut/api/tutor/materials", {
             method: "POST",
             body: JSON.stringify({
               action: "commit",
@@ -789,8 +835,17 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
               kind,
               title: file.name,
               path: prepared.path,
+              byte_size: uploadFile.size,
+              file_size: uploadFile.size,
             }),
           });
+          if (committed.video_used_bytes != null) {
+            runningVideoUsed = Number(committed.video_used_bytes) || runningVideoUsed;
+            setVideoUsedBytes(runningVideoUsed);
+          } else if (kind === "video") {
+            runningVideoUsed += uploadFile.size;
+            setVideoUsedBytes(runningVideoUsed);
+          }
           uploaded += 1;
         } catch (err: unknown) {
           const raw = err instanceof Error ? err.message : "No se subió el archivo.";
@@ -1351,6 +1406,8 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
             onReorderSeasons={(ids) => void reorderSeasons(ids)}
             uploadState={uploadState}
             uploadError={uploadError}
+            videoUsedBytes={videoUsedBytes}
+            videoQuotaBytes={videoQuotaBytes}
             onCopyShare={() => void copyShare()}
             onCopyPublicCode={() => void copyPublicCode()}
             onToggleExploreOptIn={(enabled) => void toggleExploreOptIn(enabled)}

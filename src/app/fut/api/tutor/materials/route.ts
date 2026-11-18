@@ -4,10 +4,12 @@ import {
   commitTutorUpload,
   deleteTutorMaterial,
   getTutorChild,
+  getTutorVideoUsageBytes,
   prepareTutorUpload,
   setTutorFeaturedVideo,
   setTutorPhotoCover,
 } from "@/lib/tutor-family";
+import { TUTOR_VIDEO_QUOTA_BYTES } from "@/lib/tutor-media-limits";
 import { createSupabaseAdminClient } from "@/lib/supabase-admin";
 import { getAuthedSupabaseClient } from "@/lib/supabase-server";
 
@@ -32,6 +34,8 @@ export async function POST(request: Request) {
     body?: string;
     file_name?: string;
     path?: string;
+    file_size?: number;
+    byte_size?: number;
   };
 
   try {
@@ -57,6 +61,7 @@ export async function POST(request: Request) {
         child,
         body.kind,
         String(body.file_name ?? "archivo"),
+        body.file_size == null ? null : Number(body.file_size),
       );
       return NextResponse.json({ ok: true, ...upload });
     }
@@ -66,8 +71,15 @@ export async function POST(request: Request) {
         kind: body.kind,
         title: String(body.title ?? ""),
         path: String(body.path ?? ""),
+        byte_size: body.byte_size == null ? body.file_size ?? null : body.byte_size,
       });
-      return NextResponse.json({ ok: true, material: row });
+      const videoUsed = await getTutorVideoUsageBytes(admin, child.guardian_user_id);
+      return NextResponse.json({
+        ok: true,
+        material: row,
+        video_used_bytes: videoUsed,
+        video_quota_bytes: TUTOR_VIDEO_QUOTA_BYTES,
+      });
     }
 
     if (body.action === "delete") {
@@ -76,7 +88,12 @@ export async function POST(request: Request) {
         child,
         String(body.material_id ?? ""),
       );
-      return NextResponse.json(result);
+      const videoUsed = await getTutorVideoUsageBytes(admin, child.guardian_user_id);
+      return NextResponse.json({
+        ...result,
+        video_used_bytes: videoUsed,
+        video_quota_bytes: TUTOR_VIDEO_QUOTA_BYTES,
+      });
     }
 
     if (body.action === "set_cover") {

@@ -18,6 +18,10 @@ import {
   syncLegacyLinkFields,
   type TutorMembership,
 } from "@/lib/tutor-memberships";
+import {
+  assertTutorVideoQuota,
+  TUTOR_VIDEO_QUOTA_BYTES,
+} from "@/lib/tutor-media-limits";
 
 export type { TutorMembership };
 
@@ -147,6 +151,8 @@ export interface TutorMaterial {
   title: string;
   body: string | null;
   storage_path: string | null;
+  /** Tamaño del archivo en bytes (para cuota de video). */
+  byte_size?: number | null;
   created_at: string;
   /** Foto principal del hero. */
   is_cover?: boolean;
@@ -1345,13 +1351,33 @@ export async function addTutorStory(
   return row;
 }
 
+export async function getTutorVideoUsageBytes(
+  admin: SupabaseClient,
+  guardianUserId: string,
+) {
+  const rows = await readJson<TutorMaterial>(admin, MATERIALS);
+  return rows.reduce((sum, row) => {
+    if (row.guardian_user_id !== guardianUserId) return sum;
+    if (row.kind !== "video") return sum;
+    const size = Number(row.byte_size);
+    if (!Number.isFinite(size) || size <= 0) return sum;
+    return sum + size;
+  }, 0);
+}
+
 export async function prepareTutorUpload(
   admin: SupabaseClient,
   child: TutorChild,
   kind: "photo" | "video",
   fileName: string,
+  fileSize?: number | null,
 ) {
   assertCanUpload(child);
+  const size = Number(fileSize);
+  if (kind === "video" && Number.isFinite(size) && size > 0) {
+    const used = await getTutorVideoUsageBytes(admin, child.guardian_user_id);
+    assertTutorVideoQuota(used, size);
+  }
   await ensureOpsBucket(admin);
   const safe = fileName.replace(/[^a-zA-Z0-9._-]+/g, "-").slice(0, 80) || "archivo";
   const storagePath = `families/${child.id}/${randomUUID()}-${safe}`;
@@ -1359,21 +1385,36 @@ export async function prepareTutorUpload(
   if (signed.error || !signed.data) {
     throw new Error(signed.error?.message || "No se pudo preparar la carga.");
   }
+  const used = await getTutorVideoUsageBytes(admin, child.guardian_user_id);
   return {
     path: storagePath,
     token: signed.data.token,
     signedUrl: signed.data.signedUrl,
+    video_used_bytes: used,
+    video_quota_bytes: TUTOR_VIDEO_QUOTA_BYTES,
   };
 }
 
 export async function commitTutorUpload(
   admin: SupabaseClient,
   child: TutorChild,
-  input: { kind: "photo" | "video"; title: string; path: string },
+  input: {
+    kind: "photo" | "video";
+    title: string;
+    path: string;
+    byte_size?: number | null;
+  },
 ) {
   assertCanUpload(child);
   if (!input.path.startsWith(`families/${child.id}/`)) {
     throw new Error("Archivo inválido.");
+  }
+  const byteSize = Number(input.byte_size);
+  const size =
+    Number.isFinite(byteSize) && byteSize > 0 ? Math.round(byteSize) : null;
+  if (input.kind === "video" && size) {
+    const used = await getTutorVideoUsageBytes(admin, child.guardian_user_id);
+    assertTutorVideoQuota(used, size);
   }
   const rows = await readJson<TutorMaterial>(admin, MATERIALS);
   const hasCover = rows.some(
@@ -1398,6 +1439,7 @@ export async function commitTutorUpload(
     title: input.title.trim() || (input.kind === "photo" ? "Foto" : "Video"),
     body: null,
     storage_path: input.path,
+    byte_size: size,
     created_at: new Date().toISOString(),
     is_cover: input.kind === "photo" ? !hasCover : false,
     is_featured: input.kind === "video" ? !hasFeatured : false,
