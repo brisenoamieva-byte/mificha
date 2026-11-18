@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { TutorActivityInbox } from "@/components/tutor/tutor-activity-inbox";
+import { TutorAgreementsInbox } from "@/components/tutor/tutor-agreements-inbox";
 import { TutorBuilderPanel } from "@/components/tutor/tutor-builder-panel";
 import { TutorLinkRequestsInbox } from "@/components/tutor/tutor-link-requests-inbox";
 import { updatePassword } from "@/lib/auth";
@@ -1116,6 +1117,7 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
         refreshKey={linkInboxKey}
         onChanged={() => void load(phone, selectedId)}
       />
+      <TutorAgreementsInbox />
       <TutorActivityInbox />
 
       {children.length > 0 ? (

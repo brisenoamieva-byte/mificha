@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
+  FileSignature,
   LayoutDashboard,
   LineChart,
   Mail,
@@ -69,6 +70,20 @@ export function DashboardSidebar({ open, onClose }: DashboardSidebarProps) {
           >
             <Eye className="h-[18px] w-[18px] shrink-0" />
             Visorías
+          </Link>
+        ) : null}
+        {canSeeVisorias || canSeeLedger ? (
+          <Link
+            href="/fut/dashboard/cartas"
+            onClick={onClose}
+            className={
+              pathname.startsWith("/fut/dashboard/cartas")
+                ? "mf-nav-link-active"
+                : "mf-nav-link"
+            }
+          >
+            <FileSignature className="h-[18px] w-[18px] shrink-0" />
+            Cartas GPH
           </Link>
         ) : null}
         {canSeeLedger ? (
