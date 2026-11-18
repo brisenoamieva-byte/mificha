@@ -95,28 +95,85 @@ async function ensureOpsBucket(admin: SupabaseClient) {
   await admin.storage.createBucket(OPS_BUCKET, { public: false });
 }
 
-async function readAgreements(admin: SupabaseClient): Promise<GphAgreement[]> {
-  const { data, error } = await admin.storage.from(OPS_BUCKET).download(AGREEMENTS_PATH);
-  if (error || !data) return [];
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function agreementsFingerprint(rows: GphAgreement[]) {
+  return rows
+    .map((row) => `${row.id}:${row.status}:${row.updated_at}`)
+    .sort()
+    .join("|");
+}
+
+function snapshotStamp(rows: GphAgreement[]) {
+  return rows.reduce((max, row) => (row.updated_at > max ? row.updated_at : max), "");
+}
+
+async function parseAgreementsBlob(data: Blob | null): Promise<GphAgreement[] | null> {
+  if (!data) return null;
   try {
     const parsed = JSON.parse(await data.text()) as GphAgreement[];
-    return Array.isArray(parsed) ? parsed : [];
+    return Array.isArray(parsed) ? parsed : null;
   } catch {
-    return [];
+    return null;
   }
+}
+
+async function readAgreements(admin: SupabaseClient): Promise<GphAgreement[]> {
+  // Prefer newest versioned snapshot (list is not CDN-sticky like a single object URL).
+  const { data: listed } = await admin.storage.from(OPS_BUCKET).list("academies/gph-agreements", {
+    limit: 40,
+  });
+  const latest = (listed ?? [])
+    .filter((f) => typeof f.name === "string" && f.name.startsWith("v-") && f.name.endsWith(".json"))
+    .sort((a, b) => b.name.localeCompare(a.name))[0];
+
+  let versioned: GphAgreement[] | null = null;
+  if (latest) {
+    const { data } = await admin.storage
+      .from(OPS_BUCKET)
+      .download(`academies/gph-agreements/${latest.name}`);
+    versioned = await parseAgreementsBlob(data);
+  }
+
+  const { data: legacyData } = await admin.storage.from(OPS_BUCKET).download(AGREEMENTS_PATH);
+  const legacy = await parseAgreementsBlob(legacyData);
+
+  if (versioned && legacy) {
+    return snapshotStamp(versioned) >= snapshotStamp(legacy) ? versioned : legacy;
+  }
+  return versioned ?? legacy ?? [];
 }
 
 async function writeAgreements(admin: SupabaseClient, rows: GphAgreement[]) {
   await ensureOpsBucket(admin);
-  const body = new Blob([JSON.stringify(rows.slice(0, 2000))], {
-    type: "application/json",
+  const payload = rows.slice(0, 2000);
+  const expected = agreementsFingerprint(payload);
+  const body = new Blob([JSON.stringify(payload)], { type: "application/json" });
+  const versionPath = `academies/gph-agreements/v-${Date.now()}-${randomUUID().slice(0, 8)}.json`;
+
+  const { error: versionError } = await admin.storage.from(OPS_BUCKET).upload(versionPath, body, {
+    upsert: false,
+    contentType: "application/json",
+    cacheControl: "0",
   });
+  if (versionError) throw new Error(versionError.message);
+
+  // Keep legacy path in sync for backups / older tooling.
   const { error } = await admin.storage.from(OPS_BUCKET).upload(AGREEMENTS_PATH, body, {
     upsert: true,
     contentType: "application/json",
     cacheControl: "0",
   });
   if (error) throw new Error(error.message);
+
+  for (let i = 0; i < 12; i++) {
+    const confirmed = await readAgreements(admin);
+    if (agreementsFingerprint(confirmed) === expected) return;
+    await sleep(120 + i * 80);
+  }
+  throw new Error("No se pudo confirmar el guardado de cartas GPH.");
 }
 
 export function hashGphTemplateVersion() {
