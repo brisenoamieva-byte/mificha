@@ -308,14 +308,14 @@ export async function createGphAgreementDraft(
     }
   }
 
-  // Si solo hay email, intenta mapear a user_id de Auth (mismo correo).
+  // Si solo hay email, intenta mapear a perfil existente.
   if (!guardianUserId && fields.guardian_email) {
-    try {
-      const { data, error } = await admin.auth.admin.getUserByEmail(fields.guardian_email);
-      if (!error && data.user) guardianUserId = data.user.id;
-    } catch {
-      // Sin Admin API: el tutor entra con el email de la carta.
-    }
+    const { data: profile } = await admin
+      .from("profiles")
+      .select("id")
+      .eq("email", fields.guardian_email)
+      .maybeSingle();
+    if (profile?.id) guardianUserId = String(profile.id);
   }
 
   fields = normalizeFields(fields);
