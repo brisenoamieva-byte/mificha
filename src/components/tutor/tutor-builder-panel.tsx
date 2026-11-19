@@ -1040,9 +1040,10 @@ export function TutorBuilderPanel({
                       className="sr-only"
                       onChange={(event) => {
                         const input = event.currentTarget;
-                        const files = input.files;
+                        // Copiar antes de limpiar: FileList es live y se vacía al reset.
+                        const files = Array.from(input.files ?? []);
                         input.value = "";
-                        void onFile("photo", files ?? undefined);
+                        void onFile("photo", files);
                       }}
                     />
                   </label>
@@ -1071,9 +1072,9 @@ export function TutorBuilderPanel({
                       className="sr-only"
                       onChange={(event) => {
                         const input = event.currentTarget;
-                        const files = input.files;
+                        const files = Array.from(input.files ?? []);
                         input.value = "";
-                        void onFile("video", files ?? undefined);
+                        void onFile("video", files);
                       }}
                     />
                   </label>

@@ -730,7 +730,10 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
       files instanceof File
         ? [files]
         : Array.from(files as FileList | File[]).filter(Boolean);
-    if (list.length === 0) return;
+    if (list.length === 0) {
+      setUploadError("No se detectó ningún archivo. Vuelve a elegir la foto o el video.");
+      return;
+    }
     if (uploadLock.current || busy) {
       setUploadError("Espera a que termine la carga actual.");
       return;
