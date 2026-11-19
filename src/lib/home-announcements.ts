@@ -2,6 +2,7 @@ import {
   GPH_PACHUCA_PATH,
   GPH_PACHUCA_SEGUNDA_FASE,
 } from "@/lib/gph-pachuca-segunda-fase";
+import { GPH_FUN, GPH_FUN_PATH } from "@/lib/gph-fun";
 import { VISORIA_EVENT, VISORIA_PUBLIC_PATH } from "@/lib/visoria-event";
 import { CRACKS_TRYOUTS, CRACKS_TRYOUTS_PATH } from "@/lib/cracks-tryouts";
 
@@ -23,6 +24,15 @@ export interface HomeAnnouncement {
  * No duplica el buscador ni CTAs de cuenta.
  */
 export const HOME_ANNOUNCEMENTS: HomeAnnouncement[] = [
+  {
+    id: "gph-fun-fiestas-2026",
+    tone: "event",
+    eyebrow: "GPH FUN",
+    title: GPH_FUN.headline,
+    detail: `${GPH_FUN.city} · promociones de apertura`,
+    href: GPH_FUN_PATH,
+    until: "2026-12-31",
+  },
   {
     id: "gph-pachuca-segunda-fase-nov-2026",
     tone: "gph",

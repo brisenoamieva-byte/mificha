@@ -1,6 +1,7 @@
 import type { AccountHome } from "@/lib/account-home";
 import { CRACKS_TRYOUTS, CRACKS_TRYOUTS_PATH } from "@/lib/cracks-tryouts";
 import { GPH_SAMPLE_CLASS, trainingBookingHref } from "@/lib/gph-alliance";
+import { GPH_FUN, GPH_FUN_PATH } from "@/lib/gph-fun";
 import {
   GPH_PACHUCA_PATH,
   GPH_PACHUCA_SEGUNDA_FASE,
@@ -151,7 +152,16 @@ export const VISORIAS_HUB = {
 export const EVENTOS_HUB = {
   title: "Eventos",
   summary: "Clínicas, jornadas y eventos con cupo publicado.",
-  items: [] as HubItem[],
+  items: [
+    {
+      id: "gph-fun-qro-2026",
+      title: GPH_FUN.title,
+      detail: `${GPH_FUN.headline} Pregunta por las promociones de apertura.`,
+      meta: `${GPH_FUN.city} · ${GPH_FUN.eyebrow}`,
+      href: GPH_FUN_PATH,
+      cta: "Ver GPH FUN",
+    },
+  ] satisfies HubItem[],
   empty:
     "Todavía no hay eventos publicados. Cuando GPH o un aliado abra una fecha, aparecerá aquí.",
 } as const;

@@ -116,10 +116,14 @@ export const MARKETING_NAV: NavSection[] = [
     icon: CalendarDays,
     links: [
       {
+        href: "/fut/gph-fun",
+        label: "GPH FUN · Fiestas",
+        description: "Fiestas futboleras · promociones de apertura",
+      },
+      {
         href: "/fut/eventos",
-        label: "Próximos eventos",
-        description: "Aún no hay eventos publicados",
-        soon: true,
+        label: "Todos los eventos",
+        description: "Clínicas, jornadas y fiestas publicadas",
       },
     ],
   },

@@ -64,12 +64,12 @@ export const TUTOR_SERVICES: TutorServiceItem[] = [
   },
   {
     id: "eventos",
-    title: "Eventos con descuento",
+    title: "Eventos",
     detail:
-      "Clínicas, jornadas y eventos GPH/CRACKS con precio de miembro cuando haya cupo publicado.",
-    status: "proximamente",
-    href: "#servicios",
-    cta: "En el hub",
+      "GPH FUN y más: fiestas futboleras, clínicas y jornadas cuando haya cupo publicado.",
+    status: "vivo",
+    href: "/fut/eventos",
+    cta: "Ver eventos",
   },
   {
     id: "gph-gratis",
