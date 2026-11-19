@@ -51,6 +51,11 @@ import {
   tutorMediaMaxLabel,
   type TutorUploadState,
 } from "@/lib/tutor-media-limits";
+import {
+  MOBILE_FILE_OVERLAY_CLASS,
+  MOBILE_PHOTO_ACCEPT,
+  MOBILE_VIDEO_ACCEPT,
+} from "@/lib/mobile-file-input";
 
 function buildEmptySeasonForm(club?: string | null) {
   return {
@@ -978,7 +983,7 @@ export function TutorBuilderPanel({
           >
             <StepHeading
               title="Aquí subes el contenido"
-              detail="En el celular: toca Subir fotos, elige de Galería y la carga empieza sola (verás la barra abajo). Puedes elegir varias. Lo más nuevo queda arriba."
+              detail="En celular (Android o iPhone): toca Subir fotos → Galería/Fotos. La carga empieza sola y verás la barra abajo. Puedes elegir varias; lo más nuevo queda arriba."
             />
             {child.active ? (
               <>
@@ -1039,11 +1044,11 @@ export function TutorBuilderPanel({
                     </span>
                     <input
                       type="file"
-                      accept="image/*,image/jpeg,image/png,image/webp"
+                      accept={MOBILE_PHOTO_ACCEPT}
                       multiple
                       disabled={busy}
                       aria-label="Elegir fotos de la galería o cámara"
-                      className="absolute inset-0 z-10 h-full w-full cursor-pointer opacity-0 disabled:cursor-not-allowed"
+                      className={MOBILE_FILE_OVERLAY_CLASS}
                       onChange={(event) => {
                         const input = event.currentTarget;
                         // Copiar antes de limpiar: FileList es live y se vacía al reset.
@@ -1068,15 +1073,15 @@ export function TutorBuilderPanel({
                     <span className="pointer-events-none text-xs text-mf-text-secondary">
                       {videoFull
                         ? "Límite de 500 MB alcanzado"
-                        : `Galería · MP4 · máx. ${tutorMediaMaxLabel("video")} c/u`}
+                        : `Galería · MP4/MOV · máx. ${tutorMediaMaxLabel("video")} c/u`}
                     </span>
                     <input
                       type="file"
-                      accept="video/*,video/mp4,video/webm,video/quicktime"
+                      accept={MOBILE_VIDEO_ACCEPT}
                       multiple
                       disabled={busy || videoFull}
                       aria-label="Elegir videos de la galería"
-                      className="absolute inset-0 z-10 h-full w-full cursor-pointer opacity-0 disabled:cursor-not-allowed"
+                      className={MOBILE_FILE_OVERLAY_CLASS}
                       onChange={(event) => {
                         const input = event.currentTarget;
                         const files = Array.from(input.files ?? []);

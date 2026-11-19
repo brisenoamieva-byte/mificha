@@ -515,8 +515,8 @@ export function AcademyForm() {
             <input
               ref={logoInputRef}
               type="file"
-              accept="image/*"
-              className="hidden"
+              accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp"
+              className="absolute h-px w-px overflow-hidden whitespace-nowrap border-0 p-0 opacity-0"
               onChange={handleLogoUpload}
             />
           </div>
@@ -560,8 +560,8 @@ export function AcademyForm() {
           <input
             ref={coverInputRef}
             type="file"
-            accept="image/*"
-            className="hidden"
+            accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp"
+            className="absolute h-px w-px overflow-hidden whitespace-nowrap border-0 p-0 opacity-0"
             onChange={handleCoverUpload}
           />
         </div>

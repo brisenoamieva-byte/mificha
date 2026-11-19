@@ -114,7 +114,7 @@ export function PlayerImportModal({
           </div>
 
           <div className="mt-6 rounded-xl border border-dashed border-slate-300 bg-slate-50 p-5">
-            <label className="flex cursor-pointer flex-col items-center gap-3 text-center">
+            <label className="relative flex cursor-pointer flex-col items-center gap-3 overflow-hidden rounded-xl text-center">
               <FileSpreadsheet className="h-8 w-8 text-[#1B4F8C]" />
               <div>
                 <p className="text-sm font-semibold text-slate-900">
@@ -131,7 +131,7 @@ export function PlayerImportModal({
               <input
                 type="file"
                 accept=".xlsx,.xls,.csv"
-                className="hidden"
+                className="absolute inset-0 h-full w-full cursor-pointer opacity-0 disabled:cursor-not-allowed"
                 disabled={loading || importing}
                 onChange={handleFileChange}
               />

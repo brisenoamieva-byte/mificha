@@ -32,6 +32,7 @@ import {
   type TutorUploadState,
 } from "@/lib/tutor-media-limits";
 import { maybeCompressTutorVideo } from "@/lib/tutor-video-compress";
+import { normalizeMobilePhoto } from "@/lib/mobile-file-input";
 
 function uploadFileWithProgress(
   signedUrl: string,
@@ -732,7 +733,7 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
         : Array.from(files as FileList | File[]).filter(Boolean);
     if (list.length === 0) {
       setUploadError(
-        "No se detectó ningún archivo. En Android: elige de Galería (no Archivos) y vuelve a intentar.",
+        "No se detectó ningún archivo. En el celular elige de Galería/Fotos (no Archivos) y vuelve a intentar.",
       );
       return;
     }
@@ -770,12 +771,18 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
         const index = i + 1;
         const total = list.length;
         try {
-          // Algunos Android entregan image/jpeg con nombre .jpg ok; otros mime vacío.
-          if (kind === "photo" && file.size <= 0) {
-            throw new Error("Esa foto llegó vacía. Prueba otra desde Galería.");
+          if (file.size <= 0) {
+            throw new Error(
+              kind === "photo"
+                ? "Esa foto llegó vacía. Prueba otra desde Galería/Fotos."
+                : "Ese video llegó vacío. Prueba otro desde Galería.",
+            );
           }
-          assertTutorMediaSize(kind, file);
           let uploadFile = file;
+          if (kind === "photo") {
+            uploadFile = await normalizeMobilePhoto(file);
+          }
+          assertTutorMediaSize(kind, uploadFile);
           if (kind === "video") {
             setUploadState({
               kind,

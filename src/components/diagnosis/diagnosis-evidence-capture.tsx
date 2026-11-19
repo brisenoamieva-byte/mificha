@@ -12,6 +12,12 @@ import {
 } from "@/lib/gph-field-protocol";
 import type { DiagnosisModule } from "@/lib/player-diagnosis";
 import { uploadDiagnosisEvidence } from "@/lib/storage";
+import {
+  MOBILE_FILE_INPUT_CLASS,
+  MOBILE_PHOTO_ACCEPT,
+  MOBILE_VIDEO_ACCEPT,
+  readFilesFromInput,
+} from "@/lib/mobile-file-input";
 import { cn } from "@/lib/utils";
 
 interface DiagnosisEvidenceCaptureProps {
@@ -135,34 +141,31 @@ export function DiagnosisEvidenceCapture({
       <input
         ref={cameraPhotoRef}
         type="file"
-        accept="image/*"
+        accept={MOBILE_PHOTO_ACCEPT}
         capture="environment"
-        className="hidden"
+        className={MOBILE_FILE_INPUT_CLASS}
         onChange={(event) => {
-          void addFiles(event.target.files);
-          event.target.value = "";
+          void addFiles(readFilesFromInput(event.currentTarget));
         }}
       />
       <input
         ref={cameraVideoRef}
         type="file"
-        accept="video/*"
+        accept={MOBILE_VIDEO_ACCEPT}
         capture="environment"
-        className="hidden"
+        className={MOBILE_FILE_INPUT_CLASS}
         onChange={(event) => {
-          void addFiles(event.target.files);
-          event.target.value = "";
+          void addFiles(readFilesFromInput(event.currentTarget));
         }}
       />
       <input
         ref={galleryRef}
         type="file"
-        accept="image/*,video/*"
+        accept={`${MOBILE_PHOTO_ACCEPT},${MOBILE_VIDEO_ACCEPT}`}
         multiple
-        className="hidden"
+        className={MOBILE_FILE_INPUT_CLASS}
         onChange={(event) => {
-          void addFiles(event.target.files);
-          event.target.value = "";
+          void addFiles(readFilesFromInput(event.currentTarget));
         }}
       />
 
