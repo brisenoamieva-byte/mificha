@@ -93,6 +93,16 @@ function parseInput(body: Record<string, unknown>): TutorChildInput {
   };
 }
 
+function clientMeta(request: Request) {
+  const forwarded = request.headers.get("x-forwarded-for");
+  const ip =
+    forwarded?.split(",")[0]?.trim() ||
+    request.headers.get("x-real-ip") ||
+    null;
+  const userAgent = request.headers.get("user-agent");
+  return { ip, userAgent };
+}
+
 export async function POST(request: Request) {
   const supabase = await getAuthedSupabaseClient(request);
   const {
@@ -104,6 +114,9 @@ export async function POST(request: Request) {
   try {
     const admin = createSupabaseAdminClient();
     const childId = body.child_id ? String(body.child_id) : "";
+    const meta = clientMeta(request);
+    const acceptorName =
+      typeof body.acceptor_name === "string" ? body.acceptor_name : "";
 
     if (childId && typeof body.explore_opt_in === "boolean" && body.action === "explore_opt_in") {
       const child = await updateTutorExploreOptIn(
@@ -111,7 +124,13 @@ export async function POST(request: Request) {
         user.id,
         childId,
         body.explore_opt_in,
-        { consentAck: body.consent_ack === true || body.explore_opt_in === false },
+        {
+          consentAck: body.consent_ack === true || body.explore_opt_in === false,
+          acceptorName,
+          email: user.email ?? null,
+          ip: meta.ip,
+          userAgent: meta.userAgent,
+        },
       );
       return NextResponse.json({ ok: true, child });
     }
@@ -119,6 +138,10 @@ export async function POST(request: Request) {
     if (childId && body.action === "linked_academy_consent") {
       const child = await grantTutorLinkedAcademyConsent(admin, user.id, childId, {
         consentAck: body.consent_ack === true,
+        acceptorName,
+        email: user.email ?? null,
+        ip: meta.ip,
+        userAgent: meta.userAgent,
       });
       return NextResponse.json({ ok: true, child });
     }

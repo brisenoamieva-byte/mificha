@@ -2,9 +2,16 @@ import { getPlayerAge, isUnknownBirthDate } from "@/lib/player-category";
 
 export const MINOR_AGE_THRESHOLD = 18;
 
+/** Versión del texto de consentimiento tutor→Explorar (para evidencia). */
+export const TUTOR_EXPLORE_CONSENT_VERSION = "tutor-explore-v1";
+
 export const PRIVACY_COPY = {
+  /** Panel academia: staff declara que tiene autorización parental. */
   consentLabel:
     "Confirmo contar con autorización del padre, madre o tutor para tratar y compartir los datos deportivos de este menor conforme al aviso de privacidad.",
+  /** Panel tutor: el firmante declara ser el padre/madre/tutor. */
+  tutorConsentLabel:
+    "Soy el padre, la madre o el tutor legal de este jugador y autorizo a MiFicha a tratar y compartir sus datos deportivos para mostrar la ficha en Explorar, conforme al aviso de privacidad.",
   publicProfileLabel:
     "Ficha accesible por link (no indexada en buscadores; solo quien tenga el enlace).",
   discoverableLabel:
@@ -16,6 +23,18 @@ export const PRIVACY_COPY = {
   minorNotice:
     "MiFicha trata datos de menores con fines deportivos. La academia es responsable de obtener y documentar el consentimiento parental.",
 } as const;
+
+export type TutorExploreConsentEvidence = {
+  accepted_at: string;
+  acceptor_user_id: string;
+  acceptor_name: string;
+  acceptor_email: string | null;
+  ip: string | null;
+  user_agent: string | null;
+  consent_version: string;
+  consent_text: string;
+  revoked_at?: string | null;
+};
 
 export function isMinor(birthDate: string | null | undefined): boolean {
   if (isUnknownBirthDate(birthDate)) return true;

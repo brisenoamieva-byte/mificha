@@ -118,6 +118,17 @@ interface TutorChildCard {
   } | null;
   explore_opt_in?: boolean;
   explore_opt_in_at?: string | null;
+  explore_consent_evidence?: {
+    accepted_at: string;
+    acceptor_user_id: string;
+    acceptor_name: string;
+    acceptor_email: string | null;
+    ip: string | null;
+    user_agent: string | null;
+    consent_version: string;
+    consent_text: string;
+    revoked_at?: string | null;
+  } | null;
   profile: {
     birth_date: string | null;
     position: string | null;
@@ -649,7 +660,7 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
     }
   }
 
-  async function toggleExploreOptIn(enabled: boolean) {
+  async function toggleExploreOptIn(enabled: boolean, acceptorName?: string) {
     if (!child) return;
     setBusy(true);
     setError(null);
@@ -662,6 +673,7 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
           child_id: child.id,
           explore_opt_in: enabled,
           consent_ack: enabled,
+          acceptor_name: acceptorName ?? "",
         }),
       });
       await load(phone);
@@ -679,7 +691,7 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
     }
   }
 
-  async function signLinkedAcademyConsent() {
+  async function signLinkedAcademyConsent(acceptorName?: string) {
     if (!child) return;
     setBusy(true);
     setError(null);
@@ -691,6 +703,7 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
           action: "linked_academy_consent",
           child_id: child.id,
           consent_ack: true,
+          acceptor_name: acceptorName ?? "",
         }),
       });
       await load(phone);
@@ -1412,8 +1425,12 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
             videoQuotaBytes={videoQuotaBytes}
             onCopyShare={() => void copyShare()}
             onCopyPublicCode={() => void copyPublicCode()}
-            onToggleExploreOptIn={(enabled) => void toggleExploreOptIn(enabled)}
-            onSignLinkedAcademyConsent={() => void signLinkedAcademyConsent()}
+            onToggleExploreOptIn={(enabled, name) =>
+              void toggleExploreOptIn(enabled, name)
+            }
+            onSignLinkedAcademyConsent={(name) =>
+              void signLinkedAcademyConsent(name)
+            }
             onLinkPlayer={(playerId, match) => void linkPlayer(playerId, match)}
             onUnlinkPlayer={(playerId) => void unlinkPlayer(playerId)}
             onCancelLinkRequest={(requestId) => void cancelLinkRequest(requestId)}

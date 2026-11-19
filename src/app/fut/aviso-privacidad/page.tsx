@@ -121,8 +121,11 @@ export default function AvisoPrivacidadPage() {
           contractual y en tu consentimiento al registrarte. El tratamiento de datos
           de jugadores menores requiere consentimiento del padre, madre o tutor legal;
           la academia es quien debe obtenerlo y documentarlo antes de activar fichas
-          públicas o directorio. MiFicha bloquea técnicamente la publicación sin
-          registro de ese consentimiento.
+          públicas o directorio. Cuando el tutor firma desde su cuenta MiFicha, se
+          registra evidencia electrónica (nombre, cuenta, fecha, versión del texto e
+          IP). MiFicha bloquea técnicamente la publicación en Explorar sin ese
+          consentimiento. No pedimos copia de identificación oficial para este
+          trámite; el link privado de la ficha puede usarse sin listarla en directorio.
         </LegalParagraph>
       </LegalSection>
 

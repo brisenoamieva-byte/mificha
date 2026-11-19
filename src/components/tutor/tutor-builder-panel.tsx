@@ -94,6 +94,7 @@ export interface TutorBuilderChild {
   } | null;
   explore_opt_in?: boolean;
   explore_opt_in_at?: string | null;
+  explore_consent_evidence?: TutorChild["explore_consent_evidence"];
   profile: TutorChild["profile"];
   materials: Array<{
     id: string;
@@ -181,8 +182,8 @@ interface TutorBuilderPanelProps {
   onLinkPlayer: (playerId: string, match?: TutorLinkSuggestion["match"]) => void;
   onUnlinkPlayer: (playerId?: string) => void;
   onCancelLinkRequest?: (requestId: string) => void;
-  onToggleExploreOptIn: (enabled: boolean) => void;
-  onSignLinkedAcademyConsent?: () => void;
+  onToggleExploreOptIn: (enabled: boolean, acceptorName?: string) => void;
+  onSignLinkedAcademyConsent?: (acceptorName?: string) => void;
   workspace?: GuardianKind;
 }
 
@@ -1718,6 +1719,7 @@ export function TutorBuilderPanel({
             <TutorConsentPanel
               exploreOptIn={Boolean(child.explore_opt_in)}
               exploreOptInAt={child.explore_opt_in_at}
+              exploreConsentEvidence={child.explore_consent_evidence}
               linkedAcademyName={child.linked_academy_name}
               linkedNeedsAcademyConsent={Boolean(
                 child.linked_player_id &&
@@ -1725,9 +1727,13 @@ export function TutorBuilderPanel({
                   !child.linked_performance.isPublicFicha,
               )}
               busy={busy}
-              onSignExplore={() => onToggleExploreOptIn(true)}
+              onSignExplore={(name) => onToggleExploreOptIn(true, name)}
               onRevokeExplore={() => onToggleExploreOptIn(false)}
-              onSignAcademy={onSignLinkedAcademyConsent}
+              onSignAcademy={
+                onSignLinkedAcademyConsent
+                  ? (name) => onSignLinkedAcademyConsent(name)
+                  : undefined
+              }
             />
 
             {child.view_stats && child.view_stats.total_views > 0 ? (

@@ -22,8 +22,13 @@ import {
   assertTutorVideoQuota,
   TUTOR_VIDEO_QUOTA_BYTES,
 } from "@/lib/tutor-media-limits";
+import {
+  PRIVACY_COPY,
+  TUTOR_EXPLORE_CONSENT_VERSION,
+  type TutorExploreConsentEvidence,
+} from "@/lib/privacy";
 
-export type { TutorMembership };
+export type { TutorMembership, TutorExploreConsentEvidence };
 
 const OPS_BUCKET = "mificha-ops";
 const ROSTER = "families/roster.json";
@@ -122,6 +127,8 @@ export interface TutorChild {
    */
   explore_opt_in: boolean;
   explore_opt_in_at: string | null;
+  /** Evidencia de la última firma de consentimiento (se conserva al revocar). */
+  explore_consent_evidence?: TutorExploreConsentEvidence | null;
 }
 
 export function childGuardianKind(child: Pick<TutorChild, "guardian_kind">): GuardianKind {
@@ -337,6 +344,7 @@ function normalizeChild(raw: TutorChild): TutorChild {
     ...syncLegacyLinkFields(normalizeMemberships(raw)),
     explore_opt_in: Boolean(raw.explore_opt_in),
     explore_opt_in_at: raw.explore_opt_in_at ?? null,
+    explore_consent_evidence: raw.explore_consent_evidence ?? null,
   };
 }
 
@@ -812,6 +820,7 @@ export async function createTutorChild(
     linked_at: null,
     explore_opt_in: false,
     explore_opt_in_at: null,
+    explore_consent_evidence: null,
   };
   const claimedNui = await claimNui(admin, {
     nui: input.nui,
@@ -1156,13 +1165,44 @@ export async function removeTutorChildMembership(
   return roster[index];
 }
 
+function buildTutorExploreConsentEvidence(input: {
+  userId: string;
+  acceptorName: string;
+  email?: string | null;
+  ip?: string | null;
+  userAgent?: string | null;
+  acceptedAt: string;
+}): TutorExploreConsentEvidence {
+  const name = input.acceptorName.trim();
+  if (name.length < 3) {
+    throw new Error("Escribe tu nombre completo para firmar el consentimiento.");
+  }
+  return {
+    accepted_at: input.acceptedAt,
+    acceptor_user_id: input.userId,
+    acceptor_name: name,
+    acceptor_email: input.email?.trim().toLowerCase() || null,
+    ip: input.ip ?? null,
+    user_agent: input.userAgent ?? null,
+    consent_version: TUTOR_EXPLORE_CONSENT_VERSION,
+    consent_text: PRIVACY_COPY.tutorConsentLabel,
+    revoked_at: null,
+  };
+}
+
 /** Activa o apaga el listado de la ficha en Explorar (opt-in firmado por el tutor). */
 export async function updateTutorExploreOptIn(
   admin: SupabaseClient,
   userId: string,
   childId: string,
   exploreOptIn: boolean,
-  options?: { consentAck?: boolean },
+  options?: {
+    consentAck?: boolean;
+    acceptorName?: string;
+    email?: string | null;
+    ip?: string | null;
+    userAgent?: string | null;
+  },
 ) {
   const { roster } = await loadRoster(admin);
   const index = roster.findIndex(
@@ -1175,11 +1215,32 @@ export async function updateTutorExploreOptIn(
     );
   }
   const now = new Date().toISOString();
-  roster[index] = {
-    ...roster[index],
-    explore_opt_in: Boolean(exploreOptIn),
-    explore_opt_in_at: exploreOptIn ? now : null,
-  };
+  const current = roster[index];
+  if (exploreOptIn) {
+    roster[index] = {
+      ...current,
+      explore_opt_in: true,
+      explore_opt_in_at: now,
+      explore_consent_evidence: buildTutorExploreConsentEvidence({
+        userId,
+        acceptorName: options?.acceptorName ?? "",
+        email: options?.email ?? current.guardian_email,
+        ip: options?.ip,
+        userAgent: options?.userAgent,
+        acceptedAt: now,
+      }),
+    };
+  } else {
+    const prev = current.explore_consent_evidence ?? null;
+    roster[index] = {
+      ...current,
+      explore_opt_in: false,
+      explore_opt_in_at: null,
+      explore_consent_evidence: prev
+        ? { ...prev, revoked_at: now }
+        : prev,
+    };
+  }
   await writeJson(admin, ROSTER, roster);
   return roster[index];
 }
@@ -1192,7 +1253,13 @@ export async function grantTutorLinkedAcademyConsent(
   admin: SupabaseClient,
   userId: string,
   childId: string,
-  options?: { consentAck?: boolean },
+  options?: {
+    consentAck?: boolean;
+    acceptorName?: string;
+    email?: string | null;
+    ip?: string | null;
+    userAgent?: string | null;
+  },
 ) {
   if (!options?.consentAck) {
     throw new Error(
@@ -1211,6 +1278,15 @@ export async function grantTutorLinkedAcademyConsent(
   }
 
   const now = new Date().toISOString();
+  const evidence = buildTutorExploreConsentEvidence({
+    userId,
+    acceptorName: options?.acceptorName ?? "",
+    email: options?.email ?? child.guardian_email,
+    ip: options?.ip,
+    userAgent: options?.userAgent,
+    acceptedAt: now,
+  });
+
   for (const membership of memberships) {
     const { error } = await admin
       .from("players")
@@ -1227,6 +1303,7 @@ export async function grantTutorLinkedAcademyConsent(
     ...child,
     explore_opt_in: true,
     explore_opt_in_at: child.explore_opt_in_at ?? now,
+    explore_consent_evidence: evidence,
   };
   await writeJson(admin, ROSTER, roster);
   return roster[index];

@@ -3,30 +3,37 @@
 import { useState } from "react";
 import Link from "next/link";
 import { LEGAL_ROUTES } from "@/lib/legal";
-import { PRIVACY_COPY } from "@/lib/privacy";
+import { PRIVACY_COPY, type TutorExploreConsentEvidence } from "@/lib/privacy";
 import { cn } from "@/lib/utils";
 
 export function TutorConsentPanel({
   exploreOptIn,
   exploreOptInAt,
+  exploreConsentEvidence,
   linkedAcademyName,
   linkedNeedsAcademyConsent,
   busy,
+  defaultAcceptorName,
   onSignExplore,
   onRevokeExplore,
   onSignAcademy,
 }: {
   exploreOptIn: boolean;
   exploreOptInAt?: string | null;
+  exploreConsentEvidence?: TutorExploreConsentEvidence | null;
   linkedAcademyName?: string | null;
   /** Hay vínculo con plantel pero la ficha de academia aún no tiene consentimiento. */
   linkedNeedsAcademyConsent?: boolean;
   busy?: boolean;
-  onSignExplore: () => void | Promise<void>;
+  defaultAcceptorName?: string;
+  onSignExplore: (acceptorName: string) => void | Promise<void>;
   onRevokeExplore: () => void | Promise<void>;
-  onSignAcademy?: () => void | Promise<void>;
+  onSignAcademy?: (acceptorName: string) => void | Promise<void>;
 }) {
   const [ack, setAck] = useState(false);
+  const [acceptorName, setAcceptorName] = useState(
+    () => defaultAcceptorName?.trim() || exploreConsentEvidence?.acceptor_name || "",
+  );
   const signedAt = exploreOptInAt
     ? new Date(exploreOptInAt).toLocaleDateString("es-MX", {
         day: "numeric",
@@ -34,6 +41,7 @@ export function TutorConsentPanel({
         year: "numeric",
       })
     : null;
+  const canSign = ack && acceptorName.trim().length >= 3;
 
   return (
     <div className="space-y-3 rounded-xl border border-mf-border bg-mf-canvas px-4 py-4">
@@ -52,6 +60,14 @@ export function TutorConsentPanel({
           Consentimiento activo
           {signedAt ? ` · firmado ${signedAt}` : ""}. Visible en el buscador si la ficha tiene
           contenido suficiente.
+          {exploreConsentEvidence?.acceptor_name ? (
+            <p className="mt-1 text-xs leading-5 text-emerald-900/80">
+              Firmado por {exploreConsentEvidence.acceptor_name}
+              {exploreConsentEvidence.consent_version
+                ? ` · ${exploreConsentEvidence.consent_version}`
+                : ""}
+            </p>
+          ) : null}
           <div className="mt-2 flex flex-wrap gap-2">
             <Link href="/fut/explorar" target="_blank" className="font-semibold underline">
               Ver Explorar
@@ -75,8 +91,19 @@ export function TutorConsentPanel({
             <Link href={LEGAL_ROUTES.privacy} className="font-semibold underline">
               aviso de privacidad
             </Link>
-            .
+            . Guardamos tu nombre, cuenta, fecha y evidencia técnica de la firma.
           </p>
+          <label className="mt-3 block text-sm">
+            <span className="font-medium">Tu nombre completo</span>
+            <input
+              type="text"
+              value={acceptorName}
+              onChange={(event) => setAcceptorName(event.target.value)}
+              placeholder="Como aparece en tu identificación"
+              className="mf-input mt-1"
+              autoComplete="name"
+            />
+          </label>
           <label className="mt-3 flex cursor-pointer items-start gap-2.5">
             <input
               type="checkbox"
@@ -84,15 +111,15 @@ export function TutorConsentPanel({
               onChange={(event) => setAck(event.target.checked)}
               className="mt-1 h-4 w-4 rounded border-mf-border"
             />
-            <span className="text-sm leading-6">{PRIVACY_COPY.consentLabel}</span>
+            <span className="text-sm leading-6">{PRIVACY_COPY.tutorConsentLabel}</span>
           </label>
           <button
             type="button"
-            disabled={busy || !ack}
-            onClick={() => void onSignExplore()}
+            disabled={busy || !canSign}
+            onClick={() => void onSignExplore(acceptorName.trim())}
             className={cn(
               "mf-btn-gph mt-3",
-              (busy || !ack) && "pointer-events-none opacity-50",
+              (busy || !canSign) && "pointer-events-none opacity-50",
             )}
           >
             Firmar y publicar en Explorar
@@ -110,10 +137,15 @@ export function TutorConsentPanel({
             Hay vínculo con el plantel, pero la ficha oficial de torneo aún no tiene tu
             consentimiento. Puedes aprobarla aquí.
           </p>
+          {!exploreOptIn ? (
+            <p className="mt-2 text-xs leading-5 text-mf-text-muted">
+              Completa nombre y casilla de arriba para firmar ambos consentimientos.
+            </p>
+          ) : null}
           <button
             type="button"
-            disabled={busy || (!exploreOptIn && !ack)}
-            onClick={() => void onSignAcademy()}
+            disabled={busy || (!exploreOptIn && !canSign)}
+            onClick={() => void onSignAcademy(acceptorName.trim())}
             className="mf-btn-gph-ghost mt-3 disabled:opacity-50"
           >
             Aprobar ficha de academia
