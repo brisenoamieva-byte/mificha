@@ -978,7 +978,7 @@ export function TutorBuilderPanel({
           >
             <StepHeading
               title="Aquí subes el contenido"
-              detail="Puedes elegir varias fotos o videos a la vez. Se ordenan por fecha de subida (lo más nuevo arriba)."
+              detail="En el celular: toca Subir fotos, elige de Galería y la carga empieza sola (verás la barra abajo). Puedes elegir varias. Lo más nuevo queda arriba."
             />
             {child.active ? (
               <>
@@ -1017,27 +1017,33 @@ export function TutorBuilderPanel({
                   </span>
                 </label>
                 <div className="grid gap-3 sm:grid-cols-2">
-                  <label
+                  {/*
+                    En Android el tap debe caer sobre el <input> (opacity-0 overlay).
+                    label+sr-only a veces abre el picker pero el FileList se pierde o
+                    el gesto no llega; el overlay evita ambos.
+                  */}
+                  <div
                     className={cn(
-                      "flex flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed px-4 py-8 text-center transition",
+                      "relative flex min-h-[9.5rem] flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl border-2 border-dashed px-4 py-8 text-center transition",
                       busy
-                        ? "cursor-not-allowed border-mf-border bg-mf-canvas opacity-60"
-                        : "cursor-pointer border-mf-gph/40 bg-mf-gph-soft hover:border-mf-gph hover:bg-mf-gph-soft/80",
+                        ? "border-mf-border bg-mf-canvas opacity-60"
+                        : "border-mf-gph/40 bg-mf-gph-soft hover:border-mf-gph hover:bg-mf-gph-soft/80",
                     )}
                   >
-                    <ImagePlus className="h-8 w-8 text-mf-gph" />
-                    <span className="text-sm font-semibold text-mf-gph-ink">
+                    <ImagePlus className="pointer-events-none h-8 w-8 text-mf-gph" />
+                    <span className="pointer-events-none text-sm font-semibold text-mf-gph-ink">
                       Subir fotos
                     </span>
-                    <span className="text-xs text-mf-text-secondary">
-                      Varias a la vez · JPG/PNG · máx. {tutorMediaMaxLabel("photo")} c/u
+                    <span className="pointer-events-none text-xs text-mf-text-secondary">
+                      Galería o cámara · JPG/PNG · máx. {tutorMediaMaxLabel("photo")} c/u
                     </span>
                     <input
                       type="file"
-                      accept="image/*"
+                      accept="image/*,image/jpeg,image/png,image/webp"
                       multiple
                       disabled={busy}
-                      className="sr-only"
+                      aria-label="Elegir fotos de la galería o cámara"
+                      className="absolute inset-0 z-10 h-full w-full cursor-pointer opacity-0 disabled:cursor-not-allowed"
                       onChange={(event) => {
                         const input = event.currentTarget;
                         // Copiar antes de limpiar: FileList es live y se vacía al reset.
@@ -1046,30 +1052,31 @@ export function TutorBuilderPanel({
                         void onFile("photo", files);
                       }}
                     />
-                  </label>
-                  <label
+                  </div>
+                  <div
                     className={cn(
-                      "flex flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed px-4 py-8 text-center transition",
+                      "relative flex min-h-[9.5rem] flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl border-2 border-dashed px-4 py-8 text-center transition",
                       busy || videoFull
-                        ? "cursor-not-allowed border-mf-border bg-mf-canvas opacity-60"
-                        : "cursor-pointer border-mf-border bg-mf-canvas hover:border-mf-gph/50",
+                        ? "border-mf-border bg-mf-canvas opacity-60"
+                        : "border-mf-border bg-mf-canvas hover:border-mf-gph/50",
                     )}
                   >
-                    <Video className="h-8 w-8 text-mf-gph" />
-                    <span className="text-sm font-semibold text-mf-gph-ink">
+                    <Video className="pointer-events-none h-8 w-8 text-mf-gph" />
+                    <span className="pointer-events-none text-sm font-semibold text-mf-gph-ink">
                       Subir videos
                     </span>
-                    <span className="text-xs text-mf-text-secondary">
+                    <span className="pointer-events-none text-xs text-mf-text-secondary">
                       {videoFull
                         ? "Límite de 500 MB alcanzado"
-                        : `Varios a la vez · MP4/MOV · máx. ${tutorMediaMaxLabel("video")} c/u`}
+                        : `Galería · MP4 · máx. ${tutorMediaMaxLabel("video")} c/u`}
                     </span>
                     <input
                       type="file"
-                      accept="video/*"
+                      accept="video/*,video/mp4,video/webm,video/quicktime"
                       multiple
                       disabled={busy || videoFull}
-                      className="sr-only"
+                      aria-label="Elegir videos de la galería"
+                      className="absolute inset-0 z-10 h-full w-full cursor-pointer opacity-0 disabled:cursor-not-allowed"
                       onChange={(event) => {
                         const input = event.currentTarget;
                         const files = Array.from(input.files ?? []);
@@ -1077,7 +1084,7 @@ export function TutorBuilderPanel({
                         void onFile("video", files);
                       }}
                     />
-                  </label>
+                  </div>
                 </div>
                 {uploadState ? (
                   <div className="rounded-xl border border-mf-gph/30 bg-mf-gph-soft px-4 py-3">

@@ -731,7 +731,9 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
         ? [files]
         : Array.from(files as FileList | File[]).filter(Boolean);
     if (list.length === 0) {
-      setUploadError("No se detectó ningún archivo. Vuelve a elegir la foto o el video.");
+      setUploadError(
+        "No se detectó ningún archivo. En Android: elige de Galería (no Archivos) y vuelve a intentar.",
+      );
       return;
     }
     if (uploadLock.current || busy) {
@@ -743,6 +745,20 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
     setError(null);
     setUploadError(null);
     setNotice(null);
+    // Feedback inmediato en móvil (antes de prepare/red).
+    setUploadState({
+      kind,
+      fileName: list[0]?.name || (kind === "video" ? "video" : "foto"),
+      phase: "prepare",
+      percent: null,
+      index: 1,
+      total: list.length,
+    });
+    window.setTimeout(() => {
+      document
+        .getElementById("tutor-material-upload")
+        ?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 50);
 
     let uploaded = 0;
     let lastError: string | null = null;
@@ -754,6 +770,10 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
         const index = i + 1;
         const total = list.length;
         try {
+          // Algunos Android entregan image/jpeg con nombre .jpg ok; otros mime vacío.
+          if (kind === "photo" && file.size <= 0) {
+            throw new Error("Esa foto llegó vacía. Prueba otra desde Galería.");
+          }
           assertTutorMediaSize(kind, file);
           let uploadFile = file;
           if (kind === "video") {
