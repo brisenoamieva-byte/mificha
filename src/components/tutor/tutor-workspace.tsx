@@ -221,6 +221,8 @@ async function authed(path: string, init?: RequestInit) {
     mode?: "active" | "pending";
     proposed_to_academy?: boolean;
     pending?: TutorLinkRequest[];
+    video_used_bytes?: number;
+    video_quota_bytes?: number;
   };
   if (!response.ok) throw new Error(payload.error || "No se pudo completar.");
   return payload;
