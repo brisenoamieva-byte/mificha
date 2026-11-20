@@ -3,6 +3,9 @@ import { LEGAL_ENTITY, LEGAL_ROUTES } from "@/lib/legal";
 export const VISORIA_EVENT_ID = "queretaro-nov-2026";
 
 export const VISORIA_POSTER = "/partners/visorias-queretaro-nov-2026.jpg";
+/** Flyer con horarios por categoría e indicaciones (26–27 nov). */
+export const VISORIA_SCHEDULE_POSTER =
+  "/partners/visorias-horarios-nov-2026.jpg";
 /** 1200×630 para WhatsApp/OG: recorte desde arriba para no cortar logos ni el título. */
 export const VISORIA_OG_IMAGE = "/partners/visorias-queretaro-nov-2026-og.jpg";
 
@@ -36,7 +39,7 @@ export const VISORIA_EVENT = {
   cost: "Sin costo",
   categories: {
     femenil: { label: "Femenil", years: "2012 a 2008", minYear: 2008, maxYear: 2012 },
-    varonil: { label: "Varonil", years: "2017 a 2010", minYear: 2010, maxYear: 2017 },
+    varonil: { label: "Varonil", years: "2018 a 2010", minYear: 2010, maxYear: 2018 },
     /** Fuera de bandas pedidas por visores; se captura el año real de nacimiento. */
     otro: { label: "Otro", years: "fuera de rango · año real", minYear: 2000, maxYear: 2022 },
   },
@@ -44,7 +47,7 @@ export const VISORIA_EVENT = {
     {
       id: "jueves" as const,
       dateLabel: "Jueves 26 de noviembre",
-      hours: "9:00 a.m. a 2:00 p.m.",
+      hours: "8:45 a.m. a 2:00 p.m.",
       venue: "San Javier, Querétaro",
       audience:
         "Abierta a todo público. Quien se registre puede participar y ser observado por los visores.",
@@ -52,12 +55,27 @@ export const VISORIA_EVENT = {
     {
       id: "viernes" as const,
       dateLabel: "Viernes 27 de noviembre",
-      hours: "9:00 a.m. a 4:00 p.m.",
+      hours: "8:45 a.m. a 4:00 p.m.",
       venue: "Casa de la Juventud, Querétaro",
       audience:
         "Solo seleccionados de GPH y jugadores elegidos por los visores el jueves 26.",
     },
   ],
+  /** Horarios de participación por categoría (ambos días). */
+  scheduleSlots: [
+    { time: "8:45 a.m.", label: "Femenil" },
+    { time: "9:30 a.m.", label: "Categorías 2018 – 2017" },
+    { time: "10:00 a.m.", label: "Categorías 2016 – 2015" },
+    { time: "11:00 a.m.", label: "Categorías 2014 – 2013" },
+    { time: "12:00 p.m.", label: "Categorías 2012 – 2011 – 2010" },
+  ],
+  instructions: [
+    "Presentarse 30 minutos antes de su horario asignado.",
+    "Todos los jugadores deberán asistir vestidos completamente de blanco.",
+    "Porteros: podrán utilizar el uniforme y los colores de su preferencia.",
+  ],
+  familyMessage:
+    "Estamos a unos días de vivir una experiencia muy especial. Detrás de cada jugador hay sueños, esfuerzo, disciplina y una familia que nunca deja de apoyarlo.",
 } as const;
 
 export type VisoriaCategory = keyof typeof VISORIA_EVENT.categories;
@@ -108,19 +126,27 @@ export function visoriaPublicUrl(baseUrl?: string) {
 
 export function visoriaWhatsAppShareHref(baseUrl?: string) {
   const url = visoriaPublicUrl(baseUrl);
-  const text = `GPH / CRACKS
+  const slots = VISORIA_EVENT.scheduleSlots
+    .map((slot) => `${slot.time} — ${slot.label}`)
+    .join("\n");
+  const tips = VISORIA_EVENT.instructions.map((line) => `✅ ${line}`).join("\n");
+  const text = `⚽🧡 GPH + CRACKS | ¡LLEGÓ EL MOMENTO DE MOSTRAR SU TALENTO!
 
-VISORÍAS EN QUERÉTARO – 26 Y 27 DE NOVIEMBRE
+Queridas familias:
 
-Visores oficiales de Primera División (Chivas y Santos Laguna).
+${VISORIA_EVENT.familyMessage}
 
-Femenil: nacidas de 2012 a 2008.
-Varonil: nacidos de 2017 a 2010.
+📅 26 y 27 de noviembre · Visorías Oficiales con Chivas y Santos Laguna
 
-Jueves 26 · 9:00 a.m. a 2:00 p.m. · San Javier · abierta a todo público.
-Viernes 27 · 9:00 a.m. a 4:00 p.m. · Casa de la Juventud · solo seleccionados GPH y elegidos el jueves.
+HORARIOS DE PARTICIPACIÓN
+${slots}
 
-Registro (sin Google Forms):
+⚠️ INDICACIONES IMPORTANTES
+${tips}
+
+🙏 Puntualidad para que cada jugador tenga la oportunidad de ser observado.
+
+Detalle y registro:
 ${url}
 
 Dudas: GPH · ${VISORIA_WHATSAPP_DISPLAY}`;

@@ -8,6 +8,7 @@ import { GphLogo } from "@/components/ui/gph-logo";
 import {
   VISORIA_EVENT,
   VISORIA_POSTER,
+  VISORIA_SCHEDULE_POSTER,
   VISORIA_VIDEOS,
   visoriaContactWhatsAppHref,
 } from "@/lib/visoria-event";
@@ -105,6 +106,76 @@ export function VisoriaLanding() {
             <Link href="/fut/cracks" className="mt-3 inline-flex text-sm font-semibold text-[#e11d2e] hover:underline">
               Ver convocatoria CRACKS
             </Link>
+          </div>
+        </section>
+
+        <section
+          id="horarios"
+          className="mx-auto max-w-6xl scroll-mt-24 px-4 py-12 sm:px-6 sm:py-14"
+        >
+          <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
+            <div className="overflow-hidden rounded-xl ring-1 ring-mf-border shadow-[0_18px_50px_-28px_rgba(15,45,82,0.35)]">
+              <Image
+                src={VISORIA_SCHEDULE_POSTER}
+                alt="Horarios de participación visorías oficiales Chivas y Santos Laguna"
+                width={1080}
+                height={1350}
+                className="h-auto w-full"
+              />
+            </div>
+            <div className="space-y-5">
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
+                  Familias · 26 y 27 de noviembre
+                </p>
+                <h2 className="mt-2 text-2xl font-semibold tracking-tight text-mf-gph-ink sm:text-3xl">
+                  ¡Llegó el momento de mostrar su talento!
+                </h2>
+                <p className="mt-3 text-sm leading-7 text-mf-text-secondary">
+                  {VISORIA_EVENT.familyMessage}
+                </p>
+              </div>
+              <div className="rounded-xl border border-mf-border bg-white p-5">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
+                  Horarios de participación
+                </p>
+                <ul className="mt-3 divide-y divide-mf-border">
+                  {VISORIA_EVENT.scheduleSlots.map((slot) => (
+                    <li
+                      key={`${slot.time}-${slot.label}`}
+                      className="flex items-baseline justify-between gap-4 py-2.5 text-sm"
+                    >
+                      <span className="font-semibold tabular-nums text-mf-gph-ink">
+                        {slot.time}
+                      </span>
+                      <span className="text-right text-mf-text-secondary">{slot.label}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="rounded-xl border border-amber-200 bg-amber-50 px-5 py-4">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-amber-900">
+                  Indicaciones importantes
+                </p>
+                <ul className="mt-3 space-y-2 text-sm leading-6 text-amber-950">
+                  {VISORIA_EVENT.instructions.map((line) => (
+                    <li key={line} className="flex gap-2">
+                      <span className="mt-0.5 font-bold text-mf-gph" aria-hidden>
+                        ✓
+                      </span>
+                      <span>{line}</span>
+                    </li>
+                  ))}
+                </ul>
+                <p className="mt-3 text-xs leading-5 text-amber-900/80">
+                  Puntualidad para respetar los tiempos y que cada jugador sea observado.
+                </p>
+              </div>
+              <a href="#registro" className="mf-btn-gph">
+                Ir al registro
+                <ArrowRight className="h-4 w-4" />
+              </a>
+            </div>
           </div>
         </section>
 

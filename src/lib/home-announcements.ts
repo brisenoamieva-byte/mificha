@@ -43,6 +43,15 @@ export const HOME_ANNOUNCEMENTS: HomeAnnouncement[] = [
     until: "2026-12-15",
   },
   {
+    id: "visorias-horarios-nov-2026",
+    tone: "event",
+    eyebrow: "Visorías · horarios",
+    title: "Llegó el momento: horarios Chivas y Santos",
+    detail: "26–27 nov · blanco completo · llegar 30 min antes",
+    href: VISORIA_PUBLIC_PATH,
+    until: "2026-11-27",
+  },
+  {
     id: "visorias-qro-nov-2026",
     tone: "event",
     eyebrow: "Visoría",
