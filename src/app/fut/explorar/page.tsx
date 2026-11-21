@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { ExplorePageHero } from "@/components/marketing/explore-page-hero";
 import { ExplorePaywallBanner } from "@/components/marketing/explore-paywall";
 import { ExploreWithMap } from "@/components/marketing/explore-with-map";
+import { ProductAnalyticsBeacon } from "@/components/marketing/product-analytics-beacon";
 import { SiteFooter, SiteHeader } from "@/components/marketing/site-header";
 import { countExploreDirectoryAcademies, countExploreDirectoryPlayers } from "@/lib/explore-demo-data";
 import {
@@ -79,6 +80,7 @@ export default async function ExplorarPage({
       <SiteHeader actionHref="/fut/tutor" actionLabel="Mis fichas" />
 
       <main className="flex-1">
+        <ProductAnalyticsBeacon event="view_explorar" />
         <ExplorePageHero playerCount={playerCount} academyCount={academyCount} />
 
         <section className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:py-14">

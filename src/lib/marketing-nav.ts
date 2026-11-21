@@ -38,15 +38,32 @@ export interface NavSection {
  */
 export const MARKETING_NAV: NavSection[] = [
   {
-    id: "planes",
-    label: "Planes",
+    id: "padres",
+    label: "Padres",
     icon: Package,
     links: [
       {
-        href: "/fut/tutor",
-        label: "Tutor o representante",
-        description: `Mis fichas · Explorar Pro · ${personaCopy.short}`,
+        href: "/fut/entrar?next=/fut/tutor",
+        label: "Armar ficha de mi hijo",
+        description: `Gratis · ~5 min · Explorar Pro · ${personaCopy.short}`,
       },
+      {
+        href: "/fut/tutor",
+        label: "Mis fichas",
+        description: "Entrar al panel del tutor o representante",
+      },
+      {
+        href: "/fut/talento",
+        label: "Talento por estado",
+        description: "Índice agregado de fichas en México",
+      },
+    ],
+  },
+  {
+    id: "planes",
+    label: "Planes",
+    icon: Sparkles,
+    links: [
       {
         href: "/fut/dashboard",
         label: "Academia",
@@ -57,12 +74,17 @@ export const MARKETING_NAV: NavSection[] = [
         label: "Organizadores de torneo",
         description: "Calendario, acta y datos conectados a fichas",
       },
+      {
+        href: "/fut/captacion",
+        label: "Captación multi-estado",
+        description: "Plantillas para academias y torneos fuera de QRO",
+      },
     ],
   },
   {
     id: "productos",
     label: "Productos",
-    icon: Sparkles,
+    icon: Package,
     links: [
       {
         href: "/fut/evaluaciones",
@@ -102,11 +124,6 @@ export const MARKETING_NAV: NavSection[] = [
         href: VISORIA_PUBLIC_PATH,
         label: "Visorías Querétaro",
         description: "26–27 nov · Chivas y Santos · registro abierto",
-      },
-      {
-        href: "/fut/visorias",
-        label: "Ver visorías",
-        description: "Calendario y registro",
       },
     ],
   },

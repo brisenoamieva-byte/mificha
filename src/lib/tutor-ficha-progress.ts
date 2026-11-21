@@ -30,6 +30,19 @@ export interface TutorProgressStep {
   weight: number;
 }
 
+export function isExploreListingReady(input: {
+  player_name: string;
+  profile: TutorChildProfile;
+  exploreOptIn?: boolean;
+}) {
+  return Boolean(
+    input.exploreOptIn &&
+      input.player_name.trim() &&
+      input.profile.birth_date &&
+      input.profile.position,
+  );
+}
+
 export function buildTutorProgress(input: TutorProgressInput) {
   const profile = input.profile;
   const photos = input.materials.filter((item) => item.kind === "photo").length;
@@ -41,6 +54,7 @@ export function buildTutorProgress(input: TutorProgressInput) {
       Boolean(row.tournament_name?.trim()) &&
       (Number(row.matches) > 0 || Number(row.minutes) > 0),
   );
+  const exploreReady = isExploreListingReady(input);
 
   const steps: TutorProgressStep[] = [
     {
@@ -90,10 +104,12 @@ export function buildTutorProgress(input: TutorProgressInput) {
     {
       id: "compartir",
       label: "Publicar en Explorar",
-      hint: input.exploreOptIn
-        ? "Consentimiento activo · visible en el buscador"
-        : "Falta tu consentimiento: sin firmar, no aparece en Explorar",
-      done: Boolean(input.exploreOptIn),
+      hint: exploreReady
+        ? "Listo para el buscador (consentimiento + datos mínimos)"
+        : input.exploreOptIn
+          ? "Firmaste, pero falta posición o fecha de nacimiento para listar"
+          : "Falta tu consentimiento: sin firmar, no aparece en Explorar",
+      done: exploreReady,
       weight: 10,
     },
   ];

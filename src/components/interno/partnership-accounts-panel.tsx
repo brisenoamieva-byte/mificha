@@ -20,6 +20,7 @@ export function PartnershipAccountsPanel() {
   const [data, setData] = useState<PartnershipAccountsSnapshot | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [onlyWithoutConsent, setOnlyWithoutConsent] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -58,6 +59,16 @@ export function PartnershipAccountsPanel() {
   }
   if (!data) return null;
 
+  const optInPct =
+    data.totals.players > 0
+      ? Math.round((data.totals.exploreOptIn / data.totals.players) * 1000) / 10
+      : 0;
+  const accounts = onlyWithoutConsent
+    ? data.personaAccounts.filter(
+        (account) => account.explore_opt_in_count < account.player_count,
+      )
+    : data.personaAccounts;
+
   return (
     <div className="mx-auto max-w-5xl space-y-8 px-4 py-10 sm:px-6">
       <div>
@@ -69,8 +80,26 @@ export function PartnershipAccountsPanel() {
         </h1>
         <p className="mt-2 max-w-2xl text-sm leading-7 text-mf-text-secondary">
           Visible únicamente para Ricardo y Gustavo. Nadie más en la plataforma puede
-          abrir esta página ni la API.
+          abrir esta página ni la API. Opt-in actual:{" "}
+          <strong className="text-mf-gph-ink">{optInPct}%</strong>.
         </p>
+        <div className="mt-3 flex flex-wrap items-center gap-3">
+          <label className="inline-flex items-center gap-2 text-sm text-mf-text">
+            <input
+              type="checkbox"
+              checked={onlyWithoutConsent}
+              onChange={(event) => setOnlyWithoutConsent(event.target.checked)}
+              className="h-4 w-4 rounded border-mf-border"
+            />
+            Solo sin consentimiento / opt-in incompleto
+          </label>
+          <Link
+            href="/fut/interno/embudo"
+            className="text-sm font-semibold text-mf-gph hover:underline"
+          >
+            Embudo viral →
+          </Link>
+        </div>
       </div>
 
       <ul className="grid gap-3 sm:grid-cols-2">
@@ -123,13 +152,15 @@ export function PartnershipAccountsPanel() {
 
       <section className="space-y-3">
         <h2 className="text-lg font-semibold text-mf-gph-ink">Listado</h2>
-        {data.personaAccounts.length === 0 ? (
+        {accounts.length === 0 ? (
           <p className="text-sm text-mf-text-muted">
-            Aún no hay cuentas persona registradas.
+            {onlyWithoutConsent
+              ? "No hay cuentas pendientes de consentimiento con este filtro."
+              : "Aún no hay cuentas persona registradas."}
           </p>
         ) : (
           <ul className="divide-y divide-mf-border-subtle overflow-hidden rounded-xl border border-mf-border bg-white">
-            {data.personaAccounts.map((account) => (
+            {accounts.map((account) => (
               <li key={account.key} className="px-4 py-4 sm:px-5">
                 <div className="flex flex-wrap items-start justify-between gap-2">
                   <div className="min-w-0">

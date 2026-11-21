@@ -40,7 +40,10 @@ export function SiteHeader({
               Academia
             </Link>
           ) : null}
-          <Link href={actionHref} className="mf-btn-gph hidden sm:inline-flex">
+          <Link
+            href={actionHref}
+            className="mf-btn-gph inline-flex px-3 py-1.5 text-xs sm:px-4 sm:py-2 sm:text-sm"
+          >
             {actionLabel}
           </Link>
           <SiteNavMobile

@@ -291,8 +291,16 @@ export function ExploreDirectory({
 
           {displayPlayers.length === 0 ? (
             <div className="rounded-xl border border-dashed border-mf-border bg-white px-5 py-10 text-center text-sm text-mf-text-secondary">
-              No hay jugadores que coincidan. Las fichas las publican tutores o
-              representantes con consentimiento.
+              <p>
+                No hay jugadores que coincidan. Solo salen fichas con{" "}
+                <strong className="text-mf-text">consentimiento del tutor</strong>.
+              </p>
+              <a
+                href="/fut/entrar?next=/fut/tutor"
+                className="mf-btn-gph mt-4 inline-flex"
+              >
+                Publicar ficha con consentimiento
+              </a>
             </div>
           ) : (
             <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">

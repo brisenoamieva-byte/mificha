@@ -135,8 +135,8 @@ export function HomeTalentSearch({
             Encuentra jugadores de futbol
           </p>
           <p className="mt-2 max-w-xl text-sm leading-7 text-white/70 sm:text-base">
-            Nombre, posición, categoría, calificación GPH y rendimiento. Vista básica gratis;
-            ficha completa con Explorar Pro (gratis por tiempo limitado).
+            Para scouts: busca por nombre, posición, categoría y GPH. Para padres: arma la
+            ficha de tu hijo en ~5 min y publícala con consentimiento.
             {playerCount > 0 ? (
               <>
                 {" "}
@@ -262,8 +262,11 @@ export function HomeTalentSearch({
             >
               Ver mapa de talento
             </Link>
-            <Link href="/fut/tutor" className="text-sm text-white/70 hover:text-white">
-              Publicar ficha
+            <Link
+              href="/fut/entrar?next=/fut/tutor&utm_source=home&utm_medium=hero&utm_campaign=crear_ficha"
+              className="inline-flex items-center rounded-full bg-white px-4 py-2 text-sm font-semibold text-mf-brand transition hover:bg-white/95"
+            >
+              Armar ficha en ~5 min
             </Link>
             {!access.unlocked ? (
               <Link href="#pro" className="text-sm text-white/70 hover:text-white">

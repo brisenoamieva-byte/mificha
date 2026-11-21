@@ -108,14 +108,14 @@ export function ExplorePerformanceFilters({
 
       <div className="grid gap-2 sm:grid-cols-2">
         <MinNumberField
-          label="Mín. minutos"
+          label="Mínimo minutos"
           value={value.minMinutes ?? 0}
           onChange={(minMinutes) => patch({ minMinutes })}
           inputClass={inputClass}
           placeholder="Ej. 120"
         />
         <MinNumberField
-          label="Mín. partidos"
+          label="Mínimo partidos"
           value={value.minMatches ?? 0}
           onChange={(minMatches) => patch({ minMatches })}
           inputClass={inputClass}
@@ -125,21 +125,21 @@ export function ExplorePerformanceFilters({
 
       <div className="grid gap-2 sm:grid-cols-3">
         <MinNumberField
-          label="Mín. goles"
+          label="Mínimo goles"
           value={value.minGoals ?? 0}
           onChange={(minGoals) => patch({ minGoals })}
           inputClass={inputClass}
           placeholder="Ej. 2"
         />
         <MinNumberField
-          label="Mín. asistencias"
+          label="Mínimo asistencias"
           value={value.minAssists ?? 0}
           onChange={(minAssists) => patch({ minAssists })}
           inputClass={inputClass}
           placeholder="Ej. 1"
         />
         <MinNumberField
-          label="Mín. contribuciones (G+A)"
+          label="Mínimo contribuciones (G+A)"
           value={value.minContributions ?? 0}
           onChange={(minContributions) => patch({ minContributions })}
           inputClass={inputClass}
@@ -149,7 +149,7 @@ export function ExplorePerformanceFilters({
 
       <div className="grid gap-2 sm:grid-cols-2">
         <MinNumberField
-          label="Mín. goles / 90'"
+          label="Mínimo goles / 90'"
           value={value.minGoalsPer90 ?? 0}
           onChange={(minGoalsPer90) => patch({ minGoalsPer90 })}
           inputClass={inputClass}
@@ -158,7 +158,7 @@ export function ExplorePerformanceFilters({
           decimals={2}
         />
         <MinNumberField
-          label="Mín. asistencias / 90'"
+          label="Mínimo asistencias / 90'"
           value={value.minAssistsPer90 ?? 0}
           onChange={(minAssistsPer90) => patch({ minAssistsPer90 })}
           inputClass={inputClass}

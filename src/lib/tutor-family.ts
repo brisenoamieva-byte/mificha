@@ -609,18 +609,27 @@ export async function syncTutorChildren(
     changed = true;
   }
 
-  // Inscritos a visorías con el mismo WhatsApp → ficha tutor (sin meterlos a plantel).
-  if (phone) {
+  // Inscritos a visorías (mismo WhatsApp o mismo email) → reclamar fichas pending.
+  {
     const { listVisoriaRegistrations } = await import("@/lib/visoria-server");
     const { VISORIA_POSITIONS } = await import("@/lib/visoria-event");
     const regs = await listVisoriaRegistrations(admin).catch(() => []);
-    const matchedRegs = regs.filter(
-      (row) => phoneKey(row.guardian_phone) === phone,
-    );
+    const matchedRegs = regs.filter((row) => {
+      const rowPhone = phoneKey(row.guardian_phone);
+      const rowEmail = String(row.guardian_email || "")
+        .trim()
+        .toLowerCase();
+      if (phone && rowPhone && rowPhone === phone) return true;
+      if (email && rowEmail && rowEmail === email) return true;
+      return false;
+    });
     for (const reg of matchedRegs) {
       const playerName = (reg.player_full_name ?? "").trim();
       if (playerName.length < 2) continue;
       const key = nameKey(playerName);
+      const regEmail = String(reg.guardian_email || "")
+        .trim()
+        .toLowerCase();
       const existing =
         roster.find(
           (child) =>
@@ -630,7 +639,15 @@ export async function syncTutorChildren(
           (child) =>
             isPendingVisoriaGuardian(child.guardian_user_id) &&
             nameKey(child.player_name) === key &&
-            phoneKey(child.guardian_phone) === phone,
+            ((phone && phoneKey(child.guardian_phone) === phone) ||
+              (email &&
+                String(child.guardian_email || "")
+                  .trim()
+                  .toLowerCase() === email) ||
+              (regEmail &&
+                String(child.guardian_email || "")
+                  .trim()
+                  .toLowerCase() === regEmail)),
         );
       const positionLabel =
         VISORIA_POSITIONS.find((item) => item.value === reg.position)?.label ??
@@ -833,6 +850,9 @@ export async function createTutorChild(
 
   roster.unshift(child);
   await writeJson(admin, ROSTER, roster);
+  void import("@/lib/tutor-children-pg").then(({ upsertTutorChildRow }) =>
+    upsertTutorChildRow(admin, child),
+  );
   return child;
 }
 
@@ -893,6 +913,9 @@ export async function updateTutorChild(
   await syncLinkedPlayerNui(admin, updated);
   roster[index] = updated;
   await writeJson(admin, ROSTER, roster);
+  void import("@/lib/tutor-children-pg").then(({ upsertTutorChildRow }) =>
+    upsertTutorChildRow(admin, updated),
+  );
   return roster[index];
 }
 
@@ -1242,6 +1265,9 @@ export async function updateTutorExploreOptIn(
     };
   }
   await writeJson(admin, ROSTER, roster);
+  void import("@/lib/tutor-children-pg").then(({ upsertTutorChildRow }) =>
+    upsertTutorChildRow(admin, roster[index]),
+  );
   return roster[index];
 }
 

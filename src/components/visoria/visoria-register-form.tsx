@@ -79,6 +79,21 @@ export function VisoriaRegisterForm() {
       }
       setFolio(payload.folio);
       setPublicCode(payload.public_code ?? null);
+      const { trackProductEvent } = await import("@/lib/product-analytics");
+      trackProductEvent("visoria_register", {
+        folio: payload.folio,
+        public_code: payload.public_code ?? null,
+      });
+      if (payload.public_code) {
+        try {
+          window.sessionStorage.setItem(
+            "mf_claim_code",
+            String(payload.public_code),
+          );
+        } catch {
+          /* ignore */
+        }
+      }
     } catch {
       setError("Error de red. Revisa tu conexión e intenta otra vez.");
     } finally {
@@ -109,7 +124,10 @@ export function VisoriaRegisterForm() {
         {publicCode ? (
           <p className="mt-3 text-sm leading-7 text-mf-text-secondary">
             Con ese mismo código puedes{" "}
-            <Link href="/fut/tutor" className="font-semibold text-mf-gph hover:underline">
+            <Link
+              href={`/fut/entrar?next=${encodeURIComponent(`/fut/tutor?claim_code=${publicCode}`)}`}
+              className="font-semibold text-mf-gph hover:underline"
+            >
               completar foto e historia
             </Link>{" "}
             en la ficha del jugador.
@@ -124,7 +142,14 @@ export function VisoriaRegisterForm() {
           >
             Escribir a GPH
           </a>
-          <Link href="/fut/tutor" className="mf-btn-gph-ghost">
+          <Link
+            href={
+              publicCode
+                ? `/fut/entrar?next=${encodeURIComponent(`/fut/tutor?claim_code=${publicCode}`)}`
+                : "/fut/entrar?next=/fut/tutor"
+            }
+            className="mf-btn-gph-ghost"
+          >
             Armar ficha del jugador
           </Link>
         </div>

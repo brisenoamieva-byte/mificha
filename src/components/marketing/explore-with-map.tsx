@@ -38,6 +38,12 @@ export function ExploreWithMap({
 
   const onMapSelect = useCallback((next: { state: string; city: string }) => {
     setLocation(next);
+    void import("@/lib/product-analytics").then(({ trackProductEvent }) => {
+      trackProductEvent("map_click", {
+        state: next.state,
+        city: next.city,
+      });
+    });
     if (typeof document !== "undefined" && (next.state || next.city)) {
       window.setTimeout(() => {
         document

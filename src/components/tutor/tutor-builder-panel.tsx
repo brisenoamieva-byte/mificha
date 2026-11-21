@@ -17,7 +17,9 @@ import { PlayerPublicCodeCard } from "@/components/public/player-public-code-car
 import { TutorCareerSummaryCard } from "@/components/tutor/tutor-career-summary";
 import { TutorConsentPanel } from "@/components/tutor/tutor-consent-panel";
 import { TutorPublicFicha } from "@/components/tutor/tutor-public-ficha";
+import { TutorShareActions } from "@/components/tutor/tutor-share-actions";
 import { agentMaterialsPath } from "@/lib/agent-materials";
+import { buildTutorShareAbsoluteUrl } from "@/lib/og-tutor-share";
 import { MexicoLocationSelect } from "@/components/ui/mexico-location-select";
 import {
   defaultTutorSeasonLabel,
@@ -32,6 +34,7 @@ import {
 } from "@/lib/tutor-family";
 import {
   buildTutorProgress,
+  isExploreListingReady,
   type TutorBuilderStepId,
 } from "@/lib/tutor-ficha-progress";
 import { MEMBERSHIP_CHECKOUT_DISABLED } from "@/lib/gph-commerce";
@@ -1590,15 +1593,99 @@ export function TutorBuilderPanel({
           <section className="space-y-4 rounded-2xl border border-mf-border bg-white p-5">
             <StepHeading
               title="Publicar en Explorar"
-              detail="El link MF- siempre sirve. Para salir en el buscador hace falta tu consentimiento firmado abajo."
+              detail="Primero firma el consentimiento. Luego comparte por WhatsApp e invita a padres del equipo."
             />
-            <p className="text-sm leading-7 text-mf-text-secondary">
-              Completitud actual:{" "}
-              <span className="font-semibold text-mf-gph-ink">{progress.percent}%</span>.{" "}
-              {child.explore_opt_in
-                ? "Consentimiento activo."
-                : "Falta firmar el consentimiento para aparecer en Explorar."}
-            </p>
+            <TutorConsentPanel
+              exploreOptIn={Boolean(child.explore_opt_in)}
+              exploreOptInAt={child.explore_opt_in_at}
+              exploreConsentEvidence={child.explore_consent_evidence}
+              linkedAcademyName={child.linked_academy_name}
+              linkedNeedsAcademyConsent={Boolean(
+                child.linked_player_id &&
+                  child.linked_performance &&
+                  !child.linked_performance.isPublicFicha,
+              )}
+              busy={busy}
+              onSignExplore={(name) => onToggleExploreOptIn(true, name)}
+              onRevokeExplore={() => onToggleExploreOptIn(false)}
+              onSignAcademy={
+                onSignLinkedAcademyConsent
+                  ? (name) => onSignLinkedAcademyConsent(name)
+                  : undefined
+              }
+            />
+
+            {child.explore_opt_in &&
+            !isExploreListingReady({
+              player_name: child.player_name,
+              profile: child.profile,
+              exploreOptIn: child.explore_opt_in,
+            }) ? (
+              <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
+                <p className="text-sm font-semibold text-amber-950">
+                  Firmaste — ¿apareces en Explorar?
+                </p>
+                <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-amber-950/90">
+                  {!child.profile.position ? (
+                    <li>
+                      Falta posición —{" "}
+                      <button
+                        type="button"
+                        className="font-semibold underline"
+                        onClick={() => goToStep("cancha")}
+                      >
+                        completar
+                      </button>
+                    </li>
+                  ) : null}
+                  {!child.profile.birth_date ? (
+                    <li>
+                      Falta fecha de nacimiento —{" "}
+                      <button
+                        type="button"
+                        className="font-semibold underline"
+                        onClick={() => goToStep("identidad")}
+                      >
+                        completar
+                      </button>
+                    </li>
+                  ) : null}
+                  {!child.profile.city ? (
+                    <li>
+                      Ciudad ayuda a que te encuentren en el mapa —{" "}
+                      <button
+                        type="button"
+                        className="font-semibold underline"
+                        onClick={() => goToStep("identidad")}
+                      >
+                        agregar
+                      </button>
+                    </li>
+                  ) : null}
+                </ul>
+              </div>
+            ) : null}
+
+            {shareHref ? (
+              <TutorShareActions
+                playerName={child.player_name}
+                sharePath={shareHref}
+                absoluteUrl={buildTutorShareAbsoluteUrl(
+                  child.public_code || child.share_token,
+                )}
+                publicCode={child.public_code}
+              />
+            ) : null}
+
+            {child.public_code ? (
+              <PlayerPublicCodeCard
+                code={child.public_code}
+                onCopy={onCopyPublicCode}
+                copied={copied}
+                showOpenLink={Boolean(shareHref)}
+              />
+            ) : null}
+
             {!hasLinkedAcademy && seasons.length === 0 ? (
               <div className="rounded-xl border border-mf-gph/25 bg-mf-gph-soft px-4 py-3">
                 <p className="text-sm font-semibold text-mf-gph-ink">
@@ -1617,38 +1704,16 @@ export function TutorBuilderPanel({
                 </button>
               </div>
             ) : null}
-            {child.public_code ? (
-              <PlayerPublicCodeCard
-                code={child.public_code}
-                onCopy={onCopyPublicCode}
-                copied={copied}
-                showOpenLink={Boolean(shareHref)}
-              />
-            ) : null}
-            {shareHref ? (
-              <div className="flex flex-wrap gap-2">
-                <Link href={shareHref} target="_blank" className="mf-btn-gph">
-                  Ver ficha pública
-                </Link>
-                <button type="button" className="mf-btn-gph-ghost" onClick={onCopyShare}>
-                  {copied ? "Link copiado" : "Copiar link"}
-                </button>
-                <Link href="/fut/visorias" className="mf-btn-gph-ghost">
-                  Ir a visorías
-                </Link>
-              </div>
-            ) : null}
 
-            <div className="space-y-3 rounded-xl border border-mf-border bg-mf-canvas px-4 py-4">
-              <div>
-                <p className="text-sm font-semibold text-mf-gph-ink">
-                  Contacto en la ficha pública
-                </p>
-                <p className="mt-1 text-sm leading-6 text-mf-text-secondary">
-                  Apagado por defecto. Activa solo lo que quieras que vea un representante o
-                  academia.
-                </p>
-              </div>
+            <details className="rounded-xl border border-mf-border bg-mf-canvas px-4 py-3">
+              <summary className="cursor-pointer text-sm font-semibold text-mf-gph-ink">
+                Contacto en la ficha pública (opcional)
+              </summary>
+              <div className="mt-3 space-y-3">
+              <p className="text-sm leading-6 text-mf-text-secondary">
+                Apagado por defecto. Activa solo lo que quieras que vea un representante o
+                academia.
+              </p>
               <label className="flex cursor-pointer items-start gap-2.5 text-sm text-mf-text">
                 <input
                   type="checkbox"
@@ -1742,27 +1807,30 @@ export function TutorBuilderPanel({
               >
                 Guardar contacto público
               </button>
-            </div>
+              </div>
+            </details>
 
-            <TutorConsentPanel
-              exploreOptIn={Boolean(child.explore_opt_in)}
-              exploreOptInAt={child.explore_opt_in_at}
-              exploreConsentEvidence={child.explore_consent_evidence}
-              linkedAcademyName={child.linked_academy_name}
-              linkedNeedsAcademyConsent={Boolean(
-                child.linked_player_id &&
-                  child.linked_performance &&
-                  !child.linked_performance.isPublicFicha,
-              )}
-              busy={busy}
-              onSignExplore={(name) => onToggleExploreOptIn(true, name)}
-              onRevokeExplore={() => onToggleExploreOptIn(false)}
-              onSignAcademy={
-                onSignLinkedAcademyConsent
-                  ? (name) => onSignLinkedAcademyConsent(name)
-                  : undefined
-              }
-            />
+            <details className="rounded-xl border border-mf-border bg-mf-canvas px-4 py-3">
+              <summary className="cursor-pointer text-sm font-semibold text-mf-gph-ink">
+                Diagnóstico GPH (opcional)
+              </summary>
+              <div className="mt-3">
+                <p className="text-sm leading-6 text-mf-text-secondary">
+                  Se agenda por WhatsApp y el informe queda ligado a esta ficha.
+                </p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <Link
+                    href={`/fut/pagar?sku=diagnosis&player=${encodeURIComponent(child.player_name)}`}
+                    className="mf-btn-gph"
+                  >
+                    Pagar diagnóstico
+                  </Link>
+                  <Link href="/fut/evaluaciones" className="mf-btn-gph-ghost">
+                    Ver detalle
+                  </Link>
+                </div>
+              </div>
+            </details>
 
             {child.view_stats && child.view_stats.total_views > 0 ? (
               <p className="text-sm leading-6 text-mf-text-secondary">
@@ -1783,25 +1851,6 @@ export function TutorBuilderPanel({
                 Cuando alguien abra el link, aquí verás las visitas.
               </p>
             )}
-            <div className="rounded-xl border border-mf-gph/25 bg-mf-gph-soft px-4 py-4">
-              <p className="text-sm font-semibold text-mf-gph-ink">
-                ¿Quieres el diagnóstico GPH de {child.player_name}?
-              </p>
-              <p className="mt-1 text-sm leading-6 text-mf-text-secondary">
-                Se agenda por WhatsApp y el informe queda ligado a esta ficha.
-              </p>
-              <div className="mt-3 flex flex-wrap gap-2">
-                <Link
-                  href={`/fut/pagar?sku=diagnosis&player=${encodeURIComponent(child.player_name)}`}
-                  className="mf-btn-gph"
-                >
-                  Pagar diagnóstico
-                </Link>
-                <Link href="/fut/evaluaciones" className="mf-btn-gph-ghost">
-                  Ver detalle
-                </Link>
-              </div>
-            </div>
           </section>
         ) : null}
         </div>

@@ -19,25 +19,25 @@ export function HomeCtaBand() {
             Piloto · familias
           </p>
           <h2 className="mt-2 text-xl font-semibold tracking-[-0.02em] text-white sm:text-2xl">
-            Ficha, seguimiento y visibilidad ante agentes
+            Arma la ficha de tu hijo en minutos
           </h2>
           <p className="mt-2 text-sm leading-6 text-white/80">
-            Llena la ficha de tu hijo en MiFicha. En Explorar te buscan agentes de futbol.
+            Gratis para familias. Con consentimiento aparece en Explorar ante agentes.
           </p>
         </div>
         <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:flex-wrap">
           <Link
-            href="/fut/pagar?sku=diagnosis"
+            href="/fut/entrar?next=/fut/tutor&utm_source=home&utm_medium=cta&utm_campaign=crear_ficha"
             className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-mf-gph px-6 py-3 text-sm font-semibold text-white transition hover:bg-mf-gph-hot sm:w-auto"
           >
-            Contratar diagnóstico
+            Armar ficha en ~5 min
             <ArrowRight className="h-4 w-4" />
           </Link>
           <Link
-            href="/fut/tutor"
+            href="/fut/pagar?sku=diagnosis"
             className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-mf-brand transition hover:bg-white/95 sm:w-auto"
           >
-            Entrar como tutor
+            Diagnóstico GPH
           </Link>
         </div>
       </div>

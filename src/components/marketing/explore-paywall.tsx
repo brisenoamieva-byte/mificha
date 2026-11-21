@@ -107,6 +107,8 @@ export function FichaLockedTeaser({
   loginHref,
   returnPath,
   loggedIn = false,
+  /** Bajo la ficha pública: upsell suave sin ocultar la ficha. */
+  compactUpsell = false,
 }: {
   name: string;
   position?: string | null;
@@ -119,12 +121,45 @@ export function FichaLockedTeaser({
   returnPath?: string | null;
   /** Sesión activa: no pedir Entrar ni «necesitas cuenta». */
   loggedIn?: boolean;
+  compactUpsell?: boolean;
 }) {
   const copy = personaMembershipPublicCopy();
   const afterActivate = returnPath || "/fut/tutor";
   const enterHref =
     loginHref || `/fut/entrar?next=${encodeURIComponent(afterActivate)}`;
   const publicName = formatPublicLockedName(name);
+
+  if (compactUpsell) {
+    return (
+      <div className="mt-5 rounded-2xl border border-mf-border bg-white px-4 py-4 sm:px-5">
+        <p className="text-sm font-semibold text-mf-gph-ink">
+          ¿Quieres armar la ficha de tu jugador?
+        </p>
+        <p className="mt-1 text-sm leading-6 text-mf-text-secondary">
+          Esta vista es pública y gratuita. Contacto y kit de agentes se abren con
+          Explorar Pro{PERSONA_MEMBERSHIP_FREE_PROMO ? ` (${copy.short})` : ""}.
+        </p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <Link
+            href="/fut/entrar?next=/fut/tutor"
+            className="mf-btn-gph"
+          >
+            Crear mi ficha
+          </Link>
+          {loggedIn ? null : (
+            <Link href={enterHref} className="mf-btn-gph-ghost">
+              Entrar
+            </Link>
+          )}
+          <PersonaMembershipCta
+            variant="ghost"
+            nextPath={afterActivate}
+            loggedIn={loggedIn}
+          />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="overflow-hidden rounded-2xl border border-mf-border bg-white">

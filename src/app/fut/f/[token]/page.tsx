@@ -150,49 +150,21 @@ export default async function TutorShareFichaPage({ params }: PageProps) {
     );
   }
 
+  // Share link = vista pública gratuita (viral). Explorar Pro solo desbloquea kit/contacto extra.
   const accessGate = await resolveExploreAccess({
     ownerUserId: child.guardian_user_id,
   });
 
-  if (!accessGate.unlocked) {
-    const place = [child.profile.club || child.profile.school, child.profile.city]
-      .filter(Boolean)
-      .join(" · ");
-    const loginHref = `/fut/entrar?next=${encodeURIComponent(sharePath)}`;
-    return (
-      <div className="flex min-h-dvh flex-col bg-mf-canvas">
-        <TutorFichaViewTracker token={access || token} />
-        <SiteHeader actionHref="/fut/tutor" actionLabel="Mis fichas" />
-        <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-8 sm:px-6 sm:py-12">
-          <FichaLockedTeaser
-            name={playerName}
-            position={child.profile.position}
-            category={formatPlayerCategory(child.profile.birth_date)}
-            place={place || null}
-            code={child.public_code}
-            loginHref={loginHref}
-            returnPath={sharePath}
-            loggedIn={Boolean(accessGate.userId)}
-          />
-          <p className="mt-6 text-center text-xs leading-6 text-mf-text-muted">
-            Busca más jugadores en{" "}
-            <Link href="/fut/explorar" className="font-semibold text-mf-gph hover:underline">
-              Explorar
-            </Link>
-          </p>
-        </main>
-        <SiteFooter />
-      </div>
-    );
-  }
-
   const materials = await listTutorMaterials(admin, child);
   const seasons = await listTutorSeasons(admin, child);
   const performance = await fetchTutorLinkedPerformance(admin, child);
-  const academyContact = child.profile.show_contact_academy
-    ? await fetchTutorLinkedAcademyContact(admin, child.linked_academy_id)
+  const academyContact =
+    accessGate.unlocked && child.profile.show_contact_academy
+      ? await fetchTutorLinkedAcademyContact(admin, child.linked_academy_id)
+      : null;
+  const contact = accessGate.unlocked
+    ? resolveTutorPublicContact(child, academyContact)
     : null;
-  const contact = resolveTutorPublicContact(child, academyContact);
 
   return (
     <div className="flex min-h-dvh flex-col bg-mf-canvas">
@@ -215,12 +187,30 @@ export default async function TutorShareFichaPage({ params }: PageProps) {
             sharePath={sharePath}
             absoluteUrl={absoluteUrl}
             publicCode={child.public_code}
-            materialsKitHref={agentMaterialsPath(agentMaterialsAccess(child))}
+            materialsKitHref={
+              accessGate.unlocked
+                ? agentMaterialsPath(agentMaterialsAccess(child))
+                : null
+            }
           />
         </div>
 
         <PlayerCodeConnections resolution={resolution} className="mt-5" />
-        {!performance?.gph ? (
+        {!accessGate.unlocked ? (
+          <FichaLockedTeaser
+            name={playerName}
+            position={child.profile.position}
+            category={formatPlayerCategory(child.profile.birth_date)}
+            place={[child.profile.club || child.profile.school, child.profile.city]
+              .filter(Boolean)
+              .join(" · ") || null}
+            code={child.public_code}
+            loginHref={`/fut/entrar?next=${encodeURIComponent(sharePath)}`}
+            returnPath={sharePath}
+            loggedIn={Boolean(accessGate.userId)}
+            compactUpsell
+          />
+        ) : !performance?.gph ? (
           <DiagnosisHireCard playerName={playerName} className="mt-5" compact />
         ) : null}
 
@@ -232,7 +222,10 @@ export default async function TutorShareFichaPage({ params }: PageProps) {
               ? " · con rendimiento capturado por el tutor"
               : ""}
           {" · "}
-          <Link href="/fut/tutor" className="font-semibold text-mf-gph hover:underline">
+          <Link
+            href="/fut/entrar?next=/fut/tutor"
+            className="font-semibold text-mf-gph hover:underline"
+          >
             Crear la tuya
           </Link>
         </p>
