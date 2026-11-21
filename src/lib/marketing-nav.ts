@@ -149,6 +149,11 @@ export const MARKETING_NAV: NavSection[] = [
 /** Enlaces secundarios (menú “Más”). Sin “Entrar”: ya está el botón del header. */
 export const MARKETING_SECONDARY_LINKS: NavLink[] = [
   {
+    href: "/fut/explorar#mapa",
+    label: "Mapa de talento",
+    description: "De dónde son las fichas en MiFicha",
+  },
+  {
     href: "/fut/#como-funciona",
     label: "Cómo funciona",
     description: "Buscar gratis, publicar ficha, membresía",

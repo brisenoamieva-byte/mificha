@@ -74,6 +74,13 @@ export default async function Home() {
               </p>
             </div>
             <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap">
+              <Link
+                href="/fut/explorar#mapa"
+                className="mf-btn-gph-ghost w-full justify-center sm:w-auto"
+              >
+                Mapa de talento
+                <ArrowRight className="h-4 w-4" />
+              </Link>
               <Link href="/fut/planes" className="mf-btn-gph w-full justify-center sm:w-auto">
                 Ver planes
                 <ArrowRight className="h-4 w-4" />

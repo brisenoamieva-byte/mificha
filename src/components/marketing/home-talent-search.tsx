@@ -255,24 +255,22 @@ export function HomeTalentSearch({
             ) : null}
           </form>
 
-          <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-white/70">
-            <Link href="/fut/tutor" className="hover:text-white">
+          <div className="mt-5 flex flex-wrap items-center gap-3">
+            <Link
+              href="/fut/explorar#mapa"
+              className="inline-flex items-center gap-2 rounded-full border border-emerald-300/40 bg-emerald-400/10 px-4 py-2 text-sm font-semibold text-emerald-200 transition hover:border-emerald-300/70 hover:bg-emerald-400/15 hover:text-white"
+            >
+              Ver mapa de talento
+            </Link>
+            <Link href="/fut/tutor" className="text-sm text-white/70 hover:text-white">
               Publicar ficha
             </Link>
             {!access.unlocked ? (
-              <>
-                <span className="hidden text-white/30 sm:inline" aria-hidden>
-                  ·
-                </span>
-                <Link href="#pro" className="hover:text-white">
-                  Explorar Pro gratis
-                </Link>
-              </>
+              <Link href="#pro" className="text-sm text-white/70 hover:text-white">
+                Explorar Pro gratis
+              </Link>
             ) : null}
-            <span className="hidden text-white/30 sm:inline" aria-hidden>
-              ·
-            </span>
-            <a href="#directorio" className="font-semibold text-emerald-300 hover:text-emerald-200">
+            <a href="#directorio" className="text-sm font-semibold text-white/80 hover:text-white">
               Ver resultados
             </a>
           </div>
