@@ -4,7 +4,7 @@ import { ORGANIZER_ONE_PAGER } from "@/lib/organizer-one-pager";
 
 export function OrganizerDemoSection() {
   return (
-    <section id="como-funciona" className="scroll-mt-24 border-b border-mf-border bg-mf-canvas">
+    <section id="como-funciona-organizadores" className="scroll-mt-24 border-b border-mf-border bg-mf-canvas">
       <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:py-16">
         <div className="max-w-2xl">
           <p className="mf-marketing-eyebrow">Cómo funciona</p>

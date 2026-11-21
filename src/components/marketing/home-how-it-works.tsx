@@ -23,7 +23,7 @@ const STEPS = [
 
 export function HomeHowItWorks() {
   return (
-    <section id="como-funciona" className="scroll-mt-20 border-b border-mf-border bg-mf-canvas">
+    <section id="como-funciona" className="scroll-mt-24 border-b border-mf-border bg-mf-canvas">
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-12">
         <div className="max-w-2xl">
           <p className="mf-marketing-eyebrow">Cómo funciona</p>

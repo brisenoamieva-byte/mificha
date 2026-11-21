@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { ChevronDown, Menu, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type MouseEvent } from "react";
 import { createPortal } from "react-dom";
 import { MARKETING_NAV, MARKETING_SECONDARY_LINKS } from "@/lib/marketing-nav";
 import { cn } from "@/lib/utils";
@@ -34,6 +34,26 @@ function NavLinks({
             ) : null}
           </>
         );
+        const hashIdx = link.href.indexOf("#");
+        const hashId = hashIdx >= 0 ? link.href.slice(hashIdx + 1) : "";
+        const pathOnly =
+          hashIdx >= 0 ? link.href.slice(0, hashIdx) : link.href;
+
+        function handleHashClick(event: MouseEvent<HTMLAnchorElement>) {
+          onNavigate?.();
+          if (!hashId || typeof window === "undefined") return;
+          const current = window.location.pathname.replace(/\/$/, "") || "/";
+          const target = (pathOnly || "/fut").replace(/\/$/, "") || "/";
+          if (current === target || current.endsWith(target)) {
+            event.preventDefault();
+            const el = document.getElementById(hashId);
+            if (el) {
+              el.scrollIntoView({ behavior: "smooth", block: "start" });
+              window.history.replaceState(null, "", `#${hashId}`);
+            }
+          }
+        }
+
         return external ? (
           <a
             key={link.href + link.label}
@@ -42,6 +62,15 @@ function NavLinks({
             target="_blank"
             rel="noopener noreferrer"
             onClick={onNavigate}
+          >
+            {body}
+          </a>
+        ) : hashId ? (
+          <a
+            key={link.href + link.label}
+            href={link.href}
+            className={className}
+            onClick={handleHashClick}
           >
             {body}
           </a>

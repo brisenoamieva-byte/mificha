@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { ExplorePageHero } from "@/components/marketing/explore-page-hero";
 import { ExplorePaywallBanner } from "@/components/marketing/explore-paywall";
 import { ExploreWithMap } from "@/components/marketing/explore-with-map";
+import { HashScroll } from "@/components/marketing/hash-scroll";
 import { ProductAnalyticsBeacon } from "@/components/marketing/product-analytics-beacon";
 import { SiteFooter, SiteHeader } from "@/components/marketing/site-header";
 import { countExploreDirectoryAcademies, countExploreDirectoryPlayers } from "@/lib/explore-demo-data";
@@ -78,6 +79,7 @@ export default async function ExplorarPage({
   return (
     <div className="flex min-h-dvh flex-col bg-mf-canvas">
       <SiteHeader actionHref="/fut/tutor" actionLabel="Mis fichas" />
+      <HashScroll />
 
       <main className="flex-1">
         <ProductAnalyticsBeacon event="view_explorar" />

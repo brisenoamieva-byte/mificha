@@ -171,7 +171,7 @@ export const MARKETING_SECONDARY_LINKS: NavLink[] = [
     description: "De dónde son las fichas en MiFicha",
   },
   {
-    href: "/fut/#como-funciona",
+    href: "/fut#como-funciona",
     label: "Cómo funciona",
     description: "Buscar gratis, publicar ficha, membresía",
   },
