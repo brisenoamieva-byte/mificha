@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { ExplorePageHero } from "@/components/marketing/explore-page-hero";
-import { ExploreDirectory } from "@/components/marketing/explore-directory";
 import { ExplorePaywallBanner } from "@/components/marketing/explore-paywall";
+import { ExploreWithMap } from "@/components/marketing/explore-with-map";
 import { SiteFooter, SiteHeader } from "@/components/marketing/site-header";
 import { countExploreDirectoryAcademies, countExploreDirectoryPlayers } from "@/lib/explore-demo-data";
 import {
@@ -10,6 +10,7 @@ import {
 } from "@/lib/public-directory";
 import { resolveExploreAccess } from "@/lib/scout-access";
 import { createSupabaseAdminClient } from "@/lib/supabase-admin";
+import { emptyTalentGeoHeat, fetchTalentGeoHeat } from "@/lib/talent-geo";
 import { fetchTutorDirectoryPlayers } from "@/lib/tutor-directory";
 
 export const metadata: Metadata = {
@@ -37,7 +38,7 @@ export default async function ExplorarPage({
   const initialCity = firstParam(params.city);
   const initialCategory = firstParam(params.category);
 
-  const [data, tutorPlayers, access] = await Promise.all([
+  const [data, tutorPlayers, access, heat] = await Promise.all([
     fetchPublicDirectory().catch(() => ({ academies: [], players: [] })),
     (async () => {
       try {
@@ -48,6 +49,14 @@ export default async function ExplorarPage({
       }
     })(),
     resolveExploreAccess(),
+    (async () => {
+      try {
+        const admin = createSupabaseAdminClient();
+        return await fetchTalentGeoHeat(admin);
+      } catch {
+        return emptyTalentGeoHeat();
+      }
+    })(),
   ]);
 
   const academySlugs = new Set(data.players.map((player) => player.slug));
@@ -72,13 +81,11 @@ export default async function ExplorarPage({
       <main className="flex-1">
         <ExplorePageHero playerCount={playerCount} academyCount={academyCount} />
 
-        <section
-          id="directorio"
-          className="scroll-mt-20 mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:py-14"
-        >
+        <section className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:py-14">
           <ExplorePaywallBanner access={access} />
-          <ExploreDirectory
+          <ExploreWithMap
             data={directory}
+            heat={heat}
             initialCategoryFilter={initialCategoryFilter}
             unlocked={access.unlocked}
             initialQuery={initialQuery}

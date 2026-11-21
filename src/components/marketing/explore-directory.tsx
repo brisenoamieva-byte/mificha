@@ -41,6 +41,10 @@ interface ExploreDirectoryProps {
   initialPosition?: string;
   initialState?: string;
   initialCity?: string;
+  /** Modo controlado (mapa de calor → filtros). */
+  locationState?: string;
+  locationCity?: string;
+  onLocationChange?: (next: { state: string; city: string }) => void;
 }
 
 function parseInitialPosition(value?: string): PlayerPosition | "all" {
@@ -71,14 +75,34 @@ export function ExploreDirectory({
   initialPosition,
   initialState = "",
   initialCity = "",
+  locationState,
+  locationCity,
+  onLocationChange,
 }: ExploreDirectoryProps) {
   const [query, setQuery] = useState(initialQuery);
   const [position, setPosition] = useState<PlayerPosition | "all">(
     parseInitialPosition(initialPosition),
   );
   const [minPassport, setMinPassport] = useState(0);
-  const [state, setState] = useState(initialState);
-  const [city, setCity] = useState(initialCity);
+  const [internalState, setInternalState] = useState(initialState);
+  const [internalCity, setInternalCity] = useState(initialCity);
+  const controlled = typeof onLocationChange === "function";
+  const state = controlled ? (locationState ?? "") : internalState;
+  const city = controlled ? (locationCity ?? "") : internalCity;
+  const setState = (nextState: string) => {
+    if (controlled) {
+      onLocationChange({ state: nextState, city: nextState ? city : "" });
+      return;
+    }
+    setInternalState(nextState);
+  };
+  const setCity = (nextCity: string) => {
+    if (controlled) {
+      onLocationChange({ state, city: nextCity });
+      return;
+    }
+    setInternalCity(nextCity);
+  };
   const [categoryFilter, setCategoryFilter] = useState(initialCategoryFilter);
   const [performance, setPerformance] = useState<DirectoryPerformanceFilter>(
     DEFAULT_PERFORMANCE_FILTER,
@@ -132,7 +156,8 @@ export function ExploreDirectory({
     <div className="space-y-6">
       <div className="mf-card p-4 sm:p-5">
         <p className="text-sm text-mf-text-secondary">
-          Solo fichas con consentimiento · {CURRENT_SEASON_LABEL} ·{" "}
+          Solo fichas con <strong className="font-semibold text-mf-text">consentimiento del tutor</strong>{" "}
+          · {CURRENT_SEASON_LABEL} ·{" "}
           <span className="tabular-nums font-medium text-mf-text">
             {displayPlayers.length}
           </span>{" "}
@@ -144,7 +169,8 @@ export function ExploreDirectory({
           categoryFilter !== "all" ||
           hasActivePerformanceFilter(performance)
             ? " con este filtro"
-            : " en el buscador"}
+            : " visibles ahora"}
+          . Hay más fichas en MiFicha; sin firma no salen aquí.
         </p>
 
         <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-6">

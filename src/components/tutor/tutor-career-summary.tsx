@@ -120,7 +120,7 @@ export function TutorCareerSummaryCard({
               {typeof exploreOptIn === "boolean"
                 ? exploreOptIn
                   ? " · visible en Explorar"
-                  : " · solo con link"
+                  : " · oculta en Explorar (falta consentimiento)"
                 : ""}
             </p>
           </div>

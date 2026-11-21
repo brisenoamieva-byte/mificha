@@ -11,7 +11,7 @@ export const PRIVACY_COPY = {
     "Confirmo contar con autorización del padre, madre o tutor para tratar y compartir los datos deportivos de este menor conforme al aviso de privacidad.",
   /** Panel tutor: el firmante declara ser el padre/madre/tutor. */
   tutorConsentLabel:
-    "Soy el padre, la madre o el tutor legal de este jugador y autorizo a MiFicha a tratar y compartir sus datos deportivos para mostrar la ficha en Explorar, conforme al aviso de privacidad.",
+    "Soy el padre, la madre o el tutor legal de este jugador y autorizo a MiFicha a publicar su ficha en Explorar (buscador de talento) y a tratar sus datos deportivos conforme al aviso de privacidad. Sin esta autorización, la ficha no aparece en el directorio.",
   publicProfileLabel:
     "Ficha accesible por link (no indexada en buscadores; solo quien tenga el enlace).",
   discoverableLabel:

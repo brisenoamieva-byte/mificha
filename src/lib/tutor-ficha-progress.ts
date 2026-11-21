@@ -18,6 +18,8 @@ export interface TutorProgressInput {
   materials: Array<{ kind: TutorMaterialKind }>;
   seasons?: Array<Pick<TutorSeasonStat, "matches" | "minutes" | "tournament_name">>;
   hasLinkedAcademy?: boolean;
+  /** Sin esto la ficha no aparece en /fut/explorar. */
+  exploreOptIn?: boolean;
 }
 
 export interface TutorProgressStep {
@@ -87,12 +89,11 @@ export function buildTutorProgress(input: TutorProgressInput) {
     },
     {
       id: "compartir",
-      label: "Lista para compartir",
-      hint: "Foto + historia + números (o academia ligada)",
-      done:
-        Boolean(input.player_name.trim() && profile.position && profile.bio?.trim()) &&
-        photos > 0 &&
-        (Boolean(input.hasLinkedAcademy) || hasManualStats),
+      label: "Publicar en Explorar",
+      hint: input.exploreOptIn
+        ? "Consentimiento activo · visible en el buscador"
+        : "Falta tu consentimiento: sin firmar, no aparece en Explorar",
+      done: Boolean(input.exploreOptIn),
       weight: 10,
     },
   ];

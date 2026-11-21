@@ -75,7 +75,7 @@ export function ExplorePageHero({ playerCount, academyCount }: ExplorePageHeroPr
 
             <ul className="mt-6 flex flex-wrap gap-2">
               {[
-                { icon: ShieldCheck, label: "Consentimiento (opt-in)" },
+                { icon: ShieldCheck, label: "Solo con consentimiento del tutor" },
                 { icon: FileUser, label: "Ficha de tutor o representante" },
                 { icon: MapPin, label: "Filtro por ciudad" },
               ].map(({ icon: Icon, label }) => (
@@ -89,13 +89,21 @@ export function ExplorePageHero({ playerCount, academyCount }: ExplorePageHeroPr
               ))}
             </ul>
 
-            <Link
-              href="#directorio"
-              className="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-mf-brand transition hover:text-mf-brand-dark"
-            >
-              Ir al directorio
-              <ArrowDown className="h-4 w-4" aria-hidden />
-            </Link>
+            <div className="mt-8 flex flex-wrap items-center gap-4">
+              <Link
+                href="#mapa"
+                className="inline-flex items-center gap-2 text-sm font-semibold text-mf-brand transition hover:text-mf-brand-dark"
+              >
+                Ver mapa de talento
+                <ArrowDown className="h-4 w-4" aria-hidden />
+              </Link>
+              <Link
+                href="#directorio"
+                className="text-sm font-medium text-mf-text-secondary transition hover:text-mf-text"
+              >
+                Ir al directorio
+              </Link>
+            </div>
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
@@ -103,7 +111,7 @@ export function ExplorePageHero({ playerCount, academyCount }: ExplorePageHeroPr
               icon={Users}
               value={String(playerCount)}
               label="Jugadores en directorio"
-              hint="Fichas publicadas con consentimiento"
+              hint="Con consentimiento firmado · el resto no se lista"
               accent="brand"
             />
             <StatCard

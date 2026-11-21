@@ -292,9 +292,11 @@ export function TutorBuilderPanel({
         materials: child.materials,
         seasons,
         hasLinkedAcademy,
+        exploreOptIn: Boolean(child.explore_opt_in),
       }),
     [
       hasLinkedAcademy,
+      child.explore_opt_in,
       child.materials,
       child.player_name,
       draftProfile,
@@ -416,18 +418,31 @@ export function TutorBuilderPanel({
             </button>
           ) : null}
           {!child.explore_opt_in ? (
-            <p className="mt-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs leading-5 text-amber-950">
-              Sin consentimiento: no aparece en Explorar. Firma abajo en{" "}
+            <div className="mt-4 rounded-xl border-2 border-amber-300 bg-amber-50 px-4 py-3 text-amber-950">
+              <p className="text-sm font-semibold">
+                Esta ficha no se ve en Explorar
+              </p>
+              <p className="mt-1 text-sm leading-6">
+                El link MF- sí funciona si lo compartes. Para que agentes y scouts la
+                encuentren en el buscador, necesitas firmar el consentimiento.
+              </p>
               <button
                 type="button"
-                className="font-semibold underline"
                 onClick={() => goToStep("compartir")}
+                className="mf-btn-gph mt-3 w-full sm:w-auto"
               >
-                Compartir
+                Firmar consentimiento
               </button>
+            </div>
+          ) : (
+            <p className="mt-3 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs leading-5 text-emerald-900">
+              Consentimiento activo: puede aparecer en{" "}
+              <a href="/fut/explorar" className="font-semibold underline">
+                Explorar
+              </a>
               .
             </p>
-          ) : null}
+          )}
         </div>
 
         <TutorPublicFicha
@@ -1574,15 +1589,15 @@ export function TutorBuilderPanel({
         {step === "compartir" ? (
           <section className="space-y-4 rounded-2xl border border-mf-border bg-white p-5">
             <StepHeading
-              title="Compartir la ficha"
-              detail="Ideal: foto, historia y al menos un torneo (o academia ligada)."
+              title="Publicar en Explorar"
+              detail="El link MF- siempre sirve. Para salir en el buscador hace falta tu consentimiento firmado abajo."
             />
             <p className="text-sm leading-7 text-mf-text-secondary">
               Completitud actual:{" "}
               <span className="font-semibold text-mf-gph-ink">{progress.percent}%</span>.{" "}
-              {progress.percent >= 90
-                ? "Lista para presentar."
-                : `Siguiente: ${progress.next.label.toLowerCase()}.`}
+              {child.explore_opt_in
+                ? "Consentimiento activo."
+                : "Falta firmar el consentimiento para aparecer en Explorar."}
             </p>
             {!hasLinkedAcademy && seasons.length === 0 ? (
               <div className="rounded-xl border border-mf-gph/25 bg-mf-gph-soft px-4 py-3">

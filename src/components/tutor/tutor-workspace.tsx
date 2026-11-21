@@ -1306,11 +1306,22 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
                 }}
                 className={
                   item.id === child?.id
-                    ? "rounded-full bg-mf-gph px-4 py-2 text-sm font-semibold text-white"
-                    : "rounded-full border border-mf-border bg-white px-4 py-2 text-sm font-semibold text-mf-gph-ink"
+                    ? "inline-flex items-center gap-2 rounded-full bg-mf-gph px-4 py-2 text-sm font-semibold text-white"
+                    : "inline-flex items-center gap-2 rounded-full border border-mf-border bg-white px-4 py-2 text-sm font-semibold text-mf-gph-ink"
                 }
               >
-                {item.player_name}
+                <span>{item.player_name}</span>
+                <span
+                  className={
+                    item.id === child?.id
+                      ? "rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white"
+                      : item.explore_opt_in
+                        ? "rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-emerald-800"
+                        : "rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-900"
+                  }
+                >
+                  {item.explore_opt_in ? "En Explorar" : "Oculta"}
+                </span>
               </button>
             ))}
             <button

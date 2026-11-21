@@ -47,19 +47,55 @@ export function TutorConsentPanel({
     <div className="space-y-3 rounded-xl border border-mf-border bg-mf-canvas px-4 py-4">
       <div>
         <p className="text-sm font-semibold text-mf-gph-ink">
-          Consentimiento · compartir ficha
+          Consentimiento para Explorar
         </p>
         <p className="mt-1 text-sm leading-6 text-mf-text-secondary">
-          Sin tu aprobación, la ficha <strong>no</strong> aparece en Explorar ni se promociona.
-          El link directo (código MF-) sigue funcionando para quien ya lo tenga.
+          Sin esta firma, la ficha <strong>no aparece</strong> en el buscador de
+          talento. Crear la ficha no es suficiente: hay que autorizar su publicación.
         </p>
       </div>
+
+      <ul className="grid gap-2 text-sm sm:grid-cols-2">
+        <li className="rounded-lg border border-mf-border bg-white px-3 py-2.5">
+          <p className="font-semibold text-mf-gph-ink">Siempre funciona</p>
+          <p className="mt-1 leading-5 text-mf-text-secondary">
+            El link / código MF- que tú compartes (WhatsApp, academia, etc.).
+          </p>
+        </li>
+        <li
+          className={cn(
+            "rounded-lg border px-3 py-2.5",
+            exploreOptIn
+              ? "border-emerald-200 bg-emerald-50"
+              : "border-amber-200 bg-amber-50",
+          )}
+        >
+          <p
+            className={cn(
+              "font-semibold",
+              exploreOptIn ? "text-emerald-950" : "text-amber-950",
+            )}
+          >
+            {exploreOptIn ? "Visible en Explorar" : "Oculta en Explorar"}
+          </p>
+          <p
+            className={cn(
+              "mt-1 leading-5",
+              exploreOptIn ? "text-emerald-900/85" : "text-amber-950/85",
+            )}
+          >
+            {exploreOptIn
+              ? "Agentes y scouts pueden encontrarla en el directorio."
+              : "Nadie la encuentra en el buscador hasta que firmes abajo."}
+          </p>
+        </li>
+      </ul>
 
       {exploreOptIn ? (
         <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2.5 text-sm text-emerald-900">
           Consentimiento activo
-          {signedAt ? ` · firmado ${signedAt}` : ""}. Visible en el buscador si la ficha tiene
-          contenido suficiente.
+          {signedAt ? ` · firmado ${signedAt}` : ""}. Visible en el buscador si la ficha
+          tiene datos básicos (nombre, categoría, posición).
           {exploreConsentEvidence?.acceptor_name ? (
             <p className="mt-1 text-xs leading-5 text-emerald-900/80">
               Firmado por {exploreConsentEvidence.acceptor_name}
@@ -83,10 +119,10 @@ export function TutorConsentPanel({
           </div>
         </div>
       ) : (
-        <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2.5 text-sm text-amber-950">
-          <p className="font-semibold">Sin consentimiento para Explorar</p>
+        <div className="rounded-lg border border-amber-300 bg-amber-50 px-3 py-3 text-sm text-amber-950">
+          <p className="font-semibold text-base">Firma para publicar en Explorar</p>
           <p className="mt-1 leading-6">
-            Actívalo solo si autorizas tratar y compartir los datos deportivos del jugador
+            Autorizas a MiFicha a mostrar la ficha del jugador en el directorio público,
             conforme al{" "}
             <Link href={LEGAL_ROUTES.privacy} className="font-semibold underline">
               aviso de privacidad
@@ -118,12 +154,15 @@ export function TutorConsentPanel({
             disabled={busy || !canSign}
             onClick={() => void onSignExplore(acceptorName.trim())}
             className={cn(
-              "mf-btn-gph mt-3",
+              "mf-btn-gph mt-3 w-full sm:w-auto",
               (busy || !canSign) && "pointer-events-none opacity-50",
             )}
           >
             Firmar y publicar en Explorar
           </button>
+          <p className="mt-2 text-xs leading-5 text-amber-900/75">
+            Puedes retirar el consentimiento cuando quieras. El link MF- sigue activo.
+          </p>
         </div>
       )}
 
