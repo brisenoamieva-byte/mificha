@@ -1,12 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import {
-  CalendarDays,
-  ClipboardList,
-  Megaphone,
-  Newspaper,
-  Package,
-  Sparkles,
-} from "lucide-react";
+import { ClipboardList, Sparkles, Users } from "lucide-react";
 import { CRACKS_TRYOUTS_PATH } from "@/lib/cracks-tryouts";
 import { GPH_SAMPLE_CLASS, trainingBookingHref } from "@/lib/gph-alliance";
 import { GPH_PACHUCA_PATH } from "@/lib/gph-pachuca-segunda-fase";
@@ -34,14 +27,14 @@ export interface NavSection {
 }
 
 /**
- * IA marketing limpia — sin duplicar el buscador de la home ni mezclar roles.
- * Orden = prioridad en el menú.
+ * Menú por intención: Padres / Soluciones / Comunidad.
+ * CTA principales viven en el header (Entrar / Armar ficha).
  */
 export const MARKETING_NAV: NavSection[] = [
   {
     id: "padres",
     label: "Padres",
-    icon: Package,
+    icon: Users,
     links: [
       {
         href: "/fut/entrar?next=/fut/tutor",
@@ -66,8 +59,8 @@ export const MARKETING_NAV: NavSection[] = [
     ],
   },
   {
-    id: "planes",
-    label: "Planes",
+    id: "soluciones",
+    label: "Soluciones",
     icon: Sparkles,
     links: [
       {
@@ -81,18 +74,6 @@ export const MARKETING_NAV: NavSection[] = [
         description: "Calendario, acta y datos conectados a fichas",
       },
       {
-        href: "/fut/captacion",
-        label: "Captación multi-estado",
-        description: "Plantillas para academias y torneos fuera de QRO",
-      },
-    ],
-  },
-  {
-    id: "productos",
-    label: "Productos",
-    icon: Package,
-    links: [
-      {
         href: "/fut/evaluaciones",
         label: "Evaluaciones GPH",
         description: "Diagnóstico GPH + 12 meses de MiFicha",
@@ -102,28 +83,26 @@ export const MARKETING_NAV: NavSection[] = [
         label: `${GPH_SAMPLE_CLASS.title} GPH`,
         description: "Gratis · sesión práctica, sin informe de diagnóstico",
       },
-    ],
-  },
-  {
-    id: "noticias",
-    label: "Noticias",
-    icon: Newspaper,
-    links: [
       {
-        href: GPH_PACHUCA_PATH,
-        label: "Orgullo GPH · Pachuca",
-        description: "Cuatro jugadores a segunda fase con Club Pachuca",
+        href: "/fut/planes",
+        label: "Planes",
+        description: "Membresías persona y academia",
       },
       {
-        href: "/fut/noticias",
-        label: "Todas las noticias",
-        description: "Anuncios y logros de la red",
+        href: "/fut/productos",
+        label: "Productos",
+        description: "Evaluaciones, entrenamientos y más",
+      },
+      {
+        href: "/fut/captacion",
+        label: "Captación multi-estado",
+        description: "Plantillas para academias y torneos fuera de QRO",
       },
     ],
   },
   {
-    id: "visorias",
-    label: "Visorías",
+    id: "comunidad",
+    label: "Comunidad",
     icon: ClipboardList,
     links: [
       {
@@ -131,39 +110,35 @@ export const MARKETING_NAV: NavSection[] = [
         label: "Visorías Querétaro",
         description: "26–27 nov · Chivas y Santos · registro abierto",
       },
-    ],
-  },
-  {
-    id: "eventos",
-    label: "Eventos",
-    icon: CalendarDays,
-    links: [
-      {
-        href: "/fut/gph-fun",
-        label: "GPH FUN · Fiestas",
-        description: "Fiestas futboleras · promociones de apertura",
-      },
-      {
-        href: "/fut/eventos",
-        label: "Todos los eventos",
-        description: "Clínicas, jornadas y fiestas publicadas",
-      },
-    ],
-  },
-  {
-    id: "convocatorias",
-    label: "Convocatorias",
-    icon: Megaphone,
-    links: [
       {
         href: CRACKS_TRYOUTS_PATH,
         label: "CRACKS · Querétaro",
         description: "Try outs noviembre · solicita liga de registro",
       },
       {
+        href: GPH_PACHUCA_PATH,
+        label: "Orgullo GPH · Pachuca",
+        description: "Cuatro jugadores a segunda fase con Club Pachuca",
+      },
+      {
+        href: "/fut/noticias",
+        label: "Noticias",
+        description: "Anuncios y logros de la red",
+      },
+      {
+        href: "/fut/eventos",
+        label: "Eventos",
+        description: "Clínicas, jornadas y fiestas publicadas",
+      },
+      {
         href: "/fut/convocatorias",
-        label: "Todas las convocatorias",
+        label: "Convocatorias",
         description: "Oportunidades abiertas para jugadores",
+      },
+      {
+        href: "/fut/gph-fun",
+        label: "GPH FUN · Fiestas",
+        description: "Fiestas futboleras · promociones de apertura",
       },
     ],
   },
@@ -185,6 +160,11 @@ export const MARKETING_SECONDARY_LINKS: NavLink[] = [
     href: "/fut#como-funciona",
     label: "Cómo funciona",
     description: "Buscar gratis, publicar ficha, membresía",
+  },
+  {
+    href: "/fut/aviso-privacidad",
+    label: "Privacidad de menores",
+    description: "Fichas privadas por defecto · consentimiento del tutor",
   },
   {
     href: "https://wa.me/524421556155?text=Hola%2C%20quiero%20informaci%C3%B3n%20sobre%20patrocinio%20en%20MiFicha.",

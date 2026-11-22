@@ -118,9 +118,26 @@ export function ExplorePlayerCard({
             {" · "}
             <span className="font-semibold text-mf-text">{stats.minutes}</span> min
           </p>
+        ) : unlocked ? (
+          <p className="mt-2 text-xs text-mf-text-muted">{CURRENT_SEASON_LABEL}</p>
         ) : (
-          <p className="mt-2 text-xs text-mf-text-muted">
-            {unlocked ? CURRENT_SEASON_LABEL : "Detalle con Explorar Pro"}
+          <p
+            className="mt-2 flex flex-wrap items-center gap-2 text-xs tabular-nums text-mf-text-muted"
+            aria-label="Estadísticas bloqueadas con Explorar Pro"
+          >
+            <span className="inline-flex items-center gap-1 rounded bg-mf-canvas px-1.5 py-0.5 blur-[2px] select-none">
+              ·· PJ
+            </span>
+            <span className="inline-flex items-center gap-1 rounded bg-mf-canvas px-1.5 py-0.5 blur-[2px] select-none">
+              ·· G
+            </span>
+            <span className="inline-flex items-center gap-1 rounded bg-mf-canvas px-1.5 py-0.5 blur-[2px] select-none">
+              GPH
+            </span>
+            <span className="inline-flex items-center gap-1 font-medium text-mf-gph">
+              <Lock className="h-3 w-3" aria-hidden />
+              Explorar Pro
+            </span>
           </p>
         )}
 
@@ -138,6 +155,12 @@ export function ExplorePlayerCard({
           )}
           {unlocked && player.has_gph_evaluation ? (
             <GphEvaluationBadge asSpan score={player.gph_global_score} />
+          ) : null}
+          {!unlocked ? (
+            <span className="inline-flex items-center gap-1 font-medium text-mf-text-muted">
+              <Lock className="h-3 w-3 shrink-0" aria-hidden />
+              Stats y contacto
+            </span>
           ) : null}
           {unlocked && player.video_url ? (
             <span className="inline-flex items-center gap-1 font-medium text-violet-700">

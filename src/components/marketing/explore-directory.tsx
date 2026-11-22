@@ -339,7 +339,7 @@ export function ExploreDirectory({
               {previewCapped ? (
                 <div className="rounded-xl border border-mf-gph/25 bg-mf-gph-soft px-4 py-4 text-center sm:px-5">
                   <p className="text-sm font-semibold text-mf-gph-ink">
-                    Vista previa · entra para ver el directorio completo
+                    Hay más fichas con Explorar Pro
                   </p>
                   <p className="mt-1 text-sm text-mf-text-secondary">
                     Crea tu cuenta de tutor y publica la ficha de tu hijo en ~5 min.
@@ -372,9 +372,20 @@ export function ExploreDirectory({
           </div>
 
           {displayAcademies.length === 0 ? (
-            <p className="text-sm text-mf-text-secondary">
-              No hay academias que coincidan con tu búsqueda.
-            </p>
+            <div className="rounded-xl border border-dashed border-mf-border bg-white px-4 py-5 text-sm text-mf-text-secondary">
+              <p className="font-medium text-mf-text">
+                {unlocked
+                  ? "Aún no hay academias públicas con ese filtro."
+                  : "Estamos sumando academias al directorio."}
+              </p>
+              <p className="mt-1">
+                Si diriges una academia,{" "}
+                <Link href="/fut/signup" className="font-semibold text-mf-gph hover:underline">
+                  créala gratis
+                </Link>{" "}
+                y publica tu página.
+              </p>
+            </div>
           ) : (
             <ul className="divide-y divide-mf-border-subtle rounded-xl border border-mf-border bg-white">
               {displayAcademies.map((academy) => (

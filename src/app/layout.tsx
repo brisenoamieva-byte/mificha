@@ -5,8 +5,10 @@ import { AuthRecoveryRedirect } from "@/components/auth/auth-recovery-redirect";
 import { AuthSessionSync } from "@/components/auth/auth-session-sync";
 import { CookieNotice } from "@/components/marketing/cookie-notice";
 import { AppToaster } from "@/components/ui/toast";
+import { JsonLd } from "@/components/seo/json-ld";
 import { getAppBaseUrl } from "@/lib/app-url";
 import { BRAND_OG_IMAGE } from "@/lib/brand";
+import { organizationJsonLd } from "@/lib/structured-data";
 import "./globals.css";
 
 const appUrl = getAppBaseUrl();
@@ -71,6 +73,7 @@ export default function RootLayout({
   return (
     <html lang="es" className={`${inter.variable} h-full antialiased`}>
       <body className="min-h-dvh bg-mf-canvas font-sans text-mf-text antialiased">
+        <JsonLd data={organizationJsonLd()} />
         <DevServiceWorkerCleanup />
         <AuthRecoveryRedirect />
         <AuthSessionSync />

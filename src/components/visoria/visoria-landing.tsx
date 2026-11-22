@@ -361,6 +361,27 @@ export function VisoriaLanding() {
             .
           </p>
         </section>
+
+        <section className="border-t border-mf-border bg-mf-canvas">
+          <div className="mx-auto flex max-w-3xl flex-col gap-4 px-4 py-10 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-12">
+            <div className="min-w-0">
+              <h2 className="text-lg font-semibold tracking-tight text-mf-gph-ink sm:text-xl">
+                Para participar con perfil completo
+              </h2>
+              <p className="mt-1.5 text-sm leading-6 text-mf-text-secondary">
+                El registro a la visoría es el primer paso. Con tu MiFicha el tutor
+                controla qué se publica y el jugador queda listo para otras oportunidades.
+              </p>
+            </div>
+            <Link
+              href="/fut/entrar?next=/fut/tutor&utm_source=visorias&utm_medium=cta&utm_campaign=crear_ficha"
+              className="mf-btn-gph inline-flex w-full shrink-0 justify-center gap-2 sm:w-auto"
+            >
+              Crea tu MiFicha gratis
+              <ArrowRight className="h-4 w-4" aria-hidden />
+            </Link>
+          </div>
+        </section>
       </main>
       <a
         href="#registro"

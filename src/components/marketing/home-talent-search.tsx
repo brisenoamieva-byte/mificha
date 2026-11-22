@@ -141,17 +141,16 @@ export function HomeTalentSearch({
             <BrandWordmark className="text-white" />
           </h1>
           <p className="mt-4 max-w-2xl text-lg font-medium leading-8 text-white/90 sm:text-xl">
-            Busca jugadores. Publica la ficha de tu hijo.
+            El puente entre el talento joven y el futbol profesional.
           </p>
           <p className="mt-2 max-w-xl text-sm leading-7 text-white/70 sm:text-base">
-            Directorio con consentimiento del tutor.
+            Familias publican con consentimiento del tutor; scouts y academias
+            buscan con filtros.
             {access.unlocked && playerCount > 0 ? (
               <>
                 {" "}
                 <span className="tabular-nums text-white/90">{playerCount}</span> visibles.
               </>
-            ) : !access.unlocked ? (
-              <> Vista previa gratis; entra para ver más.</>
             ) : null}
           </p>
 
@@ -272,23 +271,26 @@ export function HomeTalentSearch({
               href="/fut/entrar?next=/fut/tutor&utm_source=home&utm_medium=hero&utm_campaign=crear_ficha"
               className="inline-flex items-center rounded-full bg-white px-4 py-2 text-sm font-semibold text-mf-brand transition hover:bg-white/95"
             >
-              Armar ficha en ~5 min
+              Registrar a mi jugador
             </Link>
+            <a
+              href="#directorio"
+              className="inline-flex items-center rounded-full border border-white/35 bg-white/10 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/15"
+            >
+              Buscar talento
+            </a>
             <Link
               href={MISION_PATH}
-              className="inline-flex items-center rounded-full border border-white/35 bg-white/10 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/15"
+              className="text-sm font-medium text-white/70 hover:text-white"
             >
               Qué es MiFicha
             </Link>
             <Link
               href="/fut/explorar#mapa"
-              className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-200/90 transition hover:text-white"
+              className="text-sm font-semibold text-emerald-200/90 transition hover:text-white"
             >
               Mapa de talento
             </Link>
-            <a href="#directorio" className="text-sm font-medium text-white/70 hover:text-white">
-              Ver muestra
-            </a>
           </div>
         </div>
       </section>
@@ -308,7 +310,7 @@ export function HomeTalentSearch({
               <p className="mt-1 text-sm text-mf-text-secondary">
                 {access.unlocked
                   ? `${allPlayers.length} resultado${allPlayers.length === 1 ? "" : "s"}${hasActiveFilters ? " con tu filtro" : ""}`
-                  : "Muestra gratuita · entra para ver el directorio completo"}
+                  : "Muestra con consentimiento · activa Explorar Pro para el detalle"}
               </p>
             </div>
           </div>
@@ -333,7 +335,7 @@ export function HomeTalentSearch({
               {previewCapped ? (
                 <div className="mt-6 rounded-2xl border border-mf-gph/25 bg-mf-gph-soft px-4 py-5 text-center sm:px-6">
                   <p className="text-sm font-semibold text-mf-gph-ink">
-                    Vista previa · entra para ver más fichas
+                    Hay más fichas con Explorar Pro
                   </p>
                   <p className="mt-1 text-sm text-mf-text-secondary">
                     Crea la ficha en ~5 min. Si publicas, ayudas a que tu ciudad se vea

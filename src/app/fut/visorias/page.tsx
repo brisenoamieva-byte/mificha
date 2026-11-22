@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import { JsonLd } from "@/components/seo/json-ld";
 import { VisoriaLanding } from "@/components/visoria/visoria-landing";
+import { visoriaSportsEventJsonLd } from "@/lib/structured-data";
 import { VISORIA_OG_IMAGE } from "@/lib/visoria-event";
 
 const ogTitle = "Visorías gratuitas GPH / CRACKS en Querétaro";
@@ -36,5 +38,10 @@ export const metadata: Metadata = {
 };
 
 export default function VisoriasPage() {
-  return <VisoriaLanding />;
+  return (
+    <>
+      <JsonLd data={visoriaSportsEventJsonLd()} />
+      <VisoriaLanding />
+    </>
+  );
 }

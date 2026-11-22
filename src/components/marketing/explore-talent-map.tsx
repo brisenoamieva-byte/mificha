@@ -192,12 +192,12 @@ export function ExploreTalentMap({
               <StatChip label="Cobertura" value="MX" hint="nacional" />
               <StatChip
                 label="Ciudades"
-                value={heat.cityCount > 0 ? "Varias" : "—"}
+                value={heat.cityCount > 0 ? String(heat.cityCount) : "—"}
                 hint="en mapa"
               />
               <StatChip
                 label="Estados"
-                value={heat.stateCount > 0 ? "Varios" : "—"}
+                value={heat.stateCount > 0 ? String(heat.stateCount) : "—"}
                 hint="con talento"
               />
             </>
