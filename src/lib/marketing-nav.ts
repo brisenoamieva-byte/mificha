@@ -4,6 +4,7 @@ import { CRACKS_TRYOUTS_PATH } from "@/lib/cracks-tryouts";
 import { GPH_SAMPLE_CLASS, trainingBookingHref } from "@/lib/gph-alliance";
 import { GPH_PACHUCA_PATH } from "@/lib/gph-pachuca-segunda-fase";
 import { academyMembershipPublicCopy } from "@/lib/academy-membership";
+import { BRAND_INSTAGRAM_HANDLE, BRAND_INSTAGRAM_URL } from "@/lib/brand";
 import { personaMembershipPublicCopy } from "@/lib/persona-membership";
 import { MISION_PATH } from "@/lib/mision";
 import { VISORIA_PUBLIC_PATH } from "@/lib/visoria-event";
@@ -160,6 +161,11 @@ export const MARKETING_SECONDARY_LINKS: NavLink[] = [
     href: "/fut#como-funciona",
     label: "Cómo funciona",
     description: "Buscar gratis, publicar ficha, membresía",
+  },
+  {
+    href: BRAND_INSTAGRAM_URL,
+    label: `Instagram ${BRAND_INSTAGRAM_HANDLE}`,
+    description: "Novedades, visorías y comunidad",
   },
   {
     href: "/fut/aviso-privacidad",

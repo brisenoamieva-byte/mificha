@@ -1,5 +1,5 @@
 import { getAppBaseUrl } from "@/lib/app-url";
-import { BRAND_ICON, BRAND_OG_IMAGE } from "@/lib/brand";
+import { BRAND_ICON, BRAND_INSTAGRAM_URL, BRAND_OG_IMAGE } from "@/lib/brand";
 import { LEGAL_ENTITY, LEGAL_ROUTES } from "@/lib/legal";
 import {
   VISORIA_EVENT,
@@ -23,7 +23,7 @@ export function organizationJsonLd() {
       addressRegion: "Querétaro",
       addressCountry: "MX",
     },
-    sameAs: [],
+    sameAs: [BRAND_INSTAGRAM_URL],
     contactPoint: {
       "@type": "ContactPoint",
       email: LEGAL_ENTITY.contactEmail,

@@ -1,8 +1,10 @@
 import Link from "next/link";
+import { Instagram } from "lucide-react";
 import { BrandLogoLink } from "@/components/ui/brand-logo";
 import { BrandWordmark } from "@/components/ui/brand-wordmark";
 import { SiteNavDesktop, SiteNavMobile } from "@/components/marketing/site-nav";
 import { SponsorSlot } from "@/components/marketing/sponsor-slot";
+import { BRAND_INSTAGRAM_HANDLE, BRAND_INSTAGRAM_URL } from "@/lib/brand";
 import { LEGAL_ROUTES } from "@/lib/legal";
 import { MISION_PATH } from "@/lib/mision";
 
@@ -102,11 +104,20 @@ export function SiteFooter() {
       <div className="mx-auto flex max-w-6xl flex-col items-center gap-3 border-t border-mf-border px-4 py-8 text-center text-sm text-mf-text-muted sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:text-left">
         <BrandLogoLink href="/fut" size="sm" />
         <div className="flex flex-col items-center gap-2 sm:items-end">
-          <p className="text-mf-text-secondary">
+          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-mf-text-secondary sm:justify-end">
+            <a
+              href={BRAND_INSTAGRAM_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 font-medium text-mf-brand transition hover:text-mf-gph"
+            >
+              <Instagram className="h-4 w-4" aria-hidden />
+              {BRAND_INSTAGRAM_HANDLE}
+            </a>
             <a href="mailto:hola@mificha.mx" className="font-medium text-mf-brand hover:underline">
               hola@mificha.mx
             </a>
-          </p>
+          </div>
           <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 sm:justify-end">
             <Link href={LEGAL_ROUTES.privacy} className="hover:text-mf-text">
               Aviso de privacidad

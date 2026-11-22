@@ -8,6 +8,11 @@
 export const BRAND_ICON = "/brand/mificha-icon.png";
 export const BRAND_APP_ICON = "/brand/mificha-app-icon.png";
 export const BRAND_OG_IMAGE = "/marketing/og-default.png";
+/** Glyph oficial (PNG) para usos de marketing; en UI preferir el ícono vectorial. */
+export const BRAND_INSTAGRAM_ICON = "/brand/instagram.png";
+/** Perfil oficial (sin params de tracking). */
+export const BRAND_INSTAGRAM_URL = "https://www.instagram.com/mificha_mx/";
+export const BRAND_INSTAGRAM_HANDLE = "@mificha_mx";
 export { GPH_LOGO } from "@/lib/gph-alliance";
 
 /** @deprecated Usar BRAND_ICON + BrandWordmark. Mantenido para compatibilidad en emails. */
