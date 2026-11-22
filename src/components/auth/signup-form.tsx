@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
-import { signUp } from "@/lib/auth";
+import { authConfirmUrl, signUp } from "@/lib/auth";
 import { LEGAL_ROUTES, TERMS_ACCEPTANCE_LABEL } from "@/lib/legal";
 
 function getErrorMessage(error: unknown) {
@@ -62,18 +62,22 @@ export function SignUpForm() {
     setLoading(true);
 
     try {
-      const data = await signUp(email, password, "academy_admin", fullName);
+      const safeNext = nextPath.startsWith("/") ? nextPath : "/fut/dashboard";
+      const data = await signUp(email, password, "academy_admin", fullName, {
+        nextPath: safeNext,
+        emailRedirectTo: authConfirmUrl({ nextPath: safeNext }),
+      });
 
       if (data.session) {
-        router.push(nextPath.startsWith("/") ? nextPath : "/fut/dashboard");
+        router.push(safeNext);
         router.refresh();
         return;
       }
 
       setSuccess(
         joiningTeam
-          ? "Cuenta creada. Confirma tu correo si hace falta, inicia sesión y abre de nuevo el link de invitación."
-          : "Cuenta creada. Si activaste confirmación por correo, revísalo y luego inicia sesión.",
+          ? "Cuenta creada. Confirma tu correo (revisa spam), inicia sesión y abre de nuevo el link de invitación. Si no llega, WhatsApp 442 155 6155."
+          : "Cuenta creada. Confirma tu correo (revisa spam) y luego inicia sesión. Si no llega, WhatsApp 442 155 6155.",
       );
     } catch (submitError) {
       setError(getErrorMessage(submitError));

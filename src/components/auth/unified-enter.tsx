@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { signIn, signUp } from "@/lib/auth";
+import { authConfirmUrl, signIn, signUp } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 
 type Mode = "login" | "signup";
@@ -78,6 +78,9 @@ export function UnifiedEnter() {
   const [loading, setLoading] = useState(false);
   const [checking, setChecking] = useState(true);
   const [showChooser, setShowChooser] = useState(forcePick);
+  const [needsEmailConfirm, setNeedsEmailConfirm] = useState(false);
+  const [resendingConfirm, setResendingConfirm] = useState(false);
+  const [resendNotice, setResendNotice] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -163,8 +166,12 @@ export function UnifiedEnter() {
     event.preventDefault();
     setError(null);
     setSuccess(null);
+    setNeedsEmailConfirm(false);
+    setResendNotice(null);
     setLoading(true);
     const normalizedEmail = email.trim().toLowerCase();
+    const nextPath =
+      nextOverride?.startsWith("/") ? nextOverride : "/fut/tutor";
 
     try {
       if (mode === "signup") {
@@ -173,13 +180,19 @@ export function UnifiedEnter() {
           password,
           "academy_admin",
           fullName.trim() || "Usuario MiFicha",
-          { emailRedirectTo: `${window.location.origin}/fut/entrar` },
+          {
+            nextPath,
+            emailRedirectTo: authConfirmUrl({ nextPath }),
+          },
         );
         if (!created.session) {
           try {
             await signIn(normalizedEmail, password);
           } catch {
-            setSuccess("Cuenta creada. Confirma tu correo y vuelve a entrar.");
+            setNeedsEmailConfirm(true);
+            setSuccess(
+              "Cuenta creada. Te enviamos un correo para confirmar. Si no llega (spam), pídelo de nuevo abajo o escríbenos por WhatsApp al 442 155 6155.",
+            );
             setMode("login");
             setLoading(false);
             return;
@@ -193,7 +206,10 @@ export function UnifiedEnter() {
         data: { session },
       } = await supabase.auth.getSession();
       if (!session) {
-        setSuccess("Confirma tu correo antes de continuar.");
+        setNeedsEmailConfirm(true);
+        setSuccess(
+          "Confirma tu correo antes de continuar. Revisa spam o reenvía el enlace abajo.",
+        );
         setMode("login");
         setLoading(false);
         return;
@@ -219,8 +235,45 @@ export function UnifiedEnter() {
       }
       window.location.replace(path);
     } catch (submitError) {
-      setError(getErrorMessage(submitError));
+      const message = getErrorMessage(submitError);
+      setError(message);
+      if (message.includes("Confirma tu correo")) {
+        setNeedsEmailConfirm(true);
+      }
       setLoading(false);
+    }
+  }
+
+  async function resendConfirmation() {
+    const normalizedEmail = email.trim().toLowerCase();
+    if (!normalizedEmail) {
+      setResendNotice("Escribe el correo con el que te registraste.");
+      return;
+    }
+    setResendingConfirm(true);
+    setResendNotice(null);
+    try {
+      const nextPath =
+        nextOverride?.startsWith("/") ? nextOverride : "/fut/tutor";
+      const { error: resendError } = await supabase.auth.resend({
+        type: "signup",
+        email: normalizedEmail,
+        options: {
+          emailRedirectTo: authConfirmUrl({ nextPath }),
+        },
+      });
+      if (resendError) throw resendError;
+      setResendNotice(
+        "Listo: enviamos un enlace nuevo. Revisa bandeja y spam. Si no llega en 2 minutos, mándanos WhatsApp al 442 155 6155.",
+      );
+    } catch (resendErr) {
+      setResendNotice(
+        resendErr instanceof Error
+          ? resendErr.message
+          : "No se pudo reenviar. Escríbenos por WhatsApp al 442 155 6155.",
+      );
+    } finally {
+      setResendingConfirm(false);
     }
   }
 
@@ -361,6 +414,25 @@ export function UnifiedEnter() {
         <p className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
           {success}
         </p>
+      ) : null}
+
+      {needsEmailConfirm ? (
+        <div className="space-y-2 rounded-xl border border-mf-border bg-mf-canvas p-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-mf-text-muted">
+            No llegó el correo
+          </p>
+          <button
+            type="button"
+            disabled={resendingConfirm || !email.trim()}
+            onClick={() => void resendConfirmation()}
+            className="mf-btn-gph-ghost w-full disabled:opacity-60"
+          >
+            {resendingConfirm ? "Reenviando…" : "Reenviar verificación"}
+          </button>
+          {resendNotice ? (
+            <p className="text-xs leading-5 text-mf-text-secondary">{resendNotice}</p>
+          ) : null}
+        </div>
       ) : null}
 
       <button type="submit" disabled={loading} className="mf-btn-primary w-full disabled:opacity-60">

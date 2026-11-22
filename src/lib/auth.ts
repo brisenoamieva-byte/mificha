@@ -3,7 +3,17 @@ import type { UserRole } from "@/types/database";
 
 function appOrigin() {
   if (typeof window !== "undefined") return window.location.origin;
-  return process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ?? "https://mificha.mx";
+  return process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ?? "https://www.mificha.mx";
+}
+
+/** Destino del link de confirmación / recovery (consume hash/code). */
+export function authConfirmUrl(opts?: { nextPath?: string }) {
+  const origin = appOrigin();
+  const next =
+    opts?.nextPath && opts.nextPath.startsWith("/")
+      ? opts.nextPath
+      : "/fut/tutor";
+  return `${origin}/fut/confirmar?next=${encodeURIComponent(next)}`;
 }
 
 export async function signUp(
@@ -11,13 +21,15 @@ export async function signUp(
   password: string,
   role: UserRole,
   fullName: string,
-  opts?: { emailRedirectTo?: string },
+  opts?: { emailRedirectTo?: string; nextPath?: string },
 ) {
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
-      emailRedirectTo: opts?.emailRedirectTo ?? `${appOrigin()}/fut/login`,
+      emailRedirectTo:
+        opts?.emailRedirectTo ??
+        authConfirmUrl({ nextPath: opts?.nextPath ?? "/fut/tutor" }),
       data: {
         role,
         full_name: fullName,

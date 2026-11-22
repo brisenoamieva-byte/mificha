@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AuthShell } from "@/components/auth/auth-shell";
+import { authConfirmUrl } from "@/lib/auth";
 import {
   consumeAuthRedirect,
   normalizeEmailOtpType,
@@ -97,7 +98,7 @@ export function ConfirmEmailClient() {
         type: "signup",
         email,
         options: {
-          emailRedirectTo: `${window.location.origin}/fut/confirmar`,
+          emailRedirectTo: authConfirmUrl({ nextPath: "/fut/tutor" }),
         },
       });
       if (error) throw error;
