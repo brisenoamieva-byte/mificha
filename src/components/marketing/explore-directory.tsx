@@ -29,7 +29,6 @@ import {
   type PublicDirectoryData,
 } from "@/lib/public-directory";
 import { explorePreviewPlayers } from "@/lib/explore-preview";
-import { explorePreviewPlayers } from "@/lib/explore-preview";
 import { CURRENT_SEASON_LABEL } from "@/lib/marketing-season";
 import { PROGRESS_TIER_FILTER_OPTIONS } from "@/lib/passport-score";
 import type { PlayerPosition } from "@/types/database";
