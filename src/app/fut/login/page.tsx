@@ -3,6 +3,8 @@ import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "Iniciar sesión | MiFicha",
+  description: "Accede a tu cuenta de academia, tutor o agente en MiFicha.",
+  robots: { index: false, follow: false },
 };
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;

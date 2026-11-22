@@ -13,6 +13,9 @@ export const metadata: Metadata = {
   description:
     "Condiciones de uso de la plataforma MiFicha para academias deportivas escolares.",
   robots: { index: true, follow: true },
+  alternates: {
+    canonical: "/fut/terminos",
+  },
 };
 
 export default function TerminosPage() {

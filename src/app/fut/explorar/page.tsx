@@ -16,9 +16,12 @@ import { emptyTalentGeoHeat, fetchTalentGeoHeat } from "@/lib/talent-geo";
 import { fetchTutorDirectoryPlayers } from "@/lib/tutor-directory";
 
 export const metadata: Metadata = {
-  title: "Explorar talento | MiFicha",
+  title: "Explorar talento de futbol | MiFicha",
   description:
-    "Buscador de jugadores con consentimiento. Filtra gratis; ficha completa con Explorar Pro (gratis por tiempo limitado).",
+    "Buscador de jugadores con consentimiento del tutor. Filtra por posición, estado y categoría; ficha completa con Explorar Pro.",
+  alternates: {
+    canonical: "/fut/explorar",
+  },
 };
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;

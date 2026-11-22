@@ -39,18 +39,25 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const description = getPublicAcademyDescription(data.academy);
   const images = academyShareImages(data);
 
+  const pagePath = `/fut/a/${slug}`;
+  const title = `${data.academy.name} · Academia de fútbol | MiFicha`;
+
   return {
-    title: `${data.academy.name} | Academia de Fútbol | MiFicha`,
+    title,
     description,
+    alternates: {
+      canonical: pagePath,
+    },
     openGraph: {
-      title: `${data.academy.name} | Academia de Fútbol | MiFicha`,
+      title,
       description,
+      url: pagePath,
       images,
       type: "website",
     },
     twitter: {
       card: "summary_large_image",
-      title: `${data.academy.name} | Academia de Fútbol | MiFicha`,
+      title,
       description,
       images,
     },

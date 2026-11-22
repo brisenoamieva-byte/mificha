@@ -2,6 +2,7 @@ import {
   defaultAcademyCoverFallback,
   getAcademyCoverUrl,
 } from "@/lib/academy-cover-store";
+import { getAppBaseUrl } from "@/lib/app-url";
 import { fetchLatestGphScoresByPlayerId } from "@/lib/gph-player-link";
 import { GPH_LOGO } from "@/lib/gph-alliance";
 import { createSupabaseAdminClient } from "@/lib/supabase-admin";
@@ -249,10 +250,7 @@ export function getPublicAcademyDescription(academy: PublicAcademy) {
 }
 
 export function buildPublicAcademyUrl(slug: string) {
-  const base =
-    process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ??
-    "https://mificha.mx";
-  return `${base}/fut/a/${slug}`;
+  return `${getAppBaseUrl()}/fut/a/${slug}`;
 }
 
 export function formatWhatsAppUrl(phone: string | null) {

@@ -5,11 +5,11 @@ import { AuthRecoveryRedirect } from "@/components/auth/auth-recovery-redirect";
 import { AuthSessionSync } from "@/components/auth/auth-session-sync";
 import { CookieNotice } from "@/components/marketing/cookie-notice";
 import { AppToaster } from "@/components/ui/toast";
+import { getAppBaseUrl } from "@/lib/app-url";
 import { BRAND_OG_IMAGE } from "@/lib/brand";
 import "./globals.css";
 
-const appUrl =
-  process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ?? "https://mificha.mx";
+const appUrl = getAppBaseUrl();
 
 const inter = Inter({
   subsets: ["latin"],
@@ -20,7 +20,7 @@ const inter = Inter({
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "MiFicha · Ficha de futbol",
+  title: "MiFicha · Ficha de futbol para familias y academias",
   description:
     "Plataforma de futbol para familias: ficha del jugador, visorías, torneos y diagnóstico GPH.",
   metadataBase: new URL(appUrl),
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     statusBarStyle: "default",
   },
   openGraph: {
-    title: "MiFicha · Ficha de futbol",
+    title: "MiFicha · Ficha de futbol para familias y academias",
     description:
       "Plataforma de futbol para familias: ficha del jugador, visorías, torneos y diagnóstico GPH.",
     url: appUrl,
@@ -49,7 +49,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "MiFicha · Ficha de futbol",
+    title: "MiFicha · Ficha de futbol para familias y academias",
     description:
       "Plataforma de futbol para familias: ficha del jugador, visorías, torneos y diagnóstico GPH.",
     images: [BRAND_OG_IMAGE],

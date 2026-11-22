@@ -13,6 +13,9 @@ export const metadata: Metadata = {
   description:
     "Aviso de privacidad integral conforme a la LFPDPPP. Tratamiento de datos personales y protección de menores en MiFicha.",
   robots: { index: true, follow: true },
+  alternates: {
+    canonical: "/fut/aviso-privacidad",
+  },
 };
 
 export default function AvisoPrivacidadPage() {

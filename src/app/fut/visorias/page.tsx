@@ -10,6 +10,9 @@ export const metadata: Metadata = {
   title: "Visorías GPH / CRACKS · Querétaro | MiFicha",
   description:
     "Registro a visorías gratuitas el 26 y 27 de noviembre en Querétaro, con visores de Chivas y Santos Laguna. Lo llena el tutor; confirmamos por WhatsApp.",
+  alternates: {
+    canonical: "/fut/visorias",
+  },
   openGraph: {
     title: ogTitle,
     description: ogDescription,

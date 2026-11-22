@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { SiteFooter, SiteHeader } from "@/components/marketing/site-header";
 import { HomeAnnouncementsRail } from "@/components/marketing/home-announcements-rail";
 import { HomeCtaBand } from "@/components/marketing/home-cta-band";
@@ -17,6 +18,23 @@ import { createSupabaseAdminClient } from "@/lib/supabase-admin";
 import { fetchTutorDirectoryPlayers } from "@/lib/tutor-directory";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: {
+    absolute: "MiFicha · Ficha de futbol para familias y academias",
+  },
+  description:
+    "Crea la ficha de tu jugador, publica con consentimiento del tutor y encuentra visorías, academias y diagnóstico GPH en México.",
+  alternates: {
+    canonical: "/fut",
+  },
+  openGraph: {
+    title: "MiFicha · Ficha de futbol para familias y academias",
+    description:
+      "Crea la ficha de tu jugador, publica con consentimiento del tutor y encuentra visorías, academias y diagnóstico GPH en México.",
+    url: "/fut",
+  },
+};
 
 export default async function Home() {
   const [directoryBase, tutorPlayers, access] = await Promise.all([

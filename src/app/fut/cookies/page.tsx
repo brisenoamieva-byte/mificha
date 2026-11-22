@@ -13,6 +13,9 @@ export const metadata: Metadata = {
   description:
     "Uso de cookies y tecnologías similares en mificha.mx conforme a la LFPDPPP.",
   robots: { index: true, follow: true },
+  alternates: {
+    canonical: "/fut/cookies",
+  },
 };
 
 export default function CookiesPage() {

@@ -7,6 +7,7 @@ export const metadata: Metadata = {
   title: "Entrar | MiFicha",
   description:
     "Inicia sesión: cuenta persona (tutor o representante) o academia.",
+  robots: { index: false, follow: false },
 };
 
 export default function EntrarPage() {
