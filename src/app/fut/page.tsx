@@ -54,7 +54,6 @@ export default async function Home() {
       <HashScroll />
       <ProductAnalyticsBeacon event="view_home" />
       <HomeAnnouncementsRail />
-      <SponsorSlot placement="home_strip" />
 
       <main className="flex-1">
         <HomeTalentSearch
@@ -103,6 +102,8 @@ export default async function Home() {
         <HomeGphAllianceBand />
         <HomeHowItWorks />
         <HomeCtaBand />
+        {/* Patrocinio al final: no compite con marca/misión en el primer viewport */}
+        <SponsorSlot placement="home_strip" />
       </main>
 
       <SiteFooter />

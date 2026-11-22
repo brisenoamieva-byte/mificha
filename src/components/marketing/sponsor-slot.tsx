@@ -115,22 +115,24 @@ export function SponsorSlot({ placement }: { placement: SponsorPlacement }) {
     return (
       <aside
         aria-label="Patrocinadores"
-        className="border-b border-mf-border bg-[color-mix(in_srgb,var(--mf-brand)_6%,white)]"
+        className="border-t border-mf-border bg-mf-canvas"
       >
-        <div className="mx-auto flex max-w-6xl flex-col items-center gap-3 px-4 py-3.5 text-center sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-3.5 sm:text-left">
-          <div className="flex w-full min-w-0 flex-col items-center gap-2.5 sm:w-auto sm:flex-row sm:items-center sm:gap-x-4 sm:gap-y-2">
+        <div className="mx-auto flex max-w-6xl flex-col items-center gap-2.5 px-4 py-2.5 text-center sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-2 sm:text-left">
+          <div className="flex w-full min-w-0 flex-col items-center gap-2 sm:w-auto sm:flex-row sm:items-center sm:gap-x-3 sm:gap-y-1">
             <span className="shrink-0 text-[10px] font-semibold uppercase tracking-[0.14em] text-mf-text-muted">
               {slot.eyebrow}
             </span>
             {hasBrands ? (
               <SponsorLogoRow brands={brands} size="sm" />
             ) : (
-              <p className="text-sm font-medium text-mf-gph-ink">{slot.availableLabel}</p>
+              <p className="text-xs font-medium text-mf-text-secondary">
+                {slot.availableLabel}
+              </p>
             )}
           </div>
           <SlotLink
             href={hasBrands ? "/fut/patrocinio" : sponsorInquiryHref(placement)}
-            className="shrink-0 text-xs font-semibold text-mf-brand hover:underline"
+            className="shrink-0 text-[11px] font-semibold text-mf-text-muted hover:text-mf-brand hover:underline"
           >
             {hasBrands ? "Ver aliados" : "Anunciar aquí"}
           </SlotLink>
