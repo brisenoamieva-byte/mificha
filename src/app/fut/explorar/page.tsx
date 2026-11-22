@@ -83,7 +83,11 @@ export default async function ExplorarPage({
 
       <main className="flex-1">
         <ProductAnalyticsBeacon event="view_explorar" />
-        <ExplorePageHero playerCount={playerCount} academyCount={academyCount} />
+        <ExplorePageHero
+          playerCount={playerCount}
+          academyCount={academyCount}
+          showCounts={access.unlocked}
+        />
 
         <section className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:py-14">
           <ExplorePaywallBanner access={access} />

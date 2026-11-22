@@ -21,6 +21,7 @@ import {
   isMarketingPlaceholderAcademy,
   normalizeExplorePlayerName,
 } from "@/lib/explore-demo-data";
+import { explorePreviewPlayers } from "@/lib/explore-preview";
 import { CURRENT_SEASON_LABEL } from "@/lib/marketing-season";
 import { collectBirthDatesFromDirectory } from "@/lib/player-category";
 import {
@@ -84,7 +85,7 @@ export function HomeTalentSearch({
     [data, deferredQuery, position, state, city, categoryFilter, performance],
   );
 
-  const players = useMemo(() => {
+  const allPlayers = useMemo(() => {
     const real = filtered.players.filter(
       (player) => !isPlaceholderExplorePlayer(player),
     );
@@ -98,6 +99,12 @@ export function HomeTalentSearch({
     }
     return unique;
   }, [filtered.players]);
+
+  const players = useMemo(
+    () => explorePreviewPlayers(allPlayers, access.unlocked),
+    [allPlayers, access.unlocked],
+  );
+  const previewCapped = !access.unlocked && allPlayers.length > players.length;
 
   const academies = useMemo(
     () =>
@@ -137,11 +144,13 @@ export function HomeTalentSearch({
           <p className="mt-2 max-w-xl text-sm leading-7 text-white/70 sm:text-base">
             Para scouts: busca por nombre, posición, categoría y GPH. Para padres: arma la
             ficha de tu hijo en ~5 min y publícala con consentimiento.
-            {playerCount > 0 ? (
+            {access.unlocked && playerCount > 0 ? (
               <>
                 {" "}
                 <span className="tabular-nums text-white/90">{playerCount}</span> en directorio.
               </>
+            ) : !access.unlocked ? (
+              <> Vista previa gratis; el directorio completo al entrar.</>
             ) : null}
           </p>
 
@@ -240,7 +249,9 @@ export function HomeTalentSearch({
                 type="submit"
                 className="mf-btn-gph h-11 w-full justify-center px-6 sm:h-[42px] sm:w-auto"
               >
-                Ver resultados · {players.length}
+                {access.unlocked
+                  ? `Ver resultados · ${allPlayers.length}`
+                  : "Ver muestra"}
               </button>
             </div>
 
@@ -291,8 +302,9 @@ export function HomeTalentSearch({
                 Jugadores
               </h2>
               <p className="mt-1 text-sm text-mf-text-secondary">
-                {players.length} resultado{players.length === 1 ? "" : "s"}
-                {hasActiveFilters ? " con tu filtro" : ""}
+                {access.unlocked
+                  ? `${allPlayers.length} resultado${allPlayers.length === 1 ? "" : "s"}${hasActiveFilters ? " con tu filtro" : ""}`
+                  : "Muestra gratuita · entra para ver el directorio completo"}
               </p>
             </div>
           </div>
@@ -304,18 +316,36 @@ export function HomeTalentSearch({
               No hay jugadores con ese filtro. Prueba otra posición o ciudad.
             </div>
           ) : (
-            <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
-              {players.map((player) => (
-                <ExplorePlayerCard
-                  key={player.slug}
-                  player={player}
-                  unlocked={access.unlocked}
-                />
-              ))}
-            </div>
+            <>
+              <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+                {players.map((player) => (
+                  <ExplorePlayerCard
+                    key={player.slug}
+                    player={player}
+                    unlocked={access.unlocked}
+                  />
+                ))}
+              </div>
+              {previewCapped ? (
+                <div className="mt-6 rounded-2xl border border-mf-gph/25 bg-mf-gph-soft px-4 py-5 text-center sm:px-6">
+                  <p className="text-sm font-semibold text-mf-gph-ink">
+                    Vista previa · entra para ver más fichas
+                  </p>
+                  <p className="mt-1 text-sm text-mf-text-secondary">
+                    Arma la ficha de tu hijo en ~5 min y suma tu ciudad al mapa.
+                  </p>
+                  <Link
+                    href="/fut/entrar?next=/fut/tutor&utm_source=home&utm_medium=preview&utm_campaign=crear_ficha"
+                    className="mf-btn-gph mt-4 inline-flex"
+                  >
+                    Entrar / armar ficha
+                  </Link>
+                </div>
+              ) : null}
+            </>
           )}
 
-          {academies.length > 0 ? (
+          {academies.length > 0 && access.unlocked ? (
             <div className="mt-10 border-t border-mf-border-subtle pt-8">
               <h3 className="text-base font-semibold text-mf-gph-ink">
                 Academias · {academies.length}

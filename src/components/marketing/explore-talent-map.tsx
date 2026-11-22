@@ -11,6 +11,8 @@ type ExploreTalentMapProps = {
   selectedState?: string;
   selectedCity?: string;
   onSelectLocation: (next: { state: string; city: string }) => void;
+  /** Sin sesión: no mostrar totales bajos del roster. */
+  showCounts?: boolean;
 };
 
 export function ExploreTalentMap({
@@ -18,6 +20,7 @@ export function ExploreTalentMap({
   selectedState = "",
   selectedCity = "",
   onSelectLocation,
+  showCounts = true,
 }: ExploreTalentMapProps) {
   const mapNodeRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<import("leaflet").Map | null>(null);
@@ -110,7 +113,9 @@ export function ExploreTalentMap({
         });
 
         circle.bindTooltip(
-          `<strong>${bucket.city}</strong><br/>${bucket.state} · ${bucket.count} ficha${bucket.count === 1 ? "" : "s"}`,
+          showCounts
+            ? `<strong>${bucket.city}</strong><br/>${bucket.state} · ${bucket.count} ficha${bucket.count === 1 ? "" : "s"}`
+            : `<strong>${bucket.city}</strong><br/>${bucket.state}`,
           { direction: "top", opacity: 0.95 },
         );
 
@@ -139,6 +144,7 @@ export function ExploreTalentMap({
     maxCity,
     selectedState,
     selectedCity,
+    showCounts,
     onSelectLocation,
   ]);
 
@@ -163,21 +169,39 @@ export function ExploreTalentMap({
           </p>
         </div>
         <div className="grid grid-cols-3 gap-2 sm:min-w-[280px]">
-          <StatChip
-            label="Fichas"
-            value={String(heat.totalFichas)}
-            hint="en roster"
-          />
-          <StatChip
-            label="Con lugar"
-            value={String(heat.totalWithLocation)}
-            hint="ciudad/edo"
-          />
-          <StatChip
-            label="Estados"
-            value={String(heat.stateCount)}
-            hint="con talento"
-          />
+          {showCounts ? (
+            <>
+              <StatChip
+                label="Fichas"
+                value={String(heat.totalFichas)}
+                hint="en roster"
+              />
+              <StatChip
+                label="Con lugar"
+                value={String(heat.totalWithLocation)}
+                hint="ciudad/edo"
+              />
+              <StatChip
+                label="Estados"
+                value={String(heat.stateCount)}
+                hint="con talento"
+              />
+            </>
+          ) : (
+            <>
+              <StatChip label="Cobertura" value="MX" hint="nacional" />
+              <StatChip
+                label="Ciudades"
+                value={heat.cityCount > 0 ? "Varias" : "—"}
+                hint="en mapa"
+              />
+              <StatChip
+                label="Estados"
+                value={heat.stateCount > 0 ? "Varios" : "—"}
+                hint="con talento"
+              />
+            </>
+          )}
         </div>
       </div>
 
@@ -252,9 +276,11 @@ export function ExploreTalentMap({
                           {bucket.state}
                         </span>
                       </span>
-                      <span className="tabular-nums text-sm font-semibold text-white">
-                        {bucket.count}
-                      </span>
+                      {showCounts ? (
+                        <span className="tabular-nums text-sm font-semibold text-white">
+                          {bucket.count}
+                        </span>
+                      ) : null}
                     </button>
                   </li>
                 );

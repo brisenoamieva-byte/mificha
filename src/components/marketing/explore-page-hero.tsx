@@ -13,6 +13,8 @@ import { cn } from "@/lib/utils";
 interface ExplorePageHeroProps {
   playerCount: number;
   academyCount: number;
+  /** Sin sesión / sin Pro: no mostrar totales bajos. */
+  showCounts?: boolean;
 }
 
 interface StatCardProps {
@@ -53,7 +55,11 @@ function StatCard({ icon: Icon, value, label, hint, accent = "brand" }: StatCard
   );
 }
 
-export function ExplorePageHero({ playerCount, academyCount }: ExplorePageHeroProps) {
+export function ExplorePageHero({
+  playerCount,
+  academyCount,
+  showCounts = true,
+}: ExplorePageHeroProps) {
   return (
     <section className="relative overflow-hidden border-b border-mf-border bg-mf-surface">
       <div
@@ -69,7 +75,7 @@ export function ExplorePageHero({ playerCount, academyCount }: ExplorePageHeroPr
               Busca jugadores de futbol
             </h1>
             <p className="mt-5 text-base leading-8 text-mf-text-secondary sm:text-[1.0625rem]">
-              Fichas de tutores o representantes. Vista básica gratis; detalle completo con
+              Fichas de tutores o representantes. Vista previa gratis; detalle completo con
               Explorar Pro (gratis por tiempo limitado).
             </p>
 
@@ -107,24 +113,45 @@ export function ExplorePageHero({ playerCount, academyCount }: ExplorePageHeroPr
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
-            <StatCard
-              icon={Users}
-              value={String(playerCount)}
-              label="Jugadores en directorio"
-              hint="Con consentimiento firmado · el resto no se lista"
-              accent="brand"
-            />
-            <StatCard
-              icon={Building2}
-              value={String(academyCount)}
-              label="Academias"
-              hint={
-                academyCount === 0
-                  ? "Plantel y operación · aparte del buscador"
-                  : "Sedes en el directorio"
-              }
-              accent="neutral"
-            />
+            {showCounts ? (
+              <>
+                <StatCard
+                  icon={Users}
+                  value={String(playerCount)}
+                  label="Jugadores en directorio"
+                  hint="Con consentimiento firmado · el resto no se lista"
+                  accent="brand"
+                />
+                <StatCard
+                  icon={Building2}
+                  value={String(academyCount)}
+                  label="Academias"
+                  hint={
+                    academyCount === 0
+                      ? "Plantel y operación · aparte del buscador"
+                      : "Sedes en el directorio"
+                  }
+                  accent="neutral"
+                />
+              </>
+            ) : (
+              <>
+                <StatCard
+                  icon={Users}
+                  value="Vista previa"
+                  label="Directorio de talento"
+                  hint="Entra para ver el listado completo y publicar tu ficha"
+                  accent="brand"
+                />
+                <StatCard
+                  icon={Building2}
+                  value="México"
+                  label="Mapa por estado y ciudad"
+                  hint="Calor agregado · sin nombres de menores"
+                  accent="neutral"
+                />
+              </>
+            )}
           </div>
         </div>
       </div>

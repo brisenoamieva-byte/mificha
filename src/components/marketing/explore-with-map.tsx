@@ -60,6 +60,7 @@ export function ExploreWithMap({
         selectedState={location.state}
         selectedCity={location.city}
         onSelectLocation={onMapSelect}
+        showCounts={Boolean(unlocked)}
       />
       <div id="directorio" className="scroll-mt-20">
         <ExploreDirectory

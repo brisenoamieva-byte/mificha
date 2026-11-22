@@ -28,6 +28,8 @@ import {
   type DirectoryPlayer,
   type PublicDirectoryData,
 } from "@/lib/public-directory";
+import { explorePreviewPlayers } from "@/lib/explore-preview";
+import { explorePreviewPlayers } from "@/lib/explore-preview";
 import { CURRENT_SEASON_LABEL } from "@/lib/marketing-season";
 import { PROGRESS_TIER_FILTER_OPTIONS } from "@/lib/passport-score";
 import type { PlayerPosition } from "@/types/database";
@@ -129,7 +131,7 @@ export function ExploreDirectory({
     [data, query, position, minPassport, state, city, categoryFilter, performance],
   );
 
-  const displayPlayers = useMemo(() => {
+  const allPlayers = useMemo(() => {
     const realPlayers = filtered.players.filter(
       (player) => !isPlaceholderExplorePlayer(player),
     );
@@ -146,6 +148,12 @@ export function ExploreDirectory({
     return unique;
   }, [filtered.players]);
 
+  const displayPlayers = useMemo(
+    () => explorePreviewPlayers(allPlayers, unlocked),
+    [allPlayers, unlocked],
+  );
+  const previewCapped = !unlocked && allPlayers.length > displayPlayers.length;
+
   const displayAcademies = useMemo(
     () =>
       filtered.academies.filter((academy) => !isMarketingPlaceholderAcademy(academy)),
@@ -157,11 +165,19 @@ export function ExploreDirectory({
       <div className="mf-card p-4 sm:p-5">
         <p className="text-sm text-mf-text-secondary">
           Solo fichas con <strong className="font-semibold text-mf-text">consentimiento del tutor</strong>{" "}
-          · {CURRENT_SEASON_LABEL} ·{" "}
-          <span className="tabular-nums font-medium text-mf-text">
-            {displayPlayers.length}
-          </span>{" "}
-          {displayPlayers.length === 1 ? "jugador" : "jugadores"}
+          · {CURRENT_SEASON_LABEL}
+          {unlocked ? (
+            <>
+              {" "}
+              ·{" "}
+              <span className="tabular-nums font-medium text-mf-text">
+                {allPlayers.length}
+              </span>{" "}
+              {allPlayers.length === 1 ? "jugador" : "jugadores"}
+            </>
+          ) : (
+            <> · vista previa</>
+          )}
           {query ||
           position !== "all" ||
           state ||
@@ -169,8 +185,12 @@ export function ExploreDirectory({
           categoryFilter !== "all" ||
           hasActivePerformanceFilter(performance)
             ? " con este filtro"
-            : " visibles ahora"}
-          . Hay más fichas en MiFicha; sin firma no salen aquí.
+            : unlocked
+              ? " visibles ahora"
+              : ""}
+          {unlocked
+            ? ". Hay más fichas en MiFicha; sin firma no salen aquí."
+            : ". Entra para buscar el directorio completo."}
         </p>
 
         <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
@@ -284,9 +304,13 @@ export function ExploreDirectory({
         <section className="space-y-3">
           <div className="flex items-baseline justify-between gap-3">
             <h2 className="text-base font-semibold text-mf-text">Jugadores</h2>
-            <span className="text-sm text-mf-text-muted">
-              {displayPlayers.length} resultado{displayPlayers.length === 1 ? "" : "s"}
-            </span>
+            {unlocked ? (
+              <span className="text-sm text-mf-text-muted">
+                {allPlayers.length} resultado{allPlayers.length === 1 ? "" : "s"}
+              </span>
+            ) : (
+              <span className="text-sm text-mf-text-muted">Muestra gratuita</span>
+            )}
           </div>
 
           {displayPlayers.length === 0 ? (
@@ -303,24 +327,49 @@ export function ExploreDirectory({
               </a>
             </div>
           ) : (
-            <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
-              {displayPlayers.map((player) => (
-                <ExplorePlayerCard
-                  key={player.slug}
-                  player={player}
-                  unlocked={unlocked}
-                />
-              ))}
-            </div>
+            <>
+              <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+                {displayPlayers.map((player) => (
+                  <ExplorePlayerCard
+                    key={player.slug}
+                    player={player}
+                    unlocked={unlocked}
+                  />
+                ))}
+              </div>
+              {previewCapped ? (
+                <div className="rounded-xl border border-mf-gph/25 bg-mf-gph-soft px-4 py-4 text-center sm:px-5">
+                  <p className="text-sm font-semibold text-mf-gph-ink">
+                    Vista previa · entra para ver el directorio completo
+                  </p>
+                  <p className="mt-1 text-sm text-mf-text-secondary">
+                    Crea tu cuenta de tutor y publica la ficha de tu hijo en ~5 min.
+                  </p>
+                  <div className="mt-3 flex flex-wrap justify-center gap-2">
+                    <Link
+                      href="/fut/entrar?next=/fut/tutor&utm_source=explorar&utm_medium=preview&utm_campaign=crear_ficha"
+                      className="mf-btn-gph"
+                    >
+                      Entrar / armar ficha
+                    </Link>
+                    <Link href="/fut/entrar?next=/fut/explorar" className="mf-btn-gph-ghost">
+                      Ver más con Explorar Pro
+                    </Link>
+                  </div>
+                </div>
+              ) : null}
+            </>
           )}
         </section>
 
         <section className="space-y-3 border-t border-mf-border-subtle pt-8">
           <div className="flex items-baseline justify-between gap-3">
             <h2 className="text-base font-semibold text-mf-text">Academias</h2>
-            <span className="text-sm text-mf-text-muted">
-              {displayAcademies.length} resultados
-            </span>
+            {unlocked ? (
+              <span className="text-sm text-mf-text-muted">
+                {displayAcademies.length} resultados
+              </span>
+            ) : null}
           </div>
 
           {displayAcademies.length === 0 ? (
