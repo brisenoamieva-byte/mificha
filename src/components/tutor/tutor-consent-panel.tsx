@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { FounderBadge } from "@/components/tutor/founder-badge";
 import { LEGAL_ROUTES } from "@/lib/legal";
 import { PRIVACY_COPY, type TutorExploreConsentEvidence } from "@/lib/privacy";
 import { cn } from "@/lib/utils";
@@ -92,30 +93,33 @@ export function TutorConsentPanel({
       </ul>
 
       {exploreOptIn ? (
-        <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2.5 text-sm text-emerald-900">
-          Consentimiento activo
-          {signedAt ? ` · firmado ${signedAt}` : ""}. Visible en el buscador si la ficha
-          tiene datos básicos (nombre, categoría, posición).
-          {exploreConsentEvidence?.acceptor_name ? (
-            <p className="mt-1 text-xs leading-5 text-emerald-900/80">
-              Firmado por {exploreConsentEvidence.acceptor_name}
-              {exploreConsentEvidence.consent_version
-                ? ` · ${exploreConsentEvidence.consent_version}`
-                : ""}
-            </p>
-          ) : null}
-          <div className="mt-2 flex flex-wrap gap-2">
-            <Link href="/fut/explorar" target="_blank" className="font-semibold underline">
-              Ver Explorar
-            </Link>
-            <button
-              type="button"
-              disabled={busy}
-              onClick={() => void onRevokeExplore()}
-              className="font-semibold text-mf-gph underline disabled:opacity-50"
-            >
-              Retirar consentimiento
-            </button>
+        <div className="space-y-3">
+          <FounderBadge />
+          <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2.5 text-sm text-emerald-900">
+            Consentimiento activo
+            {signedAt ? ` · firmado ${signedAt}` : ""}. Visible en el buscador si la ficha
+            tiene datos básicos (nombre, categoría, posición).
+            {exploreConsentEvidence?.acceptor_name ? (
+              <p className="mt-1 text-xs leading-5 text-emerald-900/80">
+                Firmado por {exploreConsentEvidence.acceptor_name}
+                {exploreConsentEvidence.consent_version
+                  ? ` · ${exploreConsentEvidence.consent_version}`
+                  : ""}
+              </p>
+            ) : null}
+            <div className="mt-2 flex flex-wrap gap-2">
+              <Link href="/fut/explorar" target="_blank" className="font-semibold underline">
+                Ver Explorar
+              </Link>
+              <button
+                type="button"
+                disabled={busy}
+                onClick={() => void onRevokeExplore()}
+                className="font-semibold text-mf-gph underline disabled:opacity-50"
+              >
+                Retirar consentimiento
+              </button>
+            </div>
           </div>
         </div>
       ) : (

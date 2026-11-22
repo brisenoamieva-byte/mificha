@@ -4,6 +4,7 @@ import { BrandWordmark } from "@/components/ui/brand-wordmark";
 import { SiteNavDesktop, SiteNavMobile } from "@/components/marketing/site-nav";
 import { SponsorSlot } from "@/components/marketing/sponsor-slot";
 import { LEGAL_ROUTES } from "@/lib/legal";
+import { MISION_PATH } from "@/lib/mision";
 
 interface SiteHeaderProps {
   actionHref?: string;
@@ -83,6 +84,9 @@ export function SiteFooter() {
           </Link>
           <Link href="/fut/convocatorias" className="transition hover:text-mf-text">
             Convocatorias
+          </Link>
+          <Link href={MISION_PATH} className="transition hover:text-mf-text">
+            Misión
           </Link>
           <Link href="/fut#como-funciona" className="transition hover:text-mf-text">
             Cómo funciona

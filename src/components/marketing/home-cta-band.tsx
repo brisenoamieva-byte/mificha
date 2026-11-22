@@ -22,7 +22,11 @@ export function HomeCtaBand() {
             Arma la ficha de tu hijo en minutos
           </h2>
           <p className="mt-2 text-sm leading-6 text-white/80">
-            Gratis para familias. Con consentimiento aparece en Explorar ante agentes.
+            Gratis para familias. Estamos en la etapa fundacional: cada ficha suma al
+            catálogo nacional.{" "}
+            <Link href="/fut/mision" className="font-semibold text-white underline">
+              Ver la misión
+            </Link>
           </p>
         </div>
         <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:flex-wrap">

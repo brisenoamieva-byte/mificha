@@ -12,6 +12,7 @@ import { GPH_SAMPLE_CLASS, trainingBookingHref } from "@/lib/gph-alliance";
 import { GPH_PACHUCA_PATH } from "@/lib/gph-pachuca-segunda-fase";
 import { academyMembershipPublicCopy } from "@/lib/academy-membership";
 import { personaMembershipPublicCopy } from "@/lib/persona-membership";
+import { MISION_PATH } from "@/lib/mision";
 import { VISORIA_PUBLIC_PATH } from "@/lib/visoria-event";
 
 const personaCopy = personaMembershipPublicCopy();
@@ -56,6 +57,11 @@ export const MARKETING_NAV: NavSection[] = [
         href: "/fut/talento",
         label: "Talento por estado",
         description: "Índice agregado de fichas en México",
+      },
+      {
+        href: MISION_PATH,
+        label: "Misión · etapa fundacional",
+        description: "Qué es MiFicha, metas y cómo sumar a la red",
       },
     ],
   },
@@ -165,6 +171,11 @@ export const MARKETING_NAV: NavSection[] = [
 
 /** Enlaces secundarios (menú “Más”). Sin “Entrar”: ya está el botón del header. */
 export const MARKETING_SECONDARY_LINKS: NavLink[] = [
+  {
+    href: MISION_PATH,
+    label: "Misión",
+    description: "Etapa fundacional · catálogo nacional",
+  },
   {
     href: "/fut/explorar#mapa",
     label: "Mapa de talento",

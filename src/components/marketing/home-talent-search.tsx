@@ -332,14 +332,20 @@ export function HomeTalentSearch({
                     Vista previa · entra para ver más fichas
                   </p>
                   <p className="mt-1 text-sm text-mf-text-secondary">
-                    Arma la ficha de tu hijo en ~5 min y suma tu ciudad al mapa.
+                    Estamos en la etapa fundacional: armar ficha (~5 min) suma tu ciudad
+                    al catálogo nacional.
                   </p>
-                  <Link
-                    href="/fut/entrar?next=/fut/tutor&utm_source=home&utm_medium=preview&utm_campaign=crear_ficha"
-                    className="mf-btn-gph mt-4 inline-flex"
-                  >
-                    Entrar / armar ficha
-                  </Link>
+                  <div className="mt-4 flex flex-wrap justify-center gap-2">
+                    <Link
+                      href="/fut/entrar?next=/fut/tutor&utm_source=home&utm_medium=preview&utm_campaign=crear_ficha"
+                      className="mf-btn-gph inline-flex"
+                    >
+                      Entrar / armar ficha
+                    </Link>
+                    <Link href="/fut/mision" className="mf-btn-gph-ghost inline-flex">
+                      Ver la misión
+                    </Link>
+                  </div>
                 </div>
               ) : null}
             </>

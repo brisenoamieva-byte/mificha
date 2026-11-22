@@ -64,11 +64,13 @@ export function buildInviteTeammateWhatsAppHref(input: {
     campaign: "invite_companero",
     content: input.publicCode || "preview",
   });
-  const text = `Así se ve la ficha de ${input.playerName} en MiFicha${
+  const text = `Estamos armando juntos el catálogo nacional de jugadores amateurs en MiFicha.
+
+Así se ve la ficha de ${input.playerName}${
     input.publicCode ? ` (${input.publicCode})` : ""
   }: ${preview}
 
-Arma la de tu hijo gratis en ~5 min: ${signup}`;
+Suma la de tu hijo (gratis, ~5 min) y ayuda a que tu ciudad tenga densidad real: ${signup}`;
   return `https://wa.me/?text=${encodeURIComponent(text)}`;
 }
 
