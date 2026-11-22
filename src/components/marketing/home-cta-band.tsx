@@ -16,16 +16,15 @@ export function HomeCtaBand() {
       <div className="relative mx-auto flex max-w-6xl flex-col items-start gap-5 px-4 py-10 sm:px-6 sm:py-12 lg:flex-row lg:items-center lg:justify-between">
         <div className="max-w-xl">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-white/60">
-            Piloto · familias
+            Familias
           </p>
           <h2 className="mt-2 text-xl font-semibold tracking-[-0.02em] text-white sm:text-2xl">
             Arma la ficha de tu hijo en minutos
           </h2>
           <p className="mt-2 text-sm leading-6 text-white/80">
-            Gratis para familias. Estamos en la etapa fundacional: cada ficha suma al
-            catálogo nacional.{" "}
+            Gratis. Con tu consentimiento puede salir en Explorar.{" "}
             <Link href="/fut/mision" className="font-semibold text-white underline">
-              Ver la misión
+              Qué es MiFicha
             </Link>
           </p>
         </div>

@@ -1,75 +1,75 @@
-/** Narrativa de etapa fundacional — co-construcción de la red. */
+/** Copy de misión — tono directo, sin jerga de pitch. */
 
 export const MISION_PATH = "/fut/mision";
 
-export const FOUNDER_BADGE_LABEL = "Fundador de la base 2026";
+export const FOUNDER_BADGE_LABEL = "Fundador 2026";
 export const FOUNDER_BADGE_HINT =
-  "Firmaste consentimiento en la etapa fundacional. Tu ficha ayuda a construir el catálogo nacional.";
+  "Publicaste en Explorar cuando la base todavía se está armando. Gracias por sumar.";
 
 export const MISION_GOALS = [
   {
     id: "fichas",
-    label: "Fichas en la red",
-    target: "2 000+",
-    detail: "Familias con ficha armada en MiFicha",
+    label: "Fichas",
+    target: "2 000",
+    detail: "Jugadores con ficha en MiFicha",
   },
   {
     id: "optin",
-    label: "Consentimiento Explorar",
-    target: "≥ 35%",
-    detail: "Para que el directorio muestre talento real",
+    label: "En Explorar",
+    target: "35%",
+    detail: "Con consentimiento del tutor",
   },
   {
     id: "estados",
-    label: "Estados con densidad",
-    target: "≥ 3 × 100",
-    detail: "Al menos 100 fichas en tres estados",
+    label: "Estados fuertes",
+    target: "3",
+    detail: "Con al menos 100 fichas cada uno",
   },
 ] as const;
 
 export const MISION_STAGES = [
   {
     n: "1",
-    title: "Fundación de la base",
+    title: "Llenar la base",
     now: true,
-    body: "Armar el catálogo nacional de jugadores amateurs con consentimiento. Cada ficha suma; la red es de quien participa.",
+    body: "Que haya jugadores de verdad en el mapa y en Explorar. Sin eso, lo demás no sirve.",
   },
   {
     n: "2",
-    title: "Señal y competitividad",
+    title: "Mejor señal",
     now: false,
-    body: "Evaluaciones, video e historial donde ya hay densidad. Datos objetivos para scouts, academias y familias.",
+    body: "Evaluaciones GPH, video e historial donde ya haya gente. Para que un scout vea algo útil.",
   },
   {
     n: "3",
     title: "Torneos conectados",
     now: false,
-    body: "Organizadores ligan resultados a fichas MF- para que el desempeño viaje solo entre sedes de México.",
+    body: "Que los resultados de torneos entren solos a la ficha, con organizers de varios estados.",
   },
   {
     n: "4",
-    title: "Puertas y apoyos",
+    title: "Más puertas",
     now: false,
-    body: "Visibilidad ante clubes, educación y apoyos deportivos o académicos cuando la red tenga escala y partners reales.",
+    body: "Clubes, academias y apoyos cuando la base ya sea grande. No prometemos eso hoy.",
   },
 ] as const;
 
 export const MISION_ACTIONS = [
   {
-    title: "Publica la ficha",
-    body: "Nombre, categoría, posición y foto. Es tuya; el código MF- te identifica en la red.",
+    title: "Arma la ficha",
+    body: "En unos minutos. Foto, posición, ciudad. Es del jugador.",
     href: "/fut/entrar?next=/fut/tutor&utm_source=mision&utm_medium=cta&utm_campaign=crear_ficha",
-    cta: "Armar ficha en ~5 min",
+    cta: "Crear ficha",
   },
   {
-    title: "Firma Explorar",
-    body: "Sin consentimiento no hay directorio. Al firmar entras como fundador de la base 2026.",
+    title: "Publícala en Explorar",
+    body: "Hace falta tu firma. Sin eso no aparece en el buscador.",
     href: "/fut/entrar?next=/fut/tutor&utm_source=mision&utm_medium=cta&utm_campaign=consent",
     cta: "Ir a firmar",
   },
   {
-    title: "Invita a 3 del equipo",
-    body: "La red crece cuando un padre suma a otros. Si es de todos, se comparte.",
+    title: "Pásalo a otros padres",
+    body: "Si tres del equipo arman ficha, tu ciudad empieza a verse en el mapa.",
     href: "/fut/entrar?next=/fut/tutor&utm_source=mision&utm_medium=cta&utm_campaign=invite",
     cta: "Entrar e invitar",
   },

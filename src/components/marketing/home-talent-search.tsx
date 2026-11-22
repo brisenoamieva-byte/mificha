@@ -141,18 +141,17 @@ export function HomeTalentSearch({
             <BrandWordmark className="text-white" />
           </h1>
           <p className="mt-4 max-w-2xl text-lg font-medium leading-8 text-white/90 sm:text-xl">
-            El catálogo de futbolistas amateurs de México
+            Busca jugadores. Publica la ficha de tu hijo.
           </p>
           <p className="mt-2 max-w-xl text-sm leading-7 text-white/70 sm:text-base">
-            Etapa fundacional: buscas talento o publicas la ficha de tu hijo. La red crece
-            con cada familia que suma.
+            Directorio con consentimiento del tutor.
             {access.unlocked && playerCount > 0 ? (
               <>
                 {" "}
-                <span className="tabular-nums text-white/90">{playerCount}</span> en directorio.
+                <span className="tabular-nums text-white/90">{playerCount}</span> visibles.
               </>
             ) : !access.unlocked ? (
-              <> Vista previa gratis.</>
+              <> Vista previa gratis; entra para ver más.</>
             ) : null}
           </p>
 
@@ -279,7 +278,7 @@ export function HomeTalentSearch({
               href={MISION_PATH}
               className="inline-flex items-center rounded-full border border-white/35 bg-white/10 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/15"
             >
-              Qué es MiFicha · Misión
+              Qué es MiFicha
             </Link>
             <Link
               href="/fut/explorar#mapa"
@@ -337,8 +336,8 @@ export function HomeTalentSearch({
                     Vista previa · entra para ver más fichas
                   </p>
                   <p className="mt-1 text-sm text-mf-text-secondary">
-                    Estamos en la etapa fundacional: armar ficha (~5 min) suma tu ciudad
-                    al catálogo nacional.
+                    Crea la ficha en ~5 min. Si publicas, ayudas a que tu ciudad se vea
+                    en el mapa.
                   </p>
                   <div className="mt-4 flex flex-wrap justify-center gap-2">
                     <Link

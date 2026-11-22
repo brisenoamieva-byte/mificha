@@ -168,11 +168,11 @@ export function TutorShareActions({
 
       <div className="rounded-xl border border-mf-gph/20 bg-mf-gph-soft/70 px-3.5 py-3">
         <p className="text-sm font-semibold text-mf-gph-ink">
-          Invita a 3 padres del equipo · la red es de todos
+          Invita a 3 padres del equipo
         </p>
         <p className="mt-1 text-sm leading-6 text-mf-text-secondary">
-          MiFicha crece cuando sumamos fichas. Comparte la de {playerName} y pide que
-          armen la de su hijo: más densidad en tu ciudad, más valor para todos.
+          Pásales la ficha de {playerName} y que armen la de su hijo. Así tu ciudad
+          empieza a verse en el mapa.
         </p>
         <a
           href={inviteHref}

@@ -7,7 +7,6 @@ import { HomeGphAllianceBand } from "@/components/marketing/evaluaciones-page-co
 import { HomeOrganizersInvite } from "@/components/marketing/home-organizers-invite";
 import { HashScroll } from "@/components/marketing/hash-scroll";
 import { ProductAnalyticsBeacon } from "@/components/marketing/product-analytics-beacon";
-import { SponsorSlot } from "@/components/marketing/sponsor-slot";
 import { countExploreDirectoryPlayers } from "@/lib/explore-demo-data";
 import {
   fetchPublicDirectory,
@@ -103,8 +102,6 @@ export default async function Home() {
         <HomeGphAllianceBand />
         <HomeHowItWorks />
         <HomeCtaBand />
-        {/* Patrocinio al final: no compite con marca/misión en el primer viewport */}
-        <SponsorSlot placement="home_strip" />
       </main>
 
       <SiteFooter />

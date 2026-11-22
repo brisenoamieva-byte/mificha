@@ -28,9 +28,9 @@ export const HOME_ANNOUNCEMENTS: HomeAnnouncement[] = [
   {
     id: "mision-fundacional-2026",
     tone: "pilot",
-    eyebrow: "Misión",
-    title: "Etapa fundacional: armamos el catálogo nacional",
-    detail: "Tu ficha suma · la red es de quien participa",
+    eyebrow: "MiFicha",
+    title: "Todavía estamos armando la base",
+    detail: "Crea ficha · publica en Explorar · invita al equipo",
     href: MISION_PATH,
     until: "2026-12-31",
   },

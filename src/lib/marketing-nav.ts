@@ -60,8 +60,8 @@ export const MARKETING_NAV: NavSection[] = [
       },
       {
         href: MISION_PATH,
-        label: "Misión · etapa fundacional",
-        description: "Qué es MiFicha, metas y cómo sumar a la red",
+        label: "Qué es MiFicha",
+        description: "En qué estamos y cómo sumar tu ficha",
       },
     ],
   },
@@ -173,8 +173,8 @@ export const MARKETING_NAV: NavSection[] = [
 export const MARKETING_SECONDARY_LINKS: NavLink[] = [
   {
     href: MISION_PATH,
-    label: "Misión",
-    description: "Etapa fundacional · catálogo nacional",
+    label: "Qué es MiFicha",
+    description: "Todavía armamos la base · cómo participar",
   },
   {
     href: "/fut/explorar#mapa",
