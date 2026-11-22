@@ -5,6 +5,7 @@ import {
 import { GPH_FUN, GPH_FUN_PATH } from "@/lib/gph-fun";
 import { VISORIA_EVENT, VISORIA_PUBLIC_PATH } from "@/lib/visoria-event";
 import { CRACKS_TRYOUTS, CRACKS_TRYOUTS_PATH } from "@/lib/cracks-tryouts";
+import { MISION_PATH } from "@/lib/mision";
 
 export type HomeAnnouncementTone = "brand" | "gph" | "event" | "pilot";
 
@@ -24,6 +25,15 @@ export interface HomeAnnouncement {
  * No duplica el buscador ni CTAs de cuenta.
  */
 export const HOME_ANNOUNCEMENTS: HomeAnnouncement[] = [
+  {
+    id: "mision-fundacional-2026",
+    tone: "pilot",
+    eyebrow: "Misión",
+    title: "Etapa fundacional: armamos el catálogo nacional",
+    detail: "Tu ficha suma · la red es de quien participa",
+    href: MISION_PATH,
+    until: "2026-12-31",
+  },
   {
     id: "gph-fun-fiestas-2026",
     tone: "event",

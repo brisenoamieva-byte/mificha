@@ -53,7 +53,6 @@ export default async function Home() {
       <SiteHeader />
       <HashScroll />
       <ProductAnalyticsBeacon event="view_home" />
-      <HomeAnnouncementsRail />
 
       <main className="flex-1">
         <HomeTalentSearch
@@ -62,6 +61,8 @@ export default async function Home() {
           playerCount={playerCount}
           initialCategoryFilter={initialCategoryFilter}
         />
+        {/* Anuncios después del hero: la marca/misión abren la página */}
+        <HomeAnnouncementsRail />
 
         <section className="border-b border-mf-border bg-white">
           <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-10 sm:flex-row sm:items-center sm:justify-between sm:px-6">

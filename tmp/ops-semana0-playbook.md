@@ -10,7 +10,7 @@
 - Horarios email: **cola vacía** (171 enviados)
 - Follow-up ficha: **cola vacía** (reenviados los pendientes)
 - WhatsApp sin email: `tmp/visoria-horarios-sin-email-whatsapp.csv` (~235 teléfonos únicos)
-- Nudge consentimiento: lote de 40 enviado (noche 21 nov); **~133 pendientes** (`all 40` mañana)
+- Nudge consentimiento: lotes enviados 21 nov; reintentar `all 50` hasta vaciar (~cuota 100/día)
 
 ## WhatsApp (sin email)
 Lista: `tmp/visoria-horarios-sin-email-whatsapp.csv`  
