@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { Instagram } from "lucide-react";
 import { BrandLogoLink } from "@/components/ui/brand-logo";
 import { BrandWordmark } from "@/components/ui/brand-wordmark";
+import { InstagramIcon } from "@/components/ui/instagram-icon";
 import { SiteNavDesktop, SiteNavMobile } from "@/components/marketing/site-nav";
 import { SponsorSlot } from "@/components/marketing/sponsor-slot";
 import { BRAND_INSTAGRAM_HANDLE, BRAND_INSTAGRAM_URL } from "@/lib/brand";
@@ -105,7 +105,7 @@ export function SiteFooter() {
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1.5 font-medium text-mf-brand transition hover:text-mf-gph"
           >
-            <Instagram className="h-3.5 w-3.5" aria-hidden />
+            <InstagramIcon className="h-3.5 w-3.5" />
             Instagram
           </a>
         </div>
@@ -120,7 +120,7 @@ export function SiteFooter() {
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 font-medium text-mf-brand transition hover:text-mf-gph"
             >
-              <Instagram className="h-4 w-4" aria-hidden />
+              <InstagramIcon className="h-4 w-4" />
               {BRAND_INSTAGRAM_HANDLE}
             </a>
             <a href="mailto:hola@mificha.mx" className="font-medium text-mf-brand hover:underline">
