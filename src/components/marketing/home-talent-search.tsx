@@ -14,9 +14,11 @@ import {
   gphScoreFilterValueFromPerformance,
   performancePatchFromGphScoreFilter,
 } from "@/components/marketing/gph-score-filter-select";
+import { HomeMissionStrip } from "@/components/marketing/home-mission-strip";
 import { BrandWordmark } from "@/components/ui/brand-wordmark";
 import { CategoryFilterSelect } from "@/components/ui/category-filter-select";
 import { MexicoLocationSelect } from "@/components/ui/mexico-location-select";
+import { MISION_PATH } from "@/lib/mision";
 import {
   isMarketingPlaceholderAcademy,
   normalizeExplorePlayerName,
@@ -139,18 +141,18 @@ export function HomeTalentSearch({
             <BrandWordmark className="text-white" />
           </h1>
           <p className="mt-4 max-w-2xl text-lg font-medium leading-8 text-white/90 sm:text-xl">
-            Encuentra jugadores de futbol
+            El catálogo de futbolistas amateurs de México
           </p>
           <p className="mt-2 max-w-xl text-sm leading-7 text-white/70 sm:text-base">
-            Para scouts: busca por nombre, posición, categoría y GPH. Para padres: arma la
-            ficha de tu hijo en ~5 min y publícala con consentimiento.
+            Etapa fundacional: buscas talento o publicas la ficha de tu hijo. La red crece
+            con cada familia que suma.
             {access.unlocked && playerCount > 0 ? (
               <>
                 {" "}
                 <span className="tabular-nums text-white/90">{playerCount}</span> en directorio.
               </>
             ) : !access.unlocked ? (
-              <> Vista previa gratis; el directorio completo al entrar.</>
+              <> Vista previa gratis.</>
             ) : null}
           </p>
 
@@ -268,28 +270,31 @@ export function HomeTalentSearch({
 
           <div className="mt-5 flex flex-wrap items-center gap-3">
             <Link
-              href="/fut/explorar#mapa"
-              className="inline-flex items-center gap-2 rounded-full border border-emerald-300/40 bg-emerald-400/10 px-4 py-2 text-sm font-semibold text-emerald-200 transition hover:border-emerald-300/70 hover:bg-emerald-400/15 hover:text-white"
-            >
-              Ver mapa de talento
-            </Link>
-            <Link
               href="/fut/entrar?next=/fut/tutor&utm_source=home&utm_medium=hero&utm_campaign=crear_ficha"
               className="inline-flex items-center rounded-full bg-white px-4 py-2 text-sm font-semibold text-mf-brand transition hover:bg-white/95"
             >
               Armar ficha en ~5 min
             </Link>
-            {!access.unlocked ? (
-              <Link href="#pro" className="text-sm text-white/70 hover:text-white">
-                Explorar Pro gratis
-              </Link>
-            ) : null}
-            <a href="#directorio" className="text-sm font-semibold text-white/80 hover:text-white">
-              Ver resultados
+            <Link
+              href={MISION_PATH}
+              className="inline-flex items-center rounded-full border border-white/35 bg-white/10 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/15"
+            >
+              Qué es MiFicha · Misión
+            </Link>
+            <Link
+              href="/fut/explorar#mapa"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-200/90 transition hover:text-white"
+            >
+              Mapa de talento
+            </Link>
+            <a href="#directorio" className="text-sm font-medium text-white/70 hover:text-white">
+              Ver muestra
             </a>
           </div>
         </div>
       </section>
+
+      <HomeMissionStrip />
 
       <section id="directorio" className="scroll-mt-20 border-b border-mf-border bg-mf-canvas">
         <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:py-12">
