@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="1600" height="480" viewBox="0 0 1600 480" role="img" aria-label="MiFicha">
+  <rect width="100%" height="100%" fill="#FFFFFF"/>
+  <image x="96" y="91" width="298" height="298"
+    href="../01-escudo/mificha-escudo.svg" xlink:href="../01-escudo/mificha-escudo.svg"/>
+  <text x="460" y="300" font-family="Inter, Segoe UI, Arial, Helvetica, sans-serif"
+    font-size="168" fill="#1B4F8C">
+    <tspan font-weight="400">Mi</tspan><tspan font-weight="700">Ficha</tspan>
+  </text>
+</svg>

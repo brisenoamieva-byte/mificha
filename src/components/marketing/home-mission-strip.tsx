@@ -12,11 +12,11 @@ export function HomeMissionStrip() {
             Qué es MiFicha
           </p>
           <p className="mt-1.5 text-base font-semibold tracking-tight text-mf-gph-ink sm:text-lg">
-            La ficha digital del jugador. Estamos llenando la base en México.
+            La ficha digital del jugador. Estamos llenando la base de México.
           </p>
           <p className="mt-1 text-sm leading-6 text-mf-text-secondary">
-            Publicas con consentimiento, buscas en Explorar y compartes el link.
-            Falta gente: por eso pedimos que armes la tuya e invites al equipo.
+            Todavía hay pocas fichas. Si armas la de tu hijo y se la pasas a
+            los papás del equipo, tu ciudad sale en el mapa.
           </p>
         </div>
         <Link
