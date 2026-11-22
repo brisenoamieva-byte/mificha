@@ -17,10 +17,34 @@ interface PageProps {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { estado } = await params;
   const state = resolveStateFromSlug(estado);
-  if (!state) return { title: "Talento | MiFicha" };
+  if (!state) {
+    return {
+      title: "Talento por estado | MiFicha",
+      robots: { index: false, follow: true },
+    };
+  }
+
+  const slug = stateSlug(state);
+  const title = `Futbolistas en ${state} · Talento por estado | MiFicha`;
+  const description = `Fichas agregadas de futbolistas amateurs en ${state}. Publica con consentimiento del tutor y aparece en Explorar.`;
+
   return {
-    title: `Jugadores en ${state} | MiFicha`,
-    description: `Fichas agregadas de futbolistas amateurs en ${state}. Publica con consentimiento del tutor y aparece en Explorar.`,
+    title,
+    description,
+    alternates: {
+      canonical: `/fut/talento/${slug}`,
+    },
+    openGraph: {
+      title,
+      description,
+      url: `/fut/talento/${slug}`,
+      type: "website",
+    },
+    twitter: {
+      card: "summary",
+      title,
+      description,
+    },
   };
 }
 

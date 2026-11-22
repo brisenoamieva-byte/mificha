@@ -38,13 +38,21 @@ function entry(
     lastModified?: Date | string;
   },
 ): MetadataRoute.Sitemap[number] {
-  return {
+  const item: MetadataRoute.Sitemap[number] = {
     url: `${base}${path}`,
-    lastModified: options?.lastModified ?? new Date(),
     changeFrequency: options?.changeFrequency ?? "weekly",
     priority: options?.priority ?? 0.6,
   };
+  // Solo incluir lastmod cuando es fecha real de contenido (no timestamp de build).
+  if (options?.lastModified) {
+    item.lastModified = options.lastModified;
+  }
+  return item;
 }
+
+/** Fechas reales de última edición editorial (actualizar al tocar legales). */
+const LEGAL_LASTMOD = new Date("2026-11-06T00:00:00.000Z");
+const VISORIAS_LASTMOD = new Date("2026-11-20T00:00:00.000Z");
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = getAppBaseUrl();
@@ -52,7 +60,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticPages: MetadataRoute.Sitemap = [
     entry(base, "/fut", { priority: 1, changeFrequency: "daily" }),
     entry(base, "/fut/explorar", { priority: 0.9, changeFrequency: "daily" }),
-    entry(base, "/fut/visorias", { priority: 0.9, changeFrequency: "weekly" }),
+    entry(base, "/fut/visorias", {
+      priority: 0.9,
+      changeFrequency: "weekly",
+      lastModified: VISORIAS_LASTMOD,
+    }),
     entry(base, "/fut/noticias", { priority: 0.7 }),
     entry(base, "/fut/eventos", { priority: 0.7 }),
     entry(base, "/fut/convocatorias", { priority: 0.7 }),
@@ -72,14 +84,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     entry(base, "/fut/aviso-privacidad", {
       priority: 0.3,
       changeFrequency: "yearly",
+      lastModified: LEGAL_LASTMOD,
     }),
     entry(base, "/fut/terminos", {
       priority: 0.3,
       changeFrequency: "yearly",
+      lastModified: LEGAL_LASTMOD,
     }),
     entry(base, "/fut/cookies", {
       priority: 0.2,
       changeFrequency: "yearly",
+      lastModified: LEGAL_LASTMOD,
     }),
   ];
 
@@ -97,7 +112,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "weekly",
       lastModified: academy.created_at
         ? new Date(academy.created_at)
-        : new Date(),
+        : undefined,
     }),
   );
 

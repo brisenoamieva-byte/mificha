@@ -54,8 +54,10 @@ const nextConfig: NextConfig = {
       { source: "/terminos-y-condiciones", destination: "/fut/terminos", permanent: true },
       { source: "/aviso-privacidad", destination: "/fut/aviso-privacidad", permanent: false },
       { source: "/aviso-de-privacidad", destination: "/fut/aviso-privacidad", permanent: true },
+      // Canónica: /fut/aviso-privacidad (alias públicos redirigen 308)
       { source: "/privacidad", destination: "/fut/aviso-privacidad", permanent: true },
       { source: "/politica-de-privacidad", destination: "/fut/aviso-privacidad", permanent: true },
+      { source: "/fut/privacidad", destination: "/fut/aviso-privacidad", permanent: true },
       { source: "/cookies", destination: "/fut/cookies", permanent: false },
       { source: "/politica-de-cookies", destination: "/fut/cookies", permanent: true },
       { source: "/j/:path*", destination: "/fut/j/:path*", permanent: false },

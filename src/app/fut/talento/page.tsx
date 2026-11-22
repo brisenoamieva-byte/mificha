@@ -10,6 +10,9 @@ export const metadata: Metadata = {
   title: "Talento por estado | MiFicha",
   description:
     "Índice agregado de fichas de futbolistas amateurs en México por estado y ciudad. Publica con consentimiento del tutor.",
+  alternates: {
+    canonical: "/fut/talento",
+  },
 };
 
 export default async function TalentoIndexPage() {
