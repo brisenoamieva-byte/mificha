@@ -99,6 +99,15 @@ export function SiteFooter() {
           <Link href={LEGAL_ROUTES.privacy} className="transition hover:text-mf-text">
             Privacidad
           </Link>
+          <a
+            href={BRAND_INSTAGRAM_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 font-medium text-mf-brand transition hover:text-mf-gph"
+          >
+            <Instagram className="h-3.5 w-3.5" aria-hidden />
+            Instagram
+          </a>
         </div>
       </div>
       <div className="mx-auto flex max-w-6xl flex-col items-center gap-3 border-t border-mf-border px-4 py-8 text-center text-sm text-mf-text-muted sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:text-left">
