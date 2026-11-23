@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { Copy, FileText, MessageCircle, Printer, Share2, UserPlus } from "lucide-react";
+import { Copy, Download, FileText, MessageCircle, Share2, UserPlus } from "lucide-react";
 import { trackProductEvent } from "@/lib/product-analytics";
 import { PLAYER_CODE_SHORT } from "@/lib/player-public-code-copy";
 import {
@@ -24,7 +24,8 @@ export function TutorShareActions({
   /** Kit con PDF hoja de vida / presentación / ficha. */
   materialsKitHref?: string | null;
 }) {
-  const [copied, setCopied] = useState<"link" | "code" | null>(null);
+  const [copied, setCopied] = useState(false);
+  const [downloading, setDownloading] = useState(false);
   const [canNativeShare, setCanNativeShare] = useState(false);
 
   const resolvedUrl = useMemo(() => {
@@ -41,6 +42,11 @@ export function TutorShareActions({
           })();
     return withShareUtm(base, { campaign: "share_ficha", content: publicCode || "link" });
   }, [absoluteUrl, sharePath, publicCode]);
+
+  const imagePath = useMemo(
+    () => `${sharePath.replace(/\/$/, "")}/opengraph-image`,
+    [sharePath],
+  );
 
   const whatsappHref = useMemo(() => {
     const text = publicCode
@@ -63,12 +69,12 @@ export function TutorShareActions({
     setCanNativeShare(typeof navigator !== "undefined" && typeof navigator.share === "function");
   }, []);
 
-  async function copy(kind: "link" | "code", value: string) {
+  async function copyLink() {
     try {
-      await navigator.clipboard.writeText(value);
-      setCopied(kind);
-      trackProductEvent("share_click", { channel: "copy", kind });
-      window.setTimeout(() => setCopied(null), 1800);
+      await navigator.clipboard.writeText(resolvedUrl);
+      setCopied(true);
+      trackProductEvent("share_click", { channel: "copy", kind: "link" });
+      window.setTimeout(() => setCopied(false), 1800);
     } catch {
       /* ignore */
     }
@@ -89,90 +95,112 @@ export function TutorShareActions({
     }
   }
 
+  async function downloadImage() {
+    setDownloading(true);
+    try {
+      const res = await fetch(imagePath, { cache: "no-store" });
+      if (!res.ok) throw new Error("download_failed");
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${(publicCode || "ficha").toLowerCase()}-mificha.png`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      trackProductEvent("share_click", { channel: "download_image" });
+    } catch {
+      /* ignore */
+    } finally {
+      setDownloading(false);
+    }
+  }
+
   return (
     <div className="flex flex-col gap-3 rounded-2xl border border-mf-border bg-white/90 px-4 py-3.5 sm:px-5 print:hidden">
-      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
-        <div className="min-w-0">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
-            Compartir
-          </p>
-          <p className="mt-0.5 text-sm text-mf-text-secondary">
-            {publicCode ? (
-              <>
-                <span className="font-mono font-semibold text-mf-gph-ink">{publicCode}</span>
-                {" · "}
-                {PLAYER_CODE_SHORT}
-              </>
-            ) : (
-              "Link listo para visores, universidades o academias"
-            )}
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <a
-            href={whatsappHref}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => trackProductEvent("share_click", { channel: "whatsapp" })}
-            className="inline-flex items-center justify-center gap-2 rounded-lg bg-mf-accent-dark px-3.5 py-2 text-sm font-semibold text-white hover:bg-[#047857]"
-          >
-            <MessageCircle className="h-4 w-4" />
-            WhatsApp
-          </a>
-          {canNativeShare ? (
-            <button
-              type="button"
-              onClick={() => void shareNative()}
-              className="inline-flex items-center justify-center gap-2 rounded-lg border border-mf-border bg-white px-3.5 py-2 text-sm font-semibold text-mf-text hover:bg-mf-canvas"
-            >
-              <Share2 className="h-4 w-4" />
-              Compartir
-            </button>
-          ) : null}
+      <div>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
+          Compartir
+        </p>
+        <p className="mt-0.5 text-sm text-mf-text-secondary">
+          {publicCode ? (
+            <>
+              <span className="font-mono font-semibold text-mf-gph-ink">{publicCode}</span>
+              {" · "}
+              {PLAYER_CODE_SHORT}
+            </>
+          ) : (
+            "Manda el link o guarda la imagen para WhatsApp e Instagram"
+          )}
+        </p>
+      </div>
+
+      <div className="flex flex-wrap gap-2">
+        <a
+          href={whatsappHref}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={() => trackProductEvent("share_click", { channel: "whatsapp" })}
+          className="inline-flex items-center justify-center gap-2 rounded-lg bg-mf-accent-dark px-3.5 py-2 text-sm font-semibold text-white hover:bg-[#047857]"
+        >
+          <MessageCircle className="h-4 w-4" />
+          WhatsApp
+        </a>
+        <button
+          type="button"
+          onClick={() => void downloadImage()}
+          disabled={downloading}
+          className="inline-flex items-center justify-center gap-2 rounded-lg border border-mf-border bg-white px-3.5 py-2 text-sm font-semibold text-mf-text hover:bg-mf-canvas disabled:opacity-60"
+        >
+          <Download className="h-4 w-4" />
+          {downloading ? "Guardando…" : "Guardar imagen"}
+        </button>
+        <button
+          type="button"
+          onClick={() => void copyLink()}
+          className="inline-flex items-center justify-center gap-2 rounded-lg border border-mf-border bg-white px-3.5 py-2 text-sm font-semibold text-mf-text hover:bg-mf-canvas"
+        >
+          <Copy className="h-4 w-4" />
+          {copied ? "Link copiado" : "Copiar link"}
+        </button>
+        {canNativeShare ? (
           <button
             type="button"
-            onClick={() => void copy("link", resolvedUrl)}
+            onClick={() => void shareNative()}
             className="inline-flex items-center justify-center gap-2 rounded-lg border border-mf-border bg-white px-3.5 py-2 text-sm font-semibold text-mf-text hover:bg-mf-canvas"
           >
-            <Copy className="h-4 w-4" />
-            {copied === "link" ? "Link copiado" : "Copiar link"}
+            <Share2 className="h-4 w-4" />
+            Más
           </button>
-          {publicCode ? (
-            <button
-              type="button"
-              onClick={() => void copy("code", publicCode)}
-              className="inline-flex items-center justify-center gap-2 rounded-lg border border-mf-border bg-white px-3.5 py-2 text-sm font-semibold text-mf-brand hover:bg-mf-canvas"
-            >
-              {copied === "code" ? "Código copiado" : "Código"}
-            </button>
-          ) : null}
-          <button
-            type="button"
-            onClick={() => window.print()}
-            className="inline-flex items-center justify-center gap-2 rounded-lg border border-mf-border bg-white px-3.5 py-2 text-sm font-semibold text-mf-gph hover:bg-mf-gph-soft"
+        ) : null}
+      </div>
+
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-mf-border/80 pt-3 text-sm">
+        <button
+          type="button"
+          onClick={() => window.print()}
+          className="font-semibold text-mf-gph hover:underline"
+        >
+          Descargar PDF
+        </button>
+        {materialsKitHref ? (
+          <Link
+            href={materialsKitHref}
+            className="inline-flex items-center gap-1.5 font-semibold text-mf-gph hover:underline"
           >
-            <Printer className="h-4 w-4" />
-            Descargar PDF
-          </button>
-          {materialsKitHref ? (
-            <Link
-              href={materialsKitHref}
-              className="inline-flex items-center justify-center gap-2 rounded-lg bg-mf-gph px-3.5 py-2 text-sm font-semibold text-white hover:bg-[#163f70]"
-            >
-              <FileText className="h-4 w-4" />
-              Kit PDF
-            </Link>
-          ) : null}
-        </div>
+            <FileText className="h-3.5 w-3.5" />
+            Kit PDF
+          </Link>
+        ) : null}
       </div>
 
       <div className="rounded-xl border border-mf-gph/20 bg-mf-gph-soft/70 px-3.5 py-3">
         <p className="text-sm font-semibold text-mf-gph-ink">
-          Invita a 3 padres del equipo
+          Invita a padres del equipo
         </p>
         <p className="mt-1 text-sm leading-6 text-mf-text-secondary">
-          Pásales la ficha de {playerName} y que armen la de su hijo. Así tu ciudad
-          empieza a verse en el mapa.
+          Que armen la ficha de su hijo. Así tu ciudad empieza a verse en el mapa.
         </p>
         <a
           href={inviteHref}
@@ -182,7 +210,7 @@ export function TutorShareActions({
           className="mt-3 inline-flex items-center justify-center gap-2 rounded-lg bg-mf-gph px-3.5 py-2 text-sm font-semibold text-white hover:bg-[#163f70]"
         >
           <UserPlus className="h-4 w-4" />
-          Invitar compañero por WhatsApp
+          Invitar por WhatsApp
         </a>
       </div>
     </div>

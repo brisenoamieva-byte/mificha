@@ -9,7 +9,7 @@ export const contentType = "image/png";
 
 function BrandMark() {
   return (
-    <span style={{ display: "flex", fontSize: 24 }}>
+    <span style={{ display: "flex", fontSize: 26 }}>
       <span style={{ fontWeight: 400 }}>Mi</span>
       <span style={{ fontWeight: 700 }}>Ficha</span>
     </span>
@@ -26,7 +26,7 @@ function FallbackCard() {
         flexDirection: "column",
         justifyContent: "center",
         padding: 64,
-        background: "linear-gradient(135deg, #0a1628 0%, #1B4F8C 100%)",
+        background: "linear-gradient(145deg, #0a1628 0%, #0F2D52 48%, #1B4F8C 100%)",
         color: "white",
         fontFamily: "system-ui, sans-serif",
       }}
@@ -35,6 +35,25 @@ function FallbackCard() {
       <p style={{ fontSize: 28, marginTop: 16, opacity: 0.75 }}>
         Ficha de presentación
       </p>
+    </div>
+  );
+}
+
+function Chip({ children }: { children: string }) {
+  return (
+    <div
+      style={{
+        display: "flex",
+        borderRadius: 999,
+        border: "1px solid rgba(255,255,255,0.18)",
+        background: "rgba(255,255,255,0.08)",
+        padding: "10px 18px",
+        fontSize: 22,
+        fontWeight: 600,
+        color: "rgba(255,255,255,0.92)",
+      }}
+    >
+      {children}
     </div>
   );
 }
@@ -59,6 +78,9 @@ export default async function Image({
     }
 
     const payload = buildOgTutorSharePayload(child);
+    const chips = [payload.position, payload.category, payload.club].filter(
+      Boolean,
+    ) as string[];
 
     return new ImageResponse(
       (
@@ -71,7 +93,7 @@ export default async function Image({
             justifyContent: "space-between",
             padding: 56,
             background:
-              "linear-gradient(135deg, #0a1628 0%, #123d72 55%, #1B4F8C 100%)",
+              "linear-gradient(145deg, #081221 0%, #0F2D52 52%, #1B4F8C 100%)",
             color: "white",
             fontFamily: "system-ui, sans-serif",
           }}
@@ -86,22 +108,24 @@ export default async function Image({
             <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
               <div
                 style={{
-                  width: 56,
-                  height: 56,
-                  borderRadius: 999,
-                  background: "rgba(255,255,255,0.12)",
+                  width: 64,
+                  height: 64,
+                  borderRadius: 18,
+                  background: "rgba(52, 211, 153, 0.16)",
+                  border: "1px solid rgba(52, 211, 153, 0.45)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  fontSize: 22,
+                  fontSize: 24,
                   fontWeight: 700,
+                  color: "#6EE7B7",
                 }}
               >
                 {payload.initials}
               </div>
-              <div style={{ display: "flex", flexDirection: "column" }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                 <BrandMark />
-                <span style={{ fontSize: 18, opacity: 0.65 }}>
+                <span style={{ fontSize: 18, opacity: 0.62 }}>
                   Ficha de presentación
                 </span>
               </div>
@@ -109,9 +133,9 @@ export default async function Image({
             <div
               style={{
                 borderRadius: 999,
-                border: "1px solid rgba(147, 197, 253, 0.45)",
+                border: "1px solid rgba(147, 197, 253, 0.4)",
                 background: "rgba(147, 197, 253, 0.12)",
-                padding: "10px 20px",
+                padding: "10px 18px",
                 fontSize: 18,
                 fontWeight: 600,
                 color: "#bfdbfe",
@@ -121,11 +145,22 @@ export default async function Image({
             </div>
           </div>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            <div style={{ fontSize: 52, fontWeight: 700, lineHeight: 1.1 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+            <div style={{ fontSize: 58, fontWeight: 700, lineHeight: 1.05 }}>
               {payload.title}
             </div>
-            <div style={{ fontSize: 26, opacity: 0.78 }}>{payload.subtitle}</div>
+            {chips.length > 0 ? (
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+                {chips.slice(0, 3).map((chip) => (
+                  <Chip key={chip}>{chip}</Chip>
+                ))}
+              </div>
+            ) : (
+              <div style={{ fontSize: 26, opacity: 0.75 }}>{payload.subtitle}</div>
+            )}
+            {payload.city ? (
+              <div style={{ fontSize: 22, opacity: 0.65 }}>{payload.city}</div>
+            ) : null}
           </div>
 
           <div
@@ -135,9 +170,7 @@ export default async function Image({
               alignItems: "flex-end",
             }}
           >
-            <div style={{ fontSize: 20, opacity: 0.7 }}>
-              Lista para compartir con visorías y academias
-            </div>
+            <div style={{ fontSize: 20, opacity: 0.68 }}>mificha.mx</div>
             {payload.publicCode ? (
               <div
                 style={{

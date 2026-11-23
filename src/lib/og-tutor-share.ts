@@ -1,3 +1,4 @@
+import { formatPlayerCategory } from "@/lib/player-category";
 import { formatPublicLockedName } from "@/lib/privacy";
 import type { TutorChild } from "@/lib/tutor-family";
 import { tutorSharePath } from "@/lib/tutor-family";
@@ -8,6 +9,10 @@ export interface OgTutorSharePayload {
   publicCode: string | null;
   initials: string;
   badge: string;
+  position: string | null;
+  category: string | null;
+  club: string | null;
+  city: string | null;
 }
 
 function resolveAppUrl() {
@@ -21,11 +26,17 @@ export function buildTutorShareAbsoluteUrl(tokenOrCode: string) {
 }
 
 export function buildOgTutorSharePayload(child: TutorChild): OgTutorSharePayload {
-  const bits = [
-    child.profile.position,
-    child.profile.club,
-    child.profile.city,
-  ].filter(Boolean) as string[];
+  const position = child.profile.position?.trim() || null;
+  const club =
+    child.linked_academy_name?.trim() ||
+    child.profile.club?.trim() ||
+    null;
+  const city = child.profile.city?.trim() || null;
+  const categoryRaw = formatPlayerCategory(child.profile.birth_date);
+  const category =
+    categoryRaw && categoryRaw !== "Sin categoría" ? categoryRaw : null;
+
+  const bits = [position, category, club, city].filter(Boolean) as string[];
 
   const parts = child.player_name.trim().split(/\s+/).filter(Boolean);
   const initials =
@@ -39,6 +50,10 @@ export function buildOgTutorSharePayload(child: TutorChild): OgTutorSharePayload
     publicCode: child.public_code || null,
     initials,
     badge: child.linked_academy_name ? "Academia ligada" : "Ficha del jugador",
+    position,
+    category,
+    club,
+    city,
   };
 }
 
