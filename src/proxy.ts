@@ -5,7 +5,7 @@ import type { NextRequest } from "next/server";
  * Canónico: siempre www.mificha.mx.
  * Vercel ya hace 308 en el edge; esto refuerza si alguna ruta llega al apex.
  */
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const host = request.headers.get("host")?.toLowerCase() ?? "";
   if (host === "mificha.mx") {
     const url = request.nextUrl.clone();
