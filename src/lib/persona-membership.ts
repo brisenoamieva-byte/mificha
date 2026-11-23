@@ -133,12 +133,12 @@ export function personaMembershipPublicCopy() {
     : "academia (plantel, partidos y MF)";
   if (PERSONA_MEMBERSHIP_FREE_PROMO) {
     return {
-      badge: "Gratis por tiempo limitado",
-      priceLine: "Gratis por tiempo limitado",
-      meta: "Gratis · tiempo limitado",
+      badge: "Explorar Pro",
+      priceLine: "Gratis",
+      meta: "Gratis",
       cta: "Activar gratis",
-      short: "Gratis por tiempo limitado",
-      planesSummary: `Dos cuentas: persona (gratis por tiempo limitado) o ${academyBit}.`,
+      short: "Gratis",
+      planesSummary: `Dos cuentas: persona (gratis) o ${academyBit}.`,
     };
   }
   return {

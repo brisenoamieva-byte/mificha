@@ -17,7 +17,7 @@ const STEPS = [
     n: "3",
     title: "Detalle y academia",
     detail:
-      "Con Explorar Pro ves ficha completa (gratis por tiempo limitado). La academia usa plantel y partidos; el diagnóstico GPH es aparte.",
+      "Con Explorar Pro ves ficha completa (gratis). La academia usa plantel y partidos; el diagnóstico GPH es aparte.",
   },
 ] as const;
 

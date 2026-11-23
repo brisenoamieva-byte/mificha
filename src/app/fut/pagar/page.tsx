@@ -7,7 +7,7 @@ import { isMercadoPagoConfigured } from "@/lib/mercadopago";
 export const metadata: Metadata = {
   title: "Pagar diagnóstico GPH | MiFicha",
   description:
-    "Evaluación presencial GPH en Querétaro: técnica, táctica, físico, mental y hábitos. Promo por tiempo limitado (incluye 1 año de MiFicha). Mercado Pago o WhatsApp.",
+    "Evaluación presencial GPH en Querétaro: técnica, táctica, físico, mental y hábitos. Promo (incluye 1 año de MiFicha). Mercado Pago o WhatsApp.",
 };
 
 function parseSku(value: string | string[] | undefined): FamilySku | undefined {

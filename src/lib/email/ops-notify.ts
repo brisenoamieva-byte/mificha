@@ -34,7 +34,7 @@ export async function notifyOps(input: {
     return { ok: false, skipped: "RESEND_API_KEY" };
   }
 
-  const from = getResendFromEmail() || "MiFicha <notificaciones@mificha.mx>";
+  const from = getResendFromEmail() || "MiFicha <hola@mificha.mx>";
   const to = getOpsNotifyEmail();
   const rows = input.lines.filter(([, value]) => Boolean(value?.trim()));
   const text = [

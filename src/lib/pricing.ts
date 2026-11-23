@@ -75,7 +75,7 @@ export const DIAGNOSIS_PRODUCT = {
       id: "individual",
       label: "Jugador",
       listPriceLabel: "Promo",
-      priceLabel: "Promo · tiempo limitado",
+      priceLabel: "Promo",
       promo: true,
       period: "Sesión + 12 meses MiFicha",
       description: "Diagnóstico completo e informe ligado a la ficha. El monto se confirma al pagar.",
@@ -95,9 +95,9 @@ export const SCOUT_PRICING = {
   basicLabel: "Búsqueda básica",
   basicPrice: "Gratis",
   proLabel: "Explorar Pro",
-  proStatus: "Gratis por tiempo limitado",
+  proStatus: "Gratis",
   description:
-    "Filtra por categoría, posición y ciudad. Solo fichas con consentimiento. El detalle completo se desbloquea con Explorar Pro (gratis por tiempo limitado).",
+    "Filtra por categoría, posición y ciudad. Solo fichas con consentimiento. El detalle completo se desbloquea con Explorar Pro (gratis).",
   unlockNote:
     "Incluye publicar fichas (tutor o representante) y ver fotos, videos, bio, contacto y ficha completa de terceros con opt-in.",
 } as const;

@@ -36,11 +36,11 @@ export const FAMILY_PRICING_COPY = {
     "La plataforma está abierta para que el tutor arme la ficha del jugador. Lo que se cobra aparte es el diagnóstico GPH (evaluación presencial + 12 meses de MiFicha).",
   /** Una línea (nav, pies, cards). */
   todayShort:
-    "Ficha del jugador gratis por tiempo limitado. Diagnóstico GPH opcional (incluye 12 meses).",
+    "Ficha del jugador gratis. Diagnóstico GPH opcional (incluye 12 meses).",
   diagnosis: "Diagnóstico GPH · evaluación presencial + 12 meses de MiFicha",
   /** Solo pie discreto; no va en el hero. */
   laterNote:
-    "La ficha del jugador está en piloto gratuito por tiempo limitado. El diagnóstico GPH se cotiza aparte.",
+    "La ficha del jugador es gratis. El diagnóstico GPH se cotiza aparte.",
 } as const;
 
 export const GPH_PARTNERSHIP = {
@@ -97,7 +97,7 @@ export const FAMILY_PRODUCTS = {
     locationLabel: "Querétaro",
     locationDetail: "Sesión presencial en Querétaro (fecha y sede se coordinan al pagar o por WhatsApp).",
     description:
-      "Es una evaluación presencial con metodología GPH: medimos técnica, táctica, físico, mental y hábitos. Sales con etapa de desarrollo, fortalezas, 3–5 objetivos claros y el informe en MiFicha — más 12 meses de acceso para seguimiento. Promoción −30% por tiempo limitado.",
+      "Es una evaluación presencial con metodología GPH: medimos técnica, táctica, físico, mental y hábitos. Sales con etapa de desarrollo, fortalezas, 3–5 objetivos claros y el informe en MiFicha — más 12 meses de acceso para seguimiento. Promoción −30%.",
     highlights: [
       "Presencial en Querétaro",
       "Pruebas 1–5 + etapa de desarrollo",

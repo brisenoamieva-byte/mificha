@@ -40,7 +40,7 @@ export const MARKETING_NAV: NavSection[] = [
       {
         href: "/fut/entrar?next=/fut/tutor",
         label: "Armar ficha de mi hijo",
-        description: `Gratis · ~5 min · Explorar Pro · ${personaCopy.short}`,
+        description: "Gratis · ~5 min · Explorar Pro",
       },
       {
         href: "/fut/tutor",

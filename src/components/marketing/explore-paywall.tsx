@@ -71,9 +71,6 @@ export function ExplorePaywallBanner({ access }: { access: ExploreAccess }) {
                 {copy.badge}
               </p>
               <p className="mt-2 text-3xl font-semibold text-mf-gph-ink">Gratis</p>
-              <p className="mt-1 text-sm text-mf-text-secondary">
-                Por tiempo limitado en el piloto.
-              </p>
             </>
           ) : (
             <p className="text-3xl font-semibold text-mf-gph-ink">Explorar Pro</p>

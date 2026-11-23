@@ -31,7 +31,7 @@ export function HomeSearchHero({ playerCount }: HomeSearchHeroProps) {
         </p>
         <p className="mt-2 max-w-xl text-sm leading-7 text-white/70 sm:text-base">
           Filtra por posición y ciudad. Vista básica gratis; ficha completa con membresía
-          persona (gratis por tiempo limitado).
+          persona (gratis).
           {playerCount > 0 ? (
             <>
               {" "}

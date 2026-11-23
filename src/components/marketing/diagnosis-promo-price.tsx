@@ -56,7 +56,7 @@ export function DiagnosisPromoPrice({
               tone === "dark" ? "text-[#fda4af]" : "text-[#e11d48]",
             )}
           >
-            Solo por tiempo limitado
+            Precio promocional
           </span>
         </div>
       ) : null}

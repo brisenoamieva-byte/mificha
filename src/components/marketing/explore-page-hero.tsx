@@ -76,7 +76,7 @@ export function ExplorePageHero({
             </h1>
             <p className="mt-5 text-base leading-8 text-mf-text-secondary sm:text-[1.0625rem]">
               Fichas de tutores o representantes. Vista previa gratis; detalle completo con
-              Explorar Pro (gratis por tiempo limitado).
+              Explorar Pro (gratis).
             </p>
 
             <ul className="mt-6 flex flex-wrap gap-2">
