@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { redirect } from "next/navigation";
+import { AppInstallPanel } from "@/components/marketing/app-install-panel";
 import { SiteFooter, SiteHeader } from "@/components/marketing/site-header";
 import { TutorWorkspace } from "@/components/tutor/tutor-workspace";
+import { APP_INSTALL_PATH } from "@/lib/app-install";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 
 export const metadata: Metadata = {
@@ -40,7 +43,22 @@ export default async function TutorPage() {
             membresía (gratis) desbloquea detalle en
             Explorar.
           </p>
+          <p className="mt-3 text-sm">
+            <Link
+              href={APP_INSTALL_PATH}
+              className="font-semibold text-mf-brand hover:underline"
+            >
+              Descargar app · Android e iPhone
+            </Link>
+          </p>
         </div>
+
+        <section
+          id="app"
+          className="mb-8 scroll-mt-24 rounded-xl border border-mf-border bg-white px-4 py-5 sm:px-6"
+        >
+          <AppInstallPanel compact />
+        </section>
 
         <section id="ficha" className="scroll-mt-24">
           <TutorWorkspace />

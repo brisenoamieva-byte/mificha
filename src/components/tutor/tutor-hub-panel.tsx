@@ -8,12 +8,11 @@ import { GPH_SAMPLE_CLASS } from "@/lib/gph-alliance";
 import {
   gphFreeTrainingBookingHref,
   gphFreeTrainingBookingIsCalendly,
-  TUTOR_APP_INSTALL,
   TUTOR_SERVICE_STATUS_LABEL,
   TUTOR_SERVICES,
 } from "@/lib/tutor-hub";
+import { AppInstallPanel } from "@/components/marketing/app-install-panel";
 import { SponsorSlot } from "@/components/marketing/sponsor-slot";
-import { TutorInstallHint } from "@/components/tutor/tutor-install-hint";
 
 const nav = [
   { href: "#noticias", label: "Noticias" },
@@ -157,27 +156,7 @@ export function TutorHubPanel() {
       </section>
 
       <section id="app" className="scroll-mt-24 rounded-xl border border-mf-border bg-white px-5 py-6 sm:px-7">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
-          App MiFicha
-        </p>
-        <h2 className="mt-2 text-xl font-semibold tracking-tight text-mf-gph-ink">
-          {TUTOR_APP_INSTALL.title}
-        </h2>
-        <p className="mt-2 max-w-2xl text-sm leading-7 text-mf-text-secondary">
-          {TUTOR_APP_INSTALL.detail}
-        </p>
-        <ul className="mt-4 space-y-2 text-sm leading-6 text-mf-text-secondary">
-          <li>
-            <span className="font-semibold text-mf-gph-ink">Android:</span>{" "}
-            {TUTOR_APP_INSTALL.androidHint}
-          </li>
-          <li>
-            <span className="font-semibold text-mf-gph-ink">iPhone:</span>{" "}
-            {TUTOR_APP_INSTALL.iosHint}
-          </li>
-        </ul>
-        <p className="mt-3 text-xs leading-5 text-mf-text-muted">{TUTOR_APP_INSTALL.storeNote}</p>
-        <TutorInstallHint />
+        <AppInstallPanel compact />
       </section>
     </div>
   );

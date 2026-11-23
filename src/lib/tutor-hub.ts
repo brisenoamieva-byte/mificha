@@ -83,11 +83,12 @@ export const TUTOR_SERVICES: TutorServiceItem[] = [
 ];
 
 export const TUTOR_APP_INSTALL = {
-  title: "Lleva MiFicha en el celular",
+  title: "Descargar app MiFicha",
   detail:
-    "Instala MiFicha como app desde el navegador (Android o iPhone). Así entras al hub de tutor sin buscar el link.",
+    "App gratis para Android e iPhone: instálala desde el navegador y queda en tu pantalla de inicio.",
   androidHint: "Chrome → menú ⋮ → Instalar app / Añadir a pantalla de inicio",
   iosHint: "Safari → Compartir → Añadir a pantalla de inicio",
   storeNote:
-    "Las apps de Play Store y App Store llegan después; por ahora la instalación web es la vía oficial.",
+    "Todavía no está en Play Store ni App Store: la vía oficial es instalarla desde /fut/app.",
+  href: "/fut/app",
 } as const;

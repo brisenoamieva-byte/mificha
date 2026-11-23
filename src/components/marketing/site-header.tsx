@@ -66,6 +66,9 @@ export function SiteFooter() {
       <SponsorSlot placement="footer_rail" />
       <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
         <div className="flex flex-wrap justify-center gap-x-5 gap-y-2 text-center text-sm text-mf-text-secondary sm:justify-start sm:text-left">
+          <Link href="/fut/app" className="font-semibold text-mf-brand transition hover:text-mf-gph">
+            Descargar app
+          </Link>
           <Link href="/fut/planes" className="transition hover:text-mf-text">
             Planes
           </Link>

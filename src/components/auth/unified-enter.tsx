@@ -444,6 +444,12 @@ export function UnifiedEnter() {
         publica fichas y desbloquea el detalle en
         Explorar.
       </p>
+
+      <p className="text-center text-sm">
+        <Link href="/fut/app" className="font-semibold text-mf-brand hover:underline">
+          Descargar app · Android e iPhone
+        </Link>
+      </p>
     </form>
   );
 }

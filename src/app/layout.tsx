@@ -4,6 +4,7 @@ import { DevServiceWorkerCleanup } from "@/components/dev-service-worker-cleanup
 import { AuthRecoveryRedirect } from "@/components/auth/auth-recovery-redirect";
 import { AuthSessionSync } from "@/components/auth/auth-session-sync";
 import { CookieNotice } from "@/components/marketing/cookie-notice";
+import { PwaRegister } from "@/components/pwa-register";
 import { AppToaster } from "@/components/ui/toast";
 import { JsonLd } from "@/components/seo/json-ld";
 import { getAppBaseUrl } from "@/lib/app-url";
@@ -75,6 +76,7 @@ export default function RootLayout({
       <body className="min-h-dvh bg-mf-canvas font-sans text-mf-text antialiased">
         <JsonLd data={organizationJsonLd()} />
         <DevServiceWorkerCleanup />
+        <PwaRegister />
         <AuthRecoveryRedirect />
         <AuthSessionSync />
         {children}

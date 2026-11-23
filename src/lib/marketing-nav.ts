@@ -48,6 +48,11 @@ export const MARKETING_NAV: NavSection[] = [
         description: "Entrar al panel del tutor o representante",
       },
       {
+        href: "/fut/app",
+        label: "Descargar app",
+        description: "Gratis · Android e iPhone · pantalla de inicio",
+      },
+      {
         href: "/fut/talento",
         label: "Talento por estado",
         description: "Índice agregado de fichas en México",
@@ -147,6 +152,11 @@ export const MARKETING_NAV: NavSection[] = [
 
 /** Enlaces secundarios (menú “Más”). Sin “Entrar”: ya está el botón del header. */
 export const MARKETING_SECONDARY_LINKS: NavLink[] = [
+  {
+    href: "/fut/app",
+    label: "Descargar app",
+    description: "Android e iPhone · ícono en pantalla de inicio",
+  },
   {
     href: MISION_PATH,
     label: "Qué es MiFicha",
