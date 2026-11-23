@@ -1,5 +1,5 @@
 import { ImageResponse } from "next/og";
-import { buildOgTutorSharePayloadWithPhoto } from "@/lib/og-tutor-share";
+import { buildOgTutorSharePayloadWithPhoto } from "@/lib/og-tutor-share-image";
 import { peekTutorChildByShareToken } from "@/lib/tutor-family";
 import { createSupabaseAdminClient } from "@/lib/supabase-admin";
 
