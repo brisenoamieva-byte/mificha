@@ -10,12 +10,12 @@ export const SCOUT_PRODUCT = {
   currency: "USD",
   period: "al año",
   summary:
-    "Con tu cuenta de tutor o representante publicas fichas (con consentimiento) y ves fotos, contacto, videos y detalle de otros jugadores en Explorar.",
+    "Publica las fichas de tus jugadores y abre el detalle completo de terceros en Explorar.",
   includes: [
-    "Publicar fichas de hijos o representados (con opt-in a Explorar)",
-    "Ficha completa de terceros: fotos, videos, bio y stats",
-    "Datos de contacto cuando el tutor o representante los publique",
-    "Búsqueda por categoría, posición y ciudad con detalle completo",
+    "Publicar fichas de hijos o representados (con opt-in)",
+    "Fotos, videos, bio y stats de otros jugadores",
+    "Contacto cuando el tutor lo publique",
+    "Filtros por categoría, posición y ciudad",
   ],
   checkoutPath: "/fut/explorar#pro",
   /** Endpoint de activación / cobro (promo gratis o Mercado Pago). */

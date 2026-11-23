@@ -12,8 +12,6 @@ import {
 } from "@/lib/scout-product";
 
 export function ExplorePaywallBanner({ access }: { access: ExploreAccess }) {
-  const copy = personaMembershipPublicCopy();
-
   if (access.unlocked) {
     const label =
       access.reason === "scout_sub"
@@ -55,28 +53,15 @@ export function ExplorePaywallBanner({ access }: { access: ExploreAccess }) {
               <li key={line}>· {line}</li>
             ))}
           </ul>
-          <p className="mt-4 text-xs leading-5 text-mf-text-muted">
-            Lo principal de tu cuenta es{" "}
-            <Link href="/fut/tutor" className="font-semibold text-mf-gph hover:underline">
-              Mis fichas
-            </Link>
-            : ahí creas y descargas el PDF de tus jugadores. Explorar Pro desbloquea el
-            detalle de otros jugadores.
-          </p>
         </div>
         <div className="border-t border-mf-border bg-mf-canvas px-5 py-6 sm:px-6 lg:border-l lg:border-t-0">
           {PERSONA_MEMBERSHIP_FREE_PROMO ? (
-            <>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-mf-gph">
-                {copy.badge}
-              </p>
-              <p className="mt-2 text-3xl font-semibold text-mf-gph-ink">Gratis</p>
-            </>
+            <p className="text-3xl font-semibold text-mf-gph-ink">Gratis</p>
           ) : (
             <p className="text-3xl font-semibold text-mf-gph-ink">Explorar Pro</p>
           )}
           <p className="mt-2 text-sm text-mf-text-secondary">
-            Incluye publicar fichas y desbloquear detalle, fotos y contacto de terceros.
+            Actívalo para ver fichas completas en Explorar.
           </p>
           <PersonaMembershipCta
             className="mt-5"
@@ -84,9 +69,9 @@ export function ExplorePaywallBanner({ access }: { access: ExploreAccess }) {
             loggedIn={Boolean(access.userId)}
           />
           <p className="mt-3 text-xs text-mf-text-muted">
-            ¿Solo quieres ver tus jugadores?{" "}
+            ¿Solo tus jugadores?{" "}
             <Link href="/fut/tutor" className="font-semibold text-mf-gph hover:underline">
-              Ir a Mis fichas
+              Mis fichas
             </Link>
           </p>
         </div>
