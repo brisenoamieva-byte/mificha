@@ -1,7 +1,11 @@
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { formatPlayerCategory } from "@/lib/player-category";
 import { formatPublicLockedName } from "@/lib/privacy";
-import type { TutorChild } from "@/lib/tutor-family";
-import { tutorSharePath } from "@/lib/tutor-family";
+import {
+  listTutorMaterials,
+  tutorSharePath,
+  type TutorChild,
+} from "@/lib/tutor-family";
 
 export interface OgTutorSharePayload {
   title: string;
@@ -13,6 +17,7 @@ export interface OgTutorSharePayload {
   category: string | null;
   club: string | null;
   city: string | null;
+  photoUrl: string | null;
 }
 
 function resolveAppUrl() {
@@ -54,7 +59,33 @@ export function buildOgTutorSharePayload(child: TutorChild): OgTutorSharePayload
     category,
     club,
     city,
+    photoUrl: null,
   };
+}
+
+/** Portada del tutor para OG / guardar imagen (signed URL). */
+export async function resolveTutorOgCoverPhotoUrl(
+  admin: SupabaseClient,
+  child: TutorChild,
+) {
+  try {
+    const materials = await listTutorMaterials(admin, child);
+    const cover =
+      materials.find((row) => row.kind === "photo" && row.is_cover && row.url) ||
+      materials.find((row) => row.kind === "photo" && row.url);
+    return cover?.url ?? null;
+  } catch {
+    return null;
+  }
+}
+
+export async function buildOgTutorSharePayloadWithPhoto(
+  admin: SupabaseClient,
+  child: TutorChild,
+): Promise<OgTutorSharePayload> {
+  const base = buildOgTutorSharePayload(child);
+  const photoUrl = await resolveTutorOgCoverPhotoUrl(admin, child);
+  return { ...base, photoUrl };
 }
 
 export function buildOgTutorImageAlt(payload: OgTutorSharePayload) {
