@@ -1,62 +1,62 @@
-/** Qué ofrece MiFicha a la familia con la membresía anual. */
+/** Qué ofrece MiFicha a la familia (cuenta persona / Explorar Pro). Hoy: gratis. */
 
 export const MEMBERSHIP_OFFER = {
-  headline: "Seguimiento del jugador + puertas a oportunidades reales",
-  headlineLead: "Seguimiento del jugador +",
-  headlineHook: "puertas a oportunidades reales",
+  headline: "La ficha de tu hijo, en un solo lugar",
+  headlineLead: "La ficha de tu hijo,",
+  headlineHook: "en un solo lugar",
   summary:
-    "Ficha del hijo, seguimiento y visibilidad ante agentes en Explorar — más visorías, torneos y GPH en una sola cuenta.",
+    "Arma la ficha, decide si sale en Explorar y recibe avisos de visorías y servicios GPH. Gratis.",
   priceLabel: "Gratis",
   pricePeriod: "sin costo",
   specializationLimit:
-    "1 ciclo de especialización al mes (o el cupo que publique GPH). Extra se cotiza aparte.",
+    "La especialización GPH y el diagnóstico presencial se cotizan aparte cuando haya cupo.",
   benefits: [
     {
       id: "seguimiento",
-      title: "Seguimiento digital del desarrollo",
+      title: "Ficha digital del jugador",
       detail:
-        "Ficha con fotos, videos e historia; opt-in a Explorar para que agentes te vean; después, historial de torneo y lectura GPH en el mismo lugar.",
+        "Fotos, videos e historia. Tú armas la ficha y tú decides si sale en Explorar.",
       status: "piloto" as const,
     },
     {
       id: "visorias",
-      title: "Visorías con equipos de Primera División",
+      title: "Avisos de visorías",
       detail:
-        "Fechas como la de Querétaro con Chivas y Santos. El miembro recibe aviso y puede presentar la ficha del jugador.",
+        "Fechas como Querétaro con Chivas y Santos. Puedes presentar la ficha del jugador.",
       status: "vivo" as const,
     },
     {
       id: "torneos",
-      title: "Convocatorias a torneos de alto nivel",
+      title: "Convocatorias a torneos",
       detail:
         "Avisos curados de torneos recomendados por GPH/MiFicha cuando haya convocatoria.",
       status: "membresia" as const,
     },
     {
       id: "eventos",
-      title: "Eventos deportivos con descuento",
+      title: "Eventos GPH / CRACKS",
       detail:
-        "Precio de miembro en clínicas, jornadas y eventos GPH/CRACKS cuando haya cupo publicado.",
+        "Clínicas, jornadas y eventos cuando haya cupo publicado.",
       status: "membresia" as const,
     },
     {
       id: "especializacion",
-      title: "Entrenamiento de especialización gratis",
+      title: "Especialización GPH",
       detail:
-        "Incluido con límite: 1 ciclo al mes según calendario GPH. Sesiones extra se cotizan aparte.",
+        "Cupos y precios según calendario GPH. No viene incluida en la ficha gratis.",
       status: "membresia" as const,
     },
   ],
 } as const;
 
 export const MEMBERSHIP_STATUS_LABEL = {
-  piloto: "En piloto",
+  piloto: "Disponible",
   vivo: "Disponible",
   membresia: "En desarrollo",
 } as const;
 
 export const MEMBERSHIP_ROADMAP_NOTE =
-  "Más adelante: convocatorias a torneos, clínicas con precio de miembro y especialización GPH.";
+  "Más adelante: convocatorias a torneos, clínicas y especialización GPH con cupo publicado.";
 
 /** Beneficios listos para la home (sin placeholders “en desarrollo”). */
 export function getLiveMembershipBenefits() {
