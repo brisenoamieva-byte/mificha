@@ -1,58 +1,47 @@
 ---
-description: Modelo de negocio MiFicha/GPH — fuentes de ingreso y cómo priorizar producto
+description: Modelo de negocio MiFicha — gratuidad, crecimiento B2B2C y monetización
 alwaysApply: true
 ---
 
-# Modelo de negocio MiFicha / GPH
+# Modelo de negocio MiFicha
 
-La plataforma no es el producto único: es el canal para vender y operar el negocio de GPH con familias, clubes y marcas. Toda feature debe acercar o cobrar una de estas fuentes. Si no toca ninguna, no es prioridad.
+Visión: llenar la base de futbol formativo/amateur en México. Hoy el producto no promete scouts ni clubes a las familias.
 
-## Fuentes de ingreso (en este orden de trabajo)
+## Gratuidad (producto)
 
-1. **Entrenamientos** — sesiones, camps, convocatorias de training GPH. La membresía incluye especialización **acotada** (1 ciclo/mes o el cupo publicado); el extra se cobra.
-2. **Anualidad de plataforma** — **$1,200 MXN al año**. Producto de familia: seguimiento + acceso a oportunidades. No es red social.
-3. **Diagnósticos GPH** — lista **$2,900**; promo vigente **−30% → $2,030 MXN** e incluye 12 meses de MiFicha. Vive en Evaluaciones, no en la página de visorías. Cobro en `/fut/pagar`.
+- **Gratis** para familias, tutores, academias y ligas (gestión + ficha + Explorar Pro familiar).
+- Copy: decir **Gratis**. Nunca “por tiempo limitado”, “piloto gratis” ni anualidad familiar como pitch principal.
+- No empujar paywall B2C ni “planes Pro” de cobro a papás. `Explorar Pro` es acceso de producto, no suscripción vendible a familias mientras `PERSONA_MEMBERSHIP_FREE_PROMO` esté on.
 
-## Qué compra la familia con $1,200
+## Crecimiento (B2B2C)
 
-Promesa pública (membresía):
+Prioridad: **Academia / liga → plantel, partidos, actas, stats → padres crean la ficha** para jugar / seguir al hijo.  
+No optimizar como “convencer padre por padre” si hay un club/liga que puede exigir el alta.
 
-1. Seguimiento digital del desarrollo del jugador (ficha, material del tutor, después torneo + GPH).
-2. Convocatorias a torneos de alto nivel (curadas, no mural abierto).
-3. Fechas de visorías con equipos de Primera División (como Querétaro · Chivas / Santos).
-4. Eventos deportivos con descuento de miembro.
-5. Entrenamiento de especialización gratis **con límite** (1 ciclo/mes o cupo GPH); el resto se cotiza.
+## Monetización (en este orden de madurez)
 
-Operación:
+1. **O2O GPH** — diagnóstico presencial (lista $2,900; promo −30% → $2,030 + 12 meses MiFicha). Split: MiFicha $600 / GPH resto. Vive en Evaluaciones / `/fut/pagar`, no en hero de visorías.
+2. **Patrocinios / publicidad** — atención segmentada (eventos, fichas, ligas).
+3. **Scouting B2B** — cobro a clubes/agentes por base y filtros (no a familias).
+4. **Marketplace** — comisión en clínicas, camps, torneos premium.
+5. Extra GPH: entrenamientos / especialización con cupo; el extra se cotiza.
 
-- Cuenta del tutor ligada al jugador. Un tutor puede tener más de un hijo.
-- Ficha privada. El tutor sube video, foto y notas; puede generar ficha presentable (universidades, visorías, clubes).
-- **Piloto:** hoy el tutor puede armar ficha sin cobro (`TUTOR_PILOT_FREE`). Al cerrar el piloto, sin membresía vigente no hay carga de material.
-- La evaluación GPH (promo $2,030 / lista $2,900) ya incluye ese mismo año: no se cobra membresía otra vez.
-- Consentimiento del tutor para menores. Compartir con clubes es permiso aparte.
+Si una feature no acerca base (fichas) ni una de estas vías, no es prioridad.
 
-## Tres bloques en la ficha (no se mezclan)
+## Copy y UX
 
-1. **Material del tutor** — lo escribe y sube papá, mamá o tutor: videos, fotos, historia. GPH no lo edita.
-2. **MiFicha** — lo arma la plataforma: identidad, partidos, stats, historial. El tutor lo ve; no lo reescribe.
-3. **GPH** — lo escribe el evaluador: diagnóstico, etapa, plan. El tutor lo ve; no lo edita.
+- Español de México, corto, de papá a papá. Evitar jerga SaaS (“ecosistema”, “marketplace”, “monetizar datos”) en UI pública.
+- Sí: ficha en un solo lugar, Explorar con consentimiento, digitalizar academia/liga sin costo.
+- No: “da visibilidad a tu talento” / promesas de scouts o Primera División como beneficio automático de crear ficha.
+- Viralidad: actas, stats, fotos y fichas fáciles de compartir (WhatsApp / IG), no feed social.
 
-## Acuerdo GPH × MiFicha (6 nov 2026)
+## Datos y privacidad
 
-- Opera evaluaciones: **Gustavo Reyes (GPH)**.
-- Plataforma: **José Ricardo Briseño Amieva (MiFicha)**.
-- Por cada evaluación cobrada (promo $2,030): MiFicha **$600**, GPH **$1,430**. Lista de referencia $2,900 (split histórico $600 / $2,300).
-- Por cada membresía sola ($1,200): MiFicha **$600**, GPH **$600**.
-- El dinero entra por Mercado Pago de MiFicha; el split se registra en cobros. No hay precio socio $2,200.
+- Jerarquía: Liga → Academia → Equipo → Jugador → Tutor.
+- Menores: consentimiento del tutor; visibilidad en Explorar solo con opt-in. No filtrar contacto/PII de menores en vistas públicas.
+- Tres bloques de ficha (no mezclar): material del tutor · datos MiFicha · informe GPH.
 
-4. **Eventos** — visorías, jornadas, clínicas. El registro en sitio es captura; el ingreso es cupo, add-ons o upsell.
-5. **Patrocinios** — marcas en eventos, fichas, convocatoria.
-6. **Fees por organización de torneos** — armar, inscribir y operar torneos.
-7. **Publicidad en la plataforma** — espacios pagados dentro del producto.
+## Acuerdo operativo GPH × MiFicha
 
-## Cómo lograrlo en producto
-
-- Funnel: visoría/evento gratis → tutor en DB → anualidad + diagnóstico + entrenamientos.
-- No construir como red social ni marketplace de scouts.
-- Copy de membresía debe listar los 5 beneficios de arriba; no vender “todo gratis para siempre”.
-- Al diseñar UI, deja gancho a membresía, diagnóstico, visorías y entrenamientos cerca de registros de evento.
+- Evaluaciones: Gustavo Reyes (GPH). Plataforma: José Ricardo Briseño Amieva (MiFicha).
+- Cobros por Mercado Pago MiFicha; registrar split en cobros.
