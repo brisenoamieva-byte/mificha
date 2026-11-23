@@ -3,6 +3,8 @@ import { buildOgTutorSharePayloadWithPhoto } from "@/lib/og-tutor-share";
 import { peekTutorChildByShareToken } from "@/lib/tutor-family";
 import { createSupabaseAdminClient } from "@/lib/supabase-admin";
 
+/** sharp (reorientar EXIF) no corre en Edge. */
+export const runtime = "nodejs";
 export const alt = "Ficha del jugador MiFicha";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";

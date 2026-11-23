@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import sharp from "sharp";
 import { formatPlayerCategory } from "@/lib/player-category";
 import { formatPublicLockedName } from "@/lib/privacy";
 import {
@@ -63,7 +64,7 @@ export function buildOgTutorSharePayload(child: TutorChild): OgTutorSharePayload
   };
 }
 
-/** Portada del tutor para OG / guardar imagen (signed URL). */
+/** Portada del tutor (signed URL cruda). */
 export async function resolveTutorOgCoverPhotoUrl(
   admin: SupabaseClient,
   child: TutorChild,
@@ -79,12 +80,34 @@ export async function resolveTutorOgCoverPhotoUrl(
   }
 }
 
+/**
+ * next/og ignora EXIF: fotos de celular salen de lado.
+ * Reorientamos con sharp y devolvemos data URL lista para ImageResponse.
+ */
+export async function orientPhotoForOg(photoUrl: string): Promise<string | null> {
+  try {
+    const res = await fetch(photoUrl);
+    if (!res.ok) return null;
+    const input = Buffer.from(await res.arrayBuffer());
+    const oriented = await sharp(input)
+      .rotate()
+      .resize(840, 1260, { fit: "cover", position: "attention" })
+      .jpeg({ quality: 84, mozjpeg: true })
+      .toBuffer();
+    return `data:image/jpeg;base64,${oriented.toString("base64")}`;
+  } catch {
+    return null;
+  }
+}
+
 export async function buildOgTutorSharePayloadWithPhoto(
   admin: SupabaseClient,
   child: TutorChild,
 ): Promise<OgTutorSharePayload> {
   const base = buildOgTutorSharePayload(child);
-  const photoUrl = await resolveTutorOgCoverPhotoUrl(admin, child);
+  const rawUrl = await resolveTutorOgCoverPhotoUrl(admin, child);
+  if (!rawUrl) return base;
+  const photoUrl = (await orientPhotoForOg(rawUrl)) || rawUrl;
   return { ...base, photoUrl };
 }
 
