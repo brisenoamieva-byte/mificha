@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { Copy, Download, FileText, MessageCircle, Share2, UserPlus } from "lucide-react";
+import { Copy, Download, FileText, MessageCircle, Printer, Share2, UserPlus } from "lucide-react";
 import { trackProductEvent } from "@/lib/product-analytics";
 import { PLAYER_CODE_SHORT } from "@/lib/player-public-code-copy";
 import {
@@ -176,23 +176,25 @@ export function TutorShareActions({
         ) : null}
       </div>
 
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-mf-border/80 pt-3 text-sm">
-        <button
-          type="button"
-          onClick={() => window.print()}
-          className="font-semibold text-mf-gph hover:underline"
-        >
-          Descargar PDF
-        </button>
+      <div className="border-t border-mf-border/80 pt-3 text-sm">
         {materialsKitHref ? (
           <Link
             href={materialsKitHref}
             className="inline-flex items-center gap-1.5 font-semibold text-mf-gph hover:underline"
           >
             <FileText className="h-3.5 w-3.5" />
-            Kit PDF
+            Descargar PDF
           </Link>
-        ) : null}
+        ) : (
+          <button
+            type="button"
+            onClick={() => window.print()}
+            className="inline-flex items-center gap-1.5 font-semibold text-mf-gph hover:underline"
+          >
+            <Printer className="h-3.5 w-3.5" />
+            Descargar PDF
+          </button>
+        )}
       </div>
 
       <div className="rounded-xl border border-mf-gph/20 bg-mf-gph-soft/70 px-3.5 py-3">
