@@ -83,7 +83,7 @@ export function buildOgTutorSharePayload(
     subtitle: bits.length > 0 ? bits.join(" · ") : "Ficha de presentación",
     publicCode: child.public_code || null,
     initials,
-    badge: child.linked_academy_name ? "Academia ligada" : "Ficha del jugador",
+    badge: child.linked_academy_name ? "Academia ligada" : "Mi ficha",
     position,
     category,
     club,

@@ -2,11 +2,21 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { Copy, Download, FileText, MessageCircle, Printer, Share2, UserPlus } from "lucide-react";
+import {
+  Copy,
+  Download,
+  FileText,
+  MessageCircle,
+  Printer,
+  Share2,
+  Sparkles,
+  UserPlus,
+} from "lucide-react";
 import { trackProductEvent } from "@/lib/product-analytics";
 import { PLAYER_CODE_SHORT } from "@/lib/player-public-code-copy";
 import {
   buildInviteTeammateWhatsAppHref,
+  buildPlayerShareWhatsAppText,
   withShareUtm,
 } from "@/lib/viral-share";
 
@@ -25,7 +35,7 @@ export function TutorShareActions({
   materialsKitHref?: string | null;
 }) {
   const [copied, setCopied] = useState(false);
-  const [downloading, setDownloading] = useState(false);
+  const [downloading, setDownloading] = useState<"og" | "story" | null>(null);
   const [canNativeShare, setCanNativeShare] = useState(false);
 
   const resolvedUrl = useMemo(() => {
@@ -47,11 +57,17 @@ export function TutorShareActions({
     () => `${sharePath.replace(/\/$/, "")}/opengraph-image`,
     [sharePath],
   );
+  const storyPath = useMemo(
+    () => `${sharePath.replace(/\/$/, "")}/story-image`,
+    [sharePath],
+  );
 
   const whatsappHref = useMemo(() => {
-    const text = publicCode
-      ? `Mira la ficha de ${playerName} en MiFicha (${publicCode}): ${resolvedUrl}`
-      : `Mira la ficha de ${playerName} en MiFicha: ${resolvedUrl}`;
+    const text = buildPlayerShareWhatsAppText({
+      playerName,
+      publicCode,
+      shareUrl: resolvedUrl,
+    });
     return `https://wa.me/?text=${encodeURIComponent(text)}`;
   }, [resolvedUrl, playerName, publicCode]);
 
@@ -85,8 +101,8 @@ export function TutorShareActions({
       await navigator.share({
         title: `${playerName} · MiFicha`,
         text: publicCode
-          ? `Ficha de ${playerName} (${publicCode})`
-          : `Ficha de ${playerName}`,
+          ? `Esta es mi ficha (${publicCode})`
+          : `Esta es mi ficha en MiFicha`,
         url: resolvedUrl,
       });
       trackProductEvent("share_click", { channel: "native" });
@@ -95,25 +111,30 @@ export function TutorShareActions({
     }
   }
 
-  async function downloadImage() {
-    setDownloading(true);
+  async function downloadImage(kind: "og" | "story") {
+    setDownloading(kind);
     try {
-      const res = await fetch(imagePath, { cache: "no-store" });
+      const path = kind === "story" ? storyPath : imagePath;
+      const res = await fetch(path, { cache: "no-store" });
       if (!res.ok) throw new Error("download_failed");
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `${(publicCode || "ficha").toLowerCase()}-mificha.png`;
+      a.download = `${(publicCode || "ficha").toLowerCase()}-mificha${
+        kind === "story" ? "-story" : ""
+      }.png`;
       document.body.appendChild(a);
       a.click();
       a.remove();
       URL.revokeObjectURL(url);
-      trackProductEvent("share_click", { channel: "download_image" });
+      trackProductEvent("share_click", {
+        channel: kind === "story" ? "download_story" : "download_image",
+      });
     } catch {
       /* ignore */
     } finally {
-      setDownloading(false);
+      setDownloading(null);
     }
   }
 
@@ -131,7 +152,7 @@ export function TutorShareActions({
               {PLAYER_CODE_SHORT}
             </>
           ) : (
-            "Manda el link o la tarjeta a WhatsApp / Instagram"
+            "Mándala al equipo, a stories o por WhatsApp"
           )}
         </p>
       </div>
@@ -149,13 +170,23 @@ export function TutorShareActions({
         </a>
         <button
           type="button"
-          onClick={() => void downloadImage()}
-          disabled={downloading}
-          title="Tarjeta corta para stories o estado de WhatsApp. La ficha completa va en el PDF o en el link."
+          onClick={() => void downloadImage("story")}
+          disabled={downloading !== null}
+          title="Imagen vertical 9:16 para Instagram Stories, Reels o estado de WhatsApp."
+          className="inline-flex items-center justify-center gap-2 rounded-lg bg-mf-gph px-3.5 py-2 text-sm font-semibold text-white hover:bg-[#163f70] disabled:opacity-60"
+        >
+          <Sparkles className="h-4 w-4" />
+          {downloading === "story" ? "Guardando…" : "Story"}
+        </button>
+        <button
+          type="button"
+          onClick={() => void downloadImage("og")}
+          disabled={downloading !== null}
+          title="Tarjeta horizontal para chats y portada de link."
           className="inline-flex items-center justify-center gap-2 rounded-lg border border-mf-border bg-white px-3.5 py-2 text-sm font-semibold text-mf-text hover:bg-mf-canvas disabled:opacity-60"
         >
           <Download className="h-4 w-4" />
-          {downloading ? "Guardando…" : "Tarjeta WhatsApp"}
+          {downloading === "og" ? "Guardando…" : "Tarjeta chat"}
         </button>
         <button
           type="button"
@@ -178,8 +209,9 @@ export function TutorShareActions({
       </div>
 
       <p className="text-xs leading-5 text-mf-text-muted">
-        La tarjeta es solo portada (foto + datos clave) para pegar en chats o stories.
-        La ficha completa con historial está en el PDF o abriendo el link.
+        <span className="font-semibold text-mf-text-secondary">Story</span> es vertical
+        para Instagram / WhatsApp. La tarjeta chat sirve en grupos. La ficha completa
+        está en el PDF o abriendo el link.
       </p>
 
       <div className="border-t border-mf-border/80 pt-3 text-sm">
@@ -205,10 +237,11 @@ export function TutorShareActions({
 
       <div className="rounded-xl border border-mf-gph/20 bg-mf-gph-soft/70 px-3.5 py-3">
         <p className="text-sm font-semibold text-mf-gph-ink">
-          Invita a padres del equipo
+          Invita a tu equipo
         </p>
         <p className="mt-1 text-sm leading-6 text-mf-text-secondary">
-          Que armen la ficha de su hijo. Así tu ciudad empieza a verse en el mapa.
+          Que tus compañeros armen la suya. Entre más fichas del equipo, más se ve
+          su ciudad en el mapa.
         </p>
         <a
           href={inviteHref}
@@ -218,7 +251,7 @@ export function TutorShareActions({
           className="mt-3 inline-flex items-center justify-center gap-2 rounded-lg bg-mf-gph px-3.5 py-2 text-sm font-semibold text-white hover:bg-[#163f70]"
         >
           <UserPlus className="h-4 w-4" />
-          Invitar por WhatsApp
+          Invitar compañeros
         </a>
       </div>
     </div>

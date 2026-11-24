@@ -125,7 +125,7 @@ export default async function Image({
               <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                 <BrandMark />
                 <span style={{ fontSize: 18, opacity: 0.62 }}>
-                  Ficha de presentación
+                  Mi ficha
                 </span>
               </div>
               <div

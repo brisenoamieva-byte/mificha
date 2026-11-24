@@ -169,7 +169,10 @@ export default async function TutorShareFichaPage({ params }: PageProps) {
   return (
     <div className="flex min-h-dvh flex-col bg-mf-canvas">
       <TutorFichaViewTracker token={access || token} />
-      <SiteHeader actionHref="/fut/tutor" actionLabel="Soy tutor" />
+      <SiteHeader
+        actionHref="/fut/entrar?next=/fut/tutor"
+        actionLabel="Armar la mía"
+      />
       <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-8 sm:px-6 sm:py-12">
         <TutorPublicFicha
           child={child}
@@ -214,21 +217,32 @@ export default async function TutorShareFichaPage({ params }: PageProps) {
           <DiagnosisHireCard playerName={playerName} className="mt-5" compact />
         ) : null}
 
-        <p className="mt-6 text-center text-xs leading-6 text-mf-text-muted print:hidden">
-          Ficha armada por el tutor
-          {performance
-            ? " · incluye rendimiento de academia ligada"
-            : seasons.length
-              ? " · con rendimiento capturado por el tutor"
-              : ""}
-          {" · "}
-          <Link
-            href="/fut/entrar?next=/fut/tutor"
-            className="font-semibold text-mf-gph hover:underline"
-          >
-            Crear la tuya
-          </Link>
-        </p>
+        <div className="mt-6 space-y-2 text-center text-xs leading-6 text-mf-text-muted print:hidden">
+          <p>
+            <Link
+              href={`/fut/entrar?next=${encodeURIComponent("/fut/tutor#fin-de-semana")}`}
+              className="font-semibold text-mf-gph hover:underline"
+            >
+              Actualizar mi ficha
+            </Link>
+            {" · "}
+            <Link
+              href="/fut/entrar?next=/fut/tutor"
+              className="font-semibold text-mf-gph hover:underline"
+            >
+              Crear la mía
+            </Link>
+          </p>
+          <p>
+            Consentimiento y Explorar los controla el tutor o representante
+            {performance
+              ? " · stats oficiales de academia ligada"
+              : seasons.length
+                ? " · rendimiento capturado en la cuenta"
+                : ""}
+            .
+          </p>
+        </div>
       </main>
       <SiteFooter />
     </div>

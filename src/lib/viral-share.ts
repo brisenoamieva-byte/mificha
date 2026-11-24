@@ -51,6 +51,20 @@ export function buildTutorSignupHref(opts?: {
   return `${getAppBaseUrl()}${path}`;
 }
 
+/** Texto corto para compartir la ficha (jugador → amigos / equipo). */
+export function buildPlayerShareWhatsAppText(input: {
+  playerName: string;
+  publicCode?: string | null;
+  shareUrl: string;
+}) {
+  const url = withShareUtm(input.shareUrl, {
+    campaign: "share_ficha",
+    content: input.publicCode || "link",
+  });
+  const code = input.publicCode ? ` (${input.publicCode})` : "";
+  return `Esta es mi ficha en MiFicha${code}: ${url}`;
+}
+
 export function buildInviteTeammateWhatsAppHref(input: {
   playerName: string;
   publicCode?: string | null;
@@ -59,16 +73,17 @@ export function buildInviteTeammateWhatsAppHref(input: {
   const signup = buildTutorSignupHref({
     refCode: input.publicCode,
     absolute: true,
+    campaign: "invite_companero",
   });
   const preview = withShareUtm(input.shareUrl, {
     campaign: "invite_companero",
     content: input.publicCode || "preview",
   });
-  const text = `Mira la ficha de ${input.playerName} en MiFicha${
+  const text = `Mira mi ficha en MiFicha${
     input.publicCode ? ` (${input.publicCode})` : ""
   }: ${preview}
 
-Arma la de tu hijo gratis (~5 min). Estamos llenando el directorio de jugadores en México: ${signup}`;
+Ármate la tuya gratis (~5 min) y la compartimos con el equipo: ${signup}`;
   return `https://wa.me/?text=${encodeURIComponent(text)}`;
 }
 

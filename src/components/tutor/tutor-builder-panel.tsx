@@ -236,6 +236,12 @@ export function TutorBuilderPanel({
     buildEmptySeasonForm(child.profile.club || form.club),
   );
   const [editingSeasonId, setEditingSeasonId] = useState<string | null>(null);
+  const [weekendForm, setWeekendForm] = useState({
+    goals: "",
+    assists: "",
+    minutes: "",
+  });
+  const [weekendSaved, setWeekendSaved] = useState(false);
   const editorPanelRef = useRef<HTMLDivElement | null>(null);
   const isGoalkeeper = /portero/i.test(form.position || child.profile.position || "");
 
@@ -315,6 +321,18 @@ export function TutorBuilderPanel({
   const shareHref = shareAccess ? tutorSharePath(shareAccess) : null;
   const materialsHref = shareAccess ? agentMaterialsPath(shareAccess) : null;
   const showAcademy = hasLinkedAcademy || linkSuggestions.length > 0;
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (window.location.hash !== "#fin-de-semana") return;
+    setStep("rendimiento");
+    window.setTimeout(() => {
+      document.getElementById("fin-de-semana")?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }, 120);
+  }, [child.id]);
 
   function goToStep(next: TutorBuilderStepId) {
     setStep(next);
@@ -1276,7 +1294,10 @@ export function TutorBuilderPanel({
         ) : null}
 
         {step === "rendimiento" ? (
-          <section className="space-y-4 rounded-2xl border border-mf-border bg-white p-5">
+          <section
+            id="fin-de-semana"
+            className="space-y-4 rounded-2xl border border-mf-border bg-white p-5 scroll-mt-24"
+          >
             <StepHeading
               title="Rendimiento"
               detail={
@@ -1285,6 +1306,121 @@ export function TutorBuilderPanel({
                   : "Sin academia aún: captura torneos, minutos, goles y asistencias para que un visor vea números en tu link."
               }
             />
+
+            <form
+              className="space-y-3 rounded-2xl border border-emerald-200/80 bg-gradient-to-br from-emerald-50 to-white p-4"
+              onSubmit={(event) => {
+                event.preventDefault();
+                const goals = Number(weekendForm.goals || 0);
+                const assists = Number(weekendForm.assists || 0);
+                const minutes = Number(weekendForm.minutes || 0);
+                if (!goals && !assists && !minutes) return;
+                const top = seasons[0];
+                if (top) {
+                  onSaveSeason(
+                    {
+                      tournament_name: top.tournament_name,
+                      season_label: top.season_label,
+                      team_name: top.team_name,
+                      matches: top.matches + 1,
+                      goals: top.goals + goals,
+                      assists: top.assists + assists,
+                      minutes: top.minutes + minutes,
+                      notes: top.notes,
+                    },
+                    top.id,
+                  );
+                } else {
+                  onSaveSeason({
+                    tournament_name: "Temporada actual",
+                    season_label: defaultTutorSeasonLabel(),
+                    team_name: form.club || child.profile.club || null,
+                    matches: 1,
+                    goals,
+                    assists,
+                    minutes,
+                  });
+                }
+                setWeekendForm({ goals: "", assists: "", minutes: "" });
+                setWeekendSaved(true);
+                window.setTimeout(() => setWeekendSaved(false), 2200);
+              }}
+            >
+              <div>
+                <p className="text-sm font-semibold text-mf-gph-ink">
+                  ¿Cómo te fue el fin de semana?
+                </p>
+                <p className="mt-0.5 text-xs leading-5 text-mf-text-secondary">
+                  Suma 1 partido y lo que metiste. Listo en segundos — luego
+                  comparte tu Story.
+                </p>
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                <label className="text-xs font-semibold text-mf-text-secondary">
+                  Goles
+                  <input
+                    inputMode="numeric"
+                    value={weekendForm.goals}
+                    onChange={(event) =>
+                      setWeekendForm((prev) => ({
+                        ...prev,
+                        goals: event.target.value,
+                      }))
+                    }
+                    placeholder="0"
+                    className={inputClass}
+                  />
+                </label>
+                <label className="text-xs font-semibold text-mf-text-secondary">
+                  Asist.
+                  <input
+                    inputMode="numeric"
+                    value={weekendForm.assists}
+                    onChange={(event) =>
+                      setWeekendForm((prev) => ({
+                        ...prev,
+                        assists: event.target.value,
+                      }))
+                    }
+                    placeholder="0"
+                    className={inputClass}
+                  />
+                </label>
+                <label className="text-xs font-semibold text-mf-text-secondary">
+                  Min
+                  <input
+                    inputMode="numeric"
+                    value={weekendForm.minutes}
+                    onChange={(event) =>
+                      setWeekendForm((prev) => ({
+                        ...prev,
+                        minutes: event.target.value,
+                      }))
+                    }
+                    placeholder="0"
+                    className={inputClass}
+                  />
+                </label>
+              </div>
+              <button
+                type="submit"
+                disabled={busy}
+                className="inline-flex w-full items-center justify-center rounded-lg bg-mf-accent-dark px-3.5 py-2.5 text-sm font-semibold text-white hover:bg-[#047857] disabled:opacity-60"
+              >
+                {weekendSaved ? "¡Listo! Ya sumó" : "Sumar este partido"}
+              </button>
+              {seasons[0] ? (
+                <p className="text-[11px] leading-4 text-mf-text-muted">
+                  Se suma a {seasons[0].tournament_name}
+                  {seasons[0].season_label ? ` · ${seasons[0].season_label}` : ""}.
+                </p>
+              ) : (
+                <p className="text-[11px] leading-4 text-mf-text-muted">
+                  Crea “Temporada actual” si aún no hay torneo.
+                </p>
+              )}
+            </form>
+
             <label className="flex items-start gap-2 text-sm text-mf-text-secondary">
               <input
                 type="checkbox"
