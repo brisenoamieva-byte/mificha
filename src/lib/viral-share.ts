@@ -83,7 +83,7 @@ export function buildInviteTeammateWhatsAppHref(input: {
     input.publicCode ? ` (${input.publicCode})` : ""
   }: ${preview}
 
-Ármate la tuya gratis (~5 min) y la compartimos con el equipo: ${signup}`;
+Ármate la tuya y la vemos juntos: ${signup}`;
   return `https://wa.me/?text=${encodeURIComponent(text)}`;
 }
 

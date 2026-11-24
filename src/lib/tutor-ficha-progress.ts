@@ -46,8 +46,6 @@ export function isExploreListingReady(input: {
 export function buildTutorProgress(input: TutorProgressInput) {
   const profile = input.profile;
   const photos = input.materials.filter((item) => item.kind === "photo").length;
-  const videos = input.materials.filter((item) => item.kind === "video").length;
-  const stories = input.materials.filter((item) => item.kind === "story").length;
   const seasons = input.seasons ?? [];
   const hasManualStats = seasons.some(
     (row) =>
@@ -87,9 +85,9 @@ export function buildTutorProgress(input: TutorProgressInput) {
     },
     {
       id: "material",
-      label: "Subir foto y video",
-      hint: "Aquí cargas la foto de portada, videos y notas",
-      done: photos > 0 && (videos > 0 || stories > 0),
+      label: "Subir foto",
+      hint: "Foto de portada (video opcional)",
+      done: photos > 0,
       weight: 15,
     },
     {
@@ -103,13 +101,11 @@ export function buildTutorProgress(input: TutorProgressInput) {
     },
     {
       id: "compartir",
-      label: "Publicar en Explorar",
+      label: "Compartir",
       hint: exploreReady
-        ? "Listo para el buscador (consentimiento + datos mínimos)"
-        : input.exploreOptIn
-          ? "Firmaste, pero falta posición o fecha de nacimiento para listar"
-          : "Falta tu consentimiento: sin firmar, no aparece en Explorar",
-      done: exploreReady,
+        ? "Lista para mandar y visible en Explorar"
+        : "Mándala por WhatsApp; Explorar lo firma el tutor",
+      done: exploreReady || Boolean(input.player_name.trim() && photos > 0),
       weight: 10,
     },
   ];
@@ -127,5 +123,5 @@ export function buildTutorProgress(input: TutorProgressInput) {
           ? "Empezando"
           : "Por completar";
 
-  return { steps, percent, next, statusLabel, photos, videos, stories };
+  return { steps, percent, next, statusLabel, photos, videos: 0, stories: 0 };
 }

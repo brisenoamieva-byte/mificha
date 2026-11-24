@@ -13,7 +13,6 @@ import {
   ImagePlus,
   Video,
 } from "lucide-react";
-import { PlayerPublicCodeCard } from "@/components/public/player-public-code-card";
 import { TutorCareerSummaryCard } from "@/components/tutor/tutor-career-summary";
 import { TutorConsentPanel } from "@/components/tutor/tutor-consent-panel";
 import { TutorPublicFicha } from "@/components/tutor/tutor-public-ficha";
@@ -242,6 +241,7 @@ export function TutorBuilderPanel({
     minutes: "",
   });
   const [weekendSaved, setWeekendSaved] = useState(false);
+  const [weekendError, setWeekendError] = useState<string | null>(null);
   const editorPanelRef = useRef<HTMLDivElement | null>(null);
   const isGoalkeeper = /portero/i.test(form.position || child.profile.position || "");
 
@@ -377,7 +377,7 @@ export function TutorBuilderPanel({
 
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:items-start">
-      <div className="space-y-4 lg:sticky lg:top-20">
+      <div className="order-2 space-y-4 lg:sticky lg:top-20 lg:order-1">
         <div className="rounded-2xl border border-mf-border bg-white p-4 sm:p-5">
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
@@ -439,26 +439,22 @@ export function TutorBuilderPanel({
             </button>
           ) : null}
           {!child.explore_opt_in ? (
-            <div className="mt-4 rounded-xl border-2 border-amber-300 bg-amber-50 px-4 py-3 text-amber-950">
-              <p className="text-sm font-semibold">
-                Esta ficha no se ve en Explorar
-              </p>
-              <p className="mt-1 text-sm leading-6">
-                El link MF- sí funciona si lo compartes. Para que agentes y scouts la
-                encuentren en el buscador, necesitas firmar el consentimiento.
-              </p>
+            <p className="mt-3 text-sm leading-6 text-mf-text-secondary">
+              Ya puedes mandar el link. Para salir en el buscador, lo firma el tutor
+              en{" "}
               <button
                 type="button"
                 onClick={() => goToStep("compartir")}
-                className="mf-btn-gph mt-3 w-full sm:w-auto"
+                className="font-semibold text-mf-gph hover:underline"
               >
-                Firmar consentimiento
+                Compartir
               </button>
-            </div>
+              .
+            </p>
           ) : (
-            <p className="mt-3 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs leading-5 text-emerald-900">
-              Consentimiento activo: puede aparecer en{" "}
-              <a href="/fut/explorar" className="font-semibold underline">
+            <p className="mt-3 text-sm leading-6 text-mf-text-secondary">
+              Visible en{" "}
+              <a href="/fut/explorar" className="font-semibold text-mf-gph hover:underline">
                 Explorar
               </a>
               .
@@ -488,12 +484,12 @@ export function TutorBuilderPanel({
         />
       </div>
 
-      <div className="space-y-4">
+      <div className="order-1 space-y-4 lg:order-2">
         <TutorCareerSummaryCard
           seasons={seasons}
           performance={child.linked_performance ?? null}
           performances={linkedPerformances}
-          title="Dashboard del alumno"
+          title="Tu rendimiento"
           exploreOptIn={Boolean(child.explore_opt_in)}
           onAddTournament={() => goToStep("rendimiento")}
         />
@@ -1314,7 +1310,12 @@ export function TutorBuilderPanel({
                 const goals = Number(weekendForm.goals || 0);
                 const assists = Number(weekendForm.assists || 0);
                 const minutes = Number(weekendForm.minutes || 0);
-                if (!goals && !assists && !minutes) return;
+                if (!goals && !assists && !minutes) {
+                  setWeekendError("Escribe goles, asistencias o minutos.");
+                  setWeekendSaved(false);
+                  return;
+                }
+                setWeekendError(null);
                 const top = seasons[0];
                 if (top) {
                   onSaveSeason(
@@ -1343,16 +1344,14 @@ export function TutorBuilderPanel({
                 }
                 setWeekendForm({ goals: "", assists: "", minutes: "" });
                 setWeekendSaved(true);
-                window.setTimeout(() => setWeekendSaved(false), 2200);
               }}
             >
               <div>
                 <p className="text-sm font-semibold text-mf-gph-ink">
-                  ¿Cómo te fue el fin de semana?
+                  ¿Jugaste?
                 </p>
                 <p className="mt-0.5 text-xs leading-5 text-mf-text-secondary">
-                  Suma 1 partido y lo que metiste. Listo en segundos — luego
-                  comparte tu Story.
+                  Anota goles, asistencias y minutos. Se suma 1 partido.
                 </p>
               </div>
               <div className="grid grid-cols-3 gap-2">
@@ -1361,12 +1360,13 @@ export function TutorBuilderPanel({
                   <input
                     inputMode="numeric"
                     value={weekendForm.goals}
-                    onChange={(event) =>
+                    onChange={(event) => {
+                      setWeekendError(null);
                       setWeekendForm((prev) => ({
                         ...prev,
                         goals: event.target.value,
-                      }))
-                    }
+                      }));
+                    }}
                     placeholder="0"
                     className={inputClass}
                   />
@@ -1376,12 +1376,13 @@ export function TutorBuilderPanel({
                   <input
                     inputMode="numeric"
                     value={weekendForm.assists}
-                    onChange={(event) =>
+                    onChange={(event) => {
+                      setWeekendError(null);
                       setWeekendForm((prev) => ({
                         ...prev,
                         assists: event.target.value,
-                      }))
-                    }
+                      }));
+                    }}
                     placeholder="0"
                     className={inputClass}
                   />
@@ -1391,24 +1392,37 @@ export function TutorBuilderPanel({
                   <input
                     inputMode="numeric"
                     value={weekendForm.minutes}
-                    onChange={(event) =>
+                    onChange={(event) => {
+                      setWeekendError(null);
                       setWeekendForm((prev) => ({
                         ...prev,
                         minutes: event.target.value,
-                      }))
-                    }
+                      }));
+                    }}
                     placeholder="0"
                     className={inputClass}
                   />
                 </label>
               </div>
+              {weekendError ? (
+                <p className="text-xs font-medium text-mf-danger">{weekendError}</p>
+              ) : null}
               <button
                 type="submit"
                 disabled={busy}
                 className="inline-flex w-full items-center justify-center rounded-lg bg-mf-accent-dark px-3.5 py-2.5 text-sm font-semibold text-white hover:bg-[#047857] disabled:opacity-60"
               >
-                {weekendSaved ? "¡Listo! Ya sumó" : "Sumar este partido"}
+                {weekendSaved ? "Listo" : "Sumar el partido"}
               </button>
+              {weekendSaved ? (
+                <button
+                  type="button"
+                  onClick={() => goToStep("compartir")}
+                  className="inline-flex w-full items-center justify-center rounded-lg bg-mf-gph px-3.5 py-2.5 text-sm font-semibold text-white hover:bg-[#163f70]"
+                >
+                  Compartir ahora
+                </button>
+              ) : null}
               {seasons[0] ? (
                 <p className="text-[11px] leading-4 text-mf-text-muted">
                   Se suma a {seasons[0].tournament_name}
@@ -1416,7 +1430,7 @@ export function TutorBuilderPanel({
                 </p>
               ) : (
                 <p className="text-[11px] leading-4 text-mf-text-muted">
-                  Crea “Temporada actual” si aún no hay torneo.
+                  Si no hay torneo, crea “Temporada actual”.
                 </p>
               )}
             </form>
@@ -1728,28 +1742,50 @@ export function TutorBuilderPanel({
         {step === "compartir" ? (
           <section className="space-y-4 rounded-2xl border border-mf-border bg-white p-5">
             <StepHeading
-              title="Publicar en Explorar"
-              detail="Primero firma el consentimiento. Luego comparte por WhatsApp e invita a padres del equipo."
+              title="Compartir"
+              detail="Mándala por WhatsApp o guárdala para tu historia."
             />
-            <TutorConsentPanel
-              exploreOptIn={Boolean(child.explore_opt_in)}
-              exploreOptInAt={child.explore_opt_in_at}
-              exploreConsentEvidence={child.explore_consent_evidence}
-              linkedAcademyName={child.linked_academy_name}
-              linkedNeedsAcademyConsent={Boolean(
-                child.linked_player_id &&
-                  child.linked_performance &&
-                  !child.linked_performance.isPublicFicha,
-              )}
-              busy={busy}
-              onSignExplore={(name) => onToggleExploreOptIn(true, name)}
-              onRevokeExplore={() => onToggleExploreOptIn(false)}
-              onSignAcademy={
-                onSignLinkedAcademyConsent
-                  ? (name) => onSignLinkedAcademyConsent(name)
-                  : undefined
-              }
-            />
+
+            {shareHref ? (
+              <TutorShareActions
+                playerName={child.player_name}
+                sharePath={shareHref}
+                absoluteUrl={buildTutorShareAbsoluteUrl(
+                  child.public_code || child.share_token,
+                )}
+                publicCode={child.public_code}
+              />
+            ) : null}
+
+            <div className="rounded-xl border border-mf-border bg-mf-canvas/80 px-4 py-4">
+              <p className="text-sm font-semibold text-mf-gph-ink">
+                Para salir en el buscador
+              </p>
+              <p className="mt-1 text-sm leading-6 text-mf-text-secondary">
+                Lo firma el tutor o representante. Tú ya puedes mandar el link.
+              </p>
+              <div className="mt-3">
+                <TutorConsentPanel
+                  exploreOptIn={Boolean(child.explore_opt_in)}
+                  exploreOptInAt={child.explore_opt_in_at}
+                  exploreConsentEvidence={child.explore_consent_evidence}
+                  linkedAcademyName={child.linked_academy_name}
+                  linkedNeedsAcademyConsent={Boolean(
+                    child.linked_player_id &&
+                      child.linked_performance &&
+                      !child.linked_performance.isPublicFicha,
+                  )}
+                  busy={busy}
+                  onSignExplore={(name) => onToggleExploreOptIn(true, name)}
+                  onRevokeExplore={() => onToggleExploreOptIn(false)}
+                  onSignAcademy={
+                    onSignLinkedAcademyConsent
+                      ? (name) => onSignLinkedAcademyConsent(name)
+                      : undefined
+                  }
+                />
+              </div>
+            </div>
 
             {child.explore_opt_in &&
             !isExploreListingReady({
@@ -1759,7 +1795,7 @@ export function TutorBuilderPanel({
             }) ? (
               <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
                 <p className="text-sm font-semibold text-amber-950">
-                  Firmaste — ¿apareces en Explorar?
+                  Firmaste — falta un dato para Explorar
                 </p>
                 <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-amber-950/90">
                   {!child.profile.position ? (
@@ -1786,40 +1822,8 @@ export function TutorBuilderPanel({
                       </button>
                     </li>
                   ) : null}
-                  {!child.profile.city ? (
-                    <li>
-                      Ciudad ayuda a que te encuentren en el mapa —{" "}
-                      <button
-                        type="button"
-                        className="font-semibold underline"
-                        onClick={() => goToStep("identidad")}
-                      >
-                        agregar
-                      </button>
-                    </li>
-                  ) : null}
                 </ul>
               </div>
-            ) : null}
-
-            {shareHref ? (
-              <TutorShareActions
-                playerName={child.player_name}
-                sharePath={shareHref}
-                absoluteUrl={buildTutorShareAbsoluteUrl(
-                  child.public_code || child.share_token,
-                )}
-                publicCode={child.public_code}
-              />
-            ) : null}
-
-            {child.public_code ? (
-              <PlayerPublicCodeCard
-                code={child.public_code}
-                onCopy={onCopyPublicCode}
-                copied={copied}
-                showOpenLink={Boolean(shareHref)}
-              />
             ) : null}
 
             {!hasLinkedAcademy && seasons.length === 0 ? (

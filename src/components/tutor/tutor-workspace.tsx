@@ -272,7 +272,6 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
   const [newPassword, setNewPassword] = useState("");
   const [newPasswordConfirm, setNewPasswordConfirm] = useState("");
   const [passwordBusy, setPasswordBusy] = useState(false);
-  const [consentPromptOpen, setConsentPromptOpen] = useState(false);
   const childPanelRef = useRef<HTMLDivElement | null>(null);
   const createFichaRef = useRef<HTMLFormElement | null>(null);
 
@@ -635,14 +634,13 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
       if (!updating) {
         const { trackProductEvent } = await import("@/lib/product-analytics");
         trackProductEvent("create_ficha", { child_id: createdId });
-        setConsentPromptOpen(true);
       }
       setNotice(
         updating
-          ? "Ficha actualizada. La vista previa ya refleja los cambios."
+          ? "Ficha actualizada."
           : form.public_code.trim()
-            ? "Ficha creada con tu código MF. Si hay plantel con el mismo código, confirma el vínculo en Academia."
-            : "Ficha creada. Completa foto, historia y firma el consentimiento para Explorar.",
+            ? "Ficha creada con tu código MF. Súbele foto y compártela."
+            : "Ficha creada. Súbele foto, el partido del domingo y compártela.",
       );
       window.setTimeout(() => {
         childPanelRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -1298,63 +1296,65 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
         </p>
       ) : null}
 
-      <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-4">
-        <p className="text-sm font-semibold text-amber-950">
-          ¿Te registraste en las visorías GPH/CRACKS?
-        </p>
-        <p className="mt-1 text-sm leading-6 text-amber-950/85">
-          Pon el WhatsApp del registro para traer las fichas ya sembradas a esta cuenta
-          (también se reclaman por el mismo correo con el que entraste).
-        </p>
-        <form
-          className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-end"
-          onSubmit={(event) => {
-            event.preventDefault();
-            const next = phone.trim();
-            try {
-              if (next) window.localStorage.setItem(PHONE_STORAGE_KEY, next);
-            } catch {
-              /* ignore */
-            }
-            setBusy(true);
-            void load(next, selectedId)
-              .then(async (rows) => {
-                const { trackProductEvent } = await import("@/lib/product-analytics");
-                trackProductEvent("claim_visorias", {
-                  found: rows.length,
-                  channel: "whatsapp",
-                });
-                setNotice(
-                  rows.length > 0
-                    ? `Listo: ${rows.length} ficha${rows.length === 1 ? "" : "s"} en tu cuenta.`
-                    : "No encontramos fichas con ese WhatsApp. Revisa el número o crea la ficha abajo.",
-                );
-              })
-              .catch((err: unknown) => {
-                setError(
-                  err instanceof Error ? err.message : "No se pudo reclamar la ficha.",
-                );
-              })
-              .finally(() => setBusy(false));
-          }}
-        >
-          <label className="block min-w-0 flex-1 text-sm">
-            <span className="font-medium text-amber-950">WhatsApp del registro</span>
-            <input
-              type="tel"
-              inputMode="tel"
-              value={phone}
-              onChange={(event) => setPhone(event.target.value)}
-              placeholder="442… o 52…"
-              className="mf-input mt-1"
-              autoComplete="tel"
-            />
-          </label>
-          <button type="submit" disabled={busy} className="mf-btn-gph shrink-0">
-            {busy ? "Buscando…" : "Traer fichas"}
-          </button>
-        </form>
-      </div>
+      {children.length === 0 ? (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-4">
+          <p className="text-sm font-semibold text-amber-950">
+            ¿Te registraste en las visorías GPH/CRACKS?
+          </p>
+          <p className="mt-1 text-sm leading-6 text-amber-950/85">
+            Si ya te inscribiste ahí, pon el mismo WhatsApp y traemos esas fichas a
+            esta cuenta (también con el mismo correo con el que entraste).
+          </p>
+          <form
+            className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-end"
+            onSubmit={(event) => {
+              event.preventDefault();
+              const next = phone.trim();
+              try {
+                if (next) window.localStorage.setItem(PHONE_STORAGE_KEY, next);
+              } catch {
+                /* ignore */
+              }
+              setBusy(true);
+              void load(next, selectedId)
+                .then(async (rows) => {
+                  const { trackProductEvent } = await import("@/lib/product-analytics");
+                  trackProductEvent("claim_visorias", {
+                    found: rows.length,
+                    channel: "whatsapp",
+                  });
+                  setNotice(
+                    rows.length > 0
+                      ? `Listo: ${rows.length} ficha${rows.length === 1 ? "" : "s"} en tu cuenta.`
+                      : "No encontramos fichas con ese WhatsApp. Revisa el número o crea la ficha abajo.",
+                  );
+                })
+                .catch((err: unknown) => {
+                  setError(
+                    err instanceof Error ? err.message : "No se pudo reclamar la ficha.",
+                  );
+                })
+                .finally(() => setBusy(false));
+            }}
+          >
+            <label className="block min-w-0 flex-1 text-sm">
+              <span className="font-medium text-amber-950">WhatsApp del registro</span>
+              <input
+                type="tel"
+                inputMode="tel"
+                value={phone}
+                onChange={(event) => setPhone(event.target.value)}
+                placeholder="442… o 52…"
+                className="mf-input mt-1"
+                autoComplete="tel"
+              />
+            </label>
+            <button type="submit" disabled={busy} className="mf-btn-gph shrink-0">
+              {busy ? "Buscando…" : "Traer fichas"}
+            </button>
+          </form>
+        </div>
+      ) : null}
 
       <TutorLinkRequestsInbox
         refreshKey={linkInboxKey}
@@ -1629,50 +1629,6 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
         )}
       </div>
 
-      {consentPromptOpen ? (
-        <div
-          className="fixed inset-0 z-50 flex items-end justify-center bg-black/45 p-4 sm:items-center"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="consent-prompt-title"
-        >
-          <div className="w-full max-w-md rounded-2xl border border-mf-border bg-white p-5 shadow-xl">
-            <p
-              id="consent-prompt-title"
-              className="text-lg font-semibold text-mf-gph-ink"
-            >
-              ¿Publicar en Explorar?
-            </p>
-            <p className="mt-2 text-sm leading-6 text-mf-text-secondary">
-              Sin tu consentimiento firmado, la ficha <strong>no aparece</strong> en el
-              buscador. El link MF- sí funciona si lo compartes. Firma en el paso{" "}
-              <strong>Publicar en Explorar</strong> (abajo en el constructor).
-            </p>
-            <div className="mt-4 flex flex-wrap gap-2">
-              <button
-                type="button"
-                className="mf-btn-gph"
-                onClick={() => {
-                  setConsentPromptOpen(false);
-                  childPanelRef.current?.scrollIntoView({
-                    behavior: "smooth",
-                    block: "start",
-                  });
-                }}
-              >
-                Ir a firmar
-              </button>
-              <button
-                type="button"
-                className="mf-btn-gph-ghost"
-                onClick={() => setConsentPromptOpen(false)}
-              >
-                Después
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : null}
     </div>
   );
 }

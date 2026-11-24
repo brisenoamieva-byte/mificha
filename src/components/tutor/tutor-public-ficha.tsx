@@ -4,7 +4,6 @@ import { TutorCareerSummaryCard } from "@/components/tutor/tutor-career-summary"
 import { TutorLastMatchCard } from "@/components/tutor/tutor-last-match";
 import { TutorPublicContactCard } from "@/components/tutor/tutor-public-contact";
 import { formatPlayerCategory } from "@/lib/player-category";
-import { PLAYER_CODE_SHORT } from "@/lib/player-public-code-copy";
 import type { TutorLinkedPerformance } from "@/lib/tutor-linked-performance";
 import type { TutorChild, TutorMaterial, TutorSeasonStat } from "@/lib/tutor-family";
 import type { TutorPublicContactLinks } from "@/lib/tutor-public-contact";
@@ -98,10 +97,9 @@ export function TutorPublicFicha({
       label: "Código",
       value: child.public_code || "—",
     },
-    {
-      label: "NUI",
-      value: profile.nui || "—",
-    },
+    ...(profile.nui
+      ? [{ label: "NUI", value: profile.nui }]
+      : []),
   ] as const;
 
   const showLastMatch =
@@ -130,7 +128,7 @@ export function TutorPublicFicha({
           <div className="relative flex flex-wrap items-start justify-between gap-4">
             <div className="min-w-0 flex-1">
               <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-mf-accent-bright">
-                Ficha del jugador · MiFicha
+                Mi ficha
               </p>
               <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
                 {child.player_name}
@@ -174,11 +172,6 @@ export function TutorPublicFicha({
               <Stat key={stat.label} label={stat.label} value={stat.value} />
             ))}
           </div>
-          {child.public_code ? (
-            <p className="relative mt-3 text-xs leading-5 text-white/60 print:hidden">
-              {PLAYER_CODE_SHORT}
-            </p>
-          ) : null}
           {socialLinks.length ? (
             <div className="relative mt-4 flex flex-wrap gap-2 print:hidden">
               {socialLinks.map((link) => (
@@ -272,7 +265,7 @@ export function TutorPublicFicha({
         {!compact && stories.length ? (
           <section className="px-5 py-5 sm:px-7">
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-mf-text-muted">
-              Notas del tutor
+              Notas
             </p>
             <ul className="mt-3 space-y-3">
               {stories.map((item) => (
@@ -292,8 +285,8 @@ export function TutorPublicFicha({
         {!photos.length && !videos.length && !stories.length && !profile.bio ? (
           <p className="px-5 py-8 text-center text-sm text-mf-text-muted sm:px-7">
             {compact
-              ? "Completa los pasos de la derecha para armar esta ficha."
-              : "El tutor aún está armando esta ficha."}
+              ? "Completa los pasos para armar esta ficha."
+              : "Esta ficha todavía no tiene foto ni historia."}
           </p>
         ) : null}
       </article>
@@ -306,8 +299,7 @@ export function TutorPublicFicha({
         />
       ) : !compact ? (
         <p className="rounded-2xl border border-dashed border-mf-border bg-white/70 px-4 py-3 text-center text-sm text-mf-text-muted print:hidden">
-          Aún sin stats de torneo en esta ficha. El material y la historia del tutor sí
-          están arriba.
+          Aún sin stats de torneo en esta ficha.
         </p>
       ) : null}
 

@@ -1,20 +1,16 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { SiteFooter, SiteHeader } from "@/components/marketing/site-header";
-import { DiagnosisHireCard } from "@/components/public/diagnosis-hire-card";
-import { PlayerCodeConnections } from "@/components/tutor/player-code-connections";
+import { SiteHeader } from "@/components/marketing/site-header";
 import { PublicCodeStub } from "@/components/tutor/public-code-stub";
 import { TutorFichaViewTracker } from "@/components/tutor/tutor-ficha-view-tracker";
 import { TutorPublicFicha } from "@/components/tutor/tutor-public-ficha";
-import { FichaLockedTeaser } from "@/components/marketing/explore-paywall";
 import { TutorShareActions } from "@/components/tutor/tutor-share-actions";
 import {
   buildOgTutorImageAlt,
   buildOgTutorSharePayload,
   buildTutorShareAbsoluteUrl,
 } from "@/lib/og-tutor-share";
-import { formatPlayerCategory } from "@/lib/player-category";
 import { formatPublicLockedName } from "@/lib/privacy";
 import { resolvePublicCode } from "@/lib/public-code-resolve";
 import { resolveExploreAccess } from "@/lib/scout-access";
@@ -55,8 +51,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       const title = `${publicName} · Ficha | MiFicha`;
       const description =
         bits.length > 0
-          ? `Ficha de ${publicName}: ${bits.join(" · ")}. Material del tutor, rendimiento y seguimiento en MiFicha.`
-          : `Ficha de presentación de ${publicName}. Material del tutor en MiFicha.`;
+          ? `Ficha de ${publicName}: ${bits.join(" · ")}. MiFicha.`
+          : `Ficha de ${publicName} en MiFicha.`;
       const access = child.public_code || child.share_token;
       const pageUrl = buildTutorShareAbsoluteUrl(access);
       const ogPayload = buildOgTutorSharePayload(child);
@@ -98,7 +94,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       "Jugador";
     return {
       title: `${name} · ${resolved.code ?? "Código"} | MiFicha`,
-      description: `Código MiFicha${resolved.code ? ` ${resolved.code}` : ""} · conexiones de academia, visoría y ficha del jugador.`,
+      description: `Código MiFicha${resolved.code ? ` ${resolved.code}` : ""}.`,
       robots: { index: false, follow: false },
     };
   } catch {
@@ -115,7 +111,6 @@ export default async function TutorShareFichaPage({ params }: PageProps) {
     notFound();
   }
 
-  // Mutating get for tutor so codes/backfill stay warm; resolve uses peek + maps.
   await getTutorChildByShareToken(admin, token);
   const resolution = await resolvePublicCode(admin, token);
   if (!resolution) notFound();
@@ -134,23 +129,31 @@ export default async function TutorShareFichaPage({ params }: PageProps) {
     return (
       <div className="flex min-h-dvh flex-col bg-mf-canvas">
         <TutorFichaViewTracker token={access || token} />
-        <SiteHeader actionHref="/fut/tutor" actionLabel="Soy tutor" />
+        <SiteHeader
+          actionHref="/fut/entrar?next=/fut/tutor"
+          actionLabel="Armar la mía"
+          showAcademyLink={false}
+        />
         <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-8 sm:px-6 sm:py-12">
           <PublicCodeStub resolution={resolution} />
-          <PlayerCodeConnections resolution={resolution} className="mt-5" />
-          <p className="mt-6 text-center text-xs leading-6 text-mf-text-muted">
-            Un código abre ficha, academia y visorías cuando existen ·{" "}
-            <Link href="/fut/tutor" className="font-semibold text-mf-gph hover:underline">
-              Entrar como tutor
+          <p className="mt-6 text-center text-sm">
+            <Link
+              href="/fut/entrar?next=/fut/tutor"
+              className="font-semibold text-mf-gph hover:underline"
+            >
+              Crear la mía
             </Link>
           </p>
         </main>
-        <SiteFooter />
+        <footer className="border-t border-mf-border py-4 text-center text-xs text-mf-text-muted">
+          <Link href="/fut" className="font-semibold text-mf-brand hover:underline">
+            mificha.mx
+          </Link>
+        </footer>
       </div>
     );
   }
 
-  // Share link = vista pública gratuita (viral). Explorar Pro solo desbloquea kit/contacto extra.
   const accessGate = await resolveExploreAccess({
     ownerUserId: child.guardian_user_id,
   });
@@ -172,8 +175,9 @@ export default async function TutorShareFichaPage({ params }: PageProps) {
       <SiteHeader
         actionHref="/fut/entrar?next=/fut/tutor"
         actionLabel="Armar la mía"
+        showAcademyLink={false}
       />
-      <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-8 sm:px-6 sm:py-12">
+      <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-6 sm:px-6 sm:py-10">
         <TutorPublicFicha
           child={child}
           materials={materials}
@@ -198,53 +202,27 @@ export default async function TutorShareFichaPage({ params }: PageProps) {
           />
         </div>
 
-        <PlayerCodeConnections resolution={resolution} className="mt-5" />
-        {!accessGate.unlocked ? (
-          <FichaLockedTeaser
-            name={playerName}
-            position={child.profile.position}
-            category={formatPlayerCategory(child.profile.birth_date)}
-            place={[child.profile.club || child.profile.school, child.profile.city]
-              .filter(Boolean)
-              .join(" · ") || null}
-            code={child.public_code}
-            loginHref={`/fut/entrar?next=${encodeURIComponent(sharePath)}`}
-            returnPath={sharePath}
-            loggedIn={Boolean(accessGate.userId)}
-            compactUpsell
-          />
-        ) : !performance?.gph ? (
-          <DiagnosisHireCard playerName={playerName} className="mt-5" compact />
-        ) : null}
-
-        <div className="mt-6 space-y-2 text-center text-xs leading-6 text-mf-text-muted print:hidden">
-          <p>
-            <Link
-              href={`/fut/entrar?next=${encodeURIComponent("/fut/tutor#fin-de-semana")}`}
-              className="font-semibold text-mf-gph hover:underline"
-            >
-              Actualizar mi ficha
-            </Link>
-            {" · "}
-            <Link
-              href="/fut/entrar?next=/fut/tutor"
-              className="font-semibold text-mf-gph hover:underline"
-            >
-              Crear la mía
-            </Link>
-          </p>
-          <p>
-            Consentimiento y Explorar los controla el tutor o representante
-            {performance
-              ? " · stats oficiales de academia ligada"
-              : seasons.length
-                ? " · rendimiento capturado en la cuenta"
-                : ""}
-            .
-          </p>
-        </div>
+        <p className="mt-6 text-center text-sm print:hidden">
+          <Link
+            href={`/fut/entrar?next=${encodeURIComponent("/fut/tutor#fin-de-semana")}`}
+            className="font-semibold text-mf-gph hover:underline"
+          >
+            Actualizar mi ficha
+          </Link>
+          {" · "}
+          <Link
+            href="/fut/entrar?next=/fut/tutor"
+            className="font-semibold text-mf-gph hover:underline"
+          >
+            Crear la mía
+          </Link>
+        </p>
       </main>
-      <SiteFooter />
+      <footer className="border-t border-mf-border py-4 text-center text-xs text-mf-text-muted print:hidden">
+        <Link href="/fut" className="font-semibold text-mf-brand hover:underline">
+          mificha.mx
+        </Link>
+      </footer>
     </div>
   );
 }

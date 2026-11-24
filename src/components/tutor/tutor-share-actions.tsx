@@ -9,7 +9,6 @@ import {
   MessageCircle,
   Printer,
   Share2,
-  Sparkles,
   UserPlus,
 } from "lucide-react";
 import { trackProductEvent } from "@/lib/product-analytics";
@@ -35,7 +34,7 @@ export function TutorShareActions({
   materialsKitHref?: string | null;
 }) {
   const [copied, setCopied] = useState(false);
-  const [downloading, setDownloading] = useState<"og" | "story" | null>(null);
+  const [downloading, setDownloading] = useState(false);
   const [canNativeShare, setCanNativeShare] = useState(false);
 
   const resolvedUrl = useMemo(() => {
@@ -53,10 +52,7 @@ export function TutorShareActions({
     return withShareUtm(base, { campaign: "share_ficha", content: publicCode || "link" });
   }, [absoluteUrl, sharePath, publicCode]);
 
-  const imagePath = useMemo(
-    () => `${sharePath.replace(/\/$/, "")}/opengraph-image`,
-    [sharePath],
-  );
+  /** Una sola imagen para el usuario: vertical (Stories / estado). El preview del link usa OG sola. */
   const storyPath = useMemo(
     () => `${sharePath.replace(/\/$/, "")}/story-image`,
     [sharePath],
@@ -111,30 +107,25 @@ export function TutorShareActions({
     }
   }
 
-  async function downloadImage(kind: "og" | "story") {
-    setDownloading(kind);
+  async function downloadImage() {
+    setDownloading(true);
     try {
-      const path = kind === "story" ? storyPath : imagePath;
-      const res = await fetch(path, { cache: "no-store" });
+      const res = await fetch(storyPath, { cache: "no-store" });
       if (!res.ok) throw new Error("download_failed");
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `${(publicCode || "ficha").toLowerCase()}-mificha${
-        kind === "story" ? "-story" : ""
-      }.png`;
+      a.download = `${(publicCode || "ficha").toLowerCase()}-mificha.png`;
       document.body.appendChild(a);
       a.click();
       a.remove();
       URL.revokeObjectURL(url);
-      trackProductEvent("share_click", {
-        channel: kind === "story" ? "download_story" : "download_image",
-      });
+      trackProductEvent("share_click", { channel: "download_story" });
     } catch {
       /* ignore */
     } finally {
-      setDownloading(null);
+      setDownloading(false);
     }
   }
 
@@ -152,7 +143,7 @@ export function TutorShareActions({
               {PLAYER_CODE_SHORT}
             </>
           ) : (
-            "Mándala al equipo, a stories o por WhatsApp"
+            "Mándala al equipo por WhatsApp o súbela a tu historia"
           )}
         </p>
       </div>
@@ -170,23 +161,13 @@ export function TutorShareActions({
         </a>
         <button
           type="button"
-          onClick={() => void downloadImage("story")}
-          disabled={downloading !== null}
-          title="Imagen vertical 9:16 para Instagram Stories, Reels o estado de WhatsApp."
+          onClick={() => void downloadImage()}
+          disabled={downloading}
+          title="Guarda la imagen para pegarla en tu historia de Instagram o WhatsApp."
           className="inline-flex items-center justify-center gap-2 rounded-lg bg-mf-gph px-3.5 py-2 text-sm font-semibold text-white hover:bg-[#163f70] disabled:opacity-60"
         >
-          <Sparkles className="h-4 w-4" />
-          {downloading === "story" ? "Guardando…" : "Story"}
-        </button>
-        <button
-          type="button"
-          onClick={() => void downloadImage("og")}
-          disabled={downloading !== null}
-          title="Tarjeta horizontal para chats y portada de link."
-          className="inline-flex items-center justify-center gap-2 rounded-lg border border-mf-border bg-white px-3.5 py-2 text-sm font-semibold text-mf-text hover:bg-mf-canvas disabled:opacity-60"
-        >
           <Download className="h-4 w-4" />
-          {downloading === "og" ? "Guardando…" : "Tarjeta chat"}
+          {downloading ? "Guardando…" : "Guardar imagen"}
         </button>
         <button
           type="button"
@@ -209,9 +190,8 @@ export function TutorShareActions({
       </div>
 
       <p className="text-xs leading-5 text-mf-text-muted">
-        <span className="font-semibold text-mf-text-secondary">Story</span> es vertical
-        para Instagram / WhatsApp. La tarjeta chat sirve en grupos. La ficha completa
-        está en el PDF o abriendo el link.
+        La imagen es para tu historia. Si mandas el link, WhatsApp ya muestra la
+        portada sola. El PDF tiene la ficha completa.
       </p>
 
       <div className="border-t border-mf-border/80 pt-3 text-sm">
