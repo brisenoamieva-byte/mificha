@@ -13,12 +13,15 @@ interface SiteHeaderProps {
   actionLabel?: string;
   /** En cuenta persona (tutor) no mostrar atajo a academia. */
   showAcademyLink?: boolean;
+  /** Solo logo + CTA (ficha pública / tutor). Sin menú marketing. */
+  minimal?: boolean;
 }
 
 export function SiteHeader({
   actionHref = "/fut/entrar",
   actionLabel = "Entrar",
   showAcademyLink = true,
+  minimal = false,
 }: SiteHeaderProps) {
   return (
     <header className="mf-safe-top relative sticky top-0 z-50">
@@ -30,12 +33,16 @@ export function SiteHeader({
       <div className="relative mx-auto flex h-14 max-w-6xl items-center gap-3 px-4 sm:gap-4 sm:px-6">
         <BrandLogoLink href="/fut" className="shrink-0" />
 
-        <div className="hidden min-w-0 flex-1 justify-center lg:flex">
-          <SiteNavDesktop />
-        </div>
+        {!minimal ? (
+          <div className="hidden min-w-0 flex-1 justify-center lg:flex">
+            <SiteNavDesktop />
+          </div>
+        ) : (
+          <div className="min-w-0 flex-1" />
+        )}
 
         <div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-2">
-          {showAcademyLink ? (
+          {!minimal && showAcademyLink ? (
             <Link
               href="/fut/dashboard"
               className="hidden text-sm font-medium text-mf-text-secondary transition hover:text-mf-text lg:inline-flex"
@@ -49,11 +56,13 @@ export function SiteHeader({
           >
             {actionLabel}
           </Link>
-          <SiteNavMobile
-            actionHref={actionHref}
-            actionLabel={actionLabel}
-            showAcademyLink={showAcademyLink}
-          />
+          {!minimal ? (
+            <SiteNavMobile
+              actionHref={actionHref}
+              actionLabel={actionLabel}
+              showAcademyLink={showAcademyLink}
+            />
+          ) : null}
         </div>
       </div>
     </header>

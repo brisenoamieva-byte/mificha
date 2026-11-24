@@ -7,6 +7,7 @@ import { TutorActivityInbox } from "@/components/tutor/tutor-activity-inbox";
 import { TutorAgreementsInbox } from "@/components/tutor/tutor-agreements-inbox";
 import { TutorBuilderPanel } from "@/components/tutor/tutor-builder-panel";
 import { TutorLinkRequestsInbox } from "@/components/tutor/tutor-link-requests-inbox";
+import { MiEquipoPanel } from "@/components/tutor/mi-equipo-panel";
 import { updatePassword } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { guardianWorkspaceCopy } from "@/lib/guardian-workspace-copy";
@@ -275,25 +276,36 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
   const childPanelRef = useRef<HTMLDivElement | null>(null);
   const createFichaRef = useRef<HTMLFormElement | null>(null);
 
-  const load = useCallback(async (whatsapp: string, preferId?: string | null) => {
-    const params = new URLSearchParams({ kind: "all" });
-    if (whatsapp) params.set("phone", whatsapp);
-    const payload = await authed(`/fut/api/tutor/home?${params.toString()}`);
-    const rows = payload.children ?? [];
-    setVideoUsedBytes(Number(payload.video_used_bytes) || 0);
-    setVideoQuotaBytes(
-      Number(payload.video_quota_bytes) > 0
-        ? Number(payload.video_quota_bytes)
-        : TUTOR_VIDEO_QUOTA_BYTES,
-    );
-    setChildren(rows);
-    setSelectedId((current) => {
-      if (preferId && rows.some((row) => row.id === preferId)) return preferId;
-      if (current && rows.some((row) => row.id === current)) return current;
-      return rows[0]?.id ?? null;
-    });
-    return rows;
-  }, []);
+  const load = useCallback(
+    async (whatsapp: string, preferId?: string | null, claimCode?: string | null) => {
+      const params = new URLSearchParams({ kind: "all" });
+      if (whatsapp) params.set("phone", whatsapp);
+      if (claimCode) params.set("claim_code", claimCode);
+      const payload = await authed(`/fut/api/tutor/home?${params.toString()}`);
+      const rows = payload.children ?? [];
+      setVideoUsedBytes(Number(payload.video_used_bytes) || 0);
+      setVideoQuotaBytes(
+        Number(payload.video_quota_bytes) > 0
+          ? Number(payload.video_quota_bytes)
+          : TUTOR_VIDEO_QUOTA_BYTES,
+      );
+      setChildren(rows);
+      setSelectedId((current) => {
+        if (preferId && rows.some((row) => row.id === preferId)) return preferId;
+        if (claimCode) {
+          const hit = rows.find(
+            (row) =>
+              String(row.public_code || "").toUpperCase() === claimCode.toUpperCase(),
+          );
+          if (hit) return hit.id;
+        }
+        if (current && rows.some((row) => row.id === current)) return current;
+        return rows[0]?.id ?? null;
+      });
+      return rows;
+    },
+    [],
+  );
 
   useEffect(() => {
     try {
@@ -333,8 +345,21 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
           typeof window !== "undefined"
             ? window.localStorage.getItem(PHONE_STORAGE_KEY) ?? ""
             : "";
-        const rows = await load(savedPhone || phone);
+        const claim =
+          typeof window !== "undefined"
+            ? (
+                new URLSearchParams(window.location.search).get("claim_code") ||
+                new URLSearchParams(window.location.search).get("ref") ||
+                ""
+              )
+                .trim()
+                .toUpperCase()
+            : "";
+        const rows = await load(savedPhone || phone, null, claim || null);
         if (cancelled) return;
+        if (claim && rows.some((row) => row.public_code?.toUpperCase() === claim)) {
+          setNotice(`Listo: ficha ${claim} en tu cuenta.`);
+        }
         if (rows.length === 0) {
           setOnboardNotice(copy.onboardEmpty);
         }
@@ -1362,6 +1387,8 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
       />
       <TutorAgreementsInbox />
       <TutorActivityInbox />
+
+      <MiEquipoPanel />
 
       {children.length > 0 ? (
         <div className="space-y-2">

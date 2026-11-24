@@ -28,12 +28,13 @@ export async function GET(request: Request) {
 
   const url = new URL(request.url);
   const phone = url.searchParams.get("phone");
+  const claimCode = url.searchParams.get("claim_code");
   const kindParam = url.searchParams.get("kind");
   const kind =
     !kindParam || kindParam === "all" ? ("all" as const) : normalizeGuardianKind(kindParam);
   try {
     const admin = createSupabaseAdminClient();
-    const children = await listGuardianChildren(admin, user, phone, kind);
+    const children = await listGuardianChildren(admin, user, phone, kind, claimCode);
     const videoUsedBytes = await getTutorVideoUsageBytes(admin, user.id);
     const detailed = await Promise.all(
       children.map(async (child) => ({

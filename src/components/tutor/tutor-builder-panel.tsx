@@ -590,8 +590,8 @@ export function TutorBuilderPanel({
             {step === "identidad" ? (
               <>
                 <StepHeading
-                  title="Identidad del jugador"
-                  detail="Nombre completo y datos básicos para la portada."
+                  title="Identidad"
+                  detail="Nombre, fecha y ciudad para la portada."
                 />
                 <label className="block text-sm font-medium text-mf-text">
                   Nombre completo
@@ -607,41 +607,20 @@ export function TutorBuilderPanel({
                     className={inputClass}
                   />
                 </label>
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <label className="block text-sm font-medium text-mf-text">
-                    Fecha de nacimiento
-                    <input
-                      type="date"
-                      value={form.birth_date}
-                      onChange={(event) =>
-                        setForm((current) => ({
-                          ...current,
-                          birth_date: event.target.value,
-                        }))
-                      }
-                      className={inputClass}
-                    />
-                  </label>
-                  <label className="block text-sm font-medium text-mf-text">
-                    NUI (federado)
-                    <input
-                      value={form.nui}
-                      onChange={(event) =>
-                        setForm((current) => ({
-                          ...current,
-                          nui: event.target.value.replace(/\D+/g, "").slice(0, 12),
-                        }))
-                      }
-                      className={inputClass}
-                      inputMode="numeric"
-                      placeholder="1265657"
-                      autoComplete="off"
-                    />
-                    <span className="mt-1 block text-xs text-mf-text-muted">
-                      Número único de registro federado. Se liga a tu código MF-.
-                    </span>
-                  </label>
-                </div>
+                <label className="block text-sm font-medium text-mf-text">
+                  Fecha de nacimiento
+                  <input
+                    type="date"
+                    value={form.birth_date}
+                    onChange={(event) =>
+                      setForm((current) => ({
+                        ...current,
+                        birth_date: event.target.value,
+                      }))
+                    }
+                    className={inputClass}
+                  />
+                </label>
                 <MexicoLocationSelect
                   state={form.state}
                   city={form.city}
@@ -772,8 +751,8 @@ export function TutorBuilderPanel({
             {step === "historia" ? (
               <>
                 <StepHeading
-                  title="Historia y objetivo"
-                  detail="Texto de currículum: estilo de juego, mentalidad y siguiente paso."
+                  title="Historia"
+                  detail="Cómo juegas y a dónde quieres llegar."
                 />
                 <label className="block text-sm font-medium text-mf-text">
                   Presentación
@@ -783,7 +762,7 @@ export function TutorBuilderPanel({
                       setForm((current) => ({ ...current, bio: event.target.value }))
                     }
                     className={`${inputClass} min-h-28`}
-                    placeholder="Jugador encarador, de juego frontal y dinámico. Técnica, velocidad, intensidad…"
+                    placeholder="Cómo juegas: rápido, encarador, buen primer toque…"
                   />
                 </label>
                 <label className="block text-sm font-medium text-mf-text">
@@ -794,68 +773,10 @@ export function TutorBuilderPanel({
                       setForm((current) => ({ ...current, goals: event.target.value }))
                     }
                     className={`${inputClass} min-h-24`}
-                    placeholder="Universidad, visoría, club, siguiente paso…"
-                  />
-                </label>
-                <label className="block text-sm font-medium text-mf-text">
-                  Título profesional
-                  <input
-                    value={form.role_title}
-                    onChange={(event) =>
-                      setForm((current) => ({
-                        ...current,
-                        role_title: event.target.value,
-                      }))
-                    }
-                    className={inputClass}
-                    placeholder="Jugadora de fútbol profesional"
-                  />
-                </label>
-                <label className="block text-sm font-medium text-mf-text">
-                  En una frase
-                  <input
-                    value={form.tagline}
-                    onChange={(event) =>
-                      setForm((current) => ({
-                        ...current,
-                        tagline: event.target.value,
-                      }))
-                    }
-                    className={inputClass}
-                    placeholder="Fe, disciplina y pasión por el fútbol"
+                    placeholder="Prepa, visoría, club, siguiente paso…"
                   />
                 </label>
                 <div className="grid gap-3 sm:grid-cols-2">
-                  <label className="block text-sm font-medium text-mf-text">
-                    Correo de contacto
-                    <input
-                      type="email"
-                      value={form.contact_email}
-                      onChange={(event) =>
-                        setForm((current) => ({
-                          ...current,
-                          contact_email: event.target.value,
-                        }))
-                      }
-                      className={inputClass}
-                      placeholder="tutor@correo.com"
-                    />
-                  </label>
-                  <label className="block text-sm font-medium text-mf-text">
-                    WhatsApp de contacto
-                    <input
-                      type="tel"
-                      value={form.contact_whatsapp}
-                      onChange={(event) =>
-                        setForm((current) => ({
-                          ...current,
-                          contact_whatsapp: event.target.value,
-                        }))
-                      }
-                      className={inputClass}
-                      placeholder="442 123 4567"
-                    />
-                  </label>
                   <label className="block text-sm font-medium text-mf-text">
                     Instagram
                     <input
@@ -884,95 +805,172 @@ export function TutorBuilderPanel({
                       placeholder="@jugador"
                     />
                   </label>
-                  <label className="block text-sm font-medium text-mf-text sm:col-span-2">
-                    Facebook
-                    <input
-                      value={form.facebook}
-                      onChange={(event) =>
-                        setForm((current) => ({
-                          ...current,
-                          facebook: event.target.value,
-                        }))
-                      }
-                      className={inputClass}
-                      placeholder="usuario o https://facebook.com/…"
-                    />
-                  </label>
                 </div>
-                <p className="text-xs leading-5 text-mf-text-muted">
-                  Redes se muestran en la ficha pública. Correo y WhatsApp no se
-                  publican solos: actívalos en Compartir.
-                </p>
-                <label className="block text-sm font-medium text-mf-text">
-                  Hitos (uno por línea, máx. 4)
-                  <textarea
-                    value={form.highlight_chips_text}
-                    onChange={(event) =>
-                      setForm((current) => ({
-                        ...current,
-                        highlight_chips_text: event.target.value,
-                      }))
-                    }
-                    className={`${inputClass} min-h-24`}
-                    placeholder={"4 categorías de Selección\n2024 Campeona en Europa"}
-                  />
-                </label>
-                <label className="block text-sm font-medium text-mf-text">
-                  Logros (`Club | detalle`, uno por línea)
-                  <textarea
-                    value={form.achievements_text}
-                    onChange={(event) =>
-                      setForm((current) => ({
-                        ...current,
-                        achievements_text: event.target.value,
-                      }))
-                    }
-                    className={`${inputClass} min-h-24`}
-                    placeholder={"Chorrillo FC | Campeona LFF 2025-26"}
-                  />
-                </label>
-                <label className="block text-sm font-medium text-mf-text">
-                  Selección / convocatorias (`Nivel | detalle`)
-                  <textarea
-                    value={form.callups_text}
-                    onChange={(event) =>
-                      setForm((current) => ({
-                        ...current,
-                        callups_text: event.target.value,
-                      }))
-                    }
-                    className={`${inputClass} min-h-24`}
-                    placeholder={"MAYOR | Copa Oro: Colombia, Brasil…"}
-                  />
-                </label>
-                <label className="block text-sm font-medium text-mf-text">
-                  YouTube / highlights
-                  <input
-                    value={form.youtube_url}
-                    onChange={(event) =>
-                      setForm((current) => ({
-                        ...current,
-                        youtube_url: event.target.value,
-                      }))
-                    }
-                    className={inputClass}
-                    placeholder="https://youtu.be/…"
-                  />
-                </label>
-                <label className="block text-sm font-medium text-mf-text">
-                  Transfermarkt
-                  <input
-                    value={form.transfermarkt_url}
-                    onChange={(event) =>
-                      setForm((current) => ({
-                        ...current,
-                        transfermarkt_url: event.target.value,
-                      }))
-                    }
-                    className={inputClass}
-                    placeholder="https://www.transfermarkt.com/…"
-                  />
-                </label>
+
+                <details className="rounded-xl border border-mf-border bg-mf-canvas/60 px-4 py-3">
+                  <summary className="cursor-pointer text-sm font-semibold text-mf-gph-ink">
+                    Más datos (opcional)
+                  </summary>
+                  <div className="mt-3 space-y-3">
+                    <label className="block text-sm font-medium text-mf-text">
+                      NUI (federado)
+                      <input
+                        value={form.nui}
+                        onChange={(event) =>
+                          setForm((current) => ({
+                            ...current,
+                            nui: event.target.value.replace(/\D+/g, "").slice(0, 12),
+                          }))
+                        }
+                        className={inputClass}
+                        inputMode="numeric"
+                        placeholder="Si lo tienes"
+                        autoComplete="off"
+                      />
+                    </label>
+                    <label className="block text-sm font-medium text-mf-text">
+                      Título / frase
+                      <input
+                        value={form.role_title}
+                        onChange={(event) =>
+                          setForm((current) => ({
+                            ...current,
+                            role_title: event.target.value,
+                          }))
+                        }
+                        className={inputClass}
+                        placeholder="Opcional"
+                      />
+                    </label>
+                    <label className="block text-sm font-medium text-mf-text">
+                      En una frase
+                      <input
+                        value={form.tagline}
+                        onChange={(event) =>
+                          setForm((current) => ({
+                            ...current,
+                            tagline: event.target.value,
+                          }))
+                        }
+                        className={inputClass}
+                        placeholder="Opcional"
+                      />
+                    </label>
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      <label className="block text-sm font-medium text-mf-text">
+                        Correo de contacto
+                        <input
+                          type="email"
+                          value={form.contact_email}
+                          onChange={(event) =>
+                            setForm((current) => ({
+                              ...current,
+                              contact_email: event.target.value,
+                            }))
+                          }
+                          className={inputClass}
+                          placeholder="tutor@correo.com"
+                        />
+                      </label>
+                      <label className="block text-sm font-medium text-mf-text">
+                        WhatsApp de contacto
+                        <input
+                          type="tel"
+                          value={form.contact_whatsapp}
+                          onChange={(event) =>
+                            setForm((current) => ({
+                              ...current,
+                              contact_whatsapp: event.target.value,
+                            }))
+                          }
+                          className={inputClass}
+                          placeholder="442…"
+                        />
+                      </label>
+                    </div>
+                    <label className="block text-sm font-medium text-mf-text">
+                      Facebook
+                      <input
+                        value={form.facebook}
+                        onChange={(event) =>
+                          setForm((current) => ({
+                            ...current,
+                            facebook: event.target.value,
+                          }))
+                        }
+                        className={inputClass}
+                        placeholder="Opcional"
+                      />
+                    </label>
+                    <label className="block text-sm font-medium text-mf-text">
+                      Hitos (uno por línea)
+                      <textarea
+                        value={form.highlight_chips_text}
+                        onChange={(event) =>
+                          setForm((current) => ({
+                            ...current,
+                            highlight_chips_text: event.target.value,
+                          }))
+                        }
+                        className={`${inputClass} min-h-20`}
+                      />
+                    </label>
+                    <label className="block text-sm font-medium text-mf-text">
+                      Logros (`Club | detalle`)
+                      <textarea
+                        value={form.achievements_text}
+                        onChange={(event) =>
+                          setForm((current) => ({
+                            ...current,
+                            achievements_text: event.target.value,
+                          }))
+                        }
+                        className={`${inputClass} min-h-20`}
+                      />
+                    </label>
+                    <label className="block text-sm font-medium text-mf-text">
+                      Convocatorias (`Nivel | detalle`)
+                      <textarea
+                        value={form.callups_text}
+                        onChange={(event) =>
+                          setForm((current) => ({
+                            ...current,
+                            callups_text: event.target.value,
+                          }))
+                        }
+                        className={`${inputClass} min-h-20`}
+                      />
+                    </label>
+                    <label className="block text-sm font-medium text-mf-text">
+                      YouTube
+                      <input
+                        value={form.youtube_url}
+                        onChange={(event) =>
+                          setForm((current) => ({
+                            ...current,
+                            youtube_url: event.target.value,
+                          }))
+                        }
+                        className={inputClass}
+                        placeholder="https://youtu.be/…"
+                      />
+                    </label>
+                    <label className="block text-sm font-medium text-mf-text">
+                      Transfermarkt
+                      <input
+                        value={form.transfermarkt_url}
+                        onChange={(event) =>
+                          setForm((current) => ({
+                            ...current,
+                            transfermarkt_url: event.target.value,
+                          }))
+                        }
+                        className={inputClass}
+                        placeholder="Opcional"
+                      />
+                    </label>
+                  </div>
+                </details>
               </>
             ) : null}
 

@@ -26,6 +26,7 @@ export default async function TutorPage() {
         actionHref="/fut/tutor"
         actionLabel="Mis fichas"
         showAcademyLink={false}
+        minimal
       />
       <main className="mx-auto min-w-0 w-full max-w-6xl flex-1 px-4 py-8 sm:px-6 sm:py-10">
         <div className="mb-6 min-w-0 max-w-2xl">

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SiteHeader } from "@/components/marketing/site-header";
+import { MiEquipoSaveButton } from "@/components/tutor/mi-equipo-panel";
 import { PublicCodeStub } from "@/components/tutor/public-code-stub";
 import { TutorFichaViewTracker } from "@/components/tutor/tutor-ficha-view-tracker";
 import { TutorPublicFicha } from "@/components/tutor/tutor-public-ficha";
@@ -133,6 +134,7 @@ export default async function TutorShareFichaPage({ params }: PageProps) {
           actionHref="/fut/entrar?next=/fut/tutor"
           actionLabel="Armar la mía"
           showAcademyLink={false}
+          minimal
         />
         <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-8 sm:px-6 sm:py-12">
           <PublicCodeStub resolution={resolution} />
@@ -176,6 +178,7 @@ export default async function TutorShareFichaPage({ params }: PageProps) {
         actionHref="/fut/entrar?next=/fut/tutor"
         actionLabel="Armar la mía"
         showAcademyLink={false}
+        minimal
       />
       <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-6 sm:px-6 sm:py-10">
         <TutorPublicFicha
@@ -201,6 +204,12 @@ export default async function TutorShareFichaPage({ params }: PageProps) {
             }
           />
         </div>
+
+        {child.public_code ? (
+          <div className="mt-3 flex justify-center print:hidden">
+            <MiEquipoSaveButton code={child.public_code} name={playerName} />
+          </div>
+        ) : null}
 
         <p className="mt-6 text-center text-sm print:hidden">
           <Link

@@ -770,12 +770,42 @@ export async function syncTutorChildren(
     .sort((a, b) => a.player_name.localeCompare(b.player_name, "es"));
 }
 
+/**
+ * Reclama una ficha sembrada (visoría pending) por código MF-,
+ * aunque la cuenta ya tenga otras fichas.
+ */
+export async function claimPendingByPublicCode(
+  admin: SupabaseClient,
+  user: { id: string; email?: string | null },
+  claimCode: string | null | undefined,
+) {
+  const code = normalizePublicCode(claimCode);
+  if (!code) return null;
+
+  const email = (user.email ?? "").trim().toLowerCase();
+  const loaded = await loadRoster(admin);
+  const roster = loaded.roster;
+  const target = roster.find(
+    (child) => normalizePublicCode(child.public_code) === code,
+  );
+  if (!target) return null;
+  if (target.guardian_user_id === user.id) return target;
+  if (!isPendingVisoriaGuardian(target.guardian_user_id)) return null;
+
+  target.guardian_user_id = user.id;
+  if (email) target.guardian_email = email;
+  await writeJson(admin, ROSTER, roster);
+  return target;
+}
+
 export async function listGuardianChildren(
   admin: SupabaseClient,
   user: { id: string; email?: string | null },
   phone: string | null | undefined,
   kind: GuardianKind | "all" = "all",
+  claimCode?: string | null,
 ) {
+  await claimPendingByPublicCode(admin, user, claimCode);
   const children = await syncTutorChildren(admin, user, phone ?? null);
   if (kind === "all") return children;
   return children.filter((child) => childGuardianKind(child) === kind);
