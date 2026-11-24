@@ -315,7 +315,7 @@ export function TutorBuilderPanel({
   );
   const [step, setStep] = useState<TutorBuilderStepId>(progress.next.id);
   /** Si está activo, guardar/subir no salta al siguiente paso del resumen. */
-  const [keepCapturing, setKeepCapturing] = useState(true);
+  const [keepCapturing, setKeepCapturing] = useState(false);
   const lastChildId = useRef(child.id);
   const shareAccess = child.public_code || child.share_token;
   const shareHref = shareAccess ? tutorSharePath(shareAccess) : null;
@@ -324,14 +324,22 @@ export function TutorBuilderPanel({
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    if (window.location.hash !== "#fin-de-semana") return;
-    setStep("rendimiento");
-    window.setTimeout(() => {
-      document.getElementById("fin-de-semana")?.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
-    }, 120);
+    const hash = window.location.hash;
+    if (hash === "#fin-de-semana" || progress.photos > 0) {
+      setStep("rendimiento");
+      if (hash === "#fin-de-semana") {
+        window.setTimeout(() => {
+          document.getElementById("fin-de-semana")?.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
+        }, 120);
+      }
+      return;
+    }
+    if (progress.photos === 0) setStep("material");
+    // Solo al cambiar de ficha: el domingo o subir foto van primero.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- boot por child
   }, [child.id]);
 
   function goToStep(next: TutorBuilderStepId) {
@@ -485,6 +493,38 @@ export function TutorBuilderPanel({
       </div>
 
       <div className="order-1 space-y-4 lg:order-2">
+        <div className="rounded-2xl border border-emerald-200/90 bg-emerald-50 px-4 py-3.5">
+          <p className="text-sm font-semibold text-emerald-950">Hoy</p>
+          <p className="mt-0.5 text-xs leading-5 text-emerald-950/80">
+            Lo rápido: anota el partido o manda tu ficha.
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => goToStep("rendimiento")}
+              className="inline-flex items-center justify-center rounded-lg bg-mf-accent-dark px-3.5 py-2 text-sm font-semibold text-white hover:bg-[#047857]"
+            >
+              Sumar partido
+            </button>
+            <button
+              type="button"
+              onClick={() => goToStep("compartir")}
+              className="inline-flex items-center justify-center rounded-lg bg-mf-gph px-3.5 py-2 text-sm font-semibold text-white hover:bg-[#163f70]"
+            >
+              Compartir
+            </button>
+            {shareHref ? (
+              <Link
+                href={shareHref}
+                target="_blank"
+                className="inline-flex items-center justify-center rounded-lg border border-emerald-300 bg-white px-3.5 py-2 text-sm font-semibold text-emerald-950 hover:bg-emerald-100/60"
+              >
+                Ver ficha
+              </Link>
+            ) : null}
+          </div>
+        </div>
+
         <TutorCareerSummaryCard
           seasons={seasons}
           performance={child.linked_performance ?? null}
@@ -502,16 +542,7 @@ export function TutorBuilderPanel({
             Completa paso a paso
           </h2>
           <p className="mt-2 text-sm leading-6 text-mf-text-secondary">
-            Toca cada paso: el editor se abre justo debajo. Las fotos y videos se
-            suben en{" "}
-            <button
-              type="button"
-              className="font-semibold text-mf-gph underline-offset-2 hover:underline"
-              onClick={() => goToStep("material")}
-            >
-              Subir foto y video
-            </button>
-            .
+            Toca un paso para editarlo. Empieza por la foto si aún no hay.
           </p>
 
           {progress.photos === 0 ? (
@@ -981,10 +1012,7 @@ export function TutorBuilderPanel({
                 checked={keepCapturing}
                 onChange={(event) => setKeepCapturing(event.target.checked)}
               />
-              <span>
-                Voy a seguir capturando — al guardar me quedo en esta sección (útil para
-                subir muchas fotos, videos o torneos).
-              </span>
+              <span>Seguir aquí al guardar</span>
             </label>
             <div className="flex flex-wrap gap-3">
               <button type="submit" disabled={busy} className="mf-btn-gph">
@@ -1047,8 +1075,7 @@ export function TutorBuilderPanel({
                     onChange={(event) => setKeepCapturing(event.target.checked)}
                   />
                   <span>
-                    Voy a seguir capturando — después de cada carga me quedo en esta
-                    sección.
+                    Seguir aquí después de cada carga
                   </span>
                 </label>
                 <div className="grid gap-3 sm:grid-cols-2">
@@ -1441,7 +1468,7 @@ export function TutorBuilderPanel({
                 onChange={(event) => setKeepCapturing(event.target.checked)}
               />
               <span>
-                Voy a seguir capturando — al agregar un torneo me quedo en esta sección.
+                Seguir aquí al agregar un torneo
               </span>
             </label>
 

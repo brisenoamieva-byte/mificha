@@ -1388,7 +1388,7 @@ export function TutorWorkspace({ workspace = "tutor" }: TutorWorkspaceProps) {
       <TutorAgreementsInbox />
       <TutorActivityInbox />
 
-      <MiEquipoPanel />
+      {children.length > 0 ? <MiEquipoPanel /> : null}
 
       {children.length > 0 ? (
         <div className="space-y-2">

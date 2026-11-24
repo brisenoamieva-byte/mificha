@@ -55,30 +55,30 @@ export function MiEquipoPanel({ className }: { className?: string }) {
   const [draftName, setDraftName] = useState("");
   const [error, setError] = useState<string | null>(null);
 
-  function refresh() {
-    setMembers(readMiEquipo());
-  }
-
   useEffect(() => {
-    refresh();
+    setMembers(readMiEquipo());
   }, []);
 
   return (
-    <div
+    <details
       className={cn(
-        "rounded-2xl border border-mf-border bg-white px-4 py-4 sm:px-5",
+        "rounded-2xl border border-mf-border bg-white px-4 py-3 sm:px-5",
         className,
       )}
     >
-      <div className="flex items-start gap-2">
-        <Users className="mt-0.5 h-4 w-4 shrink-0 text-mf-gph" />
-        <div>
-          <p className="text-sm font-semibold text-mf-gph-ink">Mi equipo</p>
-          <p className="mt-0.5 text-sm leading-6 text-mf-text-secondary">
-            Guarda hasta {MI_EQUIPO_MAX} códigos MF- de compañeros en este celular.
-          </p>
-        </div>
-      </div>
+      <summary className="flex cursor-pointer list-none items-center gap-2">
+        <Users className="h-4 w-4 shrink-0 text-mf-gph" />
+        <span className="text-sm font-semibold text-mf-gph-ink">Mi equipo</span>
+        {members.length > 0 ? (
+          <span className="rounded-full bg-mf-gph-soft px-2 py-0.5 text-[11px] font-semibold text-mf-gph">
+            {members.length}
+          </span>
+        ) : null}
+      </summary>
+
+      <p className="mt-2 text-sm leading-6 text-mf-text-secondary">
+        Guarda hasta {MI_EQUIPO_MAX} códigos MF- de compañeros en este celular.
+      </p>
 
       <form
         className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-end"
@@ -133,7 +133,7 @@ export function MiEquipoPanel({ className }: { className?: string }) {
 
       {members.length === 0 ? (
         <p className="mt-3 text-sm text-mf-text-muted">
-          Aún no hay nadie. Pide el código a un compañero o ábrelo desde su ficha.
+          Aún no hay nadie. Ábrelo desde su ficha o pide su código.
         </p>
       ) : (
         <ul className="mt-3 divide-y divide-mf-border/80">
@@ -168,6 +168,6 @@ export function MiEquipoPanel({ className }: { className?: string }) {
           ))}
         </ul>
       )}
-    </div>
+    </details>
   );
 }
