@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Award, ChevronDown, MapPin, Search } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { CategoryFilterSelect } from "@/components/ui/category-filter-select";
 import { MexicoLocationSelect } from "@/components/ui/mexico-location-select";
 import { ExplorePlayerCard } from "@/components/marketing/explore-player-card";
@@ -28,7 +28,10 @@ import {
   type DirectoryPlayer,
   type PublicDirectoryData,
 } from "@/lib/public-directory";
-import { explorePreviewPlayers } from "@/lib/explore-preview";
+import {
+  EXPLORE_PAGE_SIZE,
+  explorePreviewPlayers,
+} from "@/lib/explore-preview";
 import { CURRENT_SEASON_LABEL } from "@/lib/marketing-season";
 import { PROGRESS_TIER_FILTER_OPTIONS } from "@/lib/passport-score";
 import type { PlayerPosition } from "@/types/database";
@@ -109,6 +112,7 @@ export function ExploreDirectory({
     DEFAULT_PERFORMANCE_FILTER,
   );
   const [showPerformance, setShowPerformance] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(EXPLORE_PAGE_SIZE);
 
   const birthDates = useMemo(
     () => collectBirthDatesFromDirectory(data.players, []),
@@ -147,11 +151,23 @@ export function ExploreDirectory({
     return unique;
   }, [filtered.players]);
 
-  const displayPlayers = useMemo(
+  useEffect(() => {
+    setVisibleCount(EXPLORE_PAGE_SIZE);
+  }, [query, position, minPassport, state, city, categoryFilter, performance]);
+
+  const cappedPlayers = useMemo(
     () => explorePreviewPlayers(allPlayers, unlocked),
     [allPlayers, unlocked],
   );
-  const previewCapped = !unlocked && allPlayers.length > displayPlayers.length;
+  const displayPlayers = useMemo(
+    () =>
+      unlocked ? cappedPlayers.slice(0, visibleCount) : cappedPlayers,
+    [cappedPlayers, unlocked, visibleCount],
+  );
+  const previewCapped = !unlocked && allPlayers.length > cappedPlayers.length;
+  const hasMoreUnlocked =
+    unlocked && displayPlayers.length < allPlayers.length;
+  const remainingUnlocked = Math.max(0, allPlayers.length - displayPlayers.length);
 
   const displayAcademies = useMemo(
     () =>
@@ -336,6 +352,23 @@ export function ExploreDirectory({
                   />
                 ))}
               </div>
+              {hasMoreUnlocked ? (
+                <div className="flex flex-col items-center gap-2 pt-1">
+                  <button
+                    type="button"
+                    className="mf-btn-gph-ghost w-full justify-center sm:w-auto"
+                    onClick={() =>
+                      setVisibleCount((n) => n + EXPLORE_PAGE_SIZE)
+                    }
+                  >
+                    Mostrar más · {remainingUnlocked} restante
+                    {remainingUnlocked === 1 ? "" : "s"}
+                  </button>
+                  <p className="text-xs text-mf-text-muted">
+                    Mostrando {displayPlayers.length} de {allPlayers.length}
+                  </p>
+                </div>
+              ) : null}
               {previewCapped ? (
                 <div className="rounded-xl border border-mf-gph/25 bg-mf-gph-soft px-4 py-4 text-center sm:px-5">
                   <p className="text-sm font-semibold text-mf-gph-ink">
