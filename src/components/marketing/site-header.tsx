@@ -78,20 +78,23 @@ export function SiteFooter() {
           <Link href="/fut/app" className="font-semibold text-mf-brand transition hover:text-mf-gph">
             Descargar app
           </Link>
+          <Link href="/fut/padres" className="transition hover:text-mf-text">
+            Familias
+          </Link>
           <Link href="/fut/planes" className="transition hover:text-mf-text">
             Planes
-          </Link>
-          <Link href="/fut/organizadores" className="transition hover:text-mf-text">
-            Organizadores
           </Link>
           <Link href="/fut/productos" className="transition hover:text-mf-text">
             Productos
           </Link>
-          <Link href="/fut/noticias" className="transition hover:text-mf-text">
-            Noticias
+          <Link href="/fut/organizadores" className="transition hover:text-mf-text">
+            Organizadores
           </Link>
           <Link href="/fut/visorias" className="transition hover:text-mf-text">
             Visorías
+          </Link>
+          <Link href="/fut/noticias" className="transition hover:text-mf-text">
+            Noticias
           </Link>
           <Link href="/fut/eventos" className="transition hover:text-mf-text">
             Eventos
@@ -102,24 +105,9 @@ export function SiteFooter() {
           <Link href={MISION_PATH} className="transition hover:text-mf-text">
             Misión
           </Link>
-          <Link href="/fut#como-funciona" className="transition hover:text-mf-text">
-            Cómo funciona
-          </Link>
           <Link href="/fut/entrar" className="transition hover:text-mf-text">
             Entrar
           </Link>
-          <Link href={LEGAL_ROUTES.privacy} className="transition hover:text-mf-text">
-            Privacidad
-          </Link>
-          <a
-            href={BRAND_INSTAGRAM_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 font-medium text-mf-brand transition hover:text-mf-gph"
-          >
-            <InstagramIcon className="h-3.5 w-3.5" />
-            Instagram
-          </a>
         </div>
       </div>
       <div className="mx-auto flex max-w-6xl flex-col items-center gap-3 border-t border-mf-border px-4 py-8 text-center text-sm text-mf-text-muted sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:text-left">

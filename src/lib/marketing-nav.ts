@@ -1,15 +1,10 @@
 import type { LucideIcon } from "lucide-react";
 import { ClipboardList, Sparkles, Users } from "lucide-react";
-import { CRACKS_TRYOUTS_PATH } from "@/lib/cracks-tryouts";
-import { GPH_SAMPLE_CLASS, trainingBookingHref } from "@/lib/gph-alliance";
-import { GPH_PACHUCA_PATH } from "@/lib/gph-pachuca-segunda-fase";
 import { academyMembershipPublicCopy } from "@/lib/academy-membership";
 import { BRAND_INSTAGRAM_HANDLE, BRAND_INSTAGRAM_URL } from "@/lib/brand";
-import { personaMembershipPublicCopy } from "@/lib/persona-membership";
 import { MISION_PATH } from "@/lib/mision";
 import { VISORIA_PUBLIC_PATH } from "@/lib/visoria-event";
 
-const personaCopy = personaMembershipPublicCopy();
 const academyCopy = academyMembershipPublicCopy();
 
 export interface NavLink {
@@ -28,8 +23,11 @@ export interface NavSection {
 }
 
 /**
- * Menú por intención: Padres / Soluciones / Comunidad.
- * CTA principales viven en el header (Entrar / Armar ficha).
+ * Menú por intención: Padres / Soluciones / Comunidad + Más.
+ * CTA Entrar / Armar ficha viven en el header.
+ *
+ * Criterio: un destino por intención. Hubs (Productos, Noticias, Eventos,
+ * Convocatorias) agrupan lo que antes estaba duplicado como ítems sueltos.
  */
 export const MARKETING_NAV: NavSection[] = [
   {
@@ -40,27 +38,17 @@ export const MARKETING_NAV: NavSection[] = [
       {
         href: "/fut/entrar?next=/fut/tutor",
         label: "Armar ficha de mi hijo",
-        description: "Gratis · ~5 min · Explorar Pro",
+        description: "Gratis · ~5 min · con Explorar Pro",
       },
       {
         href: "/fut/tutor",
         label: "Mis fichas",
-        description: "Entrar al panel del tutor o representante",
+        description: "Panel del tutor o representante",
       },
       {
-        href: "/fut/app",
-        label: "Descargar app",
-        description: "Gratis · Android e iPhone · pantalla de inicio",
-      },
-      {
-        href: "/fut/talento",
-        label: "Talento por estado",
-        description: "Índice agregado de fichas en México",
-      },
-      {
-        href: MISION_PATH,
-        label: "Qué es MiFicha",
-        description: "En qué estamos y cómo sumar tu ficha",
+        href: "/fut/padres",
+        label: "Para familias",
+        description: "Cómo funciona la ficha y el seguimiento",
       },
     ],
   },
@@ -72,22 +60,12 @@ export const MARKETING_NAV: NavSection[] = [
       {
         href: "/fut/dashboard",
         label: "Academia",
-        description: `Panel academia · plantel, partidos y MF · ${academyCopy.short}`,
+        description: `Plantel, partidos y MF · ${academyCopy.short}`,
       },
       {
         href: "/fut/organizadores",
         label: "Organizadores de torneo",
         description: "Calendario, acta y datos conectados a fichas",
-      },
-      {
-        href: "/fut/evaluaciones",
-        label: "Evaluaciones GPH",
-        description: "Diagnóstico GPH + 12 meses de MiFicha",
-      },
-      {
-        href: trainingBookingHref(),
-        label: `${GPH_SAMPLE_CLASS.title} GPH`,
-        description: "Gratis · sesión práctica, sin informe de diagnóstico",
       },
       {
         href: "/fut/planes",
@@ -96,8 +74,8 @@ export const MARKETING_NAV: NavSection[] = [
       },
       {
         href: "/fut/productos",
-        label: "Productos",
-        description: "Evaluaciones, entrenamientos y más",
+        label: "Productos GPH",
+        description: "Evaluaciones, clase muestra y más",
       },
       {
         href: "/fut/captacion",
@@ -117,16 +95,6 @@ export const MARKETING_NAV: NavSection[] = [
         description: "26–27 nov · Chivas y Santos · registro abierto",
       },
       {
-        href: CRACKS_TRYOUTS_PATH,
-        label: "CRACKS · Querétaro",
-        description: "Try outs noviembre · solicita liga de registro",
-      },
-      {
-        href: GPH_PACHUCA_PATH,
-        label: "Orgullo GPH · Pachuca",
-        description: "Cuatro jugadores a segunda fase con Club Pachuca",
-      },
-      {
         href: "/fut/noticias",
         label: "Noticias",
         description: "Anuncios y logros de la red",
@@ -134,43 +102,41 @@ export const MARKETING_NAV: NavSection[] = [
       {
         href: "/fut/eventos",
         label: "Eventos",
-        description: "Clínicas, jornadas y fiestas publicadas",
+        description: "Clínicas, jornadas y GPH FUN",
       },
       {
         href: "/fut/convocatorias",
         label: "Convocatorias",
-        description: "Oportunidades abiertas para jugadores",
-      },
-      {
-        href: "/fut/gph-fun",
-        label: "GPH FUN · Fiestas",
-        description: "Fiestas futboleras · promociones de apertura",
+        description: "Try outs y oportunidades abiertas",
       },
     ],
   },
 ];
 
-/** Enlaces secundarios (menú “Más”). Sin “Entrar”: ya está el botón del header. */
+/**
+ * Secundarios (menú “Más”). Sin Entrar (ya está en el header).
+ * App / misión / mapa viven aquí — no se repiten en Padres.
+ */
 export const MARKETING_SECONDARY_LINKS: NavLink[] = [
   {
     href: "/fut/app",
     label: "Descargar app",
-    description: "Android e iPhone · ícono en pantalla de inicio",
+    description: "Android e iPhone · pantalla de inicio",
   },
   {
     href: MISION_PATH,
     label: "Qué es MiFicha",
-    description: "Todavía armamos la base · cómo participar",
-  },
-  {
-    href: "/fut/explorar#mapa",
-    label: "Mapa de talento",
-    description: "De dónde son las fichas en MiFicha",
+    description: "En qué estamos y cómo sumar tu ficha",
   },
   {
     href: "/fut#como-funciona",
     label: "Cómo funciona",
     description: "Buscar gratis, publicar ficha, membresía",
+  },
+  {
+    href: "/fut/talento",
+    label: "Talento por estado",
+    description: "Índice y mapa de fichas en México",
   },
   {
     href: BRAND_INSTAGRAM_URL,
