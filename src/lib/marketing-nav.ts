@@ -68,19 +68,9 @@ export const MARKETING_NAV: NavSection[] = [
         description: "Calendario, acta y datos conectados a fichas",
       },
       {
-        href: "/fut/planes",
-        label: "Planes",
-        description: "Membresías persona y academia",
-      },
-      {
         href: "/fut/productos",
         label: "Productos GPH",
         description: "Evaluaciones, clase muestra y más",
-      },
-      {
-        href: "/fut/captacion",
-        label: "Captación multi-estado",
-        description: "Plantillas para academias y torneos fuera de QRO",
       },
     ],
   },

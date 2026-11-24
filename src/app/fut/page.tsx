@@ -85,13 +85,14 @@ export default async function Home() {
           <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-10 sm:flex-row sm:items-center sm:justify-between sm:px-6">
             <div className="min-w-0">
               <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph">
-                Planes y productos
+                Productos GPH
               </p>
               <h2 className="mt-1 text-xl font-semibold text-mf-gph-ink">
-                Membresías, evaluaciones y entrenamientos
+                Evaluaciones y entrenamientos
               </h2>
               <p className="mt-1 max-w-xl text-sm leading-6 text-mf-text-secondary">
-                Cuentas de plataforma y servicios GPH.
+                La plataforma es gratis. El valor de pago está en diagnóstico y clase
+                muestra GPH.
               </p>
             </div>
             <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap">
@@ -102,15 +103,12 @@ export default async function Home() {
                 Mapa de talento
                 <ArrowRight className="h-4 w-4" />
               </Link>
-              <Link href="/fut/planes" className="mf-btn-gph w-full justify-center sm:w-auto">
-                Ver planes
-                <ArrowRight className="h-4 w-4" />
-              </Link>
               <Link
                 href="/fut/productos"
-                className="mf-btn-gph-ghost w-full justify-center sm:w-auto"
+                className="mf-btn-gph w-full justify-center sm:w-auto"
               >
                 Ver productos
+                <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
           </div>
