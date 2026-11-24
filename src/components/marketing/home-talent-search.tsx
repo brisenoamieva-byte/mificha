@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useDeferredValue, useMemo, useState } from "react";
+import { FormEvent, useDeferredValue, useEffect, useMemo, useState } from "react";
 import { ChevronDown, Search } from "lucide-react";
 import { ExplorePlayerCard } from "@/components/marketing/explore-player-card";
 import {
@@ -23,7 +23,10 @@ import {
   isMarketingPlaceholderAcademy,
   normalizeExplorePlayerName,
 } from "@/lib/explore-demo-data";
-import { explorePreviewPlayers } from "@/lib/explore-preview";
+import {
+  EXPLORE_PAGE_SIZE,
+  explorePreviewPlayers,
+} from "@/lib/explore-preview";
 import { CURRENT_SEASON_LABEL } from "@/lib/marketing-season";
 import { collectBirthDatesFromDirectory } from "@/lib/player-category";
 import {
@@ -65,6 +68,7 @@ export function HomeTalentSearch({
     DEFAULT_PERFORMANCE_FILTER,
   );
   const [showPerformance, setShowPerformance] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(EXPLORE_PAGE_SIZE);
   const deferredQuery = useDeferredValue(query.trim());
 
   const birthDates = useMemo(
@@ -102,11 +106,23 @@ export function HomeTalentSearch({
     return unique;
   }, [filtered.players]);
 
-  const players = useMemo(
+  useEffect(() => {
+    setVisibleCount(EXPLORE_PAGE_SIZE);
+  }, [deferredQuery, position, state, city, categoryFilter, performance]);
+
+  const cappedPlayers = useMemo(
     () => explorePreviewPlayers(allPlayers, access.unlocked),
     [allPlayers, access.unlocked],
   );
-  const previewCapped = !access.unlocked && allPlayers.length > players.length;
+  const players = useMemo(
+    () =>
+      access.unlocked ? cappedPlayers.slice(0, visibleCount) : cappedPlayers,
+    [cappedPlayers, access.unlocked, visibleCount],
+  );
+  const previewCapped = !access.unlocked && allPlayers.length > cappedPlayers.length;
+  const hasMoreUnlocked =
+    access.unlocked && players.length < allPlayers.length;
+  const remainingUnlocked = Math.max(0, allPlayers.length - players.length);
 
   const academies = useMemo(
     () =>
@@ -332,6 +348,23 @@ export function HomeTalentSearch({
                   />
                 ))}
               </div>
+              {hasMoreUnlocked ? (
+                <div className="mt-6 flex flex-col items-center gap-2">
+                  <button
+                    type="button"
+                    className="mf-btn-gph-ghost w-full justify-center sm:w-auto"
+                    onClick={() =>
+                      setVisibleCount((n) => n + EXPLORE_PAGE_SIZE)
+                    }
+                  >
+                    Mostrar más · {remainingUnlocked} restante
+                    {remainingUnlocked === 1 ? "" : "s"}
+                  </button>
+                  <p className="text-xs text-mf-text-muted">
+                    Mostrando {players.length} de {allPlayers.length}
+                  </p>
+                </div>
+              ) : null}
               {previewCapped ? (
                 <div className="mt-6 rounded-2xl border border-mf-gph/25 bg-mf-gph-soft px-4 py-5 text-center sm:px-6">
                   <p className="text-sm font-semibold text-mf-gph-ink">

@@ -60,6 +60,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticPages: MetadataRoute.Sitemap = [
     entry(base, "/fut", { priority: 1, changeFrequency: "daily" }),
     entry(base, "/fut/explorar", { priority: 0.9, changeFrequency: "daily" }),
+    entry(base, "/fut/app", { priority: 0.8, changeFrequency: "monthly" }),
     entry(base, "/fut/visorias", {
       priority: 0.9,
       changeFrequency: "weekly",
