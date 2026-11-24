@@ -131,7 +131,7 @@ export function TutorShareActions({
               {PLAYER_CODE_SHORT}
             </>
           ) : (
-            "Manda el link o guarda la imagen para WhatsApp e Instagram"
+            "Manda el link o la tarjeta a WhatsApp / Instagram"
           )}
         </p>
       </div>
@@ -151,10 +151,11 @@ export function TutorShareActions({
           type="button"
           onClick={() => void downloadImage()}
           disabled={downloading}
+          title="Tarjeta corta para stories o estado de WhatsApp. La ficha completa va en el PDF o en el link."
           className="inline-flex items-center justify-center gap-2 rounded-lg border border-mf-border bg-white px-3.5 py-2 text-sm font-semibold text-mf-text hover:bg-mf-canvas disabled:opacity-60"
         >
           <Download className="h-4 w-4" />
-          {downloading ? "Guardando…" : "Guardar imagen"}
+          {downloading ? "Guardando…" : "Tarjeta WhatsApp"}
         </button>
         <button
           type="button"
@@ -176,6 +177,11 @@ export function TutorShareActions({
         ) : null}
       </div>
 
+      <p className="text-xs leading-5 text-mf-text-muted">
+        La tarjeta es solo portada (foto + datos clave) para pegar en chats o stories.
+        La ficha completa con historial está en el PDF o abriendo el link.
+      </p>
+
       <div className="border-t border-mf-border/80 pt-3 text-sm">
         {materialsKitHref ? (
           <Link
@@ -183,7 +189,7 @@ export function TutorShareActions({
             className="inline-flex items-center gap-1.5 font-semibold text-mf-gph hover:underline"
           >
             <FileText className="h-3.5 w-3.5" />
-            Descargar PDF
+            Descargar PDF completo
           </Link>
         ) : (
           <button
@@ -192,7 +198,7 @@ export function TutorShareActions({
             className="inline-flex items-center gap-1.5 font-semibold text-mf-gph hover:underline"
           >
             <Printer className="h-3.5 w-3.5" />
-            Descargar PDF
+            Descargar PDF completo
           </button>
         )}
       </div>

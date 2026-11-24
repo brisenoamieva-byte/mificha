@@ -85,9 +85,12 @@ export default async function Image({
       "@/lib/og-tutor-share-image"
     );
     const payload = await buildOgTutorSharePayloadWithPhoto(admin, child);
-    const chips = [payload.position, payload.category, payload.club].filter(
-      Boolean,
-    ) as string[];
+    const chips = [
+      payload.position,
+      payload.category,
+      payload.club,
+      ...payload.detailChips,
+    ].filter(Boolean) as string[];
     const hasPhoto = Boolean(payload.photoUrl);
 
     return new ImageResponse(
@@ -146,13 +149,30 @@ export default async function Image({
               </div>
               {chips.length > 0 ? (
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-                  {chips.slice(0, 3).map((chip) => (
+                  {chips.slice(0, 4).map((chip) => (
                     <Chip key={chip}>{chip}</Chip>
                   ))}
                 </div>
               ) : (
                 <div style={{ fontSize: 24, opacity: 0.75 }}>{payload.subtitle}</div>
               )}
+              {payload.statsLine ? (
+                <div
+                  style={{
+                    display: "flex",
+                    borderRadius: 16,
+                    border: "1px solid rgba(52, 211, 153, 0.35)",
+                    background: "rgba(52, 211, 153, 0.12)",
+                    padding: "12px 18px",
+                    fontSize: 26,
+                    fontWeight: 700,
+                    color: "#A7F3D0",
+                    letterSpacing: "0.02em",
+                  }}
+                >
+                  {payload.statsLine}
+                </div>
+              ) : null}
               {payload.city ? (
                 <div style={{ fontSize: 22, opacity: 0.65 }}>{payload.city}</div>
               ) : null}

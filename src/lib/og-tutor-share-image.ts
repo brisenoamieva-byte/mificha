@@ -3,7 +3,11 @@ import {
   buildOgTutorSharePayload,
   type OgTutorSharePayload,
 } from "@/lib/og-tutor-share";
-import { listTutorMaterials, type TutorChild } from "@/lib/tutor-family";
+import {
+  listTutorMaterials,
+  listTutorSeasons,
+  type TutorChild,
+} from "@/lib/tutor-family";
 
 /** Portada del tutor (signed URL cruda). Solo servidor. */
 export async function resolveTutorOgCoverPhotoUrl(
@@ -49,7 +53,13 @@ export async function buildOgTutorSharePayloadWithPhoto(
   admin: SupabaseClient,
   child: TutorChild,
 ): Promise<OgTutorSharePayload> {
-  const base = buildOgTutorSharePayload(child);
+  let seasons: Awaited<ReturnType<typeof listTutorSeasons>> = [];
+  try {
+    seasons = await listTutorSeasons(admin, child);
+  } catch {
+    seasons = [];
+  }
+  const base = buildOgTutorSharePayload(child, seasons);
   const rawUrl = await resolveTutorOgCoverPhotoUrl(admin, child);
   if (!rawUrl) return base;
   const photoUrl = (await orientPhotoForOg(rawUrl)) || rawUrl;
