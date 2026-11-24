@@ -19,6 +19,23 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: process.cwd(),
   },
+  // Evita que Turbopack meta sharp en el graph SSR de páginas y
+  // fuerza el binario nativo correcto en el empaquetado de Vercel.
+  serverExternalPackages: ["sharp"],
+  outputFileTracingIncludes: {
+    "/fut/f/[token]/opengraph-image": [
+      "./node_modules/@img/sharp-linux-x64/**/*",
+      "./node_modules/@img/sharp-libvips-linux-x64/**/*",
+    ],
+    "/fut/j/[slug]/opengraph-image": [
+      "./node_modules/@img/sharp-linux-x64/**/*",
+      "./node_modules/@img/sharp-libvips-linux-x64/**/*",
+    ],
+    "/fut/j/[slug]/logro/[key]/opengraph-image": [
+      "./node_modules/@img/sharp-linux-x64/**/*",
+      "./node_modules/@img/sharp-libvips-linux-x64/**/*",
+    ],
+  },
   async headers() {
     return [
       {

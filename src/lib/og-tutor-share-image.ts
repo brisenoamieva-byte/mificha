@@ -1,5 +1,4 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import sharp from "sharp";
 import {
   buildOgTutorSharePayload,
   type OgTutorSharePayload,
@@ -24,10 +23,14 @@ export async function resolveTutorOgCoverPhotoUrl(
 
 /**
  * next/og ignora EXIF: fotos de celular salen de lado.
- * Reorientamos con sharp y devolvemos data URL lista para ImageResponse.
+ * Import dinámico de sharp: si falla en el runtime (Vercel/libvips),
+ * devolvemos null y el OG usa la URL firmada o el fallback sin foto.
  */
 export async function orientPhotoForOg(photoUrl: string): Promise<string | null> {
   try {
+    const sharpMod = await import("sharp").catch(() => null);
+    if (!sharpMod?.default) return null;
+    const sharp = sharpMod.default;
     const res = await fetch(photoUrl);
     if (!res.ok) return null;
     const input = Buffer.from(await res.arrayBuffer());
