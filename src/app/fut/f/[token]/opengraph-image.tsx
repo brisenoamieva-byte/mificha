@@ -1,5 +1,4 @@
 import { ImageResponse } from "next/og";
-import { buildOgTutorSharePayloadWithPhoto } from "@/lib/og-tutor-share-image";
 import { peekTutorChildByShareToken } from "@/lib/tutor-family";
 import { createSupabaseAdminClient } from "@/lib/supabase-admin";
 
@@ -8,6 +7,7 @@ export const runtime = "nodejs";
 export const alt = "Ficha del jugador MiFicha";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
+export const preferredRegion = ["iad1", "sfo1"];
 
 function BrandMark() {
   return (
@@ -80,6 +80,10 @@ export default async function Image({
       return new ImageResponse(<FallbackCard />, { ...size });
     }
 
+    // Dynamic import: si sharp/libvips falla en el runtime, cae al FallbackCard.
+    const { buildOgTutorSharePayloadWithPhoto } = await import(
+      "@/lib/og-tutor-share-image"
+    );
     const payload = await buildOgTutorSharePayloadWithPhoto(admin, child);
     const chips = [payload.position, payload.category, payload.club].filter(
       Boolean,

@@ -23,15 +23,8 @@ const nextConfig: NextConfig = {
   // fuerza el binario nativo correcto en el empaquetado de Vercel.
   serverExternalPackages: ["sharp"],
   outputFileTracingIncludes: {
-    "/fut/f/[token]/opengraph-image": [
-      "./node_modules/@img/sharp-linux-x64/**/*",
-      "./node_modules/@img/sharp-libvips-linux-x64/**/*",
-    ],
-    "/fut/j/[slug]/opengraph-image": [
-      "./node_modules/@img/sharp-linux-x64/**/*",
-      "./node_modules/@img/sharp-libvips-linux-x64/**/*",
-    ],
-    "/fut/j/[slug]/logro/[key]/opengraph-image": [
+    // sharp 0.34+ necesita libvips en el bundle de la función serverless.
+    "/**": [
       "./node_modules/@img/sharp-linux-x64/**/*",
       "./node_modules/@img/sharp-libvips-linux-x64/**/*",
     ],

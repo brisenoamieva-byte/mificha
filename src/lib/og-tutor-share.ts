@@ -1,3 +1,4 @@
+import { getAppBaseUrl } from "@/lib/app-url";
 import { formatPlayerCategory } from "@/lib/player-category";
 import { formatPublicLockedName } from "@/lib/privacy";
 import { tutorSharePath, type TutorChild } from "@/lib/tutor-family";
@@ -15,14 +16,9 @@ export interface OgTutorSharePayload {
   photoUrl: string | null;
 }
 
-function resolveAppUrl() {
-  return (
-    process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ?? "https://www.mificha.mx"
-  );
-}
-
 export function buildTutorShareAbsoluteUrl(tokenOrCode: string) {
-  return `${resolveAppUrl()}${tutorSharePath(tokenOrCode)}`;
+  // Siempre www (apex redirige 308; evita links rotos en WhatsApp/OG).
+  return `${getAppBaseUrl()}${tutorSharePath(tokenOrCode)}`;
 }
 
 export function buildOgTutorSharePayload(child: TutorChild): OgTutorSharePayload {

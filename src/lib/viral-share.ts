@@ -2,6 +2,8 @@
  * UTMs y copy de invitaciones virales (share 1:N, no solo 1:1).
  */
 
+import { getAppBaseUrl } from "@/lib/app-url";
+
 export function withShareUtm(
   url: string,
   opts: { campaign: string; content?: string; source?: string; medium?: string },
@@ -46,9 +48,7 @@ export function buildTutorSignupHref(opts?: {
   }
   const path = `/fut/entrar?${params.toString()}`;
   if (!opts?.absolute) return path;
-  const origin =
-    process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ?? "https://www.mificha.mx";
-  return `${origin}${path}`;
+  return `${getAppBaseUrl()}${path}`;
 }
 
 export function buildInviteTeammateWhatsAppHref(input: {
