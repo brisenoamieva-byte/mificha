@@ -1,12 +1,11 @@
-import { DIAGNOSIS_PROMO } from "@/lib/gph-commerce";
+import { DIAGNOSIS_PROMO, formatMxn } from "@/lib/gph-commerce";
 import { cn } from "@/lib/utils";
 
 type PromoSize = "sm" | "md" | "lg";
 type PromoTone = "light" | "dark" | "gph";
 
 /**
- * Badge de promo del diagnóstico sin montos en UI pública.
- * El cobro concreto vive en Mercado Pago al pagar.
+ * Precio del diagnóstico con promo: lista tachada + precio actual.
  */
 export function DiagnosisPromoPrice({
   size = "md",
@@ -21,6 +20,8 @@ export function DiagnosisPromoPrice({
   className?: string;
 }) {
   const percent = DIAGNOSIS_PROMO.discountPercent;
+  const listLabel = formatMxn(DIAGNOSIS_PROMO.listPriceMxn);
+  const saleLabel = formatMxn(DIAGNOSIS_PROMO.priceMxn);
 
   const headlineSize =
     size === "lg"
@@ -37,6 +38,8 @@ export function DiagnosisPromoPrice({
         : "text-mf-text-secondary";
   const saleColor =
     tone === "dark" ? "text-white" : tone === "gph" ? "text-mf-gph-ink" : "text-mf-gph-ink";
+  const listColor =
+    tone === "dark" ? "text-white/55" : tone === "gph" ? "text-mf-gph-ink/45" : "text-mf-text-muted";
 
   return (
     <div className={cn("min-w-0", className)}>
@@ -61,18 +64,16 @@ export function DiagnosisPromoPrice({
         </div>
       ) : null}
 
-      <p
-        className={cn(
-          "font-bold tracking-tight leading-tight",
-          saleColor,
-          headlineSize,
-          showBadge ? "mt-3" : "mt-0",
-        )}
-      >
-        Promo del diagnóstico
-      </p>
+      <div className={cn("flex flex-wrap items-baseline gap-x-3 gap-y-1", showBadge ? "mt-3" : "mt-0")}>
+        <p className={cn("font-bold tracking-tight leading-none", saleColor, headlineSize)}>
+          {saleLabel}
+        </p>
+        <p className={cn("text-base font-semibold line-through sm:text-lg", listColor)}>
+          {listLabel}
+        </p>
+      </div>
       <p className={cn("mt-1.5 text-sm leading-6", muted)}>
-        Evaluación presencial + 12 meses de MiFicha. El monto se confirma al pagar.
+        Evaluación presencial + 12 meses de MiFicha · {listLabel} con {percent}% de descuento.
       </p>
     </div>
   );

@@ -289,6 +289,12 @@ export function HomeTalentSearch({
             >
               Registrar a mi jugador
             </Link>
+            <Link
+              href="#diagnostico-gph"
+              className="inline-flex items-center rounded-full border border-mf-gph-hot/50 bg-mf-gph px-4 py-2 text-sm font-semibold text-white transition hover:bg-mf-gph-hot"
+            >
+              Diagnóstico GPH · $2,030
+            </Link>
             <a
               href="#directorio"
               className="inline-flex items-center rounded-full border border-white/35 bg-white/10 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/15"
@@ -300,12 +306,6 @@ export function HomeTalentSearch({
               className="text-sm font-medium text-white/70 hover:text-white"
             >
               Qué es MiFicha
-            </Link>
-            <Link
-              href="/fut/explorar#mapa"
-              className="text-sm font-semibold text-emerald-200/90 transition hover:text-white"
-            >
-              Mapa de talento
             </Link>
           </div>
         </div>

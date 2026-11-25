@@ -26,6 +26,15 @@ export interface HomeAnnouncement {
  */
 export const HOME_ANNOUNCEMENTS: HomeAnnouncement[] = [
   {
+    id: "diagnostico-gph-promo-2026",
+    tone: "gph",
+    eyebrow: "Diagnóstico",
+    title: "GPH con 30% de descuento",
+    detail: "$2,030 · lista $2,900 · Querétaro",
+    href: "/fut/evaluaciones",
+    until: "2026-12-31",
+  },
+  {
     id: "mision-fundacional-2026",
     tone: "pilot",
     eyebrow: "MiFicha",

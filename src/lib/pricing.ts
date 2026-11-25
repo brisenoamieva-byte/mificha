@@ -74,11 +74,12 @@ export const DIAGNOSIS_PRODUCT = {
     {
       id: "individual",
       label: "Jugador",
-      listPriceLabel: "Promo",
-      priceLabel: "Promo",
+      listPriceLabel: FAMILY_PRODUCTS.diagnosis.listPriceLabel,
+      priceLabel: FAMILY_PRODUCTS.diagnosis.priceLabel,
       promo: true,
       period: "Sesión + 12 meses MiFicha",
-      description: "Diagnóstico completo e informe ligado a la ficha. El monto se confirma al pagar.",
+      description:
+        "Diagnóstico completo e informe ligado a la ficha. $2,900 con 30% de descuento = $2,030.",
     },
     {
       id: "grupo",

@@ -115,11 +115,17 @@ export function EvaluacionesPageContent() {
           <div className="mt-6 grid gap-3 sm:grid-cols-2">
             <article className="flex flex-col rounded-xl border border-mf-gph/25 bg-mf-gph-soft/50 px-5 py-5">
               <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-mf-gph">
-                De pago · promo
+                De pago · −30%
               </p>
               <h3 className="mt-2 text-base font-semibold text-mf-gph-ink">
                 Diagnóstico GPH
               </h3>
+              <p className="mt-2 text-xl font-bold tracking-tight text-mf-gph-ink">
+                {DIAGNOSIS_PRODUCT.publicPriceLabel}{" "}
+                <span className="text-sm font-semibold text-mf-text-muted line-through">
+                  {DIAGNOSIS_PRODUCT.listPriceLabel}
+                </span>
+              </p>
               <p className="mt-1.5 flex-1 text-sm leading-6 text-mf-text-secondary">
                 Evaluación completa e informe en tu ficha. Elige horario en el
                 calendario de diagnóstico.
@@ -337,19 +343,19 @@ export function HomeGphAllianceBand() {
             <AllianceLockup size="sm" />
           </div>
           <p className="mt-4 text-[11px] font-semibold uppercase tracking-[0.16em] text-mf-gph-hot">
-            Disponible ahora
+            Alianza GPH · disponible ahora
           </p>
           <h2 className="mt-2 text-xl font-semibold tracking-[-0.02em] text-white sm:text-2xl">
-            Diagnóstico GPH o clase muestra gratis
+            Diagnóstico {DIAGNOSIS_PRODUCT.publicPriceLabel} · o clase muestra gratis
           </h2>
           <p className="mt-2 text-sm leading-7 text-white/75">
-            Evaluación de pago con informe en la ficha, o sesión gratuita de
-            especialización.
+            {DIAGNOSIS_PRODUCT.listPriceLabel} con −{DIAGNOSIS_PRODUCT.discountPercent}% ·
+            informe en la ficha + 12 meses. La clase muestra es sin costo.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <Link href="/fut/pagar?sku=diagnosis" className="mf-btn-gph">
-            Pagar diagnóstico
+            Pagar {DIAGNOSIS_PRODUCT.publicPriceLabel}
             <ArrowRight className="h-4 w-4" />
           </Link>
           <a
