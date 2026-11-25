@@ -49,7 +49,17 @@ export default async function PagoRetornoPage({
         } else if (isAcademy) {
           await markAcademyOrderPaid(admin, folio, params.payment_id);
         } else {
-          await markFamilyOrderPaid(admin, folio, params.payment_id);
+          const paidOrder = await markFamilyOrderPaid(
+            admin,
+            folio,
+            params.payment_id,
+          );
+          if (paidOrder?.sku === "diagnosis") {
+            const { fireAndForgetDiagnosisPassEmail } = await import(
+              "@/lib/email/diagnosis-paid-notify"
+            );
+            fireAndForgetDiagnosisPassEmail(admin, paidOrder);
+          }
         }
       }
       if (isPersona) {

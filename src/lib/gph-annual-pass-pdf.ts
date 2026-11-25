@@ -1,10 +1,7 @@
-import { readFile } from "fs/promises";
-import path from "path";
 import { PDFDocument, StandardFonts } from "pdf-lib";
 import { formatMxn } from "@/lib/gph-commerce";
 
-const TEMPLATE_RELATIVE =
-  "public/certificates/pase-anual-gph-cracks-2027.pdf";
+const TEMPLATE_PATH = "/certificates/pase-anual-gph-cracks-2027.pdf";
 
 export type GphAnnualPassFields = {
   playerName: string;
@@ -22,12 +19,24 @@ function formatDateMx(iso: string) {
 }
 
 async function loadTemplateBytes() {
-  const filePath = path.join(process.cwd(), TEMPLATE_RELATIVE);
-  return readFile(filePath);
+  const base = (
+    process.env.NEXT_PUBLIC_APP_URL ||
+    process.env.VERCEL_PROJECT_PRODUCTION_URL ||
+    "https://www.mificha.mx"
+  ).replace(/\/$/, "");
+  const url = base.startsWith("http")
+    ? `${base}${TEMPLATE_PATH}`
+    : `https://${base}${TEMPLATE_PATH}`;
+  const response = await fetch(url, { cache: "force-cache" });
+  if (!response.ok) {
+    throw new Error(`No se pudo cargar la plantilla del certificado (${response.status}).`);
+  }
+  return new Uint8Array(await response.arrayBuffer());
 }
 
 /**
  * Llena el certificado oficial GPH + CRACKS 2027 (plantilla con campos AcroForm).
+ * Solo usar en rutas/servidor (webhook / jobs), no en cliente.
  */
 export async function buildGphAnnualPassPdfBytes(
   input: GphAnnualPassFields,

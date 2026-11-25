@@ -1,14 +1,18 @@
 import { Resend } from "resend";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { getResendFromEmail } from "@/lib/email/resend-config";
 import {
   formatMxn,
   GPH_ANNUAL_PASS,
   type FamilyOrderRow,
 } from "@/lib/gph-commerce";
+import { patchFamilyOrder } from "@/lib/family-orders";
 import {
   buildGphAnnualPassPdfBytes,
   gphAnnualPassFilename,
 } from "@/lib/gph-annual-pass-pdf";
+
+const PASS_EMAIL_SENT = "pass_email_sent";
 
 function escapeHtml(value: string) {
   return value
@@ -25,10 +29,25 @@ function appBase() {
   );
 }
 
+function alreadySent(order: FamilyOrderRow) {
+  return String(order.notes ?? "").includes(PASS_EMAIL_SENT);
+}
+
 /**
  * Confirmación al tutor/pagador: PDF del Pase Anual GPH + CRACKS 2027.
+ * Solo invocar desde rutas de servidor (webhook / retorno de pago).
  */
-export async function notifyDiagnosisPaidWithPass(order: FamilyOrderRow) {
+export async function notifyDiagnosisPaidWithPass(
+  admin: SupabaseClient,
+  order: FamilyOrderRow,
+) {
+  if (order.sku !== "diagnosis") {
+    return { ok: false as const, skipped: "not_diagnosis" as const };
+  }
+  if (alreadySent(order)) {
+    return { ok: false as const, skipped: "already_sent" as const };
+  }
+
   const to = order.payer_email?.trim();
   if (!to) return { ok: false as const, skipped: "no_email" as const };
 
@@ -116,6 +135,9 @@ MiFicha · GPH`;
       ],
     });
     if (error) return { ok: false as const, error: error.message };
+
+    const nextNotes = [order.notes, PASS_EMAIL_SENT].filter(Boolean).join(" | ");
+    await patchFamilyOrder(admin, order.folio, { notes: nextNotes });
     return { ok: true as const, filename };
   } catch (error) {
     return {
@@ -123,4 +145,17 @@ MiFicha · GPH`;
       error: error instanceof Error ? error.message : "send_failed",
     };
   }
+}
+
+export function fireAndForgetDiagnosisPassEmail(
+  admin: SupabaseClient,
+  order: FamilyOrderRow | null | undefined,
+) {
+  if (!order || order.sku !== "diagnosis") return;
+  void notifyDiagnosisPaidWithPass(admin, order).catch((error) => {
+    console.error(
+      "[diagnosis-pass-email]",
+      error instanceof Error ? error.message : error,
+    );
+  });
 }

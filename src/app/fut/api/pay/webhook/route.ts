@@ -53,7 +53,13 @@ async function handlePaymentNotification(paymentId: string) {
     await markAcademyOrderPaid(admin, folio, paymentKey);
     return;
   }
-  await markFamilyOrderPaid(admin, folio, paymentKey);
+  const family = await markFamilyOrderPaid(admin, folio, paymentKey);
+  if (family?.sku === "diagnosis") {
+    const { fireAndForgetDiagnosisPassEmail } = await import(
+      "@/lib/email/diagnosis-paid-notify"
+    );
+    fireAndForgetDiagnosisPassEmail(admin, family);
+  }
 }
 
 function readHeader(request: Request, name: string) {

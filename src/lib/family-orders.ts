@@ -206,17 +206,6 @@ export async function markFamilyOrderPaid(
         ["Membresía hasta", updated.membership_until],
       ],
     });
-    // Certificado Pase Anual 2027 al pagador (PDF adjunto).
-    void import("@/lib/email/diagnosis-paid-notify")
-      .then(({ notifyDiagnosisPaidWithPass }) =>
-        notifyDiagnosisPaidWithPass(updated),
-      )
-      .catch((error) => {
-        console.error(
-          "[diagnosis-pass-email]",
-          error instanceof Error ? error.message : error,
-        );
-      });
   }
 
   return updated;
