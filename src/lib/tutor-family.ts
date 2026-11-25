@@ -11,6 +11,7 @@ import {
   ensureTutorPublicCodes,
   mintPublicCode,
   normalizePublicCode,
+  pointTutorPublicCode,
   releaseTutorPublicCode,
 } from "@/lib/public-player-code";
 import {
@@ -129,6 +130,10 @@ export interface TutorChild {
   explore_opt_in_at: string | null;
   /** Evidencia de la última firma de consentimiento (se conserva al revocar). */
   explore_consent_evidence?: TutorExploreConsentEvidence | null;
+  /** Códigos MF- adicionales que resuelven a esta ficha (post-fusión). */
+  alias_codes?: string[];
+  /** Si está fusionada en otra ficha, no se lista como activa. */
+  merged_into_child_id?: string | null;
 }
 
 export function childGuardianKind(child: Pick<TutorChild, "guardian_kind">): GuardianKind {
@@ -345,6 +350,12 @@ function normalizeChild(raw: TutorChild): TutorChild {
     explore_opt_in: Boolean(raw.explore_opt_in),
     explore_opt_in_at: raw.explore_opt_in_at ?? null,
     explore_consent_evidence: raw.explore_consent_evidence ?? null,
+    alias_codes: Array.isArray(raw.alias_codes)
+      ? raw.alias_codes
+          .map((code) => normalizePublicCode(code))
+          .filter((code): code is string => Boolean(code))
+      : [],
+    merged_into_child_id: raw.merged_into_child_id?.trim() || null,
   };
 }
 
@@ -766,7 +777,10 @@ export async function syncTutorChildren(
 
   if (changed) await writeJson(admin, ROSTER, roster);
   return roster
-    .filter((child) => child.guardian_user_id === user.id)
+    .filter(
+      (child) =>
+        child.guardian_user_id === user.id && !child.merged_into_child_id,
+    )
     .sort((a, b) => a.player_name.localeCompare(b.player_name, "es"));
 }
 
@@ -1437,10 +1451,21 @@ function findChildByShareAccess(roster: TutorChild[], token: string) {
   if (!raw) return null;
   const asCode = normalizePublicCode(raw);
   if (asCode) {
-    const byCode = roster.find(
-      (child) => normalizePublicCode(child.public_code) === asCode,
-    );
-    if (byCode) return byCode;
+    const byCode =
+      roster.find((child) => normalizePublicCode(child.public_code) === asCode) ??
+      roster.find((child) =>
+        (child.alias_codes ?? []).some(
+          (alias) => normalizePublicCode(alias) === asCode,
+        ),
+      );
+    if (byCode) {
+      if (byCode.merged_into_child_id) {
+        const canonical =
+          roster.find((child) => child.id === byCode.merged_into_child_id) ?? byCode;
+        return canonical;
+      }
+      return byCode;
+    }
   }
   const clean = raw.toLowerCase();
   return roster.find((child) => child.share_token === clean) ?? null;
@@ -1984,4 +2009,254 @@ export async function seedTutorFromVisoriaRegistration(
   roster.unshift(child);
   await writeJson(admin, ROSTER, roster);
   return child;
+}
+
+export type EnrollmentFichaCandidate = {
+  child_id: string;
+  public_code: string;
+  player_name: string;
+  birth_date: string | null;
+  reason: string;
+  match: "code" | "birth" | "contact";
+};
+
+function enrollmentPhoneKey(value: string | null | undefined) {
+  const digits = String(value ?? "").replace(/\D/g, "");
+  if (digits.length >= 10) return digits.slice(-10);
+  return "";
+}
+
+/** Adopta una ficha pending/misma cuenta/mismo WhatsApp para el tutor actual. */
+export async function adoptTutorChildForEnrollment(
+  admin: SupabaseClient,
+  user: { id: string; email?: string | null },
+  childId: string,
+  guardianPhone: string | null | undefined,
+) {
+  const email = (user.email ?? "").trim().toLowerCase();
+  const phone = enrollmentPhoneKey(guardianPhone);
+  const { roster } = await loadRoster(admin);
+  const index = roster.findIndex((child) => child.id === childId);
+  if (index < 0) throw new Error("No encontramos esa ficha.");
+  const child = roster[index];
+  if (child.merged_into_child_id) {
+    throw new Error("Esa ficha ya fue fusionada en otra. Usa el código canónico.");
+  }
+
+  const sameUser = child.guardian_user_id === user.id;
+  const pending = isPendingVisoriaGuardian(child.guardian_user_id);
+  const samePhone =
+    Boolean(phone) && enrollmentPhoneKey(child.guardian_phone) === phone;
+
+  if (!sameUser && !pending && !samePhone) {
+    throw new Error("No puedes reclamar esa ficha con estos datos.");
+  }
+
+  let changed = false;
+  if (!sameUser) {
+    child.guardian_user_id = user.id;
+    changed = true;
+  }
+  if (email && child.guardian_email !== email) {
+    child.guardian_email = email;
+    changed = true;
+  }
+  if (phone && enrollmentPhoneKey(child.guardian_phone) !== phone) {
+    child.guardian_phone = phone;
+    changed = true;
+  }
+  if (changed) {
+    roster[index] = normalizeChild(child);
+    await writeJson(admin, ROSTER, roster);
+  }
+  return roster[index];
+}
+
+/**
+ * Fusiona dos fichas tutor (mismo jugador, dos MF-).
+ * Conserva `keepCode` como canónico; `absorbCode` queda como alias.
+ */
+export async function mergeTutorChildrenByPublicCode(
+  admin: SupabaseClient,
+  input: { keepCode: string; absorbCode: string },
+) {
+  const keepCode = normalizePublicCode(input.keepCode);
+  const absorbCode = normalizePublicCode(input.absorbCode);
+  if (!keepCode || !absorbCode) {
+    throw new Error("Indica dos códigos MF- válidos.");
+  }
+  if (keepCode === absorbCode) {
+    throw new Error("Los dos códigos son el mismo.");
+  }
+
+  const { roster } = await loadRoster(admin);
+  const keepIndex = roster.findIndex(
+    (child) =>
+      !child.merged_into_child_id &&
+      (normalizePublicCode(child.public_code) === keepCode ||
+        (child.alias_codes ?? []).some((alias) => normalizePublicCode(alias) === keepCode)),
+  );
+  const absorbIndex = roster.findIndex(
+    (child) =>
+      !child.merged_into_child_id &&
+      (normalizePublicCode(child.public_code) === absorbCode ||
+        (child.alias_codes ?? []).some(
+          (alias) => normalizePublicCode(alias) === absorbCode,
+        )),
+  );
+  if (keepIndex < 0) throw new Error(`No encontramos ${keepCode}.`);
+  if (absorbIndex < 0) throw new Error(`No encontramos ${absorbCode}.`);
+  if (keepIndex === absorbIndex) {
+    throw new Error("Esos códigos ya pertenecen a la misma ficha.");
+  }
+
+  const keep = roster[keepIndex];
+  const absorb = roster[absorbIndex];
+
+  const aliases = new Set<string>([
+    ...(keep.alias_codes ?? []),
+    absorbCode,
+    ...(absorb.alias_codes ?? []),
+  ]);
+  const absorbPrimary = normalizePublicCode(absorb.public_code);
+  if (absorbPrimary && absorbPrimary !== keepCode) aliases.add(absorbPrimary);
+  aliases.delete(keepCode);
+
+  const keepProfile = keep.profile ?? emptyProfile();
+  const absorbProfile = absorb.profile ?? emptyProfile();
+  const fill = <T,>(current: T, incoming: T): T => {
+    if (Array.isArray(current)) {
+      return (current.length > 0 ? current : incoming) as T;
+    }
+    if (current === null || current === undefined || current === "") {
+      return incoming;
+    }
+    return current;
+  };
+  const mergedProfile: TutorChildProfile = {
+    birth_date: fill(keepProfile.birth_date, absorbProfile.birth_date),
+    position: fill(keepProfile.position, absorbProfile.position),
+    club: fill(keepProfile.club, absorbProfile.club),
+    school: fill(keepProfile.school, absorbProfile.school),
+    city: fill(keepProfile.city, absorbProfile.city),
+    state: fill(keepProfile.state, absorbProfile.state),
+    height_cm: fill(keepProfile.height_cm, absorbProfile.height_cm),
+    weight_kg: fill(keepProfile.weight_kg, absorbProfile.weight_kg),
+    nationality: fill(keepProfile.nationality, absorbProfile.nationality),
+    nui: fill(keepProfile.nui, absorbProfile.nui),
+    dominant_foot: fill(keepProfile.dominant_foot, absorbProfile.dominant_foot),
+    bio: fill(keepProfile.bio, absorbProfile.bio),
+    goals: fill(keepProfile.goals, absorbProfile.goals),
+    youtube_url: fill(keepProfile.youtube_url, absorbProfile.youtube_url),
+    transfermarkt_url: fill(
+      keepProfile.transfermarkt_url,
+      absorbProfile.transfermarkt_url,
+    ),
+    role_title: fill(keepProfile.role_title, absorbProfile.role_title),
+    tagline: fill(keepProfile.tagline, absorbProfile.tagline),
+    contact_email: fill(keepProfile.contact_email, absorbProfile.contact_email),
+    contact_whatsapp: fill(
+      keepProfile.contact_whatsapp,
+      absorbProfile.contact_whatsapp,
+    ),
+    instagram: fill(keepProfile.instagram, absorbProfile.instagram),
+    facebook: fill(keepProfile.facebook, absorbProfile.facebook),
+    tiktok: fill(keepProfile.tiktok, absorbProfile.tiktok),
+    show_contact_email:
+      keepProfile.show_contact_email || absorbProfile.show_contact_email,
+    show_contact_whatsapp:
+      keepProfile.show_contact_whatsapp || absorbProfile.show_contact_whatsapp,
+    show_contact_academy:
+      keepProfile.show_contact_academy || absorbProfile.show_contact_academy,
+    highlight_chips: fill(keepProfile.highlight_chips, absorbProfile.highlight_chips),
+    achievements: fill(keepProfile.achievements, absorbProfile.achievements),
+    callups: fill(keepProfile.callups, absorbProfile.callups),
+  };
+
+  const memberships = normalizeMemberships({
+    ...keep,
+    memberships: [
+      ...normalizeMemberships(keep),
+      ...normalizeMemberships(absorb).filter(
+        (row) =>
+          !normalizeMemberships(keep).some(
+            (existing) =>
+              existing.player_id === row.player_id ||
+              (existing.academy_id && existing.academy_id === row.academy_id),
+          ),
+      ),
+    ],
+  });
+
+  const sourceFolios = [
+    ...new Set([...(keep.source_folios ?? []), ...(absorb.source_folios ?? [])]),
+  ];
+
+  roster[keepIndex] = normalizeChild({
+    ...keep,
+    ...syncLegacyLinkFields(memberships),
+    profile: mergedProfile,
+    memberships,
+    source_folios: sourceFolios,
+    alias_codes: [...aliases],
+    explore_opt_in: keep.explore_opt_in || absorb.explore_opt_in,
+    explore_opt_in_at: keep.explore_opt_in_at || absorb.explore_opt_in_at,
+    explore_consent_evidence:
+      keep.explore_consent_evidence ?? absorb.explore_consent_evidence ?? null,
+    guardian_phone: keep.guardian_phone || absorb.guardian_phone,
+    guardian_email: keep.guardian_email || absorb.guardian_email,
+  });
+
+  roster[absorbIndex] = normalizeChild({
+    ...absorb,
+    merged_into_child_id: keep.id,
+    alias_codes: [],
+  });
+
+  await writeJson(admin, ROSTER, roster);
+
+  for (const code of aliases) {
+    await pointTutorPublicCode(admin, code, keep.id);
+  }
+  await pointTutorPublicCode(admin, keepCode, keep.id);
+
+  const materials = await readJson<TutorMaterial>(admin, MATERIALS);
+  let materialsChanged = false;
+  const nextMaterials = materials.map((row) => {
+    if (row.child_id !== absorb.id) return row;
+    materialsChanged = true;
+    return {
+      ...row,
+      child_id: keep.id,
+      guardian_user_id: keep.guardian_user_id,
+    };
+  });
+  if (materialsChanged) await writeJson(admin, MATERIALS, nextMaterials);
+
+  const seasons = await readJson<TutorSeasonStat>(admin, SEASONS);
+  let seasonsChanged = false;
+  const nextSeasons = seasons.map((row) => {
+    if (row.child_id !== absorb.id) return row;
+    seasonsChanged = true;
+    return {
+      ...row,
+      child_id: keep.id,
+      guardian_user_id: keep.guardian_user_id,
+    };
+  });
+  if (seasonsChanged) await writeJson(admin, SEASONS, nextSeasons);
+
+  const { remappointGphAgreementsTutorChild } = await import("@/lib/gph-agreements");
+  const agreementsMoved = await remappointGphAgreementsTutorChild(
+    admin,
+    absorb.id,
+    keep.id,
+  );
+
+  return {
+    keep: roster[keepIndex],
+    absorbed: roster[absorbIndex],
+    alias_codes: [...aliases],
+    agreements_moved: agreementsMoved,
+  };
 }

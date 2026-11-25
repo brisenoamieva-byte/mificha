@@ -613,3 +613,25 @@ export async function downloadSealedAgreementPdf(
   if (error || !data) throw new Error(error?.message || "PDF no encontrado.");
   return Buffer.from(await data.arrayBuffer());
 }
+
+/** Tras fusionar fichas tutor: reapunta cartas al child canónico. */
+export async function remappointGphAgreementsTutorChild(
+  admin: SupabaseClient,
+  fromChildId: string,
+  toChildId: string,
+) {
+  if (!fromChildId || !toChildId || fromChildId === toChildId) return 0;
+  const rows = await readAgreements(admin);
+  let changed = 0;
+  const next = rows.map((row) => {
+    if (row.tutor_child_id !== fromChildId) return row;
+    changed += 1;
+    return {
+      ...row,
+      tutor_child_id: toChildId,
+      updated_at: new Date().toISOString(),
+    };
+  });
+  if (changed > 0) await writeAgreements(admin, next);
+  return changed;
+}

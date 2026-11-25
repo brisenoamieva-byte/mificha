@@ -57,6 +57,15 @@ export function GphEnrollmentForm({
   const [honeypot, setHoneypot] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [candidates, setCandidates] = useState<
+    Array<{
+      child_id: string;
+      public_code: string;
+      player_name: string;
+      birth_date: string | null;
+      reason: string;
+    }>
+  >([]);
   const [done, setDone] = useState<{
     agreementId: string;
     playerName: string;
@@ -76,8 +85,10 @@ export function GphEnrollmentForm({
     [],
   );
 
-  async function onSubmit(event: React.FormEvent) {
-    event.preventDefault();
+  async function submitEnrollment(opts?: {
+    selectedChildId?: string | null;
+    forceNew?: boolean;
+  }) {
     setError(null);
     setLoading(true);
     try {
@@ -97,20 +108,40 @@ export function GphEnrollmentForm({
           privacy_accepted: privacy,
           reglamento_accepted: reglamento,
           public_code: publicCode.trim() || null,
+          selected_child_id: opts?.selectedChildId ?? null,
+          force_new: opts?.forceNew === true,
           honeypot,
         }),
       });
       const payload = (await response.json()) as {
         error?: string;
+        message?: string;
+        needs_choice?: boolean;
+        candidates?: Array<{
+          child_id: string;
+          public_code: string;
+          player_name: string;
+          birth_date: string | null;
+          reason: string;
+        }>;
         agreement_id?: string;
         public_code?: string | null;
         amount_mxn?: number;
         player_name?: string;
         reused?: boolean;
       };
+      if (response.status === 409 && payload.needs_choice) {
+        setCandidates(payload.candidates ?? []);
+        setError(
+          payload.message ||
+            "Encontramos fichas parecidas. Elige una o crea una nueva.",
+        );
+        return;
+      }
       if (!response.ok || !payload.agreement_id) {
         throw new Error(payload.error || "No se pudo completar la inscripción.");
       }
+      setCandidates([]);
       setDone({
         agreementId: payload.agreement_id,
         playerName: payload.player_name || playerName,
@@ -123,6 +154,11 @@ export function GphEnrollmentForm({
     } finally {
       setLoading(false);
     }
+  }
+
+  async function onSubmit(event: React.FormEvent) {
+    event.preventDefault();
+    await submitEnrollment();
   }
 
   if (done) {
@@ -377,6 +413,53 @@ export function GphEnrollmentForm({
         autoComplete="off"
         aria-hidden
       />
+
+      {candidates.length > 0 ? (
+        <section className="space-y-3 rounded-2xl border border-amber-200 bg-amber-50/80 p-4 sm:p-5">
+          <h2 className="text-base font-semibold text-mf-gph-ink">
+            ¿Es alguna de estas fichas?
+          </h2>
+          <p className="text-sm leading-6 text-mf-text-secondary">
+            Encontramos registros parecidos (nombre / fecha / WhatsApp). Elige uno para
+            no duplicar al jugador, o crea una ficha nueva si no es el mismo.
+          </p>
+          <ul className="space-y-2">
+            {candidates.map((row) => (
+              <li
+                key={row.child_id}
+                className="flex flex-col gap-2 rounded-xl border border-amber-200 bg-white p-3 sm:flex-row sm:items-center sm:justify-between"
+              >
+                <div>
+                  <p className="font-semibold text-mf-gph-ink">{row.player_name}</p>
+                  <p className="text-xs text-mf-text-muted">
+                    {row.public_code}
+                    {row.birth_date ? ` · ${row.birth_date}` : ""}
+                  </p>
+                  <p className="mt-1 text-xs text-mf-text-secondary">{row.reason}</p>
+                </div>
+                <button
+                  type="button"
+                  disabled={loading}
+                  onClick={() =>
+                    void submitEnrollment({ selectedChildId: row.child_id })
+                  }
+                  className="mf-btn-gph justify-center disabled:opacity-60"
+                >
+                  Usar esta
+                </button>
+              </li>
+            ))}
+          </ul>
+          <button
+            type="button"
+            disabled={loading}
+            onClick={() => void submitEnrollment({ forceNew: true })}
+            className="mf-btn-gph-ghost h-11 w-full justify-center disabled:opacity-60"
+          >
+            No es ninguna · crear ficha nueva
+          </button>
+        </section>
+      ) : null}
 
       {error ? (
         <p className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">

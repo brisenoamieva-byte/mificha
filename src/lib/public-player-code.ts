@@ -436,6 +436,25 @@ export async function ensureTutorPublicCodes(
   return result;
 }
 
+/** Apunta un MF- al child tutor canónico (p. ej. tras fusionar duplicados). */
+export async function pointTutorPublicCode(
+  admin: SupabaseClient,
+  code: string,
+  childId: string,
+) {
+  const normalized = normalizePublicCode(code);
+  if (!normalized) throw new Error("Código de jugador inválido.");
+  if (!childId.trim()) throw new Error("Falta el id de ficha.");
+  const registry = await readPublicCodeRegistry(admin);
+  registry[normalized] = {
+    kind: "tutor",
+    id: childId,
+    updated_at: new Date().toISOString(),
+  };
+  await writePublicCodeRegistry(admin, registry);
+  return normalized;
+}
+
 /** Libera el MF- del registro solo si el dueño es esta ficha tutor. */
 export async function releaseTutorPublicCode(
   admin: SupabaseClient,

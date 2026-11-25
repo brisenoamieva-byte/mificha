@@ -86,6 +86,8 @@ export function GphAgreementsPanel() {
   const [showForm, setShowForm] = useState(false);
   const [playerId, setPlayerId] = useState("");
   const [fields, setFields] = useState(emptyFields);
+  const [keepCode, setKeepCode] = useState("");
+  const [absorbCode, setAbsorbCode] = useState("");
 
   const pkg = useMemo(() => {
     try {
@@ -209,6 +211,33 @@ export function GphAgreementsPanel() {
     }
   }
 
+  async function mergeFichas() {
+    setBusy(true);
+    setError(null);
+    try {
+      const payload = await diagnosisAuthedFetch("/fut/api/academy/merge-ficha", {
+        method: "POST",
+        body: JSON.stringify({
+          keep_code: keepCode.trim().toUpperCase(),
+          absorb_code: absorbCode.trim().toUpperCase(),
+        }),
+      });
+      toast.success(
+        `Fusionado: ${(payload.keep_code as string) || keepCode} queda canónico` +
+          (Array.isArray(payload.alias_codes) && payload.alias_codes.length
+            ? ` · alias ${(payload.alias_codes as string[]).join(", ")}`
+            : ""),
+      );
+      setKeepCode("");
+      setAbsorbCode("");
+      await load();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "No se pudo fusionar.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function act(action: "countersign" | "cancel" | "send", id: string) {
     setBusy(true);
     setError(null);
@@ -274,6 +303,46 @@ export function GphAgreementsPanel() {
       {error ? (
         <p className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>
       ) : null}
+
+      <section className="space-y-3 rounded-2xl border border-slate-200 bg-white p-5">
+        <div>
+          <p className="text-sm font-semibold text-slate-900">Fusionar fichas duplicadas</p>
+          <p className="mt-1 text-sm leading-6 text-slate-600">
+            Si el mismo jugador tiene dos códigos MF-, conserva uno y el otro queda como
+            alias (sigue abriendo la ficha canónica).
+          </p>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-[1fr_1fr_auto]">
+          <label className="block text-sm">
+            <span className="font-medium text-slate-700">Código a conservar</span>
+            <input
+              value={keepCode}
+              onChange={(event) => setKeepCode(event.target.value.toUpperCase())}
+              placeholder="MF-XXXXX"
+              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2.5"
+            />
+          </label>
+          <label className="block text-sm">
+            <span className="font-medium text-slate-700">Código a fusionar</span>
+            <input
+              value={absorbCode}
+              onChange={(event) => setAbsorbCode(event.target.value.toUpperCase())}
+              placeholder="MF-YYYYY"
+              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2.5"
+            />
+          </label>
+          <div className="flex items-end">
+            <button
+              type="button"
+              disabled={busy || !keepCode.trim() || !absorbCode.trim()}
+              onClick={() => void mergeFichas()}
+              className="inline-flex w-full items-center justify-center rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-800 hover:bg-slate-50 disabled:opacity-50"
+            >
+              Fusionar
+            </button>
+          </div>
+        </div>
+      </section>
 
       {showForm ? (
         <section className="space-y-4 rounded-2xl border border-slate-200 bg-white p-5">

@@ -43,9 +43,26 @@ export async function POST(request: Request) {
       privacyAccepted: body.privacy_accepted === true,
       reglamentoAccepted: body.reglamento_accepted === true,
       publicCode: body.public_code ? String(body.public_code) : null,
+      selectedChildId: body.selected_child_id
+        ? String(body.selected_child_id)
+        : null,
+      forceNew: body.force_new === true,
       ip: meta.ip,
       userAgent: meta.userAgent,
     });
+
+    if (result.status === "needs_choice") {
+      return NextResponse.json(
+        {
+          ok: false,
+          needs_choice: true,
+          candidates: result.candidates,
+          message:
+            "Encontramos fichas parecidas. Elige una o crea una nueva para no duplicar.",
+        },
+        { status: 409 },
+      );
+    }
 
     return NextResponse.json({
       ok: true,
@@ -59,10 +76,6 @@ export async function POST(request: Request) {
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "No se pudo completar la inscripción.";
-    const status =
-      message.includes("aceptar") || message.includes("inválid") || message.includes("Falta")
-        ? 400
-        : 400;
-    return NextResponse.json({ error: message }, { status });
+    return NextResponse.json({ error: message }, { status: 400 });
   }
 }

@@ -22,9 +22,19 @@ import {
   type GphSedeId,
 } from "@/lib/gph-reglamento-content";
 import { buildPlayerSlug, buildPublicPlayerUrl } from "@/lib/player-utils";
-import { createTutorChild, listGuardianChildren } from "@/lib/tutor-family";
+import { normalizePublicCode } from "@/lib/public-player-code";
+import {
+  adoptTutorChildForEnrollment,
+  createTutorChild,
+  listGuardianChildren,
+  type EnrollmentFichaCandidate,
+  type TutorChild,
+} from "@/lib/tutor-family";
 import { childMembershipForAcademy } from "@/lib/tutor-memberships";
-import { linkTutorChildToPlayer } from "@/lib/tutor-player-link";
+import {
+  findTutorMatchesForAcademyPlayer,
+  linkTutorChildToPlayer,
+} from "@/lib/tutor-player-link";
 import type { DominantFoot, PlayerPosition } from "@/types/database";
 
 function nameKey(value: string) {
@@ -100,19 +110,77 @@ export type GphEnrollInput = {
   privacyAccepted: boolean;
   reglamentoAccepted: boolean;
   publicCode?: string | null;
+  /** El tutor eligió una ficha candidata (anti-duplicado). */
+  selectedChildId?: string | null;
+  /** El tutor confirma que quiere ficha nueva pese a candidatos. */
+  forceNew?: boolean;
   ip?: string | null;
   userAgent?: string | null;
 };
+
+export type GphEnrollOk = {
+  status: "ok";
+  agreement: GphAgreement;
+  reused: boolean;
+  publicCode: string | null;
+};
+
+export type GphEnrollNeedsChoice = {
+  status: "needs_choice";
+  candidates: EnrollmentFichaCandidate[];
+};
+
+export type GphEnrollResult = GphEnrollOk | GphEnrollNeedsChoice;
+
+async function claimableCandidates(
+  admin: SupabaseClient,
+  user: { id: string },
+  input: {
+    playerName: string;
+    birthDate: string;
+    guardianPhone: string;
+    email?: string | null;
+    publicCode?: string | null;
+  },
+): Promise<EnrollmentFichaCandidate[]> {
+  const matches = await findTutorMatchesForAcademyPlayer(admin, {
+    name: input.playerName,
+    birthDate: input.birthDate,
+    guardianPhone: input.guardianPhone,
+    guardianEmail: input.email,
+    publicCode: input.publicCode,
+  });
+  const phone = normalizeMxPhone(input.guardianPhone);
+  const { listAllTutorChildrenForOps, isPendingVisoriaGuardian } = await import(
+    "@/lib/tutor-family"
+  );
+  const roster = await listAllTutorChildrenForOps(admin);
+  const byId = new Map(roster.map((child) => [child.id, child]));
+
+  return matches
+    .filter((match) => {
+      const child = byId.get(match.child_id);
+      if (!child || child.merged_into_child_id) return false;
+      if (child.guardian_user_id === user.id) return true;
+      if (isPendingVisoriaGuardian(child.guardian_user_id)) return true;
+      const childPhone = normalizeMxPhone(child.guardian_phone ?? "");
+      return Boolean(phone) && childPhone === phone;
+    })
+    .map((match) => ({
+      child_id: match.child_id,
+      public_code: match.public_code,
+      player_name: match.player_name,
+      birth_date: match.birth_date,
+      reason: match.reason,
+      match: match.match,
+    }));
+}
 
 export async function enrollGphStudent(
   admin: SupabaseClient,
   user: { id: string; email?: string | null },
   input: GphEnrollInput,
-): Promise<{
-  agreement: GphAgreement;
-  reused: boolean;
-  publicCode: string | null;
-}> {
+): Promise<GphEnrollResult> {
   if (!input.reglamentoAccepted) {
     throw new Error("Debes aceptar el reglamento GPH.");
   }
@@ -125,6 +193,7 @@ export async function enrollGphStudent(
   const playerName = input.playerName.trim();
   const birthDate = input.birthDate.trim().slice(0, 10);
   const acceptorName = input.acceptorName.trim() || guardianName;
+  const preferredCode = normalizePublicCode(input.publicCode);
 
   if (guardianName.length < 2) throw new Error("Escribe el nombre del tutor.");
   if (guardianPhone.length !== 10) {
@@ -154,10 +223,54 @@ export async function enrollGphStudent(
       : "right";
 
   const academy = await resolveGphAcademy(admin);
-  const children = await listGuardianChildren(admin, user, guardianPhone);
-  const existingChild = children.find(
-    (row) => nameKey(row.player_name) === nameKey(playerName),
+  const children = await listGuardianChildren(
+    admin,
+    user,
+    guardianPhone,
+    "all",
+    preferredCode,
   );
+  let existingChild =
+    children.find((row) => nameKey(row.player_name) === nameKey(playerName)) ??
+    (preferredCode
+      ? children.find(
+          (row) => normalizePublicCode(row.public_code) === preferredCode,
+        )
+      : undefined);
+
+  if (input.selectedChildId) {
+    existingChild = await adoptTutorChildForEnrollment(
+      admin,
+      user,
+      input.selectedChildId,
+      guardianPhone,
+    );
+  } else if (!existingChild && !input.forceNew) {
+    const candidates = await claimableCandidates(admin, user, {
+      playerName,
+      birthDate,
+      guardianPhone,
+      email: user.email,
+      publicCode: preferredCode,
+    });
+    if (candidates.length > 0) {
+      const byCode = preferredCode
+        ? candidates.find(
+            (row) => normalizePublicCode(row.public_code) === preferredCode,
+          )
+        : undefined;
+      if (byCode) {
+        existingChild = await adoptTutorChildForEnrollment(
+          admin,
+          user,
+          byCode.child_id,
+          guardianPhone,
+        );
+      } else {
+        return { status: "needs_choice", candidates };
+      }
+    }
+  }
 
   const existingAgreements = await listGphAgreementsForTutor(admin, user.id);
   const existing = existingAgreements.find(
@@ -170,13 +283,14 @@ export async function enrollGphStudent(
   );
   if (existing) {
     return {
+      status: "ok",
       agreement: existing,
       reused: true,
       publicCode: existingChild?.public_code ?? null,
     };
   }
 
-  let child = existingChild;
+  let child: TutorChild | undefined = existingChild;
   if (!child) {
     child = await createTutorChild(admin, user, {
       player_name: playerName,
@@ -188,7 +302,7 @@ export async function enrollGphStudent(
       club: "Academia Real GPH",
       city: "Querétaro",
       state: "Querétaro",
-      public_code: input.publicCode,
+      public_code: preferredCode,
       contact_whatsapp: guardianPhone,
       show_contact_whatsapp: true,
     });
@@ -258,7 +372,6 @@ export async function enrollGphStudent(
     } catch (err) {
       const message = err instanceof Error ? err.message : "";
       if (!message.includes("Ya hay un vínculo con esa academia")) throw err;
-      // Ya ligado a GPH con otro/mismo jugador: seguimos con el playerId actual.
     }
   }
 
@@ -315,6 +428,7 @@ export async function enrollGphStudent(
   void notifyGphAgreementSigned(withPdf);
 
   return {
+    status: "ok",
     agreement: withPdf,
     reused: false,
     publicCode: child.public_code ?? null,
