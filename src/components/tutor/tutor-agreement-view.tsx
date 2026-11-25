@@ -175,7 +175,7 @@ export function TutorAgreementView({ agreementId }: { agreementId: string }) {
         <h1 className="mt-1 text-2xl font-semibold text-mf-gph-ink">
           {agreement.template_title}
         </h1>
-        <p className="mt-1 text-sm text-mf-text-secondary">
+        <p className="mt-1 break-words text-sm text-mf-text-secondary">
           {agreement.fields.player_name} ·{" "}
           {agreement.status === "active"
             ? "Activa (firmada por ambas partes)"

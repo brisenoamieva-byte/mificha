@@ -47,6 +47,12 @@ export function buildGphAgreementPdfBytes(agreement: GphAgreement): Uint8Array {
     }
   };
 
+  /** Evita desborde con emails/nombres sin espacios (splitTextToSize no parte tokens duros). */
+  const softBreakLongTokens = (text: string) =>
+    text.replace(/(\S{28,})/g, (token) =>
+      token.replace(/([@._/+\-])/g, "$1\u200b").replace(/(.{24})/g, "$1\u200b"),
+    );
+
   const write = (
     text: string,
     opts?: { size?: number; bold?: boolean; color?: [number, number, number] },
@@ -56,10 +62,10 @@ export function buildGphAgreementPdfBytes(agreement: GphAgreement): Uint8Array {
     doc.setFontSize(size);
     if (opts?.color) doc.setTextColor(...opts.color);
     else doc.setTextColor(15, 23, 42);
-    const lines = doc.splitTextToSize(text, maxWidth) as string[];
+    const lines = doc.splitTextToSize(softBreakLongTokens(text), maxWidth) as string[];
     for (const line of lines) {
       ensureSpace(size + 6);
-      doc.text(line, margin, y);
+      doc.text(line.replace(/\u200b/g, ""), margin, y);
       y += size + 4;
     }
   };

@@ -656,10 +656,12 @@ export function GphAgreementsPanel() {
         ) : (
           <ul className="divide-y divide-slate-100">
             {agreements.map((row) => (
-              <li key={row.id} className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
-                <div>
-                  <p className="font-semibold text-slate-900">{row.fields.player_name}</p>
-                  <p className="mt-0.5 text-xs text-slate-500">
+              <li key={row.id} className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-start sm:justify-between sm:px-5">
+                <div className="min-w-0 flex-1">
+                  <p className="break-words font-semibold text-slate-900">
+                    {row.fields.player_name}
+                  </p>
+                  <p className="mt-0.5 break-words text-xs text-slate-500">
                     Tutor: {row.fields.guardian_name}
                     {row.tutor_evidence?.acceptor_name
                       ? ` · Firmó: ${row.tutor_evidence.acceptor_name}`
