@@ -1,3 +1,7 @@
+import {
+  BRAND_WHATSAPP_DISPLAY,
+  BRAND_WHATSAPP_E164,
+} from "@/lib/brand";
 import { LEGAL_ENTITY, LEGAL_ROUTES } from "@/lib/legal";
 
 export const VISORIA_EVENT_ID = "queretaro-nov-2026";
@@ -24,8 +28,8 @@ export const VISORIA_VIDEOS = [
   },
 ] as const;
 
-export const VISORIA_WHATSAPP_DISPLAY = "446 132 2207";
-export const VISORIA_WHATSAPP_E164 = "524461322207";
+export const VISORIA_WHATSAPP_DISPLAY = BRAND_WHATSAPP_DISPLAY;
+export const VISORIA_WHATSAPP_E164 = BRAND_WHATSAPP_E164;
 
 export const VISORIA_PUBLIC_PATH = "/fut/visorias";
 
@@ -149,7 +153,7 @@ ${tips}
 Detalle y registro:
 ${url}
 
-Dudas: GPH · ${VISORIA_WHATSAPP_DISPLAY}`;
+Dudas: MiFicha · ${VISORIA_WHATSAPP_DISPLAY}`;
   return `https://wa.me/?text=${encodeURIComponent(text)}`;
 }
 

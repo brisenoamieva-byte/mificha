@@ -1,3 +1,5 @@
+import { BRAND_WHATSAPP_DISPLAY } from "@/lib/brand";
+
 export const ORGANIZER_ONE_PAGER = {
   eyebrow: "Torneos interescolares · Querétaro",
   title: "MiFicha para organizadores",
@@ -41,7 +43,7 @@ export const ORGANIZER_ONE_PAGER = {
   contact: {
     name: "Ricardo Briseño",
     email: "hola@mificha.mx",
-    phoneDisplay: "442 155 6155",
+    phoneDisplay: BRAND_WHATSAPP_DISPLAY,
     web: "mificha.mx/fut/organizadores",
   },
 } as const;
@@ -73,7 +75,7 @@ export function buildOrganizerOnePagerPlainText(options?: {
     ...(season ? [`Temporada ${season}.`, ""] : []),
     "¿20 min esta semana para ver cómo cargaríamos tu jornada?",
     "",
-    "Ricardo · WhatsApp 442 155 6155 · hola@mificha.mx · mificha.mx",
+    `MiFicha · WhatsApp ${BRAND_WHATSAPP_DISPLAY} · hola@mificha.mx · mificha.mx`,
   ].join("\n");
 }
 

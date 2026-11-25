@@ -13,6 +13,17 @@ export const BRAND_INSTAGRAM_ICON = "/brand/instagram.png";
 /** Perfil oficial (sin params de tracking). */
 export const BRAND_INSTAGRAM_URL = "https://www.instagram.com/mificha_mx/";
 export const BRAND_INSTAGRAM_HANDLE = "@mificha_mx";
+
+/** WhatsApp oficial MiFicha (México · Querétaro). */
+export const BRAND_WHATSAPP_DISPLAY = "442 336 1602";
+export const BRAND_WHATSAPP_E164 = "524423361602";
+
+export function brandWhatsAppHref(prefill?: string) {
+  const base = `https://wa.me/${BRAND_WHATSAPP_E164}`;
+  if (!prefill?.trim()) return base;
+  return `${base}?text=${encodeURIComponent(prefill.trim())}`;
+}
+
 export { GPH_LOGO } from "@/lib/gph-alliance";
 
 /** @deprecated Usar BRAND_ICON + BrandWordmark. Mantenido para compatibilidad en emails. */

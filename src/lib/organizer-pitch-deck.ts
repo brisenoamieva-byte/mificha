@@ -1,3 +1,4 @@
+import { BRAND_WHATSAPP_DISPLAY } from "@/lib/brand";
 import type { PitchSlide } from "@/lib/pitch-deck-content";
 
 /**
@@ -73,7 +74,7 @@ export const ORGANIZER_PITCH_SLIDES: PitchSlide[] = [
       "Te pasamos un texto listo para las academias",
       "Con la primera acta ya salen fichas y avisos",
     ],
-    highlight: "WhatsApp 442 155 6155 · hola@mificha.mx · mificha.mx/fut/organizadores",
+    highlight: `WhatsApp ${BRAND_WHATSAPP_DISPLAY} · hola@mificha.mx · mificha.mx/fut/organizadores`,
     imageKey: "ctaBand",
   },
 ];

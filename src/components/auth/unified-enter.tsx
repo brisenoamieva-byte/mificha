@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { authConfirmUrl, signIn, signUp } from "@/lib/auth";
+import { BRAND_WHATSAPP_DISPLAY } from "@/lib/brand";
 import { supabase } from "@/lib/supabase";
 
 type Mode = "login" | "signup";
@@ -191,7 +192,7 @@ export function UnifiedEnter() {
           } catch {
             setNeedsEmailConfirm(true);
             setSuccess(
-              "Cuenta creada. Te enviamos un correo para confirmar. Si no llega (spam), pídelo de nuevo abajo o escríbenos por WhatsApp al 442 155 6155.",
+              `Cuenta creada. Te enviamos un correo para confirmar. Si no llega (spam), pídelo de nuevo abajo o escríbenos por WhatsApp al ${BRAND_WHATSAPP_DISPLAY}.`,
             );
             setMode("login");
             setLoading(false);
@@ -264,13 +265,13 @@ export function UnifiedEnter() {
       });
       if (resendError) throw resendError;
       setResendNotice(
-        "Listo: enviamos un enlace nuevo. Revisa bandeja y spam. Si no llega en 2 minutos, mándanos WhatsApp al 442 155 6155.",
+        `Listo: enviamos un enlace nuevo. Revisa bandeja y spam. Si no llega en 2 minutos, mándanos WhatsApp al ${BRAND_WHATSAPP_DISPLAY}.`,
       );
     } catch (resendErr) {
       setResendNotice(
         resendErr instanceof Error
           ? resendErr.message
-          : "No se pudo reenviar. Escríbenos por WhatsApp al 442 155 6155.",
+          : `No se pudo reenviar. Escríbenos por WhatsApp al ${BRAND_WHATSAPP_DISPLAY}.`,
       );
     } finally {
       setResendingConfirm(false);

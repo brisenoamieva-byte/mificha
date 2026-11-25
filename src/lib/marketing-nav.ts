@@ -1,7 +1,11 @@
 import type { LucideIcon } from "lucide-react";
 import { ClipboardList, Sparkles, Users } from "lucide-react";
 import { academyMembershipPublicCopy } from "@/lib/academy-membership";
-import { BRAND_INSTAGRAM_HANDLE, BRAND_INSTAGRAM_URL } from "@/lib/brand";
+import {
+  BRAND_INSTAGRAM_HANDLE,
+  BRAND_INSTAGRAM_URL,
+  brandWhatsAppHref,
+} from "@/lib/brand";
 import { MISION_PATH } from "@/lib/mision";
 import { VISORIA_PUBLIC_PATH } from "@/lib/visoria-event";
 
@@ -139,7 +143,9 @@ export const MARKETING_SECONDARY_LINKS: NavLink[] = [
     description: "Fichas privadas por defecto · consentimiento del tutor",
   },
   {
-    href: "https://wa.me/524421556155?text=Hola%2C%20quiero%20informaci%C3%B3n%20sobre%20patrocinio%20en%20MiFicha.",
+    href: brandWhatsAppHref(
+      "Hola, quiero información sobre patrocinio en MiFicha.",
+    ),
     label: "Patrocinio",
     description: "WhatsApp · solicitar información",
   },

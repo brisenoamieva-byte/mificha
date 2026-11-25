@@ -5,6 +5,7 @@ import { SiteFooter, SiteHeader } from "@/components/marketing/site-header";
 import { AllianceLockup } from "@/components/ui/gph-logo";
 import { BrandWordmark } from "@/components/ui/brand-wordmark";
 import { GPH_ALLIANCE } from "@/lib/gph-alliance";
+import { GPH_ENROLLMENT_PATH } from "@/lib/gph-enrollment";
 import { GPH_INVITE_LANDING_PATH, gphInviteTutorHref } from "@/lib/gph-invite-wave";
 
 export const metadata: Metadata = {
@@ -54,9 +55,12 @@ export default function GphInviteLandingPage() {
               de la red GPH.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link href={ctaHref} className="mf-btn-gph">
-                Entrar al espacio tutor
+              <Link href={GPH_ENROLLMENT_PATH} className="mf-btn-gph">
+                Inscribir alumno GPH
                 <ArrowRight className="h-4 w-4" />
+              </Link>
+              <Link href={ctaHref} className="mf-btn-gph-ghost border-white/25 text-white hover:bg-white/10">
+                Solo armar ficha
               </Link>
               <Link
                 href="/fut/evaluaciones"

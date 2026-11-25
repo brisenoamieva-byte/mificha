@@ -1,10 +1,15 @@
+import {
+  BRAND_WHATSAPP_DISPLAY,
+  BRAND_WHATSAPP_E164,
+} from "@/lib/brand";
+
 export const CRACKS_TRYOUTS_PATH = "/fut/cracks";
 
 export const CRACKS_TRYOUTS_POSTER =
   "/partners/cracks-tryouts-queretaro-nov-2026.jpg";
 
-export const CRACKS_TRYOUTS_WHATSAPP_DISPLAY = "446 132 2207";
-export const CRACKS_TRYOUTS_WHATSAPP_E164 = "524461322207";
+export const CRACKS_TRYOUTS_WHATSAPP_DISPLAY = BRAND_WHATSAPP_DISPLAY;
+export const CRACKS_TRYOUTS_WHATSAPP_E164 = BRAND_WHATSAPP_E164;
 
 export const CRACKS_TRYOUTS = {
   brand: "CRACKS",

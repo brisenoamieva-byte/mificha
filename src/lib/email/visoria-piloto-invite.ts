@@ -1,7 +1,11 @@
-import { getBrandIconUrl } from "@/lib/brand";
+import {
+  BRAND_WHATSAPP_DISPLAY,
+  BRAND_WHATSAPP_E164,
+  getBrandIconUrl,
+} from "@/lib/brand";
 
-export const VISORIA_PILOTO_WHATSAPP_DISPLAY = "442 155 6155";
-export const VISORIA_PILOTO_WHATSAPP_E164 = "524421556155";
+export const VISORIA_PILOTO_WHATSAPP_DISPLAY = BRAND_WHATSAPP_DISPLAY;
+export const VISORIA_PILOTO_WHATSAPP_E164 = BRAND_WHATSAPP_E164;
 export const VISORIA_PILOTO_CAMPAIGN = "piloto10";
 
 export type VisoriaPilotoInviteInput = {

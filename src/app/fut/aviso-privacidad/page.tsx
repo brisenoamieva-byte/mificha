@@ -6,6 +6,7 @@ import {
   LegalParagraph,
   LegalSection,
 } from "@/components/marketing/legal-page-shell";
+import { BRAND_WHATSAPP_DISPLAY } from "@/lib/brand";
 import { LEGAL_ENTITY, LEGAL_ROUTES, PRIVACY_NOTICE_SHORT } from "@/lib/legal";
 
 export const metadata: Metadata = {
@@ -164,7 +165,7 @@ export default function AvisoPrivacidadPage() {
             "Transferencia necesaria: clubes visores confirmados (hoy Club Deportivo Guadalajara y Club Santos Laguna, y los que se anuncien). Sin esta autorización no hay registro.",
             "Imagen: fotos y video del evento para difusión de GPH y CRACKS, con consentimiento expreso del tutor (LGDNNA).",
             "Finalidad secundaria opcional: avisos de otras convocatorias. Se puede negar sin perder la inscripción.",
-            `ARCO y revocación: ${LEGAL_ENTITY.privacyEmail} o WhatsApp 446 132 2207. Plazo de respuesta: 20 días hábiles.`,
+            `ARCO y revocación: ${LEGAL_ENTITY.privacyEmail} o WhatsApp ${BRAND_WHATSAPP_DISPLAY}. Plazo de respuesta: 20 días hábiles.`,
             "No hay promesa de selección, beca, contrato ni resultado profesional.",
           ]}
         />

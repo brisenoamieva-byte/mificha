@@ -1,3 +1,7 @@
+import {
+  BRAND_WHATSAPP_DISPLAY,
+  BRAND_WHATSAPP_E164,
+} from "@/lib/brand";
 import { CRACKS_TRYOUTS_PATH } from "@/lib/cracks-tryouts";
 import { GPH_LOGO } from "@/lib/gph-alliance";
 
@@ -6,8 +10,8 @@ export type SponsorPlacement = "home_strip" | "tutor_card" | "footer_rail";
 const SPONSOR_SALES_PATH = "/fut/patrocinio";
 
 /** WhatsApp comercial MiFicha — solicitud de info de patrocinio. */
-export const SPONSOR_WHATSAPP_DISPLAY = "442 155 6155";
-export const SPONSOR_WHATSAPP_E164 = "524421556155";
+export const SPONSOR_WHATSAPP_DISPLAY = BRAND_WHATSAPP_DISPLAY;
+export const SPONSOR_WHATSAPP_E164 = BRAND_WHATSAPP_E164;
 
 export interface SponsorBrand {
   id: string;

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { authConfirmUrl, signUp } from "@/lib/auth";
+import { BRAND_WHATSAPP_DISPLAY } from "@/lib/brand";
 import { LEGAL_ROUTES, TERMS_ACCEPTANCE_LABEL } from "@/lib/legal";
 
 function getErrorMessage(error: unknown) {
@@ -76,8 +77,8 @@ export function SignUpForm() {
 
       setSuccess(
         joiningTeam
-          ? "Cuenta creada. Confirma tu correo (revisa spam), inicia sesión y abre de nuevo el link de invitación. Si no llega, WhatsApp 442 155 6155."
-          : "Cuenta creada. Confirma tu correo (revisa spam) y luego inicia sesión. Si no llega, WhatsApp 442 155 6155.",
+          ? `Cuenta creada. Confirma tu correo (revisa spam), inicia sesión y abre de nuevo el link de invitación. Si no llega, WhatsApp ${BRAND_WHATSAPP_DISPLAY}.`
+          : `Cuenta creada. Confirma tu correo (revisa spam) y luego inicia sesión. Si no llega, WhatsApp ${BRAND_WHATSAPP_DISPLAY}.`,
       );
     } catch (submitError) {
       setError(getErrorMessage(submitError));

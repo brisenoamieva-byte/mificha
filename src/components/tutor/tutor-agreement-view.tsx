@@ -135,12 +135,25 @@ export function TutorAgreementView({ agreementId }: { agreementId: string }) {
   }
 
   if (!agreement) {
+    const needsLogin =
+      Boolean(error?.toLowerCase().includes("inicia sesión")) ||
+      Boolean(error?.toLowerCase().includes("no autenticado"));
+    const next = `/fut/tutor/acuerdo/${agreementId}`;
     return (
       <div className="space-y-3">
         <p className="text-sm text-mf-danger">{error || "Carta no encontrada."}</p>
-        <Link href="/fut/tutor" className="text-sm font-semibold text-mf-gph">
-          ← Volver al tutor
-        </Link>
+        {needsLogin ? (
+          <Link
+            href={`/fut/entrar?next=${encodeURIComponent(next)}`}
+            className="inline-flex text-sm font-semibold text-mf-gph"
+          >
+            Inicia sesión para firmar →
+          </Link>
+        ) : (
+          <Link href="/fut/tutor" className="text-sm font-semibold text-mf-gph">
+            ← Volver al tutor
+          </Link>
+        )}
       </div>
     );
   }

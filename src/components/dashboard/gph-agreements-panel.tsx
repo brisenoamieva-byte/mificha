@@ -8,6 +8,7 @@ import { NoAcademyState } from "@/components/dashboard/no-academy-state";
 import { toast } from "@/components/ui/toast";
 import { diagnosisAuthedFetch } from "@/lib/player-diagnosis-client";
 import type { GphAgreement } from "@/lib/gph-agreements";
+import { gphEnrollmentHref } from "@/lib/gph-enrollment";
 import {
   GPH_LEVELS,
   GPH_POSITIONS,
@@ -246,6 +247,18 @@ export function GphAgreementsPanel() {
           <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-600">
             Envía el Reglamento 2027 al tutor para firma electrónica. Tú contrafirmas
             y queda el PDF sellado. Sin cobro de mensualidades en MiFicha.
+          </p>
+          <p className="mt-3 max-w-2xl rounded-xl border border-emerald-200 bg-emerald-50/80 px-3 py-2 text-sm text-emerald-900">
+            Liga pública para nuevos alumnos:{" "}
+            <a
+              href={gphEnrollmentHref({ absolute: true })}
+              className="font-semibold underline"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {gphEnrollmentHref({ absolute: true })}
+            </a>
+            . Llegan firmados; tú confirmas nivel y contrafirmas.
           </p>
         </div>
         <button

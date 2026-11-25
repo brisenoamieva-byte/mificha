@@ -1,8 +1,13 @@
+import {
+  BRAND_WHATSAPP_DISPLAY,
+  BRAND_WHATSAPP_E164,
+} from "@/lib/brand";
+
 /** Contacto comercial para registro de torneos. */
 export const ORGANIZER_CONTACT = {
   email: "hola@mificha.mx",
-  phoneDisplay: "442 155 6155",
-  phoneE164: "524421556155",
+  phoneDisplay: BRAND_WHATSAPP_DISPLAY,
+  phoneE164: BRAND_WHATSAPP_E164,
   whatsappPrefill:
     "Hola, quiero registrar mi torneo en MiFicha (gratis). ¿Me ayudan a cargar el calendario?",
   mailSubject: "Registrar torneo · MiFicha",
