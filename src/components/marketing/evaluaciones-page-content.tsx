@@ -1,11 +1,9 @@
 import Link from "next/link";
 import {
   ArrowRight,
-  Check,
   ClipboardList,
   LineChart,
   MessageCircle,
-  Target,
 } from "lucide-react";
 import { MarketingPageHero } from "@/components/marketing/marketing-page-hero";
 import { AllianceLockup, GphLogo } from "@/components/ui/gph-logo";
@@ -31,18 +29,19 @@ import { cn } from "@/lib/utils";
 const STEPS = [
   {
     icon: MessageCircle,
-    title: "Paga y elige horario",
-    description: "Pago en línea y calendario GPH. Sesión presencial en Querétaro.",
+    title: "Paga y agenda",
+    description: "Un solo pago anual. Luego eliges horario del diagnóstico en Querétaro.",
   },
   {
     icon: ClipboardList,
-    title: "Sesión de evaluación",
+    title: "Evaluación presencial",
     description: "Técnica, táctica, físico, mental y hábitos · escala 1–5.",
   },
   {
     icon: LineChart,
-    title: "Informe en tu ficha",
-    description: "Etapa, objetivos y seguimiento en mificha.mx por 12 meses.",
+    title: "Informe + proyección",
+    description:
+      "Resultados en tu ficha. Visorías, selectivos y especialización según el pase 2027.",
   },
 ] as const;
 
@@ -61,7 +60,7 @@ export function EvaluacionesPageContent() {
         actions={
           <>
             <Link href="/fut/pagar?sku=diagnosis" className="mf-btn-gph">
-              Adquirir pase · $2,030
+              Adquirir pase · {DIAGNOSIS_PRODUCT.publicPriceLabel}
               <ArrowRight className="h-4 w-4" />
             </Link>
             <a
@@ -70,7 +69,9 @@ export function EvaluacionesPageContent() {
               target="_blank"
               rel="noopener noreferrer"
             >
-              {diagnosisBookingCtaLabel("Agendar por WhatsApp")}
+              {diagnosisBookingCtaLabel(
+                bookingIsCalendar ? "Agendar diagnóstico" : `WhatsApp ${GPH_WHATSAPP_DISPLAY}`,
+              )}
             </a>
           </>
         }
@@ -79,158 +80,55 @@ export function EvaluacionesPageContent() {
             <Link href="/fut/d/demo" className="font-semibold text-mf-gph hover:underline">
               Ver ejemplo de informe
             </Link>
-            {" · "}
-            {GPH_ANNUAL_PASS.certificateNote}
           </p>
         }
         aside={
           <div className="mf-card overflow-hidden p-0 sm:p-0">
             <div className="bg-[#fff1f2] px-5 py-3 sm:px-8">
               <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#e11d48]">
-                {DIAGNOSIS_PRODUCT.promoHeadline}
+                Precio promocional · −{DIAGNOSIS_PRODUCT.discountPercent}%
               </p>
             </div>
             <div className="p-6 sm:p-8">
               <AllianceLockup size="lg" showCaption />
               <DiagnosisPromoPrice className="mt-5" size="lg" showBadge={false} />
-              <GphAnnualPassBenefits className="mt-5" compact />
+              <p className="mt-4 text-sm font-medium leading-6 text-mf-gph-ink">
+                {GPH_ANNUAL_PASS.closing}
+              </p>
             </div>
           </div>
         }
       />
 
-      {/* Pase anual (pago) vs clase muestra (gratis) */}
-      <section
-        id="servicios-gph"
-        className="scroll-mt-24 border-b border-mf-border bg-white"
-      >
-        <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
-          <p className="mf-marketing-eyebrow">Servicios GPH</p>
-          <h2 className="mt-2 text-xl font-semibold tracking-[-0.02em] text-mf-gph-ink sm:text-2xl">
-            Pase Anual o clase muestra
-          </h2>
-          <div className="mt-6 grid gap-3 sm:grid-cols-2">
-            <article className="flex flex-col rounded-xl border border-mf-gph/25 bg-mf-gph-soft/50 px-5 py-5">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-mf-gph">
-                De pago · −30% · un solo pago anual
-              </p>
-              <h3 className="mt-2 text-base font-semibold text-mf-gph-ink">
-                {GPH_ANNUAL_PASS.title}
-              </h3>
-              <p className="mt-2 text-xl font-bold tracking-tight text-mf-gph-ink">
-                {DIAGNOSIS_PRODUCT.publicPriceLabel}{" "}
-                <span className="text-sm font-semibold text-mf-text-muted line-through">
-                  {DIAGNOSIS_PRODUCT.listPriceLabel}
-                </span>
-              </p>
-              <GphAnnualPassBenefits className="mt-3 flex-1" compact />
-              <div className="mt-4 flex flex-wrap gap-2">
-                <Link href="/fut/pagar?sku=diagnosis" className="mf-btn-gph">
-                  Adquirir pase
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-                <a
-                  href={bookingHref}
-                  className="mf-btn-gph-ghost"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {diagnosisBookingCtaLabel("Agendar")}
-                </a>
-              </div>
-            </article>
-            <article
-              id="clase-muestra"
-              className="flex flex-col rounded-xl border border-mf-border bg-mf-canvas px-5 py-5"
-            >
-              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-mf-text-muted">
-                {GPH_SAMPLE_CLASS.badge}
-              </p>
-              <h3 className="mt-2 text-base font-semibold text-mf-gph-ink">
-                {GPH_SAMPLE_CLASS.title}
-              </h3>
-              <p className="mt-1.5 flex-1 text-sm leading-6 text-mf-text-secondary">
-                {GPH_SAMPLE_CLASS.summary}
-              </p>
-              <p className="mt-2 text-xs text-mf-text-muted">
-                {GPH_SAMPLE_CLASS.ctaHint}
-              </p>
-              <a
-                href={trainingHref}
-                className="mf-btn-gph-ghost mt-4 self-start"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {trainingBookingCtaLabel()}
-                <ArrowRight className="h-4 w-4" />
-              </a>
-            </article>
+      <section className="border-b border-mf-border bg-white">
+        <div className="mx-auto grid max-w-6xl gap-10 px-4 py-10 sm:px-6 sm:py-12 lg:grid-cols-2 lg:gap-14">
+          <div>
+            <p className="mf-marketing-eyebrow">Incluye</p>
+            <h2 className="mt-2 text-xl font-semibold tracking-[-0.02em] text-mf-gph-ink sm:text-2xl">
+              Qué obtienes con el pase
+            </h2>
+            <GphAnnualPassBenefits className="mt-5" compact />
           </div>
-        </div>
-      </section>
-
-      <section className="border-b border-mf-border bg-mf-canvas">
-        <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-12">
-          <div className="grid gap-10 lg:grid-cols-2 lg:gap-14">
-            <div>
-              <p className="mf-marketing-eyebrow">Diagnóstico</p>
-              <h2 className="mt-2 text-xl font-semibold tracking-[-0.02em] text-mf-text sm:text-2xl">
-                Qué incluye
-              </h2>
-              <ul className="mt-5 space-y-2.5">
-                {DIAGNOSIS_PRODUCT.whatYouGet.map((item) => (
-                  <li
-                    key={item}
-                    className="flex gap-3 text-sm leading-6 text-mf-text-secondary"
-                  >
-                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-mf-gph" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <p className="mf-marketing-eyebrow">Para quién</p>
-              <h2 className="mt-2 text-xl font-semibold tracking-[-0.02em] text-mf-text sm:text-2xl">
-                Cuándo conviene
-              </h2>
-              <ul className="mt-5 space-y-2.5">
-                {DIAGNOSIS_PRODUCT.scope.map((item) => (
-                  <li
-                    key={item}
-                    className="flex gap-3 text-sm leading-6 text-mf-text-secondary"
-                  >
-                    <Target className="mt-0.5 h-4 w-4 shrink-0 text-mf-gph" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-
-          <div className="mt-10">
+          <div>
             <p className="mf-marketing-eyebrow">Proceso</p>
-            <h2 className="mt-2 text-xl font-semibold tracking-[-0.02em] text-mf-text sm:text-2xl">
+            <h2 className="mt-2 text-xl font-semibold tracking-[-0.02em] text-mf-gph-ink sm:text-2xl">
               Tres pasos
             </h2>
-            <ol className="mt-6 grid gap-3 sm:grid-cols-3 sm:gap-4">
+            <ol className="mt-5 space-y-3">
               {STEPS.map((item, index) => (
                 <li
                   key={item.title}
-                  className="rounded-xl border border-mf-border bg-white p-5"
+                  className="flex gap-3 rounded-xl border border-mf-border bg-mf-canvas/60 p-4"
                 >
-                  <div className="flex items-center gap-3">
-                    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-mf-gph text-xs font-semibold text-white">
-                      {index + 1}
-                    </span>
-                    <div className="mf-icon-brand">
-                      <item.icon className="h-4 w-4" strokeWidth={1.75} />
-                    </div>
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-mf-gph text-xs font-semibold text-white">
+                    {index + 1}
+                  </span>
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-mf-gph-ink">{item.title}</p>
+                    <p className="mt-1 text-sm leading-6 text-mf-text-secondary">
+                      {item.description}
+                    </p>
                   </div>
-                  <h3 className="mt-3 text-sm font-semibold text-mf-text">{item.title}</h3>
-                  <p className="mt-1.5 text-sm leading-6 text-mf-text-secondary">
-                    {item.description}
-                  </p>
                 </li>
               ))}
             </ol>
@@ -238,90 +136,57 @@ export function EvaluacionesPageContent() {
         </div>
       </section>
 
-      <section id="precios" className="scroll-mt-24 border-b border-mf-border bg-mf-surface">
-        <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-12">
+      <section
+        id="clase-muestra"
+        className="scroll-mt-24 border-b border-mf-border bg-mf-canvas"
+      >
+        <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-8 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-10">
           <div className="max-w-xl">
-            <p className="mf-marketing-eyebrow">Cobro</p>
-            <h2 className="mt-2 text-xl font-semibold tracking-[-0.02em] text-mf-text sm:text-2xl">
-              Precio del diagnóstico
+            <p className="mf-marketing-eyebrow">{GPH_SAMPLE_CLASS.badge}</p>
+            <h2 className="mt-2 text-xl font-semibold tracking-[-0.02em] text-mf-gph-ink">
+              {GPH_SAMPLE_CLASS.title}
             </h2>
-            <p className="mt-2 text-sm leading-7 text-mf-text-secondary">
-              {DIAGNOSIS_PRODUCT.subtitle} La clase muestra es gratis.
+            <p className="mt-2 text-sm leading-6 text-mf-text-secondary">
+              {GPH_SAMPLE_CLASS.summary} {GPH_SAMPLE_CLASS.ctaHint}
             </p>
           </div>
-          <div className="mt-7 grid gap-4 sm:grid-cols-2">
-            {DIAGNOSIS_PRODUCT.plans.map((plan) => (
-              <article
-                key={plan.id}
-                className={cn(
-                  "flex flex-col rounded-xl border bg-white p-5 sm:p-6",
-                  "promo" in plan && plan.promo
-                    ? "border-[#fda4af] shadow-[0_10px_30px_-18px_rgba(225,29,72,0.45)]"
-                    : "border-mf-border",
-                )}
-              >
-                <p className="text-sm font-semibold text-mf-text">{plan.label}</p>
-                {"promo" in plan && plan.promo ? (
-                  <DiagnosisPromoPrice className="mt-3" size="md" />
-                ) : (
-                  <p className="mt-2 text-3xl font-semibold tracking-tight text-mf-gph">
-                    {plan.priceLabel}
-                  </p>
-                )}
-                <p className="mt-2 text-xs font-medium text-mf-text-muted">{plan.period}</p>
-                <p className="mt-3 text-sm leading-6 text-mf-text-secondary">
-                  {plan.description}
-                </p>
-              </article>
-            ))}
-          </div>
-          <p className="mt-4 text-xs text-mf-text-muted">{DIAGNOSIS_PRODUCT.footnote}</p>
-
-          <div
-            id="agendar"
-            className="mt-8 flex flex-col gap-4 rounded-xl border border-mf-gph/20 bg-mf-gph-soft px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6"
+          <a
+            href={trainingHref}
+            className="mf-btn-gph-ghost self-start sm:self-center"
+            target="_blank"
+            rel="noopener noreferrer"
           >
-            <div className="max-w-md">
-              <p className="text-sm font-semibold text-mf-gph-ink">
-                {bookingIsCalendar
-                  ? "Agenda el diagnóstico o paga ahora"
-                  : "Agenda por WhatsApp o paga ahora"}
-              </p>
-              <p className="mt-1 text-xs leading-5 text-mf-text-secondary">
-                Grupo o dudas:{" "}
-                <a
-                  href={whatsapp}
-                  className="font-semibold text-mf-gph hover:underline"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  WhatsApp {GPH_WHATSAPP_DISPLAY}
-                </a>
-                {" · "}
-                <a
-                  href={trainingHref}
-                  className="font-semibold text-mf-gph hover:underline"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Clase muestra
-                </a>
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-3">
-              <a
-                href={bookingHref}
-                className="mf-btn-gph"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {!bookingIsCalendar ? <MessageCircle className="h-4 w-4" /> : null}
-                {diagnosisBookingCtaLabel(`WhatsApp ${GPH_WHATSAPP_DISPLAY}`)}
-              </a>
-              <Link href="/fut/pagar?sku=diagnosis" className="mf-btn-gph-ghost">
-                Pagar diagnóstico
-              </Link>
-            </div>
+            {trainingBookingCtaLabel()}
+            <ArrowRight className="h-4 w-4" />
+          </a>
+        </div>
+      </section>
+
+      <section id="agendar" className="scroll-mt-24 bg-mf-surface">
+        <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-10 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-12">
+          <div className="max-w-lg">
+            <h2 className="text-xl font-semibold tracking-[-0.02em] text-mf-gph-ink">
+              Listo para el pase
+            </h2>
+            <p className="mt-2 text-sm leading-6 text-mf-text-secondary">
+              {DIAGNOSIS_PRODUCT.publicPriceLabel} (antes {DIAGNOSIS_PRODUCT.listPriceLabel}).
+              Dudas o grupo: WhatsApp {GPH_WHATSAPP_DISPLAY}.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <Link href="/fut/pagar?sku=diagnosis" className="mf-btn-gph">
+              Pagar pase · {DIAGNOSIS_PRODUCT.publicPriceLabel}
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+            <a
+              href={whatsapp}
+              className="mf-btn-gph-ghost"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <MessageCircle className="h-4 w-4" />
+              WhatsApp
+            </a>
           </div>
         </div>
       </section>
@@ -348,9 +213,8 @@ export function HomeGphAllianceBand() {
             Pase Anual {DIAGNOSIS_PRODUCT.publicPriceLabel} · o clase muestra gratis
           </h2>
           <p className="mt-2 text-sm leading-7 text-white/75">
-            {DIAGNOSIS_PRODUCT.listPriceLabel} con −{DIAGNOSIS_PRODUCT.discountPercent}% ·
-            diagnóstico + visorías + selectivos + especialización. Certificado PDF al pagar.
-            La clase muestra es sin costo.
+            Diagnóstico + proyección 2027. Certificado PDF al pagar. La clase muestra es
+            sin costo.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
@@ -391,12 +255,11 @@ export function PadresGphSection() {
           <div className="max-w-xl">
             <p className="mf-marketing-eyebrow">{GPH_ALLIANCE.shortLabel}</p>
             <h2 className="mt-2 text-xl font-semibold text-mf-text">
-              Diagnóstico GPH o clase muestra
+              Pase Anual GPH–CRACKS o clase muestra
             </h2>
             <p className="mt-2 text-sm leading-7 text-mf-text-secondary">
-              Agenda horarios en Calendly o escribe por WhatsApp (
-              {GPH_WHATSAPP_DISPLAY}). Todo queda ligado a la ficha de{" "}
-              <BrandWordmark className="text-sm" />.
+              Un solo pago anual con certificado formal, o prueba gratis. Todo ligado a la
+              ficha de <BrandWordmark className="text-sm" />.
             </p>
             <div className="mt-4 flex items-center gap-3">
               <GphLogo size="sm" />
@@ -406,8 +269,8 @@ export function PadresGphSection() {
             </div>
           </div>
           <div className="flex shrink-0 flex-wrap gap-3 self-start sm:self-center">
-            <Link href="/fut/evaluaciones#servicios-gph" className="mf-btn-gph">
-              Ver opciones
+            <Link href="/fut/evaluaciones" className="mf-btn-gph">
+              Ver pase
             </Link>
             <a
               href={whatsapp}
