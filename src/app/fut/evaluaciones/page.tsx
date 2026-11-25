@@ -3,9 +3,9 @@ import { EvaluacionesPageContent } from "@/components/marketing/evaluaciones-pag
 import { SiteFooter, SiteHeader } from "@/components/marketing/site-header";
 
 export const metadata: Metadata = {
-  title: "Diagnóstico GPH | MiFicha",
+  title: "Pase Anual GPH–CRACKS | MiFicha",
   description:
-    "Sesión presencial en Querétaro: etapa, objetivos e informe en la ficha MiFicha.",
+    "Pase Anual de Proyección: diagnóstico, visorías 2027, selectivos CRACKS y especialización GPH. Un solo pago anual.",
 };
 
 export default function EvaluacionesPage() {

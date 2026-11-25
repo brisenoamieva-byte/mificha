@@ -33,18 +33,18 @@ export function HomeHeroGphOffer({ className }: { className?: string }) {
       </div>
 
       <p className="mt-3 text-[11px] font-bold uppercase tracking-[0.16em] text-mf-gph">
-        Diagnóstico GPH · Querétaro
+        Pase Anual GPH–CRACKS · Querétaro
       </p>
       <p className="mt-1.5 text-sm font-semibold leading-snug text-mf-gph-ink">
-        Evaluación presencial de futbol: mide el punto de partida y deja objetivos en la
-        ficha.
+        Diagnóstico + proyección 2027: visorías, selectivos CRACKS y especialización
+        mensual. Un solo pago anual.
       </p>
 
       <DiagnosisPromoPrice className="mt-3" size="sm" tone="gph" />
 
       <div className="mt-3 flex flex-wrap gap-2">
         <Link href={DIAGNOSIS_PRODUCT.checkoutHref} className="mf-btn-gph">
-          Pagar diagnóstico
+          Adquirir pase · $2,030
           <ArrowRight className="h-4 w-4" />
         </Link>
         <a

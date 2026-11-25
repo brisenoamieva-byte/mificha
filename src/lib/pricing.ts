@@ -47,46 +47,49 @@ export const ORGANIZER_PRICING = {
   ] satisfies OrganizerPricingPlan[],
 } as const;
 
-/** Evaluaciones GPH — promo −30% sobre $2,900. Incluye 12 meses de MiFicha. */
+/** Pase Anual GPH–CRACKS — promo −30% sobre $2,900. Un solo pago anual. */
 export const DIAGNOSIS_PRODUCT = {
   title: "Precio",
-  subtitle: "Un jugador o un grupo. El informe queda en la ficha de MiFicha.",
-  footnote: "Incluye 12 meses de MiFicha · Mercado Pago o WhatsApp.",
+  subtitle:
+    "Un solo pago anual: diagnóstico + proyección GPH–CRACKS 2027. Certificado formal por correo.",
+  footnote:
+    "Certificado PDF del Pase Anual al confirmar el pago · Mercado Pago o WhatsApp.",
   memberPriceLabel: "Membresía",
   listPriceLabel: FAMILY_PRODUCTS.diagnosis.listPriceLabel,
   publicPriceLabel: FAMILY_PRODUCTS.diagnosis.priceLabel,
   discountPercent: DIAGNOSIS_PROMO.discountPercent,
   promoBadge: DIAGNOSIS_PROMO.badge,
-  promoHeadline: DIAGNOSIS_PROMO.headline,
+  promoHeadline: "Pase Anual · 30% de descuento",
   checkoutHref: "/fut/pagar?sku=diagnosis",
   whatYouGet: [
-    "Pruebas: técnica, táctica, físico, mental y hábitos",
-    "Escala 1–5, etapa de desarrollo y 3–5 objetivos",
-    "Informe en la ficha del jugador (mificha.mx)",
-    "12 meses de plataforma para seguimiento",
+    "Diagnóstico integral de su nivel futbolístico",
+    "Lugar asegurado en visorías de abril y noviembre de 2027",
+    "Posibilidad de convocatoria a torneos y selectivos CRACKS",
+    "Entrenamiento mensual de especialización GPH (12 meses)",
+    "Certificado formal del Pase Anual 2027 por correo al pagar",
   ],
   scope: [
-    "Orientar entrenamiento en casa y con la academia",
-    "Antes de visorías, cambio de categoría o decisiones de temporada",
-    "No promete beca ni selección: mide y prioriza el desarrollo",
+    "Conocer el nivel actual y priorizar el desarrollo",
+    "Acceso a oportunidades reales de proyección (visorías / selectivos)",
+    "No garantiza selección ni contrato con un club profesional",
   ],
   plans: [
     {
       id: "individual",
-      label: "Jugador",
+      label: "Jugador · Pase Anual",
       listPriceLabel: FAMILY_PRODUCTS.diagnosis.listPriceLabel,
       priceLabel: FAMILY_PRODUCTS.diagnosis.priceLabel,
       promo: true,
-      period: "Sesión + 12 meses MiFicha",
+      period: "Un solo pago anual · vigencia 2027",
       description:
-        "Diagnóstico completo e informe ligado a la ficha. $2,900 con 30% de descuento = $2,030.",
+        "Diagnóstico + visorías + selectivos CRACKS + especialización mensual. $2,900 con 30% = $2,030.",
     },
     {
       id: "grupo",
       label: "Grupo o plantel",
       priceLabel: "A cotizar",
       period: "por jornada",
-      description: "Varios jugadores; cada uno con su ficha y plan.",
+      description: "Varios jugadores; cada uno con su pase y certificado.",
     },
   ],
 } as const;

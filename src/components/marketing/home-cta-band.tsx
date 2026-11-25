@@ -40,7 +40,7 @@ export function HomeCtaBand() {
             href="/fut/pagar?sku=diagnosis"
             className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-mf-brand transition hover:bg-white/95 sm:w-auto"
           >
-            Diagnóstico GPH · $2,030
+            Pase Anual GPH–CRACKS · $2,030
           </Link>
         </div>
       </div>

@@ -114,8 +114,8 @@ export default async function PagoRetornoPage({
                     : isAcademy
                       ? ". Ya puedes operar plantel y partidos en el panel."
                       : diagnosisBookingIsCalendar()
-                      ? ". Si contrataste evaluación, elige horario en el calendario GPH (Querétaro)."
-                      : ". Si contrataste evaluación, el equipo GPH coordina la sesión por WhatsApp."}
+                      ? ". Si contrataste evaluación, te enviamos el certificado PDF del Pase Anual 2027 al correo del pago. Elige horario en el calendario GPH (Querétaro)."
+                      : ". Si contrataste evaluación, te enviamos el certificado PDF del Pase Anual 2027 al correo del pago. GPH coordina la sesión por WhatsApp."}
                 </p>
               ) : null}
               {!paid && !pending ? (

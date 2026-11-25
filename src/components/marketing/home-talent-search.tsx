@@ -293,7 +293,7 @@ export function HomeTalentSearch({
               href="#diagnostico-gph"
               className="inline-flex items-center rounded-full border border-mf-gph-hot/50 bg-mf-gph px-4 py-2 text-sm font-semibold text-white transition hover:bg-mf-gph-hot"
             >
-              Diagnóstico GPH · $2,030
+              Pase Anual · $2,030
             </Link>
             <a
               href="#directorio"

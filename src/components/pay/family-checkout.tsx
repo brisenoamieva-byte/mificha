@@ -8,8 +8,10 @@ import {
   diagnosisWhatsAppHref,
 } from "@/lib/gph-alliance";
 import { DiagnosisPromoPrice } from "@/components/marketing/diagnosis-promo-price";
+import { GphAnnualPassBenefits } from "@/components/marketing/gph-annual-pass-benefits";
 import {
   FAMILY_PRODUCTS,
+  GPH_ANNUAL_PASS,
   MEMBERSHIP_CHECKOUT_DISABLED,
   type FamilySku,
 } from "@/lib/gph-commerce";
@@ -106,32 +108,19 @@ export function FamilyCheckout({
                 {product.locationLabel}
               </span>
             </div>
+            <p className="mt-1 text-[11px] font-bold uppercase tracking-[0.14em] text-mf-gph">
+              {GPH_ANNUAL_PASS.eyebrow}
+            </p>
             <DiagnosisPromoPrice className="mt-3" size="lg" tone="gph" />
             <p className="mt-2 text-xs text-mf-text-muted">{product.period}</p>
-            <p className="mt-3 text-sm leading-6 text-mf-text-secondary">
-              {product.description}
-            </p>
-            <p className="mt-3 text-sm font-medium leading-6 text-mf-gph-ink">
+            <GphAnnualPassBenefits className="mt-4" />
+            <p className="mt-4 text-sm font-medium leading-6 text-mf-gph-ink">
               {product.locationDetail}
             </p>
-            <ul className="mt-4 space-y-2">
-              {product.highlights.map((item) => (
-                <li
-                  key={item}
-                  className="flex gap-2 text-sm leading-6 text-mf-text-secondary"
-                >
-                  <span
-                    className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-mf-gph"
-                    aria-hidden
-                  />
-                  {item}
-                </li>
-              ))}
-            </ul>
-            <p className="mt-4 text-xs leading-5 text-mf-text-muted">
+            <p className="mt-3 text-xs leading-5 text-mf-text-muted">
               {bookingIsCalendar
-                ? "Después del pago (o por WhatsApp) eliges fecha en el calendario del equipo GPH."
-                : "La fecha y sede se coordinan con GPH por WhatsApp tras el pago."}
+                ? "Después del pago eliges fecha del diagnóstico en el calendario GPH."
+                : "La fecha del diagnóstico se coordina con GPH por WhatsApp tras el pago."}
             </p>
           </div>
         </div>
@@ -151,7 +140,7 @@ export function FamilyCheckout({
               </h2>
               <p className="mt-1 text-sm text-mf-text-secondary">
                 {mercadoPagoReady
-                  ? "Tarjeta, transferencia o OXXO. El cargo aparece como MiFicha / GPH."
+                  ? "Tarjeta, transferencia o OXXO. Al confirmar el pago te enviamos el certificado PDF del Pase Anual 2027 al correo."
                   : "Cuando Mercado Pago esté activo podrás pagar aquí. Mientras, coordina por WhatsApp."}
               </p>
             </div>
@@ -173,10 +162,11 @@ export function FamilyCheckout({
               </label>
               <input
                 id="playerName"
+                required
                 value={playerName}
                 onChange={(event) => setPlayerName(event.target.value)}
                 className={inputClass}
-                placeholder="Opcional"
+                placeholder="Como aparecerá en el certificado"
               />
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
@@ -195,14 +185,16 @@ export function FamilyCheckout({
               </div>
               <div>
                 <label htmlFor="email" className="text-sm font-medium text-mf-text">
-                  Correo
+                  Correo (certificado PDF)
                 </label>
                 <input
                   id="email"
                   type="email"
+                  required
                   value={email}
                   onChange={(event) => setEmail(event.target.value)}
                   className={inputClass}
+                  placeholder="obligatorio"
                 />
               </div>
             </div>

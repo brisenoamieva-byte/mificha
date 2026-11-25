@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { MarketingPageHero } from "@/components/marketing/marketing-page-hero";
 import { AllianceLockup, GphLogo } from "@/components/ui/gph-logo";
-import { BrandWordmark, WithBrandName } from "@/components/ui/brand-wordmark";
+import { BrandWordmark } from "@/components/ui/brand-wordmark";
 import { CURRENT_SEASON_LABEL } from "@/lib/marketing-season";
 import {
   GPH_ALLIANCE,
@@ -23,6 +23,8 @@ import {
   trainingBookingHref,
 } from "@/lib/gph-alliance";
 import { DiagnosisPromoPrice } from "@/components/marketing/diagnosis-promo-price";
+import { GphAnnualPassBenefits } from "@/components/marketing/gph-annual-pass-benefits";
+import { GPH_ANNUAL_PASS } from "@/lib/gph-commerce";
 import { DIAGNOSIS_PRODUCT } from "@/lib/pricing";
 import { cn } from "@/lib/utils";
 
@@ -54,27 +56,22 @@ export function EvaluacionesPageContent() {
     <>
       <MarketingPageHero
         eyebrow={`${GPH_ALLIANCE.shortLabel} · ${CURRENT_SEASON_LABEL}`}
-        title="Diagnóstico GPH para tu jugador."
-        description={
-          <WithBrandName>
-            Sesión presencial en Querétaro. Sales con etapa, objetivos claros y el
-            informe en MiFicha.
-          </WithBrandName>
-        }
+        title={GPH_ANNUAL_PASS.title}
+        description={`${GPH_ANNUAL_PASS.lead} Un solo pago anual.`}
         actions={
           <>
+            <Link href="/fut/pagar?sku=diagnosis" className="mf-btn-gph">
+              Adquirir pase · $2,030
+              <ArrowRight className="h-4 w-4" />
+            </Link>
             <a
               href={bookingHref}
-              className="mf-btn-gph"
+              className="mf-btn-gph-ghost"
               target="_blank"
               rel="noopener noreferrer"
             >
               {diagnosisBookingCtaLabel("Agendar por WhatsApp")}
-              <ArrowRight className="h-4 w-4" />
             </a>
-            <Link href="/fut/pagar?sku=diagnosis" className="mf-btn-gph-ghost">
-              Pagar diagnóstico
-            </Link>
           </>
         }
         belowActions={
@@ -82,6 +79,8 @@ export function EvaluacionesPageContent() {
             <Link href="/fut/d/demo" className="font-semibold text-mf-gph hover:underline">
               Ver ejemplo de informe
             </Link>
+            {" · "}
+            {GPH_ANNUAL_PASS.certificateNote}
           </p>
         }
         aside={
@@ -94,15 +93,13 @@ export function EvaluacionesPageContent() {
             <div className="p-6 sm:p-8">
               <AllianceLockup size="lg" showCaption />
               <DiagnosisPromoPrice className="mt-5" size="lg" showBadge={false} />
-              <p className="mt-4 text-sm leading-6 text-mf-text-secondary">
-                Informe en la ficha + 12 meses de MiFicha.
-              </p>
+              <GphAnnualPassBenefits className="mt-5" compact />
             </div>
           </div>
         }
       />
 
-      {/* Dos ofertas GPH: una sola vez, visible sin scroll profundo */}
+      {/* Pase anual (pago) vs clase muestra (gratis) */}
       <section
         id="servicios-gph"
         className="scroll-mt-24 border-b border-mf-border bg-white"
@@ -110,15 +107,15 @@ export function EvaluacionesPageContent() {
         <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
           <p className="mf-marketing-eyebrow">Servicios GPH</p>
           <h2 className="mt-2 text-xl font-semibold tracking-[-0.02em] text-mf-gph-ink sm:text-2xl">
-            Diagnóstico o clase muestra
+            Pase Anual o clase muestra
           </h2>
           <div className="mt-6 grid gap-3 sm:grid-cols-2">
             <article className="flex flex-col rounded-xl border border-mf-gph/25 bg-mf-gph-soft/50 px-5 py-5">
               <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-mf-gph">
-                De pago · −30%
+                De pago · −30% · un solo pago anual
               </p>
               <h3 className="mt-2 text-base font-semibold text-mf-gph-ink">
-                Diagnóstico GPH
+                {GPH_ANNUAL_PASS.title}
               </h3>
               <p className="mt-2 text-xl font-bold tracking-tight text-mf-gph-ink">
                 {DIAGNOSIS_PRODUCT.publicPriceLabel}{" "}
@@ -126,19 +123,21 @@ export function EvaluacionesPageContent() {
                   {DIAGNOSIS_PRODUCT.listPriceLabel}
                 </span>
               </p>
-              <p className="mt-1.5 flex-1 text-sm leading-6 text-mf-text-secondary">
-                Evaluación completa e informe en tu ficha. Elige horario en el
-                calendario de diagnóstico.
-              </p>
-              <a
-                href={bookingHref}
-                className="mf-btn-gph mt-4 self-start"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {diagnosisBookingCtaLabel("Agendar diagnóstico")}
-                <ArrowRight className="h-4 w-4" />
-              </a>
+              <GphAnnualPassBenefits className="mt-3 flex-1" compact />
+              <div className="mt-4 flex flex-wrap gap-2">
+                <Link href="/fut/pagar?sku=diagnosis" className="mf-btn-gph">
+                  Adquirir pase
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+                <a
+                  href={bookingHref}
+                  className="mf-btn-gph-ghost"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {diagnosisBookingCtaLabel("Agendar")}
+                </a>
+              </div>
             </article>
             <article
               id="clase-muestra"
@@ -346,16 +345,17 @@ export function HomeGphAllianceBand() {
             Alianza GPH · disponible ahora
           </p>
           <h2 className="mt-2 text-xl font-semibold tracking-[-0.02em] text-white sm:text-2xl">
-            Diagnóstico {DIAGNOSIS_PRODUCT.publicPriceLabel} · o clase muestra gratis
+            Pase Anual {DIAGNOSIS_PRODUCT.publicPriceLabel} · o clase muestra gratis
           </h2>
           <p className="mt-2 text-sm leading-7 text-white/75">
             {DIAGNOSIS_PRODUCT.listPriceLabel} con −{DIAGNOSIS_PRODUCT.discountPercent}% ·
-            informe en la ficha + 12 meses. La clase muestra es sin costo.
+            diagnóstico + visorías + selectivos + especialización. Certificado PDF al pagar.
+            La clase muestra es sin costo.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <Link href="/fut/pagar?sku=diagnosis" className="mf-btn-gph">
-            Pagar {DIAGNOSIS_PRODUCT.publicPriceLabel}
+            Adquirir pase · {DIAGNOSIS_PRODUCT.publicPriceLabel}
             <ArrowRight className="h-4 w-4" />
           </Link>
           <a

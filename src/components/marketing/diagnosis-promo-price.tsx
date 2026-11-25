@@ -73,7 +73,7 @@ export function DiagnosisPromoPrice({
         </p>
       </div>
       <p className={cn("mt-1.5 text-sm leading-6", muted)}>
-        Evaluación presencial + 12 meses de MiFicha · {listLabel} con {percent}% de descuento.
+        Pase Anual GPH–CRACKS · un solo pago · {listLabel} con {percent}% de descuento.
       </p>
     </div>
   );

@@ -72,6 +72,16 @@ export function parseCheckoutInput(raw: {
   if (name.length < 5) return { error: "Escribe el nombre de quien paga." };
   const email = String(raw.payer_email ?? "").trim().toLowerCase();
   const phone = String(raw.payer_phone ?? "").replace(/\D/g, "");
+  const playerName = String(raw.player_name ?? "").replace(/\s+/g, " ").trim();
+  // Diagnóstico: correo + jugador obligatorios para el certificado PDF del pase 2027.
+  if (product.sku === "diagnosis") {
+    if (playerName.length < 3) {
+      return { error: "Escribe el nombre del jugador (va en el certificado)." };
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return { error: "Pon un correo válido: ahí enviamos tu certificado PDF." };
+    }
+  }
   if (!email && phone.length < 10) {
     return { error: "Pon un WhatsApp a 10 dígitos o un correo." };
   }
@@ -81,7 +91,7 @@ export function parseCheckoutInput(raw: {
       payer_name: name,
       payer_email: email || null,
       payer_phone: phone.length >= 10 ? phone : null,
-      player_name: String(raw.player_name ?? "").replace(/\s+/g, " ").trim() || null,
+      player_name: playerName || null,
     },
   };
 }
@@ -196,6 +206,17 @@ export async function markFamilyOrderPaid(
         ["Membresía hasta", updated.membership_until],
       ],
     });
+    // Certificado Pase Anual 2027 al pagador (PDF adjunto).
+    void import("@/lib/email/diagnosis-paid-notify")
+      .then(({ notifyDiagnosisPaidWithPass }) =>
+        notifyDiagnosisPaidWithPass(updated),
+      )
+      .catch((error) => {
+        console.error(
+          "[diagnosis-pass-email]",
+          error instanceof Error ? error.message : error,
+        );
+      });
   }
 
   return updated;
