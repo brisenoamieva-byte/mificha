@@ -90,7 +90,13 @@ Más info: ${evaluationsHref}
 MiFicha · GPH`;
 
   const benefitsHtml = GPH_ANNUAL_PASS.benefits
-    .map((b) => `<li style="margin:0 0 6px;">${escapeHtml(b)}</li>`)
+    .map((b) => {
+      const body =
+        b === GPH_ANNUAL_PASS.featuredBenefit
+          ? `<strong>${escapeHtml(b)}</strong>`
+          : escapeHtml(b);
+      return `<li style="margin:0 0 6px;">${body}</li>`;
+    })
     .join("");
   const html = `
     <div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;padding:24px;color:#0f172a;">

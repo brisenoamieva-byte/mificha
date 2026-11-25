@@ -42,6 +42,8 @@ export const GPH_ANNUAL_PASS = {
     "Selectivos CRACKS: posibilidad de convocatoria a torneos",
     "Bono GPH: 1 entrenamiento de especialización al mes",
   ],
+  /** Beneficio clave a destacar en UI/correo (negritas). */
+  featuredBenefit: "Visorías 2027: lugar asegurado en abril y noviembre",
   flyerSrc: "/marketing/gph/pase-anual-proyeccion-2027.jpg",
   flyerAlt: "Pase Anual de Proyección GPH–CRACKS 2027",
   clubsDisclaimer:

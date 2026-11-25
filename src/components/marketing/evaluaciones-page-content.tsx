@@ -7,6 +7,7 @@ import {
   MessageCircle,
 } from "lucide-react";
 import { MarketingPageHero } from "@/components/marketing/marketing-page-hero";
+import { DiagnosisPromoPrice } from "@/components/marketing/diagnosis-promo-price";
 import { AllianceLockup, GphLogo } from "@/components/ui/gph-logo";
 import { BrandWordmark } from "@/components/ui/brand-wordmark";
 import { CURRENT_SEASON_LABEL } from "@/lib/marketing-season";
@@ -21,7 +22,6 @@ import {
   trainingBookingCtaLabel,
   trainingBookingHref,
 } from "@/lib/gph-alliance";
-import { GphAnnualPassBenefits } from "@/components/marketing/gph-annual-pass-benefits";
 import { GPH_ANNUAL_PASS } from "@/lib/gph-commerce";
 import { DIAGNOSIS_PRODUCT } from "@/lib/pricing";
 import { cn } from "@/lib/utils";
@@ -59,7 +59,7 @@ export function EvaluacionesPageContent() {
         description="Diagnóstico anual de proyección 2027 · un solo pago. Conoce dónde está hoy y construye el camino para llevarlo más lejos."
         actions={
           <>
-            <Link href="/fut/pagar?sku=diagnosis" className="mf-btn-gph">
+            <Link href={DIAGNOSIS_PRODUCT.checkoutHref} className="mf-btn-gph">
               Solicitar e inscribir · {DIAGNOSIS_PRODUCT.publicPriceLabel}
               <ArrowRight className="h-4 w-4" />
             </Link>
@@ -76,14 +76,27 @@ export function EvaluacionesPageContent() {
           </>
         }
         belowActions={
-          <p className="text-sm text-mf-text-secondary">
-            {GPH_ANNUAL_PASS.title} ·{" "}
-            <Link href="/fut/d/demo" className="font-semibold text-mf-gph hover:underline">
-              ver ejemplo de informe
-            </Link>
-          </p>
+          <div className="space-y-5">
+            <div className="rounded-xl border border-mf-border bg-mf-gph-soft/50 px-4 py-3.5">
+              <AllianceLockup size="sm" />
+              <DiagnosisPromoPrice className="mt-3" size="md" tone="gph" showBadge />
+            </div>
+            <p className="text-sm leading-6 text-mf-gph-ink">
+              <span className="font-bold">{GPH_ANNUAL_PASS.featuredBenefit}.</span>{" "}
+              <span className="text-mf-text-secondary">
+                Además: diagnóstico integral, selectivos CRACKS y especialización mensual.
+              </span>
+            </p>
+            <p className="text-sm text-mf-text-secondary">
+              <Link href="/fut/d/demo" className="font-semibold text-mf-gph hover:underline">
+                Ver ejemplo de informe
+              </Link>
+              <span className="text-mf-text-muted"> · certificado PDF al pagar</span>
+            </p>
+          </div>
         }
         asideAlign="start"
+        asideClassName="lg:max-w-[440px]"
         aside={
           <figure className="overflow-hidden rounded-2xl border border-mf-border bg-white shadow-[var(--mf-shadow)]">
             <Image
@@ -93,7 +106,7 @@ export function EvaluacionesPageContent() {
               height={1350}
               className="h-auto w-full"
               priority
-              sizes="(max-width: 1024px) 100vw, 480px"
+              sizes="(max-width: 1024px) 100vw, 440px"
             />
             <figcaption className="px-4 py-3 text-[11px] leading-5 text-mf-text-muted">
               {GPH_ANNUAL_PASS.clubsDisclaimer}
@@ -103,91 +116,83 @@ export function EvaluacionesPageContent() {
       />
 
       <section className="border-b border-mf-border bg-white">
-        <div className="mx-auto grid max-w-6xl gap-10 px-4 py-10 sm:px-6 sm:py-12 lg:grid-cols-2 lg:gap-14">
-          <div>
-            <p className="mf-marketing-eyebrow">Incluye</p>
-            <h2 className="mt-2 text-xl font-semibold tracking-[-0.02em] text-mf-gph-ink sm:text-2xl">
-              Qué obtienes con el pase
-            </h2>
-            <GphAnnualPassBenefits className="mt-5" compact />
-          </div>
-          <div>
-            <p className="mf-marketing-eyebrow">Proceso</p>
-            <h2 className="mt-2 text-xl font-semibold tracking-[-0.02em] text-mf-gph-ink sm:text-2xl">
-              Tres pasos
-            </h2>
-            <ol className="mt-5 space-y-3">
-              {STEPS.map((item, index) => (
-                <li
-                  key={item.title}
-                  className="flex gap-3 rounded-xl border border-mf-border bg-mf-canvas/60 p-4"
-                >
-                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-mf-gph text-xs font-semibold text-white">
-                    {index + 1}
-                  </span>
-                  <div className="min-w-0">
-                    <p className="text-sm font-semibold text-mf-gph-ink">{item.title}</p>
-                    <p className="mt-1 text-sm leading-6 text-mf-text-secondary">
-                      {item.description}
-                    </p>
+        <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-12">
+          <p className="mf-marketing-eyebrow">Proceso</p>
+          <h2 className="mt-2 max-w-xl text-xl font-semibold tracking-[-0.02em] text-mf-gph-ink sm:text-2xl">
+            Tres pasos hasta su proyección 2027
+          </h2>
+          <ol className="mt-8 grid gap-8 sm:grid-cols-3 sm:gap-6 lg:gap-10">
+            {STEPS.map((item, index) => {
+              const Icon = item.icon;
+              return (
+                <li key={item.title} className="min-w-0">
+                  <div className="flex items-center gap-3">
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-mf-gph text-xs font-bold text-white">
+                      {index + 1}
+                    </span>
+                    <Icon className="h-4 w-4 text-mf-gph" aria-hidden />
                   </div>
+                  <p className="mt-3 text-sm font-semibold text-mf-gph-ink">{item.title}</p>
+                  <p className="mt-1.5 text-sm leading-6 text-mf-text-secondary">
+                    {item.description}
+                  </p>
                 </li>
-              ))}
-            </ol>
-          </div>
+              );
+            })}
+          </ol>
         </div>
       </section>
 
-      <section
-        id="clase-muestra"
-        className="scroll-mt-24 border-b border-mf-border bg-mf-canvas"
-      >
-        <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-8 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-10">
-          <div className="max-w-xl">
-            <p className="mf-marketing-eyebrow">{GPH_SAMPLE_CLASS.badge}</p>
-            <h2 className="mt-2 text-xl font-semibold tracking-[-0.02em] text-mf-gph-ink">
-              {GPH_SAMPLE_CLASS.title}
+      <section id="agendar" className="scroll-mt-24 border-b border-mf-border bg-mf-surface">
+        <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:px-6 sm:py-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:gap-12">
+          <div className="min-w-0">
+            <p className="mf-marketing-eyebrow">Listo para empezar</p>
+            <h2 className="mt-2 text-xl font-semibold tracking-[-0.02em] text-mf-gph-ink sm:text-2xl">
+              {GPH_ANNUAL_PASS.title}
             </h2>
-            <p className="mt-2 text-sm leading-6 text-mf-text-secondary">
-              {GPH_SAMPLE_CLASS.summary} {GPH_SAMPLE_CLASS.ctaHint}
-            </p>
-          </div>
-          <a
-            href={trainingHref}
-            className="mf-btn-gph-ghost self-start sm:self-center"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {trainingBookingCtaLabel()}
-            <ArrowRight className="h-4 w-4" />
-          </a>
-        </div>
-      </section>
-
-      <section id="agendar" className="scroll-mt-24 bg-mf-surface">
-        <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-10 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-12">
-          <div className="max-w-lg">
-            <h2 className="text-xl font-semibold tracking-[-0.02em] text-mf-gph-ink">
-              Listo para el pase
-            </h2>
-            <p className="mt-2 text-sm leading-6 text-mf-text-secondary">
+            <p className="mt-2 max-w-lg text-sm leading-6 text-mf-text-secondary">
               {DIAGNOSIS_PRODUCT.publicPriceLabel} (antes {DIAGNOSIS_PRODUCT.listPriceLabel}).
-              Dudas o grupo: WhatsApp {GPH_WHATSAPP_DISPLAY}.
+              Al pagar recibes el certificado formal 2027 por correo.
             </p>
+            <div className="mt-5 flex flex-wrap gap-3">
+              <Link href={DIAGNOSIS_PRODUCT.checkoutHref} className="mf-btn-gph">
+                Solicitar e inscribir · {DIAGNOSIS_PRODUCT.publicPriceLabel}
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+              <a
+                href={whatsapp}
+                className="mf-btn-gph-ghost"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <MessageCircle className="h-4 w-4" />
+                WhatsApp {GPH_WHATSAPP_DISPLAY}
+              </a>
+            </div>
           </div>
-          <div className="flex flex-wrap gap-3">
-            <Link href="/fut/pagar?sku=diagnosis" className="mf-btn-gph">
-              Pagar pase · {DIAGNOSIS_PRODUCT.publicPriceLabel}
-              <ArrowRight className="h-4 w-4" />
-            </Link>
+
+          <div
+            id="clase-muestra"
+            className="scroll-mt-24 border-t border-mf-border pt-6 lg:border-l lg:border-t-0 lg:pl-10 lg:pt-0"
+          >
+            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-mf-gph">
+              {GPH_SAMPLE_CLASS.badge} · alternativa
+            </p>
+            <h3 className="mt-2 text-base font-semibold text-mf-gph-ink">
+              {GPH_SAMPLE_CLASS.title}
+            </h3>
+            <p className="mt-2 text-sm leading-6 text-mf-text-secondary">
+              Sesión práctica sin evaluación formal ni informe. Conoce el estilo GPH antes
+              del pase.
+            </p>
             <a
-              href={whatsapp}
-              className="mf-btn-gph-ghost"
+              href={trainingHref}
+              className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-mf-gph hover:underline"
               target="_blank"
               rel="noopener noreferrer"
             >
-              <MessageCircle className="h-4 w-4" />
-              WhatsApp
+              {trainingBookingCtaLabel()}
+              <ArrowRight className="h-4 w-4" />
             </a>
           </div>
         </div>

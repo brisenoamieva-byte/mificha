@@ -22,18 +22,24 @@ export function GphAnnualPassBenefits({
         </>
       ) : null}
       <ul className={cn("space-y-2", compact ? "mt-0" : "mt-4")}>
-        {GPH_ANNUAL_PASS.benefits.map((item) => (
-          <li
-            key={item}
-            className="flex gap-2 text-sm leading-6 text-mf-text-secondary"
-          >
-            <span
-              className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-mf-gph"
-              aria-hidden
-            />
-            <span>{item}</span>
-          </li>
-        ))}
+        {GPH_ANNUAL_PASS.benefits.map((item) => {
+          const featured = item === GPH_ANNUAL_PASS.featuredBenefit;
+          return (
+            <li
+              key={item}
+              className={cn(
+                "flex gap-2 text-sm leading-6",
+                featured ? "font-bold text-mf-gph-ink" : "text-mf-text-secondary",
+              )}
+            >
+              <span
+                className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-mf-gph"
+                aria-hidden
+              />
+              <span>{item}</span>
+            </li>
+          );
+        })}
       </ul>
       <p className="mt-3 text-xs leading-5 text-mf-text-muted">
         {GPH_ANNUAL_PASS.certificateNote}
