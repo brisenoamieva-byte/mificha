@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -20,7 +21,6 @@ import {
   trainingBookingCtaLabel,
   trainingBookingHref,
 } from "@/lib/gph-alliance";
-import { DiagnosisPromoPrice } from "@/components/marketing/diagnosis-promo-price";
 import { GphAnnualPassBenefits } from "@/components/marketing/gph-annual-pass-benefits";
 import { GPH_ANNUAL_PASS } from "@/lib/gph-commerce";
 import { DIAGNOSIS_PRODUCT } from "@/lib/pricing";
@@ -55,12 +55,12 @@ export function EvaluacionesPageContent() {
     <>
       <MarketingPageHero
         eyebrow={`${GPH_ALLIANCE.shortLabel} · ${CURRENT_SEASON_LABEL}`}
-        title={GPH_ANNUAL_PASS.title}
-        description={`${GPH_ANNUAL_PASS.lead} Un solo pago anual.`}
+        title="Proyecta su talento. Impulsa su sueño."
+        description="Diagnóstico anual de proyección 2027 · un solo pago. Conoce dónde está hoy y construye el camino para llevarlo más lejos."
         actions={
           <>
             <Link href="/fut/pagar?sku=diagnosis" className="mf-btn-gph">
-              Adquirir pase · {DIAGNOSIS_PRODUCT.publicPriceLabel}
+              Solicitar e inscribir · {DIAGNOSIS_PRODUCT.publicPriceLabel}
               <ArrowRight className="h-4 w-4" />
             </Link>
             <a
@@ -77,26 +77,28 @@ export function EvaluacionesPageContent() {
         }
         belowActions={
           <p className="text-sm text-mf-text-secondary">
+            {GPH_ANNUAL_PASS.title} ·{" "}
             <Link href="/fut/d/demo" className="font-semibold text-mf-gph hover:underline">
-              Ver ejemplo de informe
+              ver ejemplo de informe
             </Link>
           </p>
         }
+        asideAlign="start"
         aside={
-          <div className="mf-card overflow-hidden p-0 sm:p-0">
-            <div className="bg-[#fff1f2] px-5 py-3 sm:px-8">
-              <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#e11d48]">
-                Precio promocional · −{DIAGNOSIS_PRODUCT.discountPercent}%
-              </p>
-            </div>
-            <div className="p-6 sm:p-8">
-              <AllianceLockup size="lg" showCaption />
-              <DiagnosisPromoPrice className="mt-5" size="lg" showBadge={false} />
-              <p className="mt-4 text-sm font-medium leading-6 text-mf-gph-ink">
-                {GPH_ANNUAL_PASS.closing}
-              </p>
-            </div>
-          </div>
+          <figure className="overflow-hidden rounded-2xl border border-mf-border bg-white shadow-[var(--mf-shadow)]">
+            <Image
+              src={GPH_ANNUAL_PASS.flyerSrc}
+              alt={GPH_ANNUAL_PASS.flyerAlt}
+              width={1080}
+              height={1350}
+              className="h-auto w-full"
+              priority
+              sizes="(max-width: 1024px) 100vw, 480px"
+            />
+            <figcaption className="px-4 py-3 text-[11px] leading-5 text-mf-text-muted">
+              {GPH_ANNUAL_PASS.clubsDisclaimer}
+            </figcaption>
+          </figure>
         }
       />
 
@@ -219,7 +221,7 @@ export function HomeGphAllianceBand() {
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <Link href="/fut/pagar?sku=diagnosis" className="mf-btn-gph">
-            Adquirir pase · {DIAGNOSIS_PRODUCT.publicPriceLabel}
+            Solicitar e inscribir · {DIAGNOSIS_PRODUCT.publicPriceLabel}
             <ArrowRight className="h-4 w-4" />
           </Link>
           <a

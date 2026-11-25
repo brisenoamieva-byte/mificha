@@ -1,7 +1,6 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, MessageCircle } from "lucide-react";
-import { DiagnosisPromoPrice } from "@/components/marketing/diagnosis-promo-price";
-import { GphAnnualPassBenefits } from "@/components/marketing/gph-annual-pass-benefits";
 import { AllianceLockup } from "@/components/ui/gph-logo";
 import {
   diagnosisBookingCtaLabel,
@@ -25,7 +24,7 @@ export function HomeDiagnosisBand() {
       aria-label={GPH_ANNUAL_PASS.title}
       className="scroll-mt-24 border-b border-mf-border bg-white"
     >
-      <div className="mx-auto grid max-w-6xl gap-6 px-4 py-10 sm:px-6 sm:py-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-start lg:gap-10">
+      <div className="mx-auto grid max-w-6xl gap-6 px-4 py-10 sm:px-6 sm:py-12 lg:grid-cols-[0.95fr_1.05fr] lg:items-center lg:gap-10">
         <div className="min-w-0">
           <div className="inline-flex rounded-md bg-mf-canvas px-2 py-1.5 ring-1 ring-mf-border">
             <AllianceLockup size="sm" />
@@ -37,17 +36,16 @@ export function HomeDiagnosisBand() {
             {GPH_ANNUAL_PASS.title}
           </h2>
           <p className="mt-2 max-w-xl text-sm leading-6 text-mf-text-secondary sm:text-[15px]">
-            {GPH_ANNUAL_PASS.lead}
+            Proyecta su talento. Impulsa su sueño. Diagnóstico + visorías + selectivos +
+            especialización · hoy {DIAGNOSIS_PRODUCT.publicPriceLabel}.
           </p>
-
-          <GphAnnualPassBenefits className="mt-5" compact />
 
           <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
             <Link
               href={DIAGNOSIS_PRODUCT.checkoutHref}
               className="mf-btn-gph w-full justify-center sm:w-auto"
             >
-              Adquirir pase · $2,030
+              Solicitar e inscribir · {DIAGNOSIS_PRODUCT.publicPriceLabel}
               <ArrowRight className="h-4 w-4" />
             </Link>
             <Link
@@ -79,12 +77,16 @@ export function HomeDiagnosisBand() {
           </div>
         </div>
 
-        <aside className="rounded-2xl border border-[#fda4af]/70 bg-[#fff1f2] p-5 sm:p-6">
-          <DiagnosisPromoPrice size="lg" tone="gph" />
-          <p className="mt-4 text-sm font-medium leading-6 text-mf-gph-ink">
-            {GPH_ANNUAL_PASS.closing}
-          </p>
-        </aside>
+        <figure className="overflow-hidden rounded-2xl border border-mf-border bg-white shadow-[var(--mf-shadow)]">
+          <Image
+            src={GPH_ANNUAL_PASS.flyerSrc}
+            alt={GPH_ANNUAL_PASS.flyerAlt}
+            width={1080}
+            height={1350}
+            className="h-auto w-full"
+            sizes="(max-width: 1024px) 100vw, 560px"
+          />
+        </figure>
       </div>
     </section>
   );

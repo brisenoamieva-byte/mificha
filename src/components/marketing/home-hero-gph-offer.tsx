@@ -44,7 +44,7 @@ export function HomeHeroGphOffer({ className }: { className?: string }) {
 
       <div className="mt-3 flex flex-wrap gap-2">
         <Link href={DIAGNOSIS_PRODUCT.checkoutHref} className="mf-btn-gph">
-          Adquirir pase · $2,030
+          Solicitar e inscribir · {DIAGNOSIS_PRODUCT.publicPriceLabel}
           <ArrowRight className="h-4 w-4" />
         </Link>
         <a

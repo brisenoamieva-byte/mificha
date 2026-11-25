@@ -37,11 +37,15 @@ export const GPH_ANNUAL_PASS = {
   certificateNote:
     "Al pagar recibes por correo el certificado formal del Pase Anual 2027 (PDF).",
   benefits: [
-    "Diagnóstico integral de su nivel futbolístico",
-    "Lugar asegurado en visorías de abril y noviembre de 2027",
-    "Posibilidad de ser convocado a torneos y selectivos CRACKS",
-    "Un entrenamiento mensual de especialización en GPH durante los 12 meses de vigencia",
+    "Diagnóstico integral: nivel actual y áreas de desarrollo",
+    "Visorías 2027: lugar asegurado en abril y noviembre",
+    "Selectivos CRACKS: posibilidad de convocatoria a torneos",
+    "Bono GPH: 1 entrenamiento de especialización al mes",
   ],
+  flyerSrc: "/marketing/gph/pase-anual-proyeccion-2027.jpg",
+  flyerAlt: "Pase Anual de Proyección GPH–CRACKS 2027",
+  clubsDisclaimer:
+    "Clubes mostrados: antecedentes de procesos anteriores. Invitados 2027 por confirmar. La participación no garantiza selección.",
   schedulePhoneDisplay: "+52 446 132 2207",
 } as const;
 
