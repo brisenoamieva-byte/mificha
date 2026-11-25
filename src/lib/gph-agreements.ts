@@ -553,6 +553,56 @@ export async function countersignGphAgreement(
   return rows[index];
 }
 
+/**
+ * Corrección ops (GPH): nombre del tutor y/o de quien firmó.
+ * Útil cuando el tutor escribió el nombre del hijo en la firma.
+ */
+export async function correctGphAgreementParties(
+  admin: SupabaseClient,
+  input: {
+    agreementId: string;
+    guardianName?: string | null;
+    acceptorName?: string | null;
+  },
+) {
+  const rows = await readAgreements(admin);
+  const index = rows.findIndex((row) => row.id === input.agreementId);
+  if (index < 0) throw new Error("No encontramos esa carta.");
+  const prev = rows[index];
+  if (prev.status === "cancelled") {
+    throw new Error("No se puede editar una carta cancelada.");
+  }
+
+  const guardianName = input.guardianName?.trim();
+  const acceptorName = input.acceptorName?.trim();
+  if (!guardianName && !acceptorName) {
+    throw new Error("Indica el nombre del tutor o de quien firmó.");
+  }
+
+  const fields = normalizeFields({
+    ...prev.fields,
+    ...(guardianName ? { guardian_name: guardianName } : {}),
+  });
+  if (guardianName) assertDraftFields(fields);
+
+  const tutorEvidence = prev.tutor_evidence
+    ? {
+        ...prev.tutor_evidence,
+        acceptor_name: acceptorName || prev.tutor_evidence.acceptor_name,
+      }
+    : prev.tutor_evidence;
+
+  const now = new Date().toISOString();
+  rows[index] = {
+    ...prev,
+    fields,
+    tutor_evidence: tutorEvidence,
+    updated_at: now,
+  };
+  await writeAgreements(admin, rows);
+  return rows[index];
+}
+
 export async function setGphAgreementSealedPdf(
   admin: SupabaseClient,
   agreementId: string,

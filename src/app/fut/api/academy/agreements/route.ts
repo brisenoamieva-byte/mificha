@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import {
   assertCanManageGphAgreements,
   cancelGphAgreement,
+  correctGphAgreementParties,
   countersignGphAgreement,
   createGphAgreementDraft,
   getGphAgreement,
@@ -80,6 +81,8 @@ export async function POST(request: Request) {
     tutor_child_id?: string;
     guardian_user_id?: string;
     fields?: Record<string, unknown>;
+    guardian_name?: string;
+    acceptor_name?: string;
   };
 
   try {
@@ -137,6 +140,21 @@ export async function POST(request: Request) {
 
     if (body.action === "cancel") {
       const agreement = await cancelGphAgreement(admin, agreementId);
+      return NextResponse.json({ ok: true, agreement });
+    }
+
+    if (body.action === "correct_parties") {
+      let agreement = await correctGphAgreementParties(admin, {
+        agreementId,
+        guardianName: body.guardian_name,
+        acceptorName: body.acceptor_name,
+      });
+      // Si ya había PDF sellado, regenerarlo con los nombres corregidos.
+      if (agreement.status === "active" || agreement.status === "signed_tutor") {
+        const pdf = buildGphAgreementPdfBytes(agreement);
+        const path = await uploadSealedAgreementPdf(admin, agreement.id, pdf);
+        agreement = await setGphAgreementSealedPdf(admin, agreement.id, path);
+      }
       return NextResponse.json({ ok: true, agreement });
     }
 

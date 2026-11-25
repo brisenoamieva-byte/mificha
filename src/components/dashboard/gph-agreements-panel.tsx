@@ -261,6 +261,42 @@ export function GphAgreementsPanel() {
     }
   }
 
+  async function correctParties(row: GphAgreement) {
+    const currentGuardian = row.fields.guardian_name || "";
+    const currentAcceptor = row.tutor_evidence?.acceptor_name || currentGuardian;
+    const guardianName = window.prompt(
+      "Nombre del tutor (quien responde por el alumno):",
+      currentGuardian,
+    );
+    if (guardianName === null) return;
+    const acceptorName = window.prompt(
+      "Nombre de quien firmó el reglamento (debe ser el tutor, no el hijo):",
+      guardianName.trim() || currentAcceptor,
+    );
+    if (acceptorName === null) return;
+    if (!guardianName.trim() && !acceptorName.trim()) return;
+
+    setBusy(true);
+    setError(null);
+    try {
+      await diagnosisAuthedFetch("/fut/api/academy/agreements", {
+        method: "POST",
+        body: JSON.stringify({
+          action: "correct_parties",
+          agreement_id: row.id,
+          guardian_name: guardianName.trim(),
+          acceptor_name: acceptorName.trim(),
+        }),
+      });
+      toast.success("Tutor/firma corregidos.");
+      await load();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "No se pudo corregir.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   if (!academy) return <NoAcademyState />;
 
   return (
@@ -624,7 +660,11 @@ export function GphAgreementsPanel() {
                 <div>
                   <p className="font-semibold text-slate-900">{row.fields.player_name}</p>
                   <p className="mt-0.5 text-xs text-slate-500">
-                    {row.fields.guardian_name} · {row.fields.guardian_email || "sin email"} · $
+                    Tutor: {row.fields.guardian_name}
+                    {row.tutor_evidence?.acceptor_name
+                      ? ` · Firmó: ${row.tutor_evidence.acceptor_name}`
+                      : ""}{" "}
+                    · {row.fields.guardian_email || "sin email"} · $
                     {row.fields.amount_agreed_mxn}
                   </p>
                   <span
@@ -637,6 +677,18 @@ export function GphAgreementsPanel() {
                   </span>
                 </div>
                 <div className="flex flex-wrap gap-2">
+                  {row.status === "signed_tutor" ||
+                  row.status === "active" ||
+                  row.status === "sent" ? (
+                    <button
+                      type="button"
+                      disabled={busy}
+                      onClick={() => void correctParties(row)}
+                      className="rounded-xl border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700"
+                    >
+                      Corregir tutor/firma
+                    </button>
+                  ) : null}
                   {row.status === "signed_tutor" ? (
                     <button
                       type="button"

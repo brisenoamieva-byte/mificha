@@ -394,14 +394,18 @@ export function GphEnrollmentForm({
           </span>
         </label>
         <label className={`${labelClass} mt-3`}>
-          Nombre de quien firma
+          Nombre del tutor que firma (no el del jugador)
           <input
             className={inputClass}
             value={acceptorName}
             onChange={(e) => setAcceptorName(e.target.value)}
             required
+            placeholder="Ej. María López"
           />
         </label>
+        <p className="mt-1 text-xs text-mf-text-muted">
+          Debe ser el adulto responsable. Si pones el nombre del hijo, la carta queda mal.
+        </p>
       </section>
 
       <input
