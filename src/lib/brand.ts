@@ -15,8 +15,8 @@ export const BRAND_INSTAGRAM_URL = "https://www.instagram.com/mificha_mx/";
 export const BRAND_INSTAGRAM_HANDLE = "@mificha_mx";
 
 /** WhatsApp oficial MiFicha (México · Querétaro). */
-export const BRAND_WHATSAPP_DISPLAY = "442 336 1602";
-export const BRAND_WHATSAPP_E164 = "524423361602";
+export const BRAND_WHATSAPP_DISPLAY = "442 155 6155";
+export const BRAND_WHATSAPP_E164 = "524421556155";
 
 export function brandWhatsAppHref(prefill?: string) {
   const base = `https://wa.me/${BRAND_WHATSAPP_E164}`;
