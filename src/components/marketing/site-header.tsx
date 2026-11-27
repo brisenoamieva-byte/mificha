@@ -4,8 +4,12 @@ import { BrandWordmark } from "@/components/ui/brand-wordmark";
 import { InstagramIcon } from "@/components/ui/instagram-icon";
 import { SiteNavDesktop, SiteNavMobile } from "@/components/marketing/site-nav";
 import { SponsorSlot } from "@/components/marketing/sponsor-slot";
-import { BRAND_INSTAGRAM_HANDLE, BRAND_INSTAGRAM_URL } from "@/lib/brand";
-import { LEGAL_ROUTES } from "@/lib/legal";
+import {
+  BRAND_INSTAGRAM_HANDLE,
+  BRAND_INSTAGRAM_URL,
+  BRAND_WHATSAPP_DISPLAY,
+} from "@/lib/brand";
+import { LEGAL_ENTITY, LEGAL_ROUTES } from "@/lib/legal";
 import { MISION_PATH } from "@/lib/mision";
 
 interface SiteHeaderProps {
@@ -139,6 +143,16 @@ export function SiteFooter() {
             </p>
           </div>
         </div>
+      </div>
+      <div className="mx-auto max-w-6xl border-t border-mf-border-subtle px-4 py-4 text-center text-xs leading-5 text-mf-text-muted sm:px-6 sm:text-left">
+        <p>
+          <BrandWordmark /> es una marca de {LEGAL_ENTITY.legalName}, persona física con
+          actividad empresarial. Domicilio: {LEGAL_ENTITY.address}. WhatsApp{" "}
+          {BRAND_WHATSAPP_DISPLAY} ·{" "}
+          <a href={`mailto:${LEGAL_ENTITY.contactEmail}`} className="hover:text-mf-text">
+            {LEGAL_ENTITY.contactEmail}
+          </a>
+        </p>
       </div>
     </footer>
   );
